@@ -20,24 +20,30 @@ export async function fetchCredentials() {
   }
 }
 
-export async function registerUser(name, ID, email, password) {
+export async function registerUser(email, password) {
   try {
     const response = await axiosInstance.post("/auth/register", {
-      name,
-      ID,
       email,
       password,
     });
+    console.log(response);
     return response.data;
   } catch (error) {
-    console.error("Error registering user:", error);
-    return null;
+    if (error.response && error.response.status === 400) {
+      return { Message: "User already exists." }; // Return error message to handle on the client side
+    } else {
+      console.error("Error registering user:", error);
+      return null;
+    }
   }
 }
 
+
 export async function loginUser(email, password) {
   try {
+    console.log(email, password);
     const response = await axiosInstance.post("/auth/login", { email, password });
+    // console.log(response);
     return response.data;
   } catch (error) {
     console.error("Error logging in user:", error);
@@ -63,3 +69,4 @@ export async function logoutUser() {
     console.error("Error logging out user:", error);
   }
 }
+
