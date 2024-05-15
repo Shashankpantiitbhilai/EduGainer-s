@@ -3,7 +3,7 @@ import { AdminContext } from "../../App";
 import { Button, Form, FormGroup, Label, Input, Container } from "reactstrap";
 import GoogleIcon from "@mui/icons-material/Google";
 import { loginUser } from "../../services/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
@@ -93,6 +93,7 @@ function Login() {
           />
           <p className="error">{errors.password?.message}</p>
         </FormGroup>
+        <a href="/forgot-password">Forgot Password</a>
         <FormGroup className="text-center">
           <Button
             type="submit"
@@ -102,11 +103,7 @@ function Login() {
             Submit
           </Button>
         </FormGroup>
-        <FormGroup className="text-right">
-          <p className="forgot-password">
-            Forgot <a href="#">password?</a>
-          </p>
-        </FormGroup>
+        <FormGroup className="text-right"></FormGroup>
         <div className="or-divider mb-3">
           <hr />
           <p>OR</p>
