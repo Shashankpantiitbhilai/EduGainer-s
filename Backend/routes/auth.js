@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const { restrictToPresident, restrictToAdmin } = require("../middlewares");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 const {
   Student,
   ScietechPOR,
@@ -12,30 +15,86 @@ const {
 } = require("../models/student");
 const passport = require("../models/passportConfig");
 const { connectDB, closeDB } = require("../db");
-// router.post("/fetch", async (req, res) => {
-//   try {
-//     await connectDB();
 
-//     const student = await Student.findOne({ ID_No: req.body.student_ID });
-//     console.log(student);
-//     const scitechPor = await ScietechPOR.find({ student: student });
-//     const cultPor = await CultPOR.find({ student: student });
-//     const sportPor = await SportsPOR.find({ student: student });
-//     const acadPor = await AcadPOR.find({ student: student });
-//     const PORs = [...scitechPor, ...cultPor, ...sportPor, ...acadPor];
 
-//     const st = {
-//       student: student,
-//       PORS: PORs,
-//     };
-//     return res.status(200).json(st);
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(400).json({ success: false, message: "process failed" });
-//   }
-// });
+router.post('/reset-password/:id/:token', async (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
 
-// Session Status
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, "jwt_secret_key");
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("New hashed password:", hashedPassword);
+
+    // Retrieve the user before updating the password
+    const userBeforeUpdate = await User.findById(id);
+    console.log("User before update:", userBeforeUpdate);
+
+    // Update the user's password in the database
+    const updatedUser = await User.findByIdAndUpdate(id, { password: hashedPassword });
+
+    console.log("Updated user:", updatedUser);
+
+    if (updatedUser) {
+      // Send a success response if the user was updated
+      res.json({ success: true, message: "Password reset successfully" });
+    } else {
+      // If the user was not found, send an error response
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    // Handle errors
+    if (error.name === "JsonWebTokenError") {
+      res.status(400).json({ success: false, message: "Error with token" });
+    } else {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+});
+
+router.post("/forgot-password", (req, res) => {
+  const { email } = req.body;
+  User.findOne({ username: email })
+
+    .then(user => {
+      console.log(user);
+      if (!user) {
+        return res.send({ Status: "User not existed" });
+      }
+      // console.log(user);
+      const token = jwt.sign({ id: user._id }, "jwt_secret_key", { expiresIn: "1d" });
+      var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: "shashankpant94115@gmail.com",
+          pass: 'mtij wuhw hmjq sqeq'
+        }
+      });
+
+      var mailOptions = {
+        from: 'shashankpant94115@gmail.com',
+        to: email,
+        subject: 'Reset Password Link',
+        text: `http://localhost:3000/reset-password/${user._id}/${token}`
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+          res.status(500).send({ Status: "Error sending email" });
+        } else {
+          res.send({ Status: "Success" });
+        }
+      });
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send({ Status: "Internal Server Error" });
+    });
+});
 router.get("/fetchAuth", function (req, res) {
   if (req.isAuthenticated()) {
     res.json(req.user);

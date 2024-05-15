@@ -70,3 +70,29 @@ export async function logoutUser() {
   }
 }
 
+export async function forgotPassword(email) {
+  try {
+    const response = await axiosInstance.post("/auth/forgot-password", { email });
+    console.log(response);
+    if (response.data.Status === "Success") {
+      // Redirect to login page upon successful password reset
+      return response.data
+    }
+  } catch (error) {
+    console.error("Error resetting password:", error);
+  }
+}
+export async function resetPassword(password, id, token) {
+  try {
+    const response = await axiosInstance.post(`/auth/reset-password/${id}/${token}`, { password });
+    console.log(response);
+    if (response.data.success) {
+      console.log("Password reset successfully!");
+      return { success: true, message: "Password reset successfully" };
+    } else {
+      throw new Error("Error resetting password: " + response.data.message);
+    }
+  } catch (error) {
+    throw error;
+  }
+}
