@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+
 const { restrictToPresident, restrictToAdmin } = require("../middlewares");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const otpGenerator = require('otp-generator')
 const {
   Student,
   ScietechPOR,
@@ -16,6 +18,13 @@ const {
 const passport = require("../models/passportConfig");
 const { connectDB, closeDB } = require("../db");
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD
+  }
+});
 
 router.post('/reset-password/:id/:token', async (req, res) => {
   const { id, token } = req.params;
@@ -66,13 +75,7 @@ router.post("/forgot-password", (req, res) => {
       }
       // console.log(user);
       const token = jwt.sign({ id: user._id }, "jwt_secret_key", { expiresIn: "1d" });
-      var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: "shashankpant94115@gmail.com",
-          pass: process.env.PASSWORD
-        }
-      });
+
 
       var mailOptions = {
         from: 'shashankpant94115@gmail.com',
@@ -111,36 +114,83 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  const { password, email } = req.body;
+
   console.log(req.body);
   try {
-    // Check if the user already exists
+    // Check if the email already exists
     const existingUser = await User.findOne({ username: email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists." });
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    // Register the new user
+    // Generate OTP
+    const sentOTP = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+    req.session.sentOTP = sentOTP;
+    req.session.email = email;
+    req.session.password = password;
+    // console.log(req.session);
+    // Send email with OTP
+    const mailOptions = {
+      from: 'shashankpant94115@gmail.com',
+      to: email,
+      subject: 'OTP Verification',
+      text: `Your OTP for registration is: ${sentOTP}`
+    };
 
-    const newUser = await User.register(
-      new User({ strategy: "local", username: email }),
-      password
-    );
-
-    // Log in the new user
-    req.login(newUser, (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal Server Error" });
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error sending OTP email" });
+      } else {
+        return res.status(200).json({ message: "OTP sent successfully" });
       }
-      // Respond with success message and new user object
-      res.status(200).json({ message: "Registered successfully", user: newUser });
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// Route to verify OTP and register user
+// Route to verify OTP and register user
+router.post("/otp-verify", async (req, res) => {
+  const { otp } = req.body;
+  const sentOTP = req.session.sentOTP;
+  const email = req.session.email;
+  const password = req.session.password;
+  // console.log(req.session);
+  console.log(otp, sentOTP);
+  try {
+    // Assuming sentOTP is defined somewhere
+    if (otp === sentOTP) {
+
+      // OTP verified, register user using Passport
+      const newUser = await User.register(
+        new User({ strategy: "local", username: email }),
+        password
+      );
+
+      // Log in the new user
+      req.login(newUser, (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        // Respond with success message and new user object
+        res.status(201).json({ message: "User registered successfully", user: newUser });
+      });
+    } else {
+      // OTP verification failed
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
 
 
 // Google OAuth Authentication

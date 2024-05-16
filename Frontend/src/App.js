@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import Dashboard from "./Components/dashboard.jsx";
 import Login from "./Components/Auth/Login";
 import Register from "./Components/Auth/Register";
-
+import OTPVerify from "./Components/Auth/otp-verify.jsx";
 import GoogleRegister from "./Components/Auth/GoogleRegister";
 import ForgotPassword from "./Components/Auth/forgot-password.jsx";
 import ResetPassword from "./Components/Auth/Reset-Password.jsx";
@@ -50,6 +50,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/login" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+                <Route path="/otp-verify" element={<OTPVerify />} />
             </Routes>
         );
     }

@@ -7,7 +7,7 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
 const myPassport = require("./models/passportConfig"); // Adjust the path accordingly
-
+const MemoryStore = require('memorystore')(session)
 require("dotenv").config();
 
 const app = express();
@@ -23,13 +23,16 @@ connectDB();
 
 app.use(bodyParser.json());
 
-app.use(
-  session({
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
-  }),
-);
+
+app.use(session({
+  secret: 'keyboard cat',
+  saveUninitialized: true,
+  resave: false,
+  store: new MemoryStore({
+    checkPeriod: 86400 // prune expired entries every 24h
+  })
+}));
+
 
 app.use(myPassport.initialize());
 app.use(myPassport.session());

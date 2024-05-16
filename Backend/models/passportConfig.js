@@ -8,6 +8,7 @@ passport.use(
   new LocalStrategy(
     {
       usernameField: "email",
+      passwordField: "password"
     },
     User.authenticate(),
   ),

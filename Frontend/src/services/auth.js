@@ -26,11 +26,11 @@ export async function registerUser(email, password) {
       email,
       password,
     });
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 400) {
-      return { Message: "User already exists." }; // Return error message to handle on the client side
+      return { Message: "User already exists" }; // Return error message to handle on the client side
     } else {
       console.error("Error registering user:", error);
       return null;
@@ -38,6 +38,24 @@ export async function registerUser(email, password) {
   }
 }
 
+
+export async function verifyOTPAndRegisterUser(otp) {
+  console.log(otp);
+  try {
+    const response = await axiosInstance.post("/auth/otp-verify", { otp });
+    console.log(response);
+    if (response.status === 201) {
+      console.log("User registered successfully!");
+      return { success: true, message: "User registered successfully" };
+    } else if (response.status === 400) {
+      throw new Error("Invalid OTP: " + response.data.message);
+    } else {
+      throw new Error("Error registering user: " + response.data.message);
+    }
+  } catch (error) {
+    throw error;
+  }
+}
 
 export async function loginUser(email, password) {
   try {

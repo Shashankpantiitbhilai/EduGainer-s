@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Form, FormGroup, Label, Input, Container } from "reactstrap";
-import { registerUser } from "../../services/auth";
+import { registerUser, sendOTP } from "../../services/auth"; // Import sendOTP service
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
@@ -13,8 +13,10 @@ function Register() {
     try {
       const response = await registerUser(data.email, data.password);
       console.log(response);
-      if (response && response.Message == "User already exists.") {
+      if (response && response.message === "User already exists.") {
         setError("email", { type: "manual", message: "Email already exists" });
+      } else if (response && response.message === "OTP sent successfully") {
+        navigate("/otp-verify");
       } else {
         navigate("/dashboard");
       }
@@ -83,7 +85,7 @@ function Register() {
             className="btn btn-warning"
             style={{ width: "100%" }}
           >
-            Submit
+            Send OTP
           </Button>
         </FormGroup>
         <FormGroup className="text-center mt-3">
