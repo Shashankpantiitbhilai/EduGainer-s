@@ -39,6 +39,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  amount: {
+    type: String,
+    required: true
+  },
   image: {
     publicId: {
       type: String,
@@ -48,8 +52,19 @@ const studentSchema = new mongoose.Schema({
       type: String,
       required: true,
     }
+  },
+  Payment_detail: {
+    razorpay_order_id: {
+      type: String,
+      required: true,
+    },
+    razorpay_payment_id: {
+      type: String,
+      required: false, // This will be updated after payment verification
+    }
   }
-}
+  }
+
 );
 
 

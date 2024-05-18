@@ -11,6 +11,7 @@ import ResetPassword from "./Components/Auth/Reset-Password.jsx";
 import { fetchCredentials } from "./services/auth";
 import Library from "./Components/Library/Library.jsx";
 import NewReg from "./Components/Library/New-Reg.jsx";
+import Success from "./Components/Library/Success.jsx"
 const AdminContext = createContext();
 
 function App() {
@@ -33,7 +34,8 @@ function App() {
             <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/library" element={<Library />} />
-                    <Route path="/new-reg" element={<NewReg />} />
+                <Route path="/new-reg" element={<NewReg />} />
+                <Route path="/success" element={<Success />} />
                 <Route path="/register/google/:id" element={<GoogleRegister />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

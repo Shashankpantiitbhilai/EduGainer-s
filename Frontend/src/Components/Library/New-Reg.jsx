@@ -1,17 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Container, Form, FormGroup, Label, input, Button } from "reactstrap";
+import { Container, Form, FormGroup, Label, Input, Button } from "reactstrap";
 import { sendFormData } from "../../services/utils.js";
+import axios from "axios";
+import { useNavigate, redirect } from "react-router-dom";
+
 function NewReg() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const [image, setImage] = useState(null);
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null);
+  const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => setIsRazorpayLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const setFileToBase64 = (file) => {
     const reader = new FileReader();
@@ -23,32 +38,79 @@ function NewReg() {
 
   const handleImage = (e) => {
     const file = e.target.files[0];
-    // console.log(file);
-    setImage(file);
     setFileToBase64(file);
   };
 
   const onSubmit = async (formData) => {
     setLoading(true);
 
-    // Prepare form data including imageBase64
     const formDataWithImage = {
       ...formData,
       image: imageBase64,
     };
-    // console.log(formDataWithImage);
+
     try {
-      console.log(formDataWithImage);
       const result = await sendFormData(formDataWithImage);
-      console.log("Form data sent successfully:", result);
-      // Handle success case: show success message, redirect, etc.
-      // Optionally reset the form after successful submission
+      const { key, order, user } = result;
+
+      const options = {
+        key,
+        amount: order.amount,
+        currency: "INR",
+        name: "Library Management",
+        description: "Library Registration Fee",
+        image: "https://example.com/logo.png",
+        order_id: order.id,
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.mobile,
+        },
+        notes: {
+          address: formData.address,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+        handler: async (response) => {
+          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+            response;
+          const callbackUrl = `http://localhost:8000/payment-verification/${user._id}`;
+
+          try {
+            const verificationResponse = await axios.post(callbackUrl, {
+              order_id: razorpay_order_id,
+              payment_id: razorpay_payment_id,
+              signature: razorpay_signature,
+              user_id: user._id,
+            });
+
+            if (verificationResponse.data.success) {
+              const url = `/success/${user._id}`;
+              redirect(url); // Navigate to success page
+            } else {
+              throw new Error("Payment verification failed");
+            }
+          } catch (error) {
+            console.error("Error verifying payment:", error);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+            console.error("Payment popup closed");
+          },
+        },
+      };
+
+      const razor = new window.Razorpay(options);
+      razor.open();
     } catch (error) {
-      console.error("Error sending form data:", error);
-      // Handle error case: show error message, retry logic, etc.
+      console.error("Error processing payment:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <Container
       className="d-flex justify-content-center align-items-center NewReg-container"
@@ -83,6 +145,7 @@ function NewReg() {
             type="select"
             name="shift"
             id="shift"
+            className="form-control"
             {...register("shift", { required: "Shift selection is required" })}
             className="form-control"
           >
@@ -90,9 +153,21 @@ function NewReg() {
             <option value="morning">Morning</option>
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>
-
-            <p className="error">{errors.shift?.message}</p>
           </select>
+          <p className="error">{errors.shift?.message}</p>
+        </FormGroup>
+
+        <FormGroup className="mb-3">
+          <Label for="amount">Amount</Label>
+          <input
+            type="number"
+            name="amount"
+            id="amount"
+            {...register("amount", { required: "Amount is required" })}
+            placeholder="Enter amount"
+            className="form-control"
+          />
+          <p className="error">{errors.amount?.message}</p>
         </FormGroup>
 
         <FormGroup className="mb-3">
@@ -155,9 +230,7 @@ function NewReg() {
             onChange={handleImage}
             accept="image/*"
             className="form-control"
-            // {...register("image", { required: "Image is required" })}
           />
-          <p className="error">{errors.image?.message}</p>
         </FormGroup>
 
         <FormGroup className="text-center">
