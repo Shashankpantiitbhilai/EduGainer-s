@@ -1,17 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Container, Form, FormGroup, Label, input, Button } from "reactstrap";
-
+import { sendFormData } from "../../services/utils.js";
 function NewReg() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [image, setImage] = useState(null);
+  const [imageBase64, setImageBase64] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
 
-  const onSubmit = (data) => {
-    console.log("Form submitted successfully:", data);
-    // Handle form submission logic here, e.g., API calls, etc.
+  const setFileToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImageBase64(reader.result);
+    };
+  };
+
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    // console.log(file);
+    setImage(file);
+    setFileToBase64(file);
+  };
+
+  const onSubmit = async (formData) => {
+    setLoading(true);
+
+    // Prepare form data including imageBase64
+    const formDataWithImage = {
+      ...formData,
+      image: imageBase64,
+    };
+    // console.log(formDataWithImage);
+    try {
+      console.log(formDataWithImage);
+      const result = await sendFormData(formDataWithImage);
+      console.log("Form data sent successfully:", result);
+      // Handle success case: show success message, redirect, etc.
+      // Optionally reset the form after successful submission
+    } catch (error) {
+      console.error("Error sending form data:", error);
+      // Handle error case: show error message, retry logic, etc.
+    }
   };
 
   return (
@@ -45,18 +80,19 @@ function NewReg() {
         <FormGroup className="mb-3">
           <Label for="shift">Shift Chosen</Label>
           <select
-            className="form-control"
+            type="select"
             name="shift"
             id="shift"
             {...register("shift", { required: "Shift selection is required" })}
+            className="form-control"
           >
             <option value="">Select Shift</option>
             <option value="morning">Morning</option>
             <option value="afternoon">Afternoon</option>
             <option value="evening">Evening</option>
-          </select>
 
-          <p className="error">{errors.shift?.message}</p>
+            <p className="error">{errors.shift?.message}</p>
+          </select>
         </FormGroup>
 
         <FormGroup className="mb-3">
@@ -116,8 +152,10 @@ function NewReg() {
             type="file"
             name="image"
             id="image"
-            {...register("image", { required: "Image upload is required" })}
+            onChange={handleImage}
+            accept="image/*"
             className="form-control"
+            // {...register("image", { required: "Image is required" })}
           />
           <p className="error">{errors.image?.message}</p>
         </FormGroup>
@@ -127,8 +165,9 @@ function NewReg() {
             type="submit"
             className="btn btn-warning"
             style={{ width: "100%" }}
+            disabled={loading}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </Button>
         </FormGroup>
       </Form>
