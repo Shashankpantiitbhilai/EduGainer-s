@@ -84,10 +84,11 @@ function NewReg() {
               signature: razorpay_signature,
               user_id: user._id,
             });
-
+            const id = user._id;
+            console.log(verificationResponse.data.success);
             if (verificationResponse.data.success) {
-              const url = `/success/${user._id}`;
-              redirect(url); // Navigate to success page
+              const url = `/success/${id}`;
+              navigate(url); // Navigate to success page
             } else {
               throw new Error("Payment verification failed");
             }

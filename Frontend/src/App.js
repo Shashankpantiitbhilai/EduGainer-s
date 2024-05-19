@@ -35,7 +35,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/new-reg" element={<NewReg />} />
-                <Route path="/success" element={<Success />} />
+                <Route path="/success/:id" element={<Success />} />
                 <Route path="/register/google/:id" element={<GoogleRegister />} />
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
