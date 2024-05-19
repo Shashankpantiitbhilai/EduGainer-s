@@ -21,7 +21,7 @@ function OTPVerify() {
 
       if (response.success) {
         // OTP verified successfully, navigate to dashboard
-        navigate("/dashboard");
+        navigate("/");
       } else {
         setErrorMsg("OTP verification failed");
       }

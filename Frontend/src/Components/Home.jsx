@@ -19,40 +19,6 @@ function Dashboard() {
 
   return (
     <div className="app">
-      <header>
-        <nav>
-          <div className="logo">EDUGAINER</div>
-          <ul>
-            <li>
-              <a href="#">Home</a>
-            </li>
-            <li>
-              <Link to="/library">Library</Link>
-            </li>
-            <li>
-              <a href="">Classes</a>
-            </li>
-            <li>
-              <a href="#">About Us</a>
-            </li>
-            <li>
-              <a href="#">Contact</a>
-            </li>
-          </ul>
-          <div className="auth-buttons">
-            {IsUserLoggedIn ? (
-              <button onClick={handleLogout} className="button">
-                Logout
-              </button>
-            ) : (
-              <Link to="/login" className="button">
-                Login
-              </Link>
-            )}
-          </div>
-        </nav>
-      </header>
-
       <main>
         <section className="hero">
           <h1>Welcome to EduGainer's Library & Classes</h1>

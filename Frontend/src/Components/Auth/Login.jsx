@@ -22,7 +22,7 @@ function Login() {
       console.log(response);
       if (response && response.user) {
         setIsUserLoggedIn(response.user);
-        navigate("/dashboard");
+        navigate("/");
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });
         // Clear the error after a short delay

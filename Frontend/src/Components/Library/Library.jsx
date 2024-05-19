@@ -1,103 +1,112 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// Import your CSS file for styling
+import {
+  Container,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  Box,
+} from "@mui/material";
 
 // ButtonLink Component
 function ButtonLink({ to, children }) {
   return (
-    <Link to={to}>
-      <button>{children}</button>
+    <Link to={to} style={{ textDecoration: "none" }}>
+      <Button variant="contained" color="primary">
+        {children}
+      </Button>
     </Link>
   );
 }
 
-// App Component
+// Library Component
 function Library() {
   return (
-    <div className="app">
-      <header>
-        <nav>
-          <div className="logo">EDUGAINER</div>
-          <ul>
-            <li>
-              <a href="#">Home</a>
-            </li>
-            <li>
-              <Link to="/library">Library</Link>
-            </li>
-            <li>
-              <a href="#">Classes</a>
-            </li>
-            <li>
-              <a href="#">About Us</a>
-            </li>
-            <li>
-              <a href="#">Contact</a>
-            </li>
-          </ul>
-          <div className="auth-buttons">
-            <ButtonLink to="/login" className="button">
-              Login
-            </ButtonLink>
-          </div>
-        </nav>
-      </header>
+    <Container maxWidth="lg" style={{ marginTop: "2rem" }}>
+      <Box textAlign="center" marginBottom="2rem">
+        <Typography variant="h3" component="h1" gutterBottom>
+          Welcome to EduGainer's Library
+        </Typography>
+        <Typography variant="h6" component="p" color="textSecondary">
+          Empowering Education Through Innovation
+        </Typography>
+      </Box>
 
-      <main>
-        <section className="hero">
-          <h1>Welcome to EduGainer's Library & Classes</h1>
-          <p>Empowering Education Through Innovation</p>
-          <div className="buttons">
-            <button className="explore">Explore Our Offerings</button>
-            <a href="#" className="learn-more">
-              Learn More →
-            </a>
-          </div>
-        </section>
+      <Box textAlign="center" marginBottom="4rem">
+        <Button
+          variant="contained"
+          color="secondary"
+          style={{ marginRight: "1rem" }}
+        >
+          Explore Our Offerings
+        </Button>
+        <Button variant="outlined" color="secondary">
+          Learn More →
+        </Button>
+      </Box>
 
-        {/* Cards Section */}
-        <section className="shift-cards">
-          <h2>Library Shifts</h2>
-          <div className="card-container">
-            {/* Card 1 */}
-            <div className="card">
-              <h3>Morning Shift</h3>
-              <p>20 seats available</p>
-              <ButtonLink to="/new-reg">
-                Registration
-              </ButtonLink>
-            </div>
-            {/* Card 2 */}
-            <div className="card">
-              <h3>Afternoon Shift</h3>
-              <p>15 seats available</p>
-            </div>
-            {/* Card 3 */}
-            <div className="card">
-              <h3>Evening Shift</h3>
-              <p>10 seats available</p>
-            </div>
-            {/* Card 4 */}
-            <div className="card">
-              <h3>Night Shift</h3>
-              <p>18 seats available</p>
-            </div>
-            {/* Card 5 */}
-            <div className="card">
-              <h3>Weekend Shift</h3>
-              <p>25 seats available</p>
-            </div>
-            {/* Card 6 */}
-            <div className="card">
-              <h3>24/7 Shift</h3>
-              <p>5 seats available</p>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer>{/* Footer content */}</footer>
-    </div>
+      <Typography variant="h4" component="h2" gutterBottom>
+        Library Shifts
+      </Typography>
+      <Box display="flex" flexWrap="wrap" justifyContent="space-around">
+        {/* Card 1 */}
+        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              Morning Shift
+            </Typography>
+            <Typography variant="body2">20 seats available</Typography>
+            <ButtonLink to="/new-reg">Register</ButtonLink>
+          </CardContent>
+        </Card>
+        {/* Card 2 */}
+        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              Afternoon Shift
+            </Typography>
+            <Typography variant="body2">15 seats available</Typography>
+          </CardContent>
+        </Card>
+        {/* Card 3 */}
+        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              Evening Shift
+            </Typography>
+            <Typography variant="body2">10 seats available</Typography>
+          </CardContent>
+        </Card>
+        {/* Card 4 */}
+        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              Night Shift
+            </Typography>
+            <Typography variant="body2">18 seats available</Typography>
+          </CardContent>
+        </Card>
+        {/* Card 5 */}
+        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              Weekend Shift
+            </Typography>
+            <Typography variant="body2">25 seats available</Typography>
+          </CardContent>
+        </Card>
+        {/* Card 6 */}
+        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              24/7 Shift
+            </Typography>
+            <Typography variant="body2">5 seats available</Typography>
+          </CardContent>
+        </Card>
+      </Box>
+    </Container>
   );
 }
 

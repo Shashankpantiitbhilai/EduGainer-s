@@ -18,7 +18,7 @@ function Register() {
       } else if (response && response.message === "OTP sent successfully") {
         navigate("/otp-verify");
       } else {
-        navigate("/dashboard");
+        navigate("/");
       }
     } catch (error) {
       console.error("Registration error:", error);
