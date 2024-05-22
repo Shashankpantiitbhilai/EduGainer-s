@@ -26,12 +26,13 @@ export async function registerUser(email, password) {
       email,
       password,
     });
-    // console.log(response);
+    console.log(response);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 400) {
-      return { Message: "User already exists" }; // Return error message to handle on the client side
+      return { message: "User already exists" }; // Return error message to handle on the client side
     } else {
+
       console.error("Error registering user:", error);
       return null;
     }
@@ -46,7 +47,7 @@ export async function verifyOTPAndRegisterUser(otp) {
     console.log(response);
     if (response.status === 201) {
       console.log("User registered successfully!");
-      return { success: true, message: "User registered successfully" };
+      return { success: true, message: "User registered successfully" ,user:response};
     } else if (response.status === 400) {
       throw new Error("Invalid OTP: " + response.data.message);
     } else {

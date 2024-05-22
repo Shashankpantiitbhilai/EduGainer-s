@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button, Form, FormGroup, Label, Input, Container } from "reactstrap";
 import { verifyOTPAndRegisterUser } from "../../services/auth";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
+import { AdminContext } from "../../App";
 function OTPVerify() {
   const {
     register,
@@ -13,14 +13,15 @@ function OTPVerify() {
   } = useForm();
   const [error, setErrorMsg] = useState("");
   const navigate = useNavigate();
-
+  const { setIsUserLoggedIn } = useContext(AdminContext);
   const onSubmit = async (data) => {
     // console.log(data);
     try {
       const response = await verifyOTPAndRegisterUser(data.otp);
-
+      console.log(response);
       if (response.success) {
         // OTP verified successfully, navigate to dashboard
+        setIsUserLoggedIn(response);
         navigate("/");
       } else {
         setErrorMsg("OTP verification failed");

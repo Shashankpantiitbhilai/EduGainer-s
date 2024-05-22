@@ -13,7 +13,7 @@ function Register() {
     try {
       const response = await registerUser(data.email, data.password);
       console.log(response);
-      if (response && response.message === "User already exists.") {
+      if (response && response.message === "User already exists") {
         setError("email", { type: "manual", message: "Email already exists" });
       } else if (response && response.message === "OTP sent successfully") {
         navigate("/otp-verify");
