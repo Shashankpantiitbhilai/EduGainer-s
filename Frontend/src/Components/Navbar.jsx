@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -13,16 +13,14 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { AdminContext } from "../App";
 
-const pages = [
- 
-  { name: "Library", link: "/library" },
-  { name: "Classes", link: "/classes" },
-  { name: "Blog", link: "/blog" },
-];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
 
 function Navbar() {
+  const { IsUserLoggedIn } = useContext(AdminContext);
+  if(IsUserLoggedIn)
+  {const id=IsUserLoggedIn._id;}
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -40,10 +38,23 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+const pages = [
+  { name: "Library", link: "/library" },
+  { name: "Classes", link: "/classes" },
+  { name: "Blog", link: "/blog" },
+];
+
+const settingsLoggedOut = [{ name: "Login", link: "/login" }];
+const settingsLoggedIn = [
+  { name: "Profile", link: "/profile" },
+  { name: "Dashboard", link: `/dashboard/${ id }`},
+  { name: "Logout", link: "/logout" },
+];
+  const settings = IsUserLoggedIn ? settingsLoggedIn : settingsLoggedOut;
 
   return (
     <AppBar position="static" className="nav">
-      <Container maxWidth="xl" color="yellow">
+      <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           <Typography
@@ -57,7 +68,7 @@ function Navbar() {
               fontFamily: "monospace",
               fontWeight: 700,
               letterSpacing: ".3rem",
-              color: "yellow",
+              color: "inherit",
               textDecoration: "none",
             }}
           >
@@ -112,7 +123,7 @@ function Navbar() {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -124,7 +135,7 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            LOGO
+            EduGainer's
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
@@ -166,8 +177,15 @@ function Navbar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">
+                    <Link
+                      to={setting.link}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      {setting.name}
+                    </Link>
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>

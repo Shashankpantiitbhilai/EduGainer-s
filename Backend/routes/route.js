@@ -10,8 +10,9 @@ const axios = require("axios");
 const fs = require('fs');
 const { sendEmailWithAttachment } = require("../emailSender")
 router.post("/Lib-new-reg", async (req, res) => {
-  const { name, email, image, mobile, shift, address, amount } = req.body;
-
+  const { name, email, image, mobile, shift, address, amount, userId } = req.body;
+  // console.log(req.body);
+  console.log(userId);
   try {
     let imageData = {};
     if (image) {
@@ -24,6 +25,7 @@ router.post("/Lib-new-reg", async (req, res) => {
 
     // Create user with the order ID
     const user = await Student.create({
+      userId,
       name,
       email,
       shift,
@@ -40,7 +42,7 @@ router.post("/Lib-new-reg", async (req, res) => {
       }
     });
 
-    // console.log(user);
+    console.log(user);
 
     res.status(200).json({
       success: true,
@@ -56,15 +58,15 @@ router.post("/Lib-new-reg", async (req, res) => {
 
 router.get("/Lib_student/:user_id", async (req, res) => {
   const { user_id } = req.params;
-  // console.log(user_id, req.params)
+  console.log(user_id, req.params)
 
   try {
-    const user = await Student.findById({ _id: user_id });
+    const user = await Student.findOne({ userId: user_id });
     // console.log(user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
+    console.log(user);
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -77,13 +79,13 @@ router.post('/payment-verification/:user_id', async (req, res) => {
   const { user_id } = req.params; // Capture user ID from URL parameters
 
   // Verify the payment signature
-  // console.log(user_id);
+  console.log(user_id, "paymentverify");
   const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
-
+  console.log(isSignatureValid, "payment verify")
   if (isSignatureValid) {
     try {
       // Update the student record with the Razorpay order ID and payment ID
-      const user = await Student.findById(user_id);
+      const user = await Student.findOne({ userId: user_id });
       // console.log(user);
       if (!user) {
         return res.status(404).json({ success: false, error: 'User not found' });
@@ -114,7 +116,7 @@ router.get('/Lib_student/sendIdCard/:id', async (req, res) => {
     const { id } = req.params;
 
     // Fetch the student data from MongoDB
-    const student = await Student.findById(id).exec();
+    const student = await Student.findOne({ userId: id }).exec();
     if (!student) {
       return res.status(404).send('Student not found');
     }

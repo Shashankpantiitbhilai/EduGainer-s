@@ -23,7 +23,8 @@ export async function sendFormData(formData) {
 
 export async function fetchUserDataById(user_id) {
   try {
-    const response = await axiosInstance.get(`/Lib_student/${user_id}`); // Adjust the endpoint as per your API
+    const response = await axiosInstance.get(`/Lib_student/${user_id}`);
+    console.log(response.data);// Adjust the endpoint as per your API
     return response.data; // Assuming the API returns JSON data representing the user object
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -41,3 +42,4 @@ export async function sendIdCard(id) {
     throw error; // Propagate the error to handle it in the calling component
   }
 }
+

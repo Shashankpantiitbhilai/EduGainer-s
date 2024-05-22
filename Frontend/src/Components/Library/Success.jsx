@@ -1,46 +1,59 @@
-import { React, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import {
-  Container,
-  Card,
-  CardImg,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-} from "reactstrap";
-import { sendIdCard } from "../../services/utils";
-import { fetchUserDataById } from "../../services/utils";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Container, Card, CardImg, CardTitle, CardSubtitle } from "reactstrap";
+import { sendIdCard, fetchUserDataById } from "../../services/utils";
+
+import "react-toastify/dist/ReactToastify.css";
+import { toast, ToastContainer, Bounce } from "react-toastify";
+
 const SuccessPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [userImage, setUserImage] = useState(""); // Assuming you'll fetch this as well
+  const [userImage, setUserImage] = useState("");
+  const [isFetched, setIsFetched] = useState(false);
 
   useEffect(() => {
+    if (isFetched) return; // Prevents duplicate execution
     const getUserData = async () => {
       try {
         const userData = await fetchUserDataById(id);
         setUserData(userData);
-        setUserImage(userData.image.url); // Assuming userImage comes from userData
-        await sendIdCard(id); // Call sendIdCard immediately after fetching user data
-        console.log("ID card sent successfully.");
-        // Handle success scenario (navigate to dashboard or show success message)
+        setUserImage(userData.image.url);
+        await sendIdCard(id);
+        toast.success("👍 Check your mail for Id card!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        setTimeout(() => {
+          const url = `/dashboard/${id}`;
+          navigate(url);
+        }, 6000);
+        setIsFetched(true); // Mark as fetched
       } catch (error) {
         console.error("Error fetching user data or sending ID card:", error);
-        // Handle error scenario (show error message or retry logic)
+        toast.error("Error sending ID card. Please try again.");
       }
     };
 
     getUserData();
-  }, [id]);
+  }, [id, navigate, isFetched]);
 
   if (!userData) {
-    return <div>Loading...</div>; // Placeholder for loading state
+    return <div>Loading...</div>;
   }
+
   return (
-    <Container id="id"className=" d-flex justify-content-center align-items-center SuccessPage-container ">
+    <Container className="d-flex justify-content-center align-items-center SuccessPage-container">
       <Card style={{ width: "80%", padding: "20px", margin: "20px" }}>
         <div style={{ display: "flex" }}>
-          {/* Left Side: Details with Increased Font Size */}
           <div style={{ flex: "1", paddingRight: "20px" }}>
             <CardTitle tag="h3">{userData.name}</CardTitle>
             <CardSubtitle tag="h5" className="mb-2 text-muted">
@@ -51,8 +64,6 @@ const SuccessPage = () => {
             <p style={{ fontSize: "1.2rem" }}>Mobile: {userData.mobile}</p>
             <p style={{ fontSize: "1.2rem" }}>Address: {userData.address}</p>
           </div>
-
-          {/* Right Side: Photo */}
           <div style={{ flex: "1", height: "100%", overflow: "hidden" }}>
             <CardImg
               top
@@ -64,6 +75,18 @@ const SuccessPage = () => {
           </div>
         </div>
       </Card>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </Container>
   );
 };

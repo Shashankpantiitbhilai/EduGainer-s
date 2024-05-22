@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Container, Form, FormGroup, Label, Input, Button } from "reactstrap";
+import { Container, Form, FormGroup, Label, Button } from "reactstrap";
 import { sendFormData } from "../../services/utils.js";
 import axios from "axios";
-import { useNavigate, redirect } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import { AdminContext } from "../../App.js";
 function NewReg() {
+   const { id } = useContext(AdminContext)._id;
   const {
     register,
     handleSubmit,
@@ -13,14 +14,14 @@ function NewReg() {
   } = useForm();
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
-    script.onload = () => setIsRazorpayLoaded(true);
+
     document.body.appendChild(script);
 
     return () => {
@@ -43,16 +44,18 @@ function NewReg() {
 
   const onSubmit = async (formData) => {
     setLoading(true);
-
+   
+    // console.log(response.data);
     const formDataWithImage = {
       ...formData,
       image: imageBase64,
+      userId: id, // Add the userId to the form data
     };
 
     try {
       const result = await sendFormData(formDataWithImage);
       const { key, order, user } = result;
-
+      console.log(user.userId);
       const options = {
         key,
         amount: order.amount,
@@ -75,16 +78,16 @@ function NewReg() {
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          const callbackUrl = `http://localhost:8000/payment-verification/${user._id}`;
+          const callbackUrl = `http://localhost:8000/payment-verification/${user.userId}`;
 
           try {
             const verificationResponse = await axios.post(callbackUrl, {
               order_id: razorpay_order_id,
               payment_id: razorpay_payment_id,
               signature: razorpay_signature,
-              user_id: user._id,
             });
-            const id = user._id;
+            const id = user.userId;
+            console.log(id);
             console.log(verificationResponse.data.success);
             if (verificationResponse.data.success) {
               const url = `/success/${id}`;
@@ -148,7 +151,6 @@ function NewReg() {
             id="shift"
             className="form-control"
             {...register("shift", { required: "Shift selection is required" })}
-            className="form-control"
           >
             <option value="">Select Shift</option>
             <option value="morning">Morning</option>

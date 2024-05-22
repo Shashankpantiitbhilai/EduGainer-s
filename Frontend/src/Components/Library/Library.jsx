@@ -49,9 +49,13 @@ function Library() {
       <Typography variant="h4" component="h2" gutterBottom>
         Library Shifts
       </Typography>
-      <Box display="flex" flexWrap="wrap" justifyContent="space-around">
+      <Box
+        display="grid"
+        gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" }}
+        gap="1rem"
+      >
         {/* Card 1 */}
-        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+        <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
               Morning Shift
@@ -61,7 +65,7 @@ function Library() {
           </CardContent>
         </Card>
         {/* Card 2 */}
-        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+        <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
               Afternoon Shift
@@ -70,7 +74,7 @@ function Library() {
           </CardContent>
         </Card>
         {/* Card 3 */}
-        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+        <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
               Evening Shift
@@ -79,7 +83,7 @@ function Library() {
           </CardContent>
         </Card>
         {/* Card 4 */}
-        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+        <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
               Night Shift
@@ -88,7 +92,7 @@ function Library() {
           </CardContent>
         </Card>
         {/* Card 5 */}
-        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+        <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
               Weekend Shift
@@ -97,7 +101,7 @@ function Library() {
           </CardContent>
         </Card>
         {/* Card 6 */}
-        <Card style={{ margin: "1rem", minWidth: "200px" }}>
+        <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
               24/7 Shift

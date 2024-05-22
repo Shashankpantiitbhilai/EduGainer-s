@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { AdminContext } from "../App";
 import { logoutUser } from "../services/auth"; // Adjust the path as per your file structure
 
-function Dashboard() {
+function Home() {
   const navigate = useNavigate();
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
-
+  console.log(IsUserLoggedIn);
   const handleLogout = async () => {
     try {
       await logoutUser(); // Call the logout function
@@ -37,4 +37,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Home;

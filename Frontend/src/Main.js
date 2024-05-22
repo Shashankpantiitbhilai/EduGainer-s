@@ -12,7 +12,7 @@ import NewReg from "./Components/Library/New-Reg.jsx";
 import Success from "./Components/Library/Success.jsx";
 import ProtectedRoute from "./Protectedroute.js";
 import Navbar from "./Components/Navbar.jsx";
-
+import Dashboard from "./Components/dashboard.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -50,6 +50,14 @@ const Main = () => {
                     element={
                         <ProtectedRoute>
                             <Success />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dashboard/:id"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
                         </ProtectedRoute>
                     }
                 />
