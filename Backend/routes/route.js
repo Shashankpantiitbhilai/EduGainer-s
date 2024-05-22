@@ -1,5 +1,5 @@
 const express = require("express");
-const { Student } = require("../models/student");
+const { Student, User } = require("../models/student");
 const { uploadToCloudinary } = require("../cloudinary");
 const { createOrder, verifyPaymentSignature } = require("./payment");
 const puppeteer = require("puppeteer")
@@ -9,6 +9,37 @@ const PDFDocument = require('pdfkit');
 const axios = require("axios");
 const fs = require('fs');
 const { sendEmailWithAttachment } = require("../emailSender")
+router.put('/profile/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedUserData = req.body;
+    let imageUrl;
+    console.log(updatedUserData.firstName, id)
+    if (updatedUserData.image) {
+      const results = await uploadToCloudinary(updatedUserData.image, "Library_Students");
+      imageUrl = results.url;
+      delete updatedUserData.image; // Remove the image from the updatedUserData object
+    }
+    console.log(imageUrl);
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { ...updatedUserData, ...(imageUrl && { photoUpload: imageUrl }) }, // Add the imageUrl if it exists
+      { new: true, runValidators: true }
+    );
+    console.log(updatedUser)
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
 router.post("/Lib-new-reg", async (req, res) => {
   const { name, email, image, mobile, shift, address, amount, userId } = req.body;
   // console.log(req.body);

@@ -3,13 +3,34 @@ const passportLocalMongoose = require("passport-local-mongoose");
 var findOrCreate = require("mongoose-findorcreate");
 
 const userSchema = new mongoose.Schema({
-
   strategy: {
     type: String,
     enum: ["local", "google"],
     required: true,
   },
+  firstName: {
+    type: String,
+    required: false,
+  },
+  lastName: {
+    type: String,
+    required: false,
+  },
+  address: {
+    type: String,
+    required: false,
+  },
+  bio: {
+    type: String,
+    required: false,
+  },
+  photoUpload: {
+    type: String, // Adjust type as per your requirement (String for URL or Buffer for storing binary data)
+    required: false,
+  },
+
 });
+
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);

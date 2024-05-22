@@ -43,3 +43,27 @@ export async function sendIdCard(id) {
   }
 }
 
+export async function updateUserDetails(id, data) {
+  try {
+    console.log(id, data);
+    const response = await axiosInstance.put(`/profile/${id}`, data);
+    console.log(response);
+    return response.data; // Assuming the API returns JSON data representing the user object
+  } catch (error) {
+    if (error.response) {
+      // The request was made, but the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error("Error response data:", error.response.data);
+      console.error("Error response status:", error.response.status);
+      console.error("Error response headers:", error.response.headers);
+    } else if (error.request) {
+      // The request was made, but no response was received
+      console.error("Error request data:", error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error("Error message:", error.message);
+    }
+    console.error("Error config:", error.config);
+    throw error; // Propagate the error to handle it in the calling component
+  }
+}

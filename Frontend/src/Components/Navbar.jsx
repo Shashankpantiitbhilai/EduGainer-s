@@ -1,4 +1,4 @@
-import React, { useContext, useState ,useEffect} from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -66,7 +66,10 @@ function Navbar() {
   ];
 
   const settingsLoggedIn = [
-    { name: "Profile", link: "/profile" },
+    {
+      name: "Profile",
+      link: `/profile/${IsUserLoggedIn ? IsUserLoggedIn._id : ""}`,
+    },
     {
       name: `Dashboard`,
       link: `/dashboard/${IsUserLoggedIn ? IsUserLoggedIn._id : ""}`,
