@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState ,useEffect} from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,23 +14,35 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { AdminContext } from "../App";
-
-
+import { logoutUser } from "../services/auth";
 
 function Navbar() {
-  const { IsUserLoggedIn } = useContext(AdminContext);
-  if(IsUserLoggedIn)
-  {const id=IsUserLoggedIn._id;}
+  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
+  const [initials, setInitials] = useState("");
+  useEffect(() => {
+    if (IsUserLoggedIn && IsUserLoggedIn.username) {
+      const userInitials = IsUserLoggedIn.username
+        .split(" ")
+        .map((name) => name[0])
+        .join("");
+      setInitials(userInitials.toUpperCase());
+    } else {
+      setInitials(""); // Reset initials if user is not logged in or username is undefined
+    }
+  }, [IsUserLoggedIn]); // Trigger effect whenever IsUserLoggedIn changes
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-
+  const navigate = useNavigate();
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
+  const handlelogin = () => {
+    navigate("/login");
+  };
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
@@ -38,20 +50,32 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-const pages = [
-  { name: "Library", link: "/library" },
-  { name: "Classes", link: "/classes" },
-  { name: "Blog", link: "/blog" },
-];
+  const handleLogout = async () => {
+    try {
+      await logoutUser(); // Call the logout function
+      setIsUserLoggedIn(false); // Update context to reflect logged out state
+      navigate("/"); // Redirect to login page after successful logout
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+  const pages = [
+    { name: "Library", link: "/library" },
+    { name: "Classes", link: "/classes" },
+    { name: "Blog", link: "/blog" },
+  ];
 
-const settingsLoggedOut = [{ name: "Login", link: "/login" }];
-const settingsLoggedIn = [
-  { name: "Profile", link: "/profile" },
-  { name: "Dashboard", link: `/dashboard/${ id }`},
-  { name: "Logout", link: "/logout" },
-];
-  const settings = IsUserLoggedIn ? settingsLoggedIn : settingsLoggedOut;
+  const settingsLoggedIn = [
+    { name: "Profile", link: "/profile" },
+    {
+      name: `Dashboard`,
+      link: `/dashboard/${IsUserLoggedIn ? IsUserLoggedIn._id : ""}`,
+    },
+    { name: "Logout", link: "/logout", action: handleLogout },
+  ];
+  const settings = settingsLoggedIn;
 
+  console.log(settings);
   return (
     <AppBar position="static" className="nav">
       <Container maxWidth="xl">
@@ -155,9 +179,24 @@ const settingsLoggedIn = [
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            <Tooltip title={IsUserLoggedIn ? "Open Settings" : ""}>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                {IsUserLoggedIn ? (
+                  <Avatar
+                    alt={IsUserLoggedIn.username}
+                    src="/static/images/avatar/2.jpg"
+                  >
+                    {initials}
+                  </Avatar>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={handlelogin}
+                  >
+                    Get Started
+                  </Button>
+                )}
               </IconButton>
             </Tooltip>
             <Menu
@@ -176,18 +215,28 @@ const settingsLoggedIn = [
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">
-                    <Link
-                      to={setting.link}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                    >
-                      {setting.name}
-                    </Link>
-                  </Typography>
-                </MenuItem>
-              ))}
+              {IsUserLoggedIn &&
+                settings.map((setting) => (
+                  <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">
+                      {setting.name === "Logout" ? (
+                        <Button
+                          onClick={setting.action}
+                          style={{ textDecoration: "none", color: "inherit" }}
+                        >
+                          {setting.name}
+                        </Button>
+                      ) : (
+                        <Link
+                          to={setting.link}
+                          style={{ textDecoration: "none", color: "inherit" }}
+                        >
+                          {setting.name}
+                        </Link>
+                      )}
+                    </Typography>
+                  </MenuItem>
+                ))}
             </Menu>
           </Box>
         </Toolbar>
