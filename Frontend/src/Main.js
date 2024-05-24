@@ -10,10 +10,13 @@ import ResetPassword from "./Components/Auth/Reset-Password.jsx";
 import Library from "./Components/Library/Library.jsx";
 import NewReg from "./Components/Library/New-Reg.jsx";
 import Success from "./Components/Library/Success.jsx";
-import ProtectedRoute from "./Protectedroute.js";
+import Protected_User from "./Protected_user.js";
+
+import Protected_Admin from "./Protected_admin.js";
 import Navbar from "./Components/Navbar.jsx";
-import Dashboard from "./Components/dashboard.jsx";
-import Profile from "./Components/Profile.jsx";
+import Dashboard from "./Components/User/dashboard.jsx";
+import Profile from "./Components/User/Profile.jsx";
+import ADMIN_DASHBOARD from "./Components/Admin/ADMIN_HOME.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -23,6 +26,7 @@ const Main = () => {
         <>
             {!shouldHideNavbar && <Navbar />}
             <Routes>
+                <Route path="/admin_home" element={<ADMIN_DASHBOARD />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
@@ -33,41 +37,41 @@ const Main = () => {
                 <Route
                     path="/library"
                     element={
-                        <ProtectedRoute>
+                        <Protected_User>
                             <Library />
-                        </ProtectedRoute>
+                        </Protected_User>
                     }
                 />
                 <Route
                     path="/new-reg"
                     element={
-                        <ProtectedRoute>
+                        <Protected_User>
                             <NewReg />
-                        </ProtectedRoute>
+                        </Protected_User>
                     }
                 />
                 <Route
                     path="/success/:id"
                     element={
-                        <ProtectedRoute>
+                        <Protected_User>
                             <Success />
-                        </ProtectedRoute>
+                        </Protected_User>
                     }
                 />
                 <Route
                     path="/dashboard/:id"
                     element={
-                        <ProtectedRoute>
+                        <Protected_User>
                             <Dashboard />
-                        </ProtectedRoute>
+                        </Protected_User>
                     }
                 />
                 <Route
                     path="/profile/:id"
                     element={
-
+                        <Protected_User>
                         <Profile />
-
+</Protected_User>
                     }
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />

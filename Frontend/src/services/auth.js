@@ -62,7 +62,7 @@ export async function loginUser(email, password) {
   try {
     console.log(email, password);
     const response = await axiosInstance.post("/auth/login", { email, password });
-    // console.log(response);
+    console.log(response);
     return response.data;
   } catch (error) {
     console.error("Error logging in user:", error);

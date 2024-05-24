@@ -59,11 +59,25 @@ function Navbar() {
       console.error("Error logging out:", error);
     }
   };
-  const pages = [
-    { name: "Library", link: "/library" },
-    { name: "Classes", link: "/classes" },
-    { name: "Blog", link: "/blog" },
-  ];
+  let pages = [];
+  if (IsUserLoggedIn) {
+    const role = IsUserLoggedIn.role;
+    console.log(role);
+    if (role === "admin") {
+      pages = [
+        { name: "Library", link: "/admin_library" },
+        { name: "Classes", link: "/admin_classes" },
+        { name: "Blog", link: "/admin_blog" },
+      ];
+    } else {
+      pages = [
+        { name: "Library", link: "/library" },
+        { name: "Classes", link: "/classes" },
+        { name: "Blog", link: "/blog" },
+      ];
+    }
+  }
+
 
   const settingsLoggedIn = [
     {

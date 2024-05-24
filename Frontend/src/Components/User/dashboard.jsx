@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import Grid from "@mui/material/Grid";
-import { fetchUserDataById } from "../services/utils";
+import { fetchUserDataById } from "../../services/utils";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

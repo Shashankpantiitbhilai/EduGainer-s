@@ -20,9 +20,13 @@ function Login() {
     try {
       const response = await loginUser(data.email, data.password);
       console.log(response);
-      if (response && response.user) {
+      if (response && response.user.role === "user") {
         setIsUserLoggedIn(response.user);
         navigate("/");
+      } else if (response && response.user.role === "admin") {
+      
+        setIsUserLoggedIn(response.user);
+        navigate("/admin_home");
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });
         // Clear the error after a short delay

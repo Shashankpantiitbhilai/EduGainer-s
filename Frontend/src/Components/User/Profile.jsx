@@ -10,16 +10,18 @@ import {
   CircularProgress,
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import { fetchCredentials } from "../services/auth";
-import { updateUserDetails } from "../services/utils";
-import { AdminContext } from "../App";
+import { fetchCredentials } from "../../services/auth";
+import { updateUserDetails } from "../../services/utils";
+import { AdminContext } from "../../App";
 
 const useStyles = makeStyles({
   card: {
-    maxWidth: 600,
+    maxWidth: 800,
     margin: "auto",
     marginTop: 20,
     padding: 20,
+    display: "flex",
+    flexDirection: "row",
   },
   textField: {
     width: "100%",
@@ -33,13 +35,26 @@ const useStyles = makeStyles({
     display: "none",
   },
   imagePreview: {
-    maxWidth: "100%",
-    maxHeight: 300,
+    width: "300px",
+    height: "300px",
+    objectFit: "cover",
     marginBottom: 10,
   },
   progress: {
     margin: "auto",
     display: "block",
+  },
+  details: {
+    flex: 1,
+  },
+  imageContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  uploadButton: {
+    marginTop: 10,
   },
 });
 
@@ -85,6 +100,7 @@ const Profile = () => {
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       setImageBase64(reader.result);
+      setUser((prevUser) => ({ ...prevUser, photoUpload: reader.result }));
     };
   };
 
@@ -103,9 +119,7 @@ const Profile = () => {
         address: user.address,
         bio: user.bio,
         image: imageBase64,
-       
       };
-      console.log(updatedUser);
       const response = await updateUserDetails(id, updatedUser);
       setUser(response);
       setEditing(false);
@@ -122,7 +136,7 @@ const Profile = () => {
     <>
       {IsUserLoggedIn && (
         <Card className={classes.card}>
-          <CardContent>
+          <CardContent className={classes.details}>
             <Typography variant="h5" gutterBottom>
               Profile
             </Typography>
@@ -135,7 +149,7 @@ const Profile = () => {
               <Grid item xs={12}>
                 <TextField
                   name="username"
-                  label="Username"
+                  label="Email"
                   value={user.username}
                   variant="outlined"
                   className={classes.textField}
@@ -189,34 +203,6 @@ const Profile = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                {user.photoUpload && (
-                  <img
-                    src={user.photoUpload}
-                    alt="Uploaded"
-                    className={classes.imagePreview}
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImage}
-                  disabled={!editing}
-                  className={classes.fileInput}
-                  id="photo-upload-input"
-                />
-                <label htmlFor="photo-upload-input">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    component="span"
-                    className={classes.button}
-                    disabled={!editing || loading}
-                  >
-                    Upload Photo
-                  </Button>
-                </label>
-              </Grid>
-              <Grid item xs={12}>
                 {loading && (
                   <CircularProgress size={24} className={classes.progress} />
                 )}
@@ -242,6 +228,34 @@ const Profile = () => {
                 )}
               </Grid>
             </Grid>
+          </CardContent>
+          <CardContent className={classes.imageContainer}>
+            {user.photoUpload && (
+              <img
+                src={user.photoUpload}
+                alt="Uploaded"
+                className={classes.imagePreview}
+              />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImage}
+              disabled={!editing}
+              className={classes.fileInput}
+              id="photo-upload-input"
+            />
+            <label htmlFor="photo-upload-input">
+              <Button
+                variant="contained"
+                color="primary"
+                component="span"
+                className={classes.uploadButton}
+                disabled={!editing || loading}
+              >
+                Upload Photo
+              </Button>
+            </label>
           </CardContent>
         </Card>
       )}

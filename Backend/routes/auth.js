@@ -108,9 +108,20 @@ router.get("/fetchAuth", function (req, res) {
 
 // Local Authentication
 router.post("/login", passport.authenticate("local"), (req, res) => {
-  // If authentication is successful, this function will be called
-  console.log(req.body);
-  res.status(200).json({ message: "Login successful", user: req.user });
+ 
+  const { email, password } = req.body;
+  if (email == process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
+   
+    res.status(201).json({ message: "ADMIN Login is successful", user: req.user });
+
+
+
+
+  }
+
+  else {
+    res.status(200).json({ message: "User Login is successful", user: req.user });
+  }
 });
 
 router.post("/register", async (req, res) => {

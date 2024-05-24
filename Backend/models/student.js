@@ -28,7 +28,12 @@ const userSchema = new mongoose.Schema({
     type: String, // Adjust type as per your requirement (String for URL or Buffer for storing binary data)
     required: false,
   },
-
+  role: {
+    type: String,
+    enum: ["user", "admin"], // Define roles as needed
+    default: "user", // Default role if not specified
+    required: true,
+  },
 });
 
 
