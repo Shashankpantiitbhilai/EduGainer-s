@@ -6,7 +6,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../App.js";
 function NewReg() {
-   const { id } = useContext(AdminContext)._id;
+  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
+  console.log(IsUserLoggedIn._id);
+  const id = IsUserLoggedIn._id;
+  console.log(id);
   const {
     register,
     handleSubmit,
@@ -44,7 +47,7 @@ function NewReg() {
 
   const onSubmit = async (formData) => {
     setLoading(true);
-   
+
     // console.log(response.data);
     const formDataWithImage = {
       ...formData,
@@ -153,11 +156,15 @@ function NewReg() {
             {...register("shift", { required: "Shift selection is required" })}
           >
             <option value="">Select Shift</option>
-            <option value="morning">Morning</option>
-            <option value="afternoon">Afternoon</option>
-            <option value="evening">Evening</option>
+
+            <option value="9 PM to 6 AM">9 PM to 6 AM</option>
+            <option value="2 PM to 11 PM">2 PM to 11 PM</option>
+            <option value="7 AM to 7 PM">7 AM to 7 PM</option>
+            <option value="24*7">24*7</option>
+            <option value="2 PM to 9 PM">2 PM to 9 PM</option>
+            <option value="7 PM to 11 PM">7 PM to 11 PM</option>
+            <p className="error">{errors.shift?.message}</p>
           </select>
-          <p className="error">{errors.shift?.message}</p>
         </FormGroup>
 
         <FormGroup className="mb-3">

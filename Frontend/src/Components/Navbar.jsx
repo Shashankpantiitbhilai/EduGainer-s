@@ -77,6 +77,7 @@ function Navbar() {
       ];
     }
   }
+  console.log(pages)
 
 
   const settingsLoggedIn = [
