@@ -1,21 +1,23 @@
 const mongoose = require('mongoose');
+const { array } = require('../multer');
 
-const adminSchema = new mongoose.Schema({
-    google_id:{
-        type:String,
-        required:true
+const resourceSchema = new mongoose.Schema({
+    url: {
+        type: String,
+        required: true
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true
+    name: {
+        type: String,
+        required: true
     },
-    password:{
-        type:String,
-        required:true
-    }
+    tags: {
+        type: [String],
+        default: [], // Optional: default to an empty array if no tags are provided
+    },
 });
 
-const Admin = mongoose.model('Admin', adminSchema);
+const Resource = mongoose.model("Resource", resourceSchema);
+module.exports = {
 
-module.exports = Admin;
+    Resource
+}

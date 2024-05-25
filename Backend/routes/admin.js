@@ -1,6 +1,6 @@
 const express = require("express");
 const { Student, User } = require("../models/student");
-
+const upload = require("../multer")
 const router = express.Router();
 
 const { sendEmailWithAttachment } = require("../emailSender")
@@ -20,5 +20,8 @@ router.patch(`/editLibStudent/:id`, adminController.editStudentById);
 {
     console.log("patch")
 }
+
+
+router.post('/uploadResource', upload.single('file'), adminController.uploadResource)
 
 module.exports = router;

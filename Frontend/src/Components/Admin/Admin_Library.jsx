@@ -73,7 +73,7 @@ function Admin_Library() {
               variant="contained"
               color="primary"
               component={Link}
-              to="/manage-users"
+              to="/admin_library/manage-users"
               sx={{ marginTop: 1, marginBottom: 0 }}
             >
               Go to Manage Users
@@ -97,7 +97,7 @@ function Admin_Library() {
               variant="contained"
               color="primary"
               component={Link}
-              to="/manage-resources"
+              to="/admin_library/manage-resources"
               sx={{ marginTop: 1 }}
             >
               Go to Manage Resources
