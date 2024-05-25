@@ -157,7 +157,29 @@ export default function SearchBar() {
       headerName: "Actions",
       width: 150,
       renderCell: (params) => (
-      
+        <div>
+          {isEditMode(params.row._id) ? (
+            <IconButton
+              onClick={() => handleEdit(params.row._id, params.row)}
+              style={{ color: "light-green" }}
+            >
+              <SaveIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => enterEditMode(params.row._id)}
+              style={{ color: "red" }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+          <IconButton
+            onClick={() => handleDelete(params.row._id)}
+            style={{ color: "blue" }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
       ),
     },
   ];
