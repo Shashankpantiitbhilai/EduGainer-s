@@ -4,12 +4,22 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import { DataGrid } from "@mui/x-data-grid";
-
-import { fetchLibSudents } from "../../services/Admin_services/adminUtils";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CircularProgress from "@mui/material/CircularProgress";
+import {
+  fetchLibSudents,
+  deleteLibStudent,
+  editLibStudentById,
+} from "../../services/Admin_services/adminUtils";
 
 export default function SearchBar() {
   const [shift, setShift] = useState([]);
   const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [editModeId, setEditModeId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +52,115 @@ export default function SearchBar() {
       console.error("Error in capturing the input ", error);
     }
   };
+
+  const handleEdit = async (id, data) => {
+    setLoading(true);
+    console.log(id, data);
+    try {
+      await editLibStudentById(id, data);
+      const updatedStudents = students.map((student) =>
+        student._id === id ? { ...student, ...data } : student
+      );
+      setStudents(updatedStudents);
+    } catch (error) {
+      console.error("Error editing student:", error);
+    } finally {
+      setLoading(false);
+      setEditModeId(null); // Exit edit mode after save
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteLibStudent(id);
+      setStudents(students.filter((student) => student._id !== id));
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
+  };
+
+  const enterEditMode = (id) => {
+    setEditModeId(id);
+  };
+
+  const exitEditMode = () => {
+    setEditModeId(null);
+  };
+
+  const isEditMode = (id) => {
+    return id === editModeId;
+  };
+
+  const columns = [
+    { field: "_id", headerName: "ID", width: 70 },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 150,
+      editable: true,
+    },
+    { field: "shift", headerName: "Shift", width: 120 },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 200,
+      editable: true,
+    },
+    {
+      field: "mobile",
+      headerName: "Mobile",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "address",
+      headerName: "Address",
+      width: 150,
+      editable: true,
+    },
+    {
+      field: "amount",
+      headerName: "Amount",
+      width: 70,
+      editable: true,
+    },
+    {
+      field: "image",
+      headerName: "Image",
+      width: 80,
+      renderCell: (params) => (
+        <img
+          src={params.row.image.url}
+          alt="User"
+          style={{ width: 50, height: 50, borderRadius: "50%" }}
+        />
+      ),
+    },
+    {
+      field: "Payment_detail.razorpay_order_id",
+      headerName: "Order ID",
+      width: 180,
+      renderCell: (params) => (
+        <span>{params.row.Payment_detail.razorpay_order_id}</span>
+      ),
+    },
+    {
+      field: "Payment_detail.razorpay_payment_id",
+      headerName: "Payment ID",
+      width: 180,
+      renderCell: (params) => (
+        <span>{params.row.Payment_detail.razorpay_payment_id}</span>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+      
+      ),
+    },
+  ];
 
   return (
     <>
@@ -79,7 +198,7 @@ export default function SearchBar() {
               }}
             />
           )}
-        />{" "}
+        />
       </Box>
 
       <div style={{ height: 800, width: "100%", margin: 8 }}>
@@ -91,6 +210,13 @@ export default function SearchBar() {
           getRowId={(row) => row._id}
           checkboxSelection
         />
+        {loading && (
+          <div
+            style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+          >
+            <CircularProgress />
+          </div>
+        )}
       </div>
     </>
   );
@@ -106,45 +232,3 @@ const shifts = [
   { shift: "7 PM to 11 PM" },
   // Add more shifts as needed
 ];
-
-// Define columns for DataGrid
-
-const columns = [
-  { field: "_id", headerName: "ID", width: 70 },
-  { field: "name", headerName: "Name", width: 150 },
-  { field: "shift", headerName: "Shift", width: 120 },
-  { field: "email", headerName: "Email", width: 200 },
-  { field: "mobile", headerName: "Mobile", width: 120 },
-  { field: "address", headerName: "Address", width: 150 },
-  { field: "amount", headerName: "Amount", width: 70 },
-  {
-    field: "image",
-    headerName: "Image",
-    width: 120,
-    renderCell: (params) => (
-      <img
-        src={params.row.image.url}
-        alt="User"
-        style={{ width: 50, height: 50, borderRadius: "50%" }}
-      />
-    ),
-  },
-  {
-    field: `Payment_detail.razorpay_order_id`,
-    headerName: "Order ID",
-    width: 180,
-    renderCell: (params) => (
-      <span>{params.row.Payment_detail.razorpay_order_id}</span>
-    ),
-  },
-  {
-    field: `Payment_detail.razorpay_payment_id`,
-    headerName: "Payment ID",
-    width: 180,
-    renderCell: (params) => (
-      <span>{params.row.Payment_detail.razorpay_payment_id}</span>
-    ),
-  },
-];
-
-// Now you can update the seatsAvailable for each shift dynamically

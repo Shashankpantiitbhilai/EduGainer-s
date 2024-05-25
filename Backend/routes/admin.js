@@ -11,6 +11,14 @@ router.get('/fetchLibData', adminController.searchStudentsByShift);
     console.log("reached server")
 }
 
+router.delete(`/deleteLibStudent/:id`, adminController.deleteStudentById);
+{
+    console.log("delete")
+}
 
+router.patch(`/editLibStudent/:id`, adminController.editStudentById);
+{
+    console.log("patch")
+}
 
 module.exports = router;

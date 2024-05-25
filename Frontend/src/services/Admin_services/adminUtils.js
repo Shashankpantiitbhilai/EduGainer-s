@@ -21,3 +21,25 @@ export async function fetchLibSudents(query) {
     }
 }
 
+export async function deleteLibStudent(id) {
+    // console.log(id, "id")
+    try {
+        const response = await axiosInstance.delete(`/admin/deleteLibStudent/${id}`);
+        // console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+export async function editLibStudentById(id, data) {
+    console.log(id, data)
+    try {
+        const response = await axiosInstance.patch(`/admin/editLibStudent/${id}`, data);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
