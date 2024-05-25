@@ -19,6 +19,10 @@ import Profile from "./Components/User/Profile.jsx";
 import AdminDashboard from "./Components/Admin/ADMIN_HOME.jsx";
 import AdminLibrary from "./Components/Admin/Admin_Library.jsx";
 import ManageUsers from "./Components/Admin/ManageUsers.jsx"
+import ManageResources from "./Components/Admin/Resources.jsx";
+
+
+
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -85,10 +89,18 @@ const Main = () => {
                     }
                 />
                 <Route
-                    path="/manage-users"
+                    path="/admin_library/manage-users"
                     element={
                         <ProtectedAdmin>
                             <ManageUsers />
+                        </ProtectedAdmin>
+                    }
+                />
+                <Route
+                    path="/admin_library/manage-resources"
+                    element={
+                        <ProtectedAdmin>
+                            <ManageResources />
                         </ProtectedAdmin>
                     }
                 />

@@ -1,5 +1,9 @@
 // Assuming you have an Student model
 const { Student } = require('../models/student'); // Assuming you have a Shift model
+const { Resource } = require('../models/Admin')
+const { uploadToCloudinary } = require("../cloudinary")
+const fs = require('fs');
+const path = require('path');
 
 // Example function to search Students by shift
 const searchStudentsByShift = async (req, res) => {
@@ -56,12 +60,47 @@ const editStudentById = async (req, res) => {
         console.error("Error searching Students by shift:", error);
         res.status(500).json({ error: "Internal server error" });
     }
-};
+}
 
+
+const uploadResource = async (req, res) => {
+    const { name, tags } = req.body;
+    console.log(req.body)
+    const filePath = req.file.path;
+
+    try {
+        // Upload file to Cloudinary
+        const result = await uploadToCloudinary(filePath, 'Library_Resources'); // Specify the folder name in Cloudinary
+        console.log(result);
+        const newResource = new Resource({
+            name,
+            tags, // Assuming tags are sent as a comma-separated string
+            url: result.url,
+        });
+
+        // Save the new resource to the database
+        await newResource.save();
+        // Delete the file locally after uploading to Cloudinary
+        fs.unlinkSync(filePath);
+
+        // Send the Cloudinary URL in the response
+        res.json({ newResource });
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
 // Export controller functions
 module.exports = {
     searchStudentsByShift,
     deleteStudentById,
-    editStudentById
+    editStudentById,
+    uploadResource
     // Add other controller functions as needed
 };

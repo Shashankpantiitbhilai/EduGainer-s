@@ -5,9 +5,7 @@ const baseURL = "http://localhost:8000";
 const axiosInstance = axios.create({
     baseURL,
     withCredentials: true,
-    headers: {
-        "Content-Type": "application/json",
-    },
+
 });
 export async function fetchLibSudents(query) {
     console.log(query, 111)
@@ -43,3 +41,21 @@ export async function editLibStudentById(id, data) {
         throw error; // Propagate the error to handle it in the calling component
     }
 }
+export const fileUpload = async (data, onUploadProgress) => {
+    const formData = new FormData();
+    formData.append('file', data);
+    console.log(data);
+    for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+    }
+    const response = await axiosInstance.post('/admin/uploadResource', data, {
+        onUploadProgress,
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+
+    return response.data; // Assuming the response contains the necessary data
+};
+
+
