@@ -1,70 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Chip from "@mui/material/Chip";
 import {
   Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
+  Box,
+  Typography,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   TextField,
-  Box,
-  Typography,
   LinearProgress,
   Autocomplete,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
+import SaveIcon from "@mui/icons-material/Save";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import { fileUpload } from "../../services/Admin_services/adminUtils";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  fileUpload,
+  fetchLibResources,
+  editLibResources,
+} from "../../services/Admin_services/adminUtils";
 
 const App = () => {
-  const [resources, setResources] = useState([
-    {
-      id: 1,
-      name: "Resource Name",
-      date: "2023-01-01",
-      tags: ["Tag1", "Tag2"],
-      url: "",
-    },
-    {
-      id: 2,
-      name: "Resource Name 2",
-      date: "2023-01-02",
-      tags: ["Tag3"],
-      url: "",
-    },
-    {
-      id: 3,
-      name: "Resource Name 3",
-      date: "2023-01-03",
-      tags: ["Tag4", "Tag5"],
-      url: "",
-    },
-  ]);
-
+  const [resources, setResources] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [newResource, setNewResource] = useState({
     name: "",
     tags: [],
     file: null,
   });
+
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [editModeId, setEditModeId] = useState(null);
 
-  const handleEdit = (id) => {
-    // Edit functionality here
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const data = await fetchLibResources();
+        setResources(data);
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    };
+
+    fetchResources();
+  }, []);
+
+  const handleEdit = async (id, data) => {
+    setLoading(true);
+    try {
+      await editLibResources(id, data);
+      const updatedResources = resources.map((resource) =>
+        resource._id === id ? { ...resource, ...data } : resource
+      );
+      setResources(updatedResources);
+    } catch (error) {
+      console.error("Error editing resource:", error);
+    } finally {
+      setLoading(false);
+      setEditModeId(null);
+    }
   };
 
   const handleDelete = (id) => {
-    setResources(resources.filter((resource) => resource.id !== id));
+    setResources(resources.filter((resource) => resource._id !== id));
   };
 
   const handleFileChange = (event) => {
@@ -72,8 +79,7 @@ const App = () => {
   };
 
   const handleUpload = async () => {
-    if (!newResource.file) return;
-    console.log(newResource);
+    // if (!newResource.file) return;
     try {
       const response = await fileUpload(newResource, (progressEvent) => {
         const total = progressEvent.total;
@@ -82,21 +88,24 @@ const App = () => {
         setUploadProgress(percentCompleted);
       });
 
+      toast.success("Resource uploaded successfully!");
       setResources([
         ...resources,
         {
-          id: resources.length + 1,
+          _id: resources.length + 1,
           name: newResource.name,
           date: new Date().toISOString().split("T")[0],
           tags: newResource.tags,
-          url: response.data.url, // Assuming response contains the file URL
+          url: response.data.url,
         },
       ]);
+
       setNewResource({ name: "", tags: [], file: null });
       setOpen(false);
       setUploadProgress(0);
     } catch (error) {
       console.error("Error uploading file:", error);
+      toast.error("Failed to upload resource.");
     }
   };
 
@@ -104,146 +113,190 @@ const App = () => {
     setSearchQuery(value);
   };
 
-  const filteredResources = resources.filter((resource) =>
-    resource.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const enterEditMode = (id) => {
+    setEditModeId(id);
+  };
+
+  const isEditMode = (id) => {
+    return id === editModeId;
+  };
+
+  const columns = [
+    { field: "_id", headerName: "ID", width: 150 },
+    { field: "name", headerName: "Name", width: 200, editable: true },
+    { field: "tags", headerName: "Tags", width: 250 },
+    {
+      field: "url",
+      headerName: "View",
+      width: 150,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          onClick={() => window.open(params.value, "_blank")}
+          style={{
+            textTransform: "none",
+            fontSize: "0.875rem",
+            background: "orange",
+          }}
+        >
+          View File
+        </Button>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          {isEditMode(params.row._id) ? (
+            <IconButton
+              onClick={() => handleEdit(params.row._id, params.row)}
+              style={{ color: "lightgreen" }}
+            >
+              <SaveIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => enterEditMode(params.row._id)}
+              style={{ color: "red" }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+          <IconButton
+            onClick={() => handleDelete(params.row._id)}
+            style={{ color: "blue" }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <Container>
-      <Box my={4}>
-        <Typography variant="h4" gutterBottom>
-          Resource List
-        </Typography>
+    <>
+      <Box
+        sx={{ width: "100%", maxWidth: 500, margin: "0 auto", mt: 4, mb: 3 }}
+      >
         <Autocomplete
-          freeSolo
-          options={resources.map((resource) => resource.name)}
-          onInputChange={handleSearch}
+          multiple
+          id="search-bar"
+          options={resources}
+          getOptionLabel={(option) => option.name}
+          onChange={handleSearch}
+          filterSelectedOptions
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => (
+              <Chip
+                key={index}
+                variant="outlined"
+                label={option.name}
+                {...getTagProps({ index })}
+              />
+            ))
+          }
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Search for a resource"
               variant="outlined"
+              label="Search for resources"
+              placeholder="Type to search..."
               fullWidth
+              inputProps={{
+                ...params.inputProps,
+                "aria-label": "Search for resources",
+              }}
             />
           )}
         />
-        <TableContainer component={Paper} sx={{ mt: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Tags</TableCell>
-                <TableCell>File</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredResources.map((resource) => (
-                <TableRow key={resource.id}>
-                  <TableCell>{resource.name}</TableCell>
-                  <TableCell>{resource.date}</TableCell>
-                  <TableCell>{resource.tags.join(", ")}</TableCell>
-                  <TableCell>
-                    <a
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View File
-                    </a>
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      onClick={() => handleEdit(resource.id)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleDelete(resource.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
       </Box>
-      <Box my={4}>
-        <Button
-          variant="contained"
-          startIcon={<UploadFileIcon />}
-          onClick={() => setOpen(true)}
-        >
-          Upload New Resource
-        </Button>
-        <Dialog open={open} onClose={() => setOpen(false)}>
-          <DialogTitle>Upload New Resource</DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Resource Title"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              value={newResource.name}
-              onChange={(e) =>
-                setNewResource({ ...newResource, name: e.target.value })
-              }
-            />
-            <Autocomplete
-              multiple
-              options={["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]}
-              value={newResource.tags}
-              onChange={(event, newValue) =>
-                setNewResource({ ...newResource, tags: newValue })
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Tags"
-                  margin="normal"
-                  fullWidth
-                />
+      <Container maxWidth="lg">
+        <div style={{ height: 300, width: "100%" }}>
+          <DataGrid
+            rows={resources}
+            columns={columns}
+            autoHeight
+            checkboxSelection
+            getRowId={(row) => row._id}
+          />
+        </div>
+      </Container>
+      <Container centered>
+        <Box>
+          <Button
+            variant="contained"
+            startIcon={<UploadFileIcon />}
+            onClick={() => setOpen(true)}
+          >
+            Upload New Resource
+          </Button>
+          <Dialog open={open} onClose={() => setOpen(false)}>
+            <DialogTitle>Upload New Resource</DialogTitle>
+            <DialogContent>
+              <TextField
+                label="Resource Title"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={newResource.name}
+                onChange={(e) =>
+                  setNewResource({ ...newResource, name: e.target.value })
+                }
+              />
+              <Autocomplete
+                multiple
+                options={["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]}
+                value={newResource.tags}
+                onChange={(event, newValue) =>
+                  setNewResource({ ...newResource, tags: newValue })
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Tags"
+                    margin="normal"
+                    fullWidth
+                  />
+                )}
+              />
+
+              <Button
+                variant="contained"
+                component="label"
+                startIcon={<UploadFileIcon />}
+                fullWidth
+              >
+                Select File
+                <input type="file" hidden onChange={handleFileChange} />
+              </Button>
+              {newResource.file && (
+                <Typography variant="body1" mt={2}>
+                  File name: {newResource.file.name}
+                </Typography>
               )}
-            />
-            <Button
-              variant="contained"
-              component="label"
-              startIcon={<UploadFileIcon />}
-              fullWidth
-            >
-              Select File
-              <input type="file" hidden onChange={handleFileChange} />
-            </Button>
-            {newResource.file && (
-              <Typography variant="body1" mt={2}>
-                File name: {newResource.file.name}
-              </Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button
-              onClick={handleUpload}
-              disabled={!newResource.name || !newResource.file}
-            >
-              Upload
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Box mt={2}>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpen(false)}>Cancel</Button>
+              <Button
+                onClick={handleUpload}
+                disabled={!newResource.name || !newResource.file}
+              >
+                Upload
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+
+        <Box my={3}>
           <Typography variant="body1">Upload Progress:</Typography>
           <LinearProgress variant="determinate" value={uploadProgress} />
         </Box>
-      </Box>
-    </Container>
+      </Container>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+    </>
   );
 };
 

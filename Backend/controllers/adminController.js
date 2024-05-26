@@ -96,11 +96,78 @@ const uploadResource = async (req, res) => {
         res.status(500).json({ error: 'Error uploading file to Cloudinary' });
     }
 };
+const fetchLibResources = async (req, res) => {
+
+
+    try {
+        // Upload file to Cloudinary
+        const resources = await Resource.find({});
+
+
+        // Save the new resource to the database
+        console.log(resources)
+
+        // Send the Cloudinary URL in the response
+        res.json(resources);
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+const editLibResources = async (req, res) => {
+
+    const { id
+    } = req.params;
+    console.log(id);
+    const Name = req.body.name;
+    // console.log(req.body)
+    try {
+        // Upload file to Cloudinary
+        const resources = await Resource.findByIdAndUpdate(id, { name: Name }, { new: true });
+
+
+        // Save the new resource to the database
+        console.log(resources)
+
+        // Send the Cloudinary URL in the response
+        res.json(resources);
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
+
+
+
+
+
+
 // Export controller functions
 module.exports = {
     searchStudentsByShift,
     deleteStudentById,
     editStudentById,
-    uploadResource
+    uploadResource,
+    fetchLibResources,
+    editLibResources
     // Add other controller functions as needed
 };
