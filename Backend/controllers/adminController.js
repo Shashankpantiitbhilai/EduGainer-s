@@ -129,7 +129,7 @@ const fetchLibResources = async (req, res) => {
 
 
 
-const editLibResources = async (req, res) => {
+const editLibResource = async (req, res) => {
 
     const { id
     } = req.params;
@@ -139,6 +139,31 @@ const editLibResources = async (req, res) => {
     try {
         // Upload file to Cloudinary
         const resources = await Resource.findByIdAndUpdate(id, { name: Name }, { new: true });
+
+
+        // Save the new resource to the database
+        console.log(resources)
+
+        // Send the Cloudinary URL in the response
+        res.json(resources);
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
+const deleteLibResource = async (req, res) => {
+
+    const { id
+    } = req.params;
+    console.log(id);
+  
+    try {
+        
+        const resources = await Resource.findByIdAndDelete(id);
 
 
         // Save the new resource to the database
@@ -168,6 +193,7 @@ module.exports = {
     editStudentById,
     uploadResource,
     fetchLibResources,
-    editLibResources
+    editLibResource,
+    deleteLibResource
     // Add other controller functions as needed
 };

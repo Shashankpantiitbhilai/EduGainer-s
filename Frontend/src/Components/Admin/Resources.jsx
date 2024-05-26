@@ -19,13 +19,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import SaveIcon from "@mui/icons-material/Save";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   fileUpload,
   fetchLibResources,
   editLibResources,
+  deleteLibResource,
 } from "../../services/Admin_services/adminUtils";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [resources, setResources] = useState([]);
@@ -41,6 +42,8 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [editModeId, setEditModeId] = useState(null);
 
+  const [resourceUpdated, setResourceUpdated] = useState(false);
+
   useEffect(() => {
     const fetchResources = async () => {
       try {
@@ -50,10 +53,10 @@ const App = () => {
         console.error("Error fetching resources:", error);
       }
     };
+    console.log(resourceUpdated);
 
     fetchResources();
-  }, []);
-
+  }, [resourceUpdated]);
   const handleEdit = async (id, data) => {
     setLoading(true);
     try {
@@ -70,8 +73,16 @@ const App = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    setResources(resources.filter((resource) => resource._id !== id));
+  const handleDelete = async (id) => {
+    try {
+      await deleteLibResource(id);
+      setResourceUpdated(!resourceUpdated);
+      toast.success("Resource deleted successfully");
+      //  setResources(resources.filter((resource) => resource._id !== id));
+    } catch (error) {
+      console.error("error in deleting", error);
+      throw error;
+    }
   };
 
   const handleFileChange = (event) => {
@@ -79,7 +90,7 @@ const App = () => {
   };
 
   const handleUpload = async () => {
-    // if (!newResource.file) return;
+    if (!newResource.file) return;
     try {
       const response = await fileUpload(newResource, (progressEvent) => {
         const total = progressEvent.total;
@@ -88,7 +99,7 @@ const App = () => {
         setUploadProgress(percentCompleted);
       });
 
-      toast.success("Resource uploaded successfully!");
+      toast.success("Resource uploaded successfully");
       setResources([
         ...resources,
         {
@@ -96,16 +107,19 @@ const App = () => {
           name: newResource.name,
           date: new Date().toISOString().split("T")[0],
           tags: newResource.tags,
-          url: response.data.url,
+          url: response.url,
         },
       ]);
 
       setNewResource({ name: "", tags: [], file: null });
       setOpen(false);
       setUploadProgress(0);
+      console.log(resourceUpdated);
+      setResourceUpdated(!resourceUpdated);
+      console.log(resourceUpdated);
     } catch (error) {
       console.error("Error uploading file:", error);
-      toast.error("Failed to upload resource.");
+      toast.error("Failed to upload resource");
     }
   };
 
@@ -177,54 +191,17 @@ const App = () => {
 
   return (
     <>
-      <Box
-        sx={{ width: "100%", maxWidth: 500, margin: "0 auto", mt: 4, mb: 3 }}
-      >
-        <Autocomplete
-          multiple
-          id="search-bar"
-          options={resources}
-          getOptionLabel={(option) => option.name}
-          onChange={handleSearch}
-          filterSelectedOptions
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                key={index}
-                variant="outlined"
-                label={option.name}
-                {...getTagProps({ index })}
-              />
-            ))
-          }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Search for resources"
-              placeholder="Type to search..."
-              fullWidth
-              inputProps={{
-                ...params.inputProps,
-                "aria-label": "Search for resources",
-              }}
-            />
-          )}
-        />
-      </Box>
       <Container maxWidth="lg">
-        <div style={{ height: 300, width: "100%" }}>
-          <DataGrid
-            rows={resources}
-            columns={columns}
-            autoHeight
-            checkboxSelection
-            getRowId={(row) => row._id}
-          />
-        </div>
-      </Container>
-      <Container centered>
-        <Box>
+        <Box
+          centered
+          sx={{
+            margin: 9,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            mb: 9,
+          }}
+        >
           <Button
             variant="contained"
             startIcon={<UploadFileIcon />}
@@ -232,6 +209,49 @@ const App = () => {
           >
             Upload New Resource
           </Button>
+        </Box>
+        <Box>
+          <Autocomplete
+            multiple
+            id="search-bar"
+            options={resources}
+            getOptionLabel={(option) => option.name}
+            onChange={handleSearch}
+            filterSelectedOptions
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  key={index}
+                  variant="outlined"
+                  label={option.name}
+                  {...getTagProps({ index })}
+                />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                label="Search for resources"
+                placeholder="Type to search..."
+                fullWidth
+                inputProps={{
+                  ...params.inputProps,
+                  "aria-label": "Search for resources",
+                }}
+              />
+            )}
+          />
+
+          <div style={{ height: 300, width: "100%" }}>
+            <DataGrid
+              rows={resources}
+              columns={columns}
+              autoHeight
+              checkboxSelection
+              getRowId={(row) => row._id}
+            />
+          </div>
           <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogTitle>Upload New Resource</DialogTitle>
             <DialogContent>
@@ -277,6 +297,9 @@ const App = () => {
                   File name: {newResource.file.name}
                 </Typography>
               )}
+              {uploadProgress > 0 && (
+                <LinearProgress variant="determinate" value={uploadProgress} />
+              )}
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setOpen(false)}>Cancel</Button>
@@ -289,12 +312,8 @@ const App = () => {
             </DialogActions>
           </Dialog>
         </Box>
-
-        <Box my={3}>
-          <Typography variant="body1">Upload Progress:</Typography>
-          <LinearProgress variant="determinate" value={uploadProgress} />
-        </Box>
       </Container>
+
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </>
   );

@@ -91,3 +91,16 @@ export const editLibResources = async (id, data) => {
 };
 
 
+export const deleteLibResource = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/deleteLibResource/${id}`)
+        console.log(response.data)
+        return response.data;
+    }
+    catch (error) {
+        console.error("error fetching data:", error)
+
+    }
+    // Assuming the response contains the necessary data
+};
+
