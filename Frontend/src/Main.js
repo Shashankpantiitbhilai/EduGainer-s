@@ -24,7 +24,7 @@ import Resources from "./Components/Resources/resources.jsx"
 import EdugainerClasses from "./Components/Classes/classes.jsx";
 import ClassesRegistration from "./Components/Classes/new-reg.jsx";
 
-
+import SuccessClasses from "./Components/Classes/Success.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -72,6 +72,14 @@ const Main = () => {
                     element={
                         <ProtectedUser>
                             <ClassesRegistration />
+                        </ProtectedUser>
+                    }
+                />
+                <Route
+                    path="/classes/success/:id"
+                    element={
+                        <ProtectedUser>
+                            <SuccessClasses />
                         </ProtectedUser>
                     }
                 />

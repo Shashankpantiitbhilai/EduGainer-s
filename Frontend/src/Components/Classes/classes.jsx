@@ -23,7 +23,7 @@ function ButtonLink({ to, children }) {
 // EdugainerClasses Component
 function EdugainerClasses() {
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
-  const id = 0;
+  let id = 0;
   if (IsUserLoggedIn) {
     id = IsUserLoggedIn._id;
   }

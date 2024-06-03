@@ -99,14 +99,69 @@ const studentSchema = new mongoose.Schema({
 
 
 
+const classesSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Reference to the User model
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  Batch: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  mobile: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  amount: {
+    type: String,
+    required: true
+  },
+  image: {
+    publicId: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    }
+  },
+  Payment_detail: {
+    razorpay_order_id: {
+      type: String,
+      required: true,
+    },
+    razorpay_payment_id: {
+      type: String,
+      required: false, // This will be updated after payment verification
+    }
+  }
+}
+
+);
+
 
 
 
 const User = mongoose.model("user", userSchema);
 const Student = mongoose.model("Student", studentSchema);
+const Class = mongoose.model("Class", classesSchema);
 
 module.exports = {
   Student,
-
+Class,
   User,
 };

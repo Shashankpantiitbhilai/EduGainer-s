@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Container, Form, FormGroup, Label, Button } from "reactstrap";
-import { sendFormData } from "../../services/utils.js";
+import { sendFormData } from "../../services/Class/utils.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../App.js";
+
 function ClassesRegistration() {
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
   console.log(IsUserLoggedIn._id);
@@ -48,7 +49,7 @@ function ClassesRegistration() {
   const onSubmit = async (formData) => {
     setLoading(true);
 
-    // console.log(response.data);
+    console.log(formData);
     const formDataWithImage = {
       ...formData,
       image: imageBase64,
@@ -81,7 +82,7 @@ function ClassesRegistration() {
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          const callbackUrl = `http://localhost:8000/payment-verification/${user.userId}`;
+          const callbackUrl = `http://localhost:8000/classes/payment-verification/${user.userId}`;
 
           try {
             const verificationResponse = await axios.post(callbackUrl, {
@@ -93,7 +94,7 @@ function ClassesRegistration() {
             console.log(id);
             console.log(verificationResponse.data.success);
             if (verificationResponse.data.success) {
-              const url = `/success/${id}`;
+              const url = `/classes/success/${id}`;
               navigate(url); // Navigate to success page
             } else {
               throw new Error("Payment verification failed");
@@ -147,24 +148,20 @@ function ClassesRegistration() {
         </FormGroup>
 
         <FormGroup className="mb-3">
-          <Label for="shift">Shift Chosen</Label>
+          <Label for="Batch">Select Class</Label>
           <select
-            type="select"
-            name="shift"
-            id="shift"
-            className="form-control"
-            {...register("shift", { required: "Shift selection is required" })}
+            name="Batch"
+            id="Batch"
+            className={`form-control ${errors.class ? "is-invalid" : ""}`}
+            {...register("Batch", { required: "Class selection is required" })}
           >
-            <option value="">Select Shift</option>
-
-            <option value="9 PM to 6 AM">9 PM to 6 AM</option>
-            <option value="2 PM to 11 PM">2 PM to 11 PM</option>
-            <option value="7 AM to 7 PM">7 AM to 7 PM</option>
-            <option value="24*7">24*7</option>
-            <option value="2 PM to 9 PM">2 PM to 9 PM</option>
-            <option value="7 PM to 11 PM">7 PM to 11 PM</option>
-            <p className="error">{errors.shift?.message}</p>
+            <option value="">Select Class</option>
+            <option value="Class 6">Class 6</option>
+            <option value="Class 7">Class 7</option>
+            <option value="Class 8">Class 8</option>
+            <option value="Class 9">Class 9</option>
           </select>
+          <p className="error">{errors.class?.message}</p>
         </FormGroup>
 
         <FormGroup className="mb-3">
