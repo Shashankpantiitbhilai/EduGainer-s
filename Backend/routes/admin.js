@@ -11,7 +11,7 @@ router.get('/fetchLibData', adminController.searchStudentsByShift);
     console.log("reached server")
 }
 
-router.get('/fetchLibResource', adminController.fetchLibResources);
+router.post('/fetchLibResource', adminController.fetchLibResources);
 {
     console.log("reached server to fetch lib resources")
 }

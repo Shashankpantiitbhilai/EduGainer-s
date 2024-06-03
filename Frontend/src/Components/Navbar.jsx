@@ -73,7 +73,7 @@ function Navbar() {
       pages = [
         { name: "Library", link: "/library" },
         { name: "Classes", link: "/classes" },
-        { name: "Blog", link: "/blog" },
+        { name: "Resources", link: "/resources" },
       ];
     }
   }

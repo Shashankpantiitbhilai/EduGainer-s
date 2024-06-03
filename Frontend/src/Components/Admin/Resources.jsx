@@ -204,6 +204,7 @@ const App = () => {
         >
           <Button
             variant="contained"
+            style={{ background: "green" }}
             startIcon={<UploadFileIcon />}
             onClick={() => setOpen(true)}
           >

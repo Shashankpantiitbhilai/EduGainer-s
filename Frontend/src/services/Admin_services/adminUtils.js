@@ -59,9 +59,10 @@ export const fileUpload = async (data, onUploadProgress) => {
 };
 
 
-export const fetchLibResources = async () => {
+export const fetchLibResources = async (data) => {
     try {
-        const response = await axiosInstance.get('/admin/fetchLibResource')
+        console.log(data)
+        const response = await axiosInstance.post('/admin/fetchLibResource', { data })
         console.log(response.data)
         return response.data;
     }

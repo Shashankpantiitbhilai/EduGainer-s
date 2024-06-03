@@ -98,12 +98,17 @@ const uploadResource = async (req, res) => {
 };
 const fetchLibResources = async (req, res) => {
 
-
+    const Name = req.body.data;
+    console.log(Name);
     try {
+        let resources = [];
         // Upload file to Cloudinary
-        const resources = await Resource.find({});
+        if (!Name)
+            resources = await Resource.find({});
 
-
+        else {
+            resources = await Resource.find({ name: Name });
+        }
         // Save the new resource to the database
         console.log(resources)
 
@@ -160,9 +165,9 @@ const deleteLibResource = async (req, res) => {
     const { id
     } = req.params;
     console.log(id);
-  
+
     try {
-        
+
         const resources = await Resource.findByIdAndDelete(id);
 
 
