@@ -10,7 +10,8 @@ import { useMediaQuery, useTheme } from "@mui/material";
 
 function Login() {
   const form = useForm();
-  const { register, handleSubmit, formState, setError, clearErrors } = form;
+  const { register, handleSubmit, control, formState, setError, clearErrors } =
+    form;
   const { errors } = formState;
   const { setIsUserLoggedIn } = useContext(AdminContext);
   const navigate = useNavigate();
