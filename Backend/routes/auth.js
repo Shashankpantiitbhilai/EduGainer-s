@@ -108,10 +108,11 @@ router.get("/fetchAuth", function (req, res) {
 
 // Local Authentication
 router.post("/login", passport.authenticate("local"), (req, res) => {
- 
+
   const { email, password } = req.body;
+  console.log(req.body);
   if (email == process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
-   
+
     res.status(201).json({ message: "ADMIN Login is successful", user: req.user });
 
 
