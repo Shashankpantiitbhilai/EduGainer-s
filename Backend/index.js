@@ -13,7 +13,7 @@ require("dotenv").config();
 
 const app = express();
 const corsOptions = {
-  origin: 'https://edu-gainer-s-frontend.vercel.app', // Replace with your frontend's URL
+  origin: 'http://localhost:3000', // Replace with your frontend's URL
   credentials: true, // Enable credentials (e.g., cookies)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add all methods you will use
   allowedHeaders: ['Content-Type', 'Authorization'], // Add all headers you will use
@@ -41,7 +41,7 @@ app.use(myPassport.initialize());
 app.use(myPassport.session());
 
 app.get("/", (_req, res) => {
-  res.redirect("https://edu-gainer-s-frontend.vercel.app");
+  res.redirect("http://localhost:8000");
 });
 
 // Mount your route handlers
