@@ -81,7 +81,7 @@ function NewReg() {
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          const callbackUrl = `http://localhost:8000/payment-verification/${user.userId}`;
+          const callbackUrl = `https://edu-gainer-s.vercel.app/payment-verification/${user.userId}`;
 
           try {
             const verificationResponse = await axios.post(callbackUrl, {

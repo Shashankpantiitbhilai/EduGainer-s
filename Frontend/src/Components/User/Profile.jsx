@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { styled } from "@mui/material/styles";
 import {
   Card,
   CardContent,
@@ -8,259 +8,107 @@ import {
   Button,
   Grid,
   CircularProgress,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useParams } from "react-router-dom";
 import { fetchCredentials } from "../../services/auth";
 import { updateUserDetails } from "../../services/utils";
 import { AdminContext } from "../../App";
 
-const useStyles = makeStyles({
+// Example of custom styles using styled
+const useStyles = styled((theme) => ({
   card: {
-    maxWidth: 800,
-    margin: "auto",
-    marginTop: 20,
-    padding: 20,
-    display: "flex",
-    flexDirection: "row",
+    margin: theme.spacing(2),
   },
   textField: {
-    width: "100%",
-    marginBottom: 10,
+    marginBottom: theme.spacing(2),
   },
   button: {
-    marginTop: 20,
-    marginRight: 10,
+    marginTop: theme.spacing(2),
   },
-  fileInput: {
-    display: "none",
-  },
-  imagePreview: {
-    width: "300px",
-    height: "300px",
-    objectFit: "cover",
-    marginBottom: 10,
-  },
-  progress: {
-    margin: "auto",
-    display: "block",
-  },
-  details: {
-    flex: 1,
-  },
-  imageContainer: {
+  gridContainer: {
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
   },
-  uploadButton: {
-    marginTop: 10,
-  },
-});
+}));
 
-const Profile = () => {
-  const { IsUserLoggedIn } = useContext(AdminContext);
+const UserProfile = () => {
   const classes = useStyles();
-  const { id } = useParams(); // Assuming you're using id from the route params
-  const [user, setUser] = useState({
-    username: "",
-    firstName: "",
-    lastName: "",
-    address: "",
-    bio: "",
-    photoUpload: "",
-    mobile: "",
-  });
-  const [editing, setEditing] = useState(false);
+  const { userId } = useParams();
+  const { adminState } = useContext(AdminContext);
+  const [userDetails, setUserDetails] = useState({});
   const [loading, setLoading] = useState(false);
-  const [imageBase64, setImageBase64] = useState("");
-  const [error, setError] = useState(null); // To store error messages
 
   useEffect(() => {
-    fetchUserDetails(id);
-  }, [id]);
-
-  const fetchUserDetails = async (id) => {
-    try {
-      const response = await fetchCredentials();
-      setUser(response); // Ensure response.data contains the user object
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setError("Failed to fetch user data.");
-    }
-  };
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setUser({ ...user, [name]: value });
-  };
-
-  const setFileToBase64 = (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setImageBase64(reader.result);
-      setUser((prevUser) => ({ ...prevUser, photoUpload: reader.result }));
-    };
-  };
-
-  const handleImage = (e) => {
-    const file = e.target.files[0];
-    setFileToBase64(file);
-  };
-
-  const handleSave = async () => {
-    try {
+    const fetchUserDetails = async () => {
       setLoading(true);
-      const updatedUser = {
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        address: user.address,
-        bio: user.bio,
-        image: imageBase64,
-      };
-      const response = await updateUserDetails(id, updatedUser);
-      setUser(response);
-      setEditing(false);
-      setError(null); // Clear any previous errors
-    } catch (error) {
-      console.error("Error saving user data:", error);
-      setError("Failed to save user data."); // Set an error message
-    } finally {
+      const credentials = await fetchCredentials(userId);
+      setUserDetails(credentials);
       setLoading(false);
-    }
+    };
+
+    fetchUserDetails();
+  }, [userId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUserDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await updateUserDetails(userId, userDetails);
+    setLoading(false);
   };
 
   return (
-    <>
-      {IsUserLoggedIn && (
-        <Card className={classes.card}>
-          <CardContent className={classes.details}>
-            <Typography variant="h5" gutterBottom>
-              Profile
-            </Typography>
-            {error && (
-              <Typography variant="body2" color="error">
-                {error}
-              </Typography>
-            )}
-            <Grid container spacing={2}>
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography variant="h5">User Profile</Typography>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2} className={classes.gridContainer}>
               <Grid item xs={12}>
                 <TextField
-                  name="username"
+                  label="Name"
+                  name="name"
+                  value={userDetails.name || ""}
+                  onChange={handleChange}
+                  fullWidth
+                  className={classes.textField}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
                   label="Email"
-                  value={user.username}
-                  variant="outlined"
+                  name="email"
+                  value={userDetails.email || ""}
+                  onChange={handleChange}
+                  fullWidth
                   className={classes.textField}
-                  disabled
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  name="firstName"
-                  label="First Name"
-                  value={user.firstName}
-                  variant="outlined"
-                  className={classes.textField}
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  name="lastName"
-                  label="Last Name"
-                  value={user.lastName}
-                  variant="outlined"
-                  className={classes.textField}
-                  disabled={!editing}
-                  onChange={handleInputChange}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  name="address"
-                  label="Address"
-                  value={user.address}
-                  variant="outlined"
-                  className={classes.textField}
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="bio"
-                  label="Bio"
-                  value={user.bio}
-                  variant="outlined"
-                  multiline
-                  rows={3}
-                  className={classes.textField}
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                {loading && (
-                  <CircularProgress size={24} className={classes.progress} />
-                )}
-                {editing ? (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                    onClick={handleSave}
-                    disabled={loading}
-                  >
-                    Save
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.button}
-                    onClick={() => setEditing(true)}
-                  >
-                    Edit
-                  </Button>
-                )}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                >
+                  Update
+                </Button>
               </Grid>
             </Grid>
-          </CardContent>
-          <CardContent className={classes.imageContainer}>
-            {user.photoUpload && (
-              <img
-                src={user.photoUpload}
-                alt="Uploaded"
-                className={classes.imagePreview}
-              />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImage}
-              disabled={!editing}
-              className={classes.fileInput}
-              id="photo-upload-input"
-            />
-            <label htmlFor="photo-upload-input">
-              <Button
-                variant="contained"
-                color="primary"
-                component="span"
-                className={classes.uploadButton}
-                disabled={!editing || loading}
-              >
-                Upload Photo
-              </Button>
-            </label>
-          </CardContent>
-        </Card>
-      )}
-    </>
+          </form>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
-export default Profile;
+export default UserProfile;
