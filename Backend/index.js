@@ -50,7 +50,7 @@ app.use("/auth", routes_auth);
 app.use("/admin", routes_admin);
 app.use("/classes", routes_classes);
 
-// Start the server
-app.listen(process.env.PORT || 8000, () => {
-  console.log(`connected to port ${process.env.PORT || 8000}`);
-});
+// // Start the server
+// app.listen(process.env.PORT || 8000, () => {
+//   console.log(`connected to port ${process.env.PORT || 8000}`);
+// });
