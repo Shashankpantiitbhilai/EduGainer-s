@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "https://edu-gainer-s.vercel.app";
+const baseURL = "http://localhost:8000";
 
 const axiosInstance = axios.create({
   baseURL,
