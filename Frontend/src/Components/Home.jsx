@@ -2,15 +2,11 @@ import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AdminContext } from "../App";
 import { logoutUser } from "../services/auth"; // Adjust the path as per your file structure
-import { useMediaQuery, Button } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 
 function Home() {
   const navigate = useNavigate();
-  const theme = useTheme();
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Check if the screen size is small (sm and below)
-
+  console.log(IsUserLoggedIn);
   const handleLogout = async () => {
     try {
       await logoutUser(); // Call the logout function
@@ -28,13 +24,7 @@ function Home() {
           <h1>Welcome to EduGainer's Library & Classes</h1>
           <p>Empowering Education Through Innovation</p>
           <div className="buttons">
-            <Button
-              variant="contained"
-              className="explore"
-              size={isSmallScreen ? "small" : "large"}
-            >
-              Explore Our Offerings
-            </Button>
+            <button className="explore">Explore Our Offerings</button>
             <a href="#" className="learn-more">
               Learn More →
             </a>

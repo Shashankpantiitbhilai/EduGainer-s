@@ -15,7 +15,8 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: "https://edu-gainer-s-frontend.vercel.app",
+  origin: ["https://edu-gainer-s-frontend.vercel.app"],
+  methods: ["POST", "GET"],
   credentials: true,
 }));
 
@@ -34,6 +35,7 @@ app.use(session({
   })
 }));
 
+
 app.use(myPassport.initialize());
 app.use(myPassport.session());
 
@@ -42,7 +44,9 @@ app.use("/", routes_general);
 app.use("/auth", routes_auth);
 app.use("/admin", routes_admin);
 app.use("/classes", routes_classes);
-
+app.get("/", (req, res) => {
+  res.json("Hello");
+})
 // Start the server
 app.listen(process.env.PORT || 8000, () => {
   console.log(`connected to port ${process.env.PORT || 8000}`);
