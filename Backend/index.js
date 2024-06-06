@@ -15,7 +15,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ["https://edu-gainer-s-frontend.vercel.app"],
+  origin: ["https://edu-gainer-s-kxndkjnfrontend.vercel.app"],
   methods: ["POST", "GET"],
   credentials: true,
 }));
