@@ -13,14 +13,14 @@ require("dotenv").config();
 
 const app = express();
 const corsOptions = {
-  origin: 'https://edu-gainer-s.vercel.app/', // Replace with your frontend's URL
+  origin: ["https://edu-gainer-s-frontend.vercel.app"], // Replace with your frontend's URL
   credentials: true, // Enable credentials (e.g., cookies)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Add all methods you will use
   // Add all headers you will use
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight requests for all routes
+// Enable pre-flight requests for all routes
 
 // Connect to MongoDB
 connectDB();
