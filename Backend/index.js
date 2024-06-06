@@ -16,7 +16,7 @@ const corsOptions = {
   origin: 'https://edu-gainer-s-frontend.vercel.app', // Replace with your frontend's URL
   credentials: true, // Enable credentials (e.g., cookies)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Add all methods you will use
-  allowedHeaders: ['Content-Type', 'Authorization'], // Add all headers you will use
+  // Add all headers you will use
 };
 
 app.use(cors(corsOptions));
@@ -24,20 +24,7 @@ app.options('*', cors(corsOptions)); // Enable pre-flight requests for all route
 
 // Connect to MongoDB
 connectDB();
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
+
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
