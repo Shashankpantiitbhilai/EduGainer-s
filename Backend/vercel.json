@@ -2,7 +2,7 @@
     "version": 2,
     "headers": [
         {
-            "source": "/api/(.*)",
+            "source": "/(.*)", // Match all routes
             "headers": [
                 {
                     "key": "Access-Control-Allow-Credentials",
