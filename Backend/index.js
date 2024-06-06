@@ -13,7 +13,7 @@ require("dotenv").config();
 
 const app = express();
 const corsOptions = {
-  origin: 'https://edu-gainer-s-frontend.vercel.app', // Replace with your frontend's URL
+  origin: 'https://edu-gainer-s.vercel.app/', // Replace with your frontend's URL
   credentials: true, // Enable credentials (e.g., cookies)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Add all methods you will use
   // Add all headers you will use
@@ -52,6 +52,6 @@ app.use("/admin", routes_admin);
 app.use("/classes", routes_classes);
 
 // // Start the server
-// app.listen(process.env.PORT || 8000, () => {
-//   console.log(`connected to port ${process.env.PORT || 8000}`);
-// });
+app.listen(process.env.PORT || 8000, () => {
+  console.log(`connected to port ${process.env.PORT || 8000}`);
+});
