@@ -20,7 +20,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Enable pre-flight requests for all routes
+// Enable pre-flight requests for all routes
 
 // Connect to MongoDB
 connectDB();
