@@ -41,9 +41,9 @@ app.use(session({
 app.use(myPassport.initialize());
 app.use(myPassport.session());
 
-app.get("/", (_req, res) => {
-  res.redirect("https://edu-gainer-s-frontend.vercel.app");
-});
+// app.get("/", (_req, res) => {
+//   res.redirect("https://edu-gainer-s-frontend.vercel.app");
+// });
 
 // Mount your route handlers
 app.use("/", routes_general);
