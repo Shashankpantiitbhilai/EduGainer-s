@@ -20,9 +20,11 @@ import AdminDashboard from "./Components/Admin/ADMIN_HOME.jsx";
 import AdminLibrary from "./Components/Admin/Admin_Library.jsx";
 import ManageUsers from "./Components/Admin/ManageUsers.jsx"
 import ManageResources from "./Components/Admin/Resources.jsx";
+import Resources from "./Components/Resources/resources.jsx"
+import EdugainerClasses from "./Components/Classes/classes.jsx";
+import ClassesRegistration from "./Components/Classes/new-reg.jsx";
 
-
-
+import SuccessClasses from "./Components/Classes/Success.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -35,16 +37,49 @@ const Main = () => {
                 <Route path="/admin_home" element={<AdminDashboard />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+
                 <Route path="/register" element={<Register />} />
                 <Route path="/register/google/:id" element={<GoogleRegister />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
                 <Route path="/otp-verify" element={<OTPVerify />} />
                 <Route
+                    path="/resources"
+                    element={
+                        <ProtectedUser>
+                            <Resources />
+                        </ProtectedUser>
+                    }
+                />
+                <Route
                     path="/library"
                     element={
                         <ProtectedUser>
                             <Library />
+                        </ProtectedUser>
+                    }
+                />
+                <Route
+                    path="/classes"
+                    element={
+                        <ProtectedUser>
+                            <EdugainerClasses />
+                        </ProtectedUser>
+                    }
+                />
+                <Route
+                    path="/classes-reg/:id"
+                    element={
+                        <ProtectedUser>
+                            <ClassesRegistration />
+                        </ProtectedUser>
+                    }
+                />
+                <Route
+                    path="/classes/success/:id"
+                    element={
+                        <ProtectedUser>
+                            <SuccessClasses />
                         </ProtectedUser>
                     }
                 />

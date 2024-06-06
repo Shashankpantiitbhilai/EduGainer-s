@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, CardImg, CardTitle, CardSubtitle } from "reactstrap";
-import { sendIdCard, fetchUserDataById } from "../../services/utils";
+import {
+  sendIdCard,
+  fetchUserClassesDataById,
+} from "../../services/Class/utils";
 
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 
-const SuccessPage = () => {
+const SuccessClasses = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
@@ -17,7 +20,7 @@ const SuccessPage = () => {
     if (isFetched) return; // Prevents duplicate execution
     const getUserData = async () => {
       try {
-        const userData = await fetchUserDataById(id);
+        const userData = await fetchUserClassesDataById(id);
         setUserData(userData);
         setUserImage(userData.image.url);
         await sendIdCard(id);
@@ -51,7 +54,7 @@ const SuccessPage = () => {
   }
 
   return (
-    <Container className="d-flex justify-content-center align-items-center SuccessPage-container">
+    <Container className="d-flex justify-content-center align-items-center SuccessClasses-container">
       <Card style={{ width: "80%", padding: "20px", margin: "20px" }}>
         <div style={{ display: "flex" }}>
           <div style={{ flex: "1", paddingRight: "20px" }}>
@@ -91,4 +94,4 @@ const SuccessPage = () => {
   );
 };
 
-export default SuccessPage;
+export default SuccessClasses;

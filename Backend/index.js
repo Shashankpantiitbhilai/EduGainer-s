@@ -4,6 +4,7 @@ const cors = require("cors");
 const routes_auth = require("./routes/auth");
 const routes_general = require("./routes/route");
 const routes_admin = require("./routes/admin")
+const routes_classes = require("./routes/classes");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
@@ -47,6 +48,7 @@ app.get("/", (_req, res) => {
 app.use("/", routes_general);
 app.use("/auth", routes_auth);
 app.use("/admin", routes_admin);
+app.use("/classes", routes_classes);
 // Start the server
 app.listen(process.env.PORT || 8000, () => {
   console.log(`connected to port ${process.env.PORT || 8000}`);

@@ -96,11 +96,109 @@ const uploadResource = async (req, res) => {
         res.status(500).json({ error: 'Error uploading file to Cloudinary' });
     }
 };
+const fetchLibResources = async (req, res) => {
+
+    const Name = req.body.data;
+    console.log(Name);
+    try {
+        let resources = [];
+        // Upload file to Cloudinary
+        if (!Name)
+            resources = await Resource.find({});
+
+        else {
+            resources = await Resource.find({ name: Name });
+        }
+        // Save the new resource to the database
+        console.log(resources)
+
+        // Send the Cloudinary URL in the response
+        res.json(resources);
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+const editLibResource = async (req, res) => {
+
+    const { id
+    } = req.params;
+    console.log(id);
+    const Name = req.body.name;
+    // console.log(req.body)
+    try {
+        // Upload file to Cloudinary
+        const resources = await Resource.findByIdAndUpdate(id, { name: Name }, { new: true });
+
+
+        // Save the new resource to the database
+        console.log(resources)
+
+        // Send the Cloudinary URL in the response
+        res.json(resources);
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
+const deleteLibResource = async (req, res) => {
+
+    const { id
+    } = req.params;
+    console.log(id);
+
+    try {
+
+        const resources = await Resource.findByIdAndDelete(id);
+
+
+        // Save the new resource to the database
+        console.log(resources)
+
+        // Send the Cloudinary URL in the response
+        res.json(resources);
+    } catch (error) {
+        console.error(error);
+
+        // Ensure local file is deleted even if Cloudinary upload fails
+
+
+        res.status(500).json({ error: 'Error uploading file to Cloudinary' });
+    }
+};
+
+
+
+
+
+
 // Export controller functions
 module.exports = {
     searchStudentsByShift,
     deleteStudentById,
     editStudentById,
-    uploadResource
+    uploadResource,
+    fetchLibResources,
+    editLibResource,
+    deleteLibResource
     // Add other controller functions as needed
 };

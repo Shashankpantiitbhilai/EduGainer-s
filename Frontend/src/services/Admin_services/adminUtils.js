@@ -59,3 +59,49 @@ export const fileUpload = async (data, onUploadProgress) => {
 };
 
 
+export const fetchLibResources = async (data) => {
+    try {
+        console.log(data)
+        const response = await axiosInstance.post('/admin/fetchLibResource', { data })
+        console.log(response.data)
+        return response.data;
+    }
+    catch (error) {
+        console.error("error fetching data:", error)
+
+    }
+    // Assuming the response contains the necessary data
+};
+
+
+
+
+
+export const editLibResources = async (id, data) => {
+    console.log(data)
+    try {
+        const response = await axiosInstance.patch(`/admin/editLibResource/${id}`, data)
+        console.log(response.data)
+        return response.data;
+    }
+    catch (error) {
+        console.error("error fetching data:", error)
+
+    }
+    // Assuming the response contains the necessary data
+};
+
+
+export const deleteLibResource = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/deleteLibResource/${id}`)
+        console.log(response.data)
+        return response.data;
+    }
+    catch (error) {
+        console.error("error fetching data:", error)
+
+    }
+    // Assuming the response contains the necessary data
+};
+
