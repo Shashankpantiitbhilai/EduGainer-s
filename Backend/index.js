@@ -12,14 +12,10 @@ const MemoryStore = require('memorystore')(session);
 require("dotenv").config();
 
 const app = express();
-const corsOptions = {
-  origin: ["https://edu-gainer-s-frontend.vercel.app"], // Replace with your frontend's URL
-  credentials: true, // Enable credentials (e.g., cookies)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Add all methods you will use
-  // Add all headers you will use
-};
-
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: "https://edu-gainer-s-frontend.vercel.app",
+  credentials: true,
+}));
 // Enable pre-flight requests for all routes
 
 // Connect to MongoDB
@@ -44,7 +40,7 @@ app.use(myPassport.session());
 // app.get("/", (_req, res) => {
 //   res.redirect("https://edu-gainer-s-frontend.vercel.app");
 // });
-
+console.log("hi this is app.js")
 // Mount your route handlers
 app.use("/", routes_general);
 app.use("/auth", routes_auth);
