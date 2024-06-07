@@ -15,14 +15,14 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: ["https://edu-gainer-s-kxndkjnfrontend.vercel.app"],
-  methods: ["POST", "GET"],
-  credentials: true,
+  origin: 'https://edu-gainer-s-frontend.vercel.app',
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Enable to include cookies
 }));
-
 // Connect to MongoDB
 connectDB();
-
+app.options('*', cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
