@@ -143,6 +143,7 @@ router.post("/register", async (req, res) => {
     req.session.password = password;
     // console.log(req.session);
     // Send email with OTP
+    console.log(req.session)
     const mailOptions = {
       from: 'shashankpant94115@gmail.com',
       to: email,
@@ -172,7 +173,7 @@ router.post("/otp-verify", async (req, res) => {
   const email = req.session.email;
   const password = req.session.password;
   // console.log(req.session);
-  console.log(otp, sentOTP,email,password);
+  console.log(otp, sentOTP, email, password);
   try {
     // Assuming sentOTP is defined somewhere
     if (otp === sentOTP) {
