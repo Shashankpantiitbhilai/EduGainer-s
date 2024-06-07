@@ -12,6 +12,9 @@ const HeroSection = styled(Box)({
   borderRadius: "8px",
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   marginTop: "20px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
 });
 
 const HeroTitle = styled(Typography)({
@@ -35,6 +38,8 @@ const ButtonContainer = styled(Box)({
   flexDirection: "column",
   gap: "20px",
   alignItems: "center",
+  justifyContent: "center",
+  width: "100%", // Full width for centering within parent container
   "@media (min-width:600px)": {
     flexDirection: "row",
   },

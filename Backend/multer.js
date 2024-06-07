@@ -3,7 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 // Determine the upload directory
-const uploadDir = process.env.VERCEL ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+
+const uploadDir = process.env.NODE_ENV === 'development' ? path.join(__dirname, 'uploads') : '/tmp/uploads';
 
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {

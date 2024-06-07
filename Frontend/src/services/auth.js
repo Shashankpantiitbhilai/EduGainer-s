@@ -1,6 +1,7 @@
 import axios from "axios";
-
-const baseURL = "https://edu-gainer-s-backend.vercel.app";
+const baseURL = process.env.NODE_ENV === 'production'
+  ? "https://edu-gainer-s-backend.vercel.app"
+  : "http://localhost:8000";
 
 const axiosInstance = axios.create({
   baseURL,

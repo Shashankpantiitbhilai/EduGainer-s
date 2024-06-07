@@ -14,8 +14,12 @@ require("dotenv").config();
 const app = express();
 
 // CORS configuration
+const origin = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:3000'
+  : 'https://edu-gainer-s-frontend-alpha.vercel.app';
+console.log(process.env.NODE_ENV)
 app.use(cors({
-  origin: 'https://edu-gainer-s-frontend-alpha.vercel.app',
+  origin,
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // Enable to include cookies
@@ -48,6 +52,6 @@ app.get("/", (req, res) => {
   res.json("Hello");
 })
 // Start the server
-app.listen(process.env.PORT, () => {
-  console.log(`connected to port ${process.env.PORT}`);
+app.listen(process.env.PORT || 8000, () => {
+  console.log(`connected to port ${process.env.PORT || 8000} `);
 });
