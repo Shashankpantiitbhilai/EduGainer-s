@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator')
 const {
   Student,
- 
+
   User,
 } = require("../models/student");
 const passport = require("../models/passportConfig");
@@ -138,9 +138,9 @@ router.post("/register", async (req, res) => {
     req.session.sentOTP = sentOTP;
     req.session.email = email;
     req.session.password = password;
-    // console.log(req.session);
+    console.log(req.session);
     // Send email with OTP
-    console.log(req.session)
+    // console.log(req.session)
     const mailOptions = {
       from: 'shashankpant94115@gmail.com',
       to: email,
@@ -166,10 +166,11 @@ router.post("/register", async (req, res) => {
 // Route to verify OTP and register user
 router.post("/otp-verify", async (req, res) => {
   const { otp } = req.body;
+  console.log(req.session);
   const sentOTP = req.session.sentOTP;
   const email = req.session.email;
   const password = req.session.password;
-  console.log(req.session);
+
   console.log(otp, sentOTP, email, password);
   try {
     // Assuming sentOTP is defined somewhere
