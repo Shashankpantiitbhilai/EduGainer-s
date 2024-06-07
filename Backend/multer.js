@@ -5,7 +5,7 @@ const path = require('path');
 // Determine the upload directory
 
 const uploadDir = process.env.NODE_ENV === 'development' ? path.join(__dirname, 'uploads') : '/tmp/uploads';
-
+console.log(uploadDir)
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });

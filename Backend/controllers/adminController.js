@@ -66,6 +66,7 @@ const editStudentById = async (req, res) => {
 const uploadResource = async (req, res) => {
     const { name, tags } = req.body;
     console.log(req.body)
+    console.log(req.file)
     const filePath = req.file.path;
 
     try {
