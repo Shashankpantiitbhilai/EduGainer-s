@@ -8,7 +8,7 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
 const myPassport = require("./models/passportConfig"); // Adjust the path accordingly
-const MongoStore = require('connect-mongo');
+
 require("dotenv").config();
 const redis = require('redis');
 const client = redis.createClient();
@@ -44,17 +44,8 @@ app.use(session({
   secret: 'keyboard cat', // Use environment variable for session secret
   saveUninitialized: false, // Do not save uninitialized sessions
   resave: false, // Do not resave sessions that have not been modified
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI,
-    collectionName: 'sessions', // Optional: specify the collection name for sessions
-    ttl: 14 * 24 * 60 * 60 // Optional: specify the time-to-live for sessions (14 days here)
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    maxAge: 1000 * 60 * 60 * 24 // Optional: specify the cookie expiration time (1 day here)
-  }
 }));
-console.log(process.env.MONGODB_URI)
+
 // Passport middleware
 app.use(myPassport.initialize());
 app.use(myPassport.session());

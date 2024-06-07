@@ -42,7 +42,7 @@ const Main = () => {
                 <Route path="/register/google/:id" element={<GoogleRegister />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
-                <Route path="/otp-verify" element={<OTPVerify />} />
+                <Route path="/otp-verify/:id" element={<OTPVerify />} />
                 <Route
                     path="/resources"
                     element={

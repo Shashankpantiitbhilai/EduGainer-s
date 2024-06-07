@@ -27,7 +27,7 @@ export async function registerUser(email, password) {
       email,
       password,
     });
-    console.log(response);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 400) {
@@ -41,14 +41,14 @@ export async function registerUser(email, password) {
 }
 
 
-export async function verifyOTPAndRegisterUser(otp) {
+export async function verifyOTPAndRegisterUser(otp,id) {
   console.log(otp);
   try {
-    const response = await axiosInstance.post("/auth/otp-verify", { otp });
+    const response = await axiosInstance.post("/auth/otp-verify", { otp ,id});
     console.log(response);
     if (response.status === 201) {
       console.log("User registered successfully!");
-      return { success: true, message: "User registered successfully" ,user:response};
+      return { success: true, message: "User registered successfully", user: response };
     } else if (response.status === 400) {
       throw new Error("Invalid OTP: " + response.data.message);
     } else {

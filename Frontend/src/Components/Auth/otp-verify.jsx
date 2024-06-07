@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Button, TextField, Container, Typography, Box } from "@mui/material";
 import { verifyOTPAndRegisterUser } from "../../services/auth";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AdminContext } from "../../App";
 
 function OTPVerify() {
@@ -14,12 +14,13 @@ function OTPVerify() {
   } = useForm();
   const [error, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const { id } = useParams();
   const { setIsUserLoggedIn } = useContext(AdminContext);
 
   const onSubmit = async (data) => {
     try {
       console.log(data);
-      const response = await verifyOTPAndRegisterUser(data.otp);
+      const response = await verifyOTPAndRegisterUser(data.otp, id);
       if (response.success) {
         setIsUserLoggedIn(response);
         navigate("/");
@@ -31,7 +32,7 @@ function OTPVerify() {
       setErrorMsg("An error occurred while verifying OTP");
     }
   };
-
+  console.log(id);
   return (
     <Container
       maxWidth="sm"

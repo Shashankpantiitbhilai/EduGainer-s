@@ -16,7 +16,7 @@ function Register() {
       if (response && response.message === "User already exists") {
         setError("email", { type: "manual", message: "Email already exists" });
       } else if (response && response.message === "OTP sent successfully") {
-        navigate("/otp-verify");
+        navigate(`/otp-verify/${response.email}`);
       } else {
         navigate("/");
       }
