@@ -2,17 +2,14 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-const { restrictToPresident, restrictToAdmin } = require("../middlewares");
+
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator')
 const {
   Student,
-  ScietechPOR,
-  CultPOR,
-  SportsPOR,
-  AcadPOR,
+ 
   User,
 } = require("../models/student");
 const passport = require("../models/passportConfig");

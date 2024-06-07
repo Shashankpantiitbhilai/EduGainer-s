@@ -36,7 +36,8 @@ app.use(session({
   resave: false,
   store: new MemoryStore({
     checkPeriod: 86400 // prune expired entries every 24h
-  })
+  }),
+  cookie: { secure: true }
 }));
 
 
