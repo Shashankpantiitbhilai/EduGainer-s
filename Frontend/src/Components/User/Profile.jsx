@@ -65,7 +65,7 @@ const UploadButton = styled(Button)({
 });
 
 const Profile = () => {
-  const { IsUserLoggedIn } = useContext(AdminContext);
+  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
   const { id } = useParams(); // Assuming you're using id from the route params
   const [user, setUser] = useState({
     username: "",

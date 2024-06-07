@@ -42,7 +42,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // Session configuration
 app.use(session({
   secret: 'keyboard cat', // Use environment variable for session secret
-  saveUninitialized: false, // Do not save uninitialized sessions
+  saveUninitialized: true, // Do not save uninitialized sessions
   resave: false, // Do not resave sessions that have not been modified
 }));
 

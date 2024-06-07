@@ -15,7 +15,7 @@ function OTPVerify() {
   const [error, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
-  const { setIsUserLoggedIn } = useContext(AdminContext);
+  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
 
   const onSubmit = async (data) => {
     try {
