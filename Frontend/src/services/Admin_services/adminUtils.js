@@ -4,10 +4,13 @@ import axios from "axios";
 const baseURL = process.env.NODE_ENV === 'production'
     ? "https://edu-gainer-s-backend.vercel.app"
     : "http://localhost:8000";
-
+console.log(baseURL)
 const axiosInstance = axios.create({
     baseURL,
     withCredentials: true,
+    headers: {
+        "Content-Type": "application/json",
+    },
 });
 
 export async function fetchLibSudents(query) {
@@ -51,7 +54,7 @@ export const fileUpload = async (data, onUploadProgress) => {
     // for (let pair of formData.entries()) {
     //     console.log(pair[0], pair[1]);
     // }
-    const response = await axiosInstance.post('/admin/uploadResource', formData, {
+    const response = await axiosInstance.post('/admin/uploadResource', data, {
         onUploadProgress,
         headers: {
             'Content-Type': 'multipart/form-data',
