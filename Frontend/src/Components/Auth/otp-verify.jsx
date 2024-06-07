@@ -18,6 +18,7 @@ function OTPVerify() {
 
   const onSubmit = async (data) => {
     try {
+      console.log(data);
       const response = await verifyOTPAndRegisterUser(data.otp);
       if (response.success) {
         setIsUserLoggedIn(response);

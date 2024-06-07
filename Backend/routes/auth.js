@@ -172,7 +172,7 @@ router.post("/otp-verify", async (req, res) => {
   const email = req.session.email;
   const password = req.session.password;
   // console.log(req.session);
-  console.log(otp, sentOTP);
+  console.log(otp, sentOTP,email,password);
   try {
     // Assuming sentOTP is defined somewhere
     if (otp === sentOTP) {
