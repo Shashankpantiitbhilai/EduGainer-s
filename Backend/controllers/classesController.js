@@ -109,7 +109,8 @@ const sendIdCard = async (req, res) => {
         }
 
         // Ensure the 'idcard' directory exists
-        const pdfDir = path.join(__dirname, '..', 'idcard');
+        const pdfDir = process.env.NODE_ENV == 'development' ? path.join(__dirname, '..', 'uploads') : '/tmp/uploads';
+
         if (!fs.existsSync(pdfDir)) {
             fs.mkdirSync(pdfDir);
         }

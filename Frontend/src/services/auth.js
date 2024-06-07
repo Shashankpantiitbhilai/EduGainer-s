@@ -14,6 +14,7 @@ const axiosInstance = axios.create({
 export async function fetchCredentials() {
   try {
     const response = await axiosInstance.get("/auth/fetchAuth");
+    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error("Error fetching credentials:", error);
@@ -41,10 +42,10 @@ export async function registerUser(email, password) {
 }
 
 
-export async function verifyOTPAndRegisterUser(otp,id) {
+export async function verifyOTPAndRegisterUser(otp, id) {
   console.log(otp);
   try {
-    const response = await axiosInstance.post("/auth/otp-verify", { otp ,id});
+    const response = await axiosInstance.post("/auth/otp-verify", { otp, id });
     console.log(response);
     if (response.status === 201) {
       console.log("User registered successfully!");

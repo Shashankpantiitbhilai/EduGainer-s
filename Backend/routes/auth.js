@@ -60,7 +60,7 @@ router.post("/register", async (req, res) => {
         console.error(error);
         return res.status(500).json({ message: "Error sending OTP email" });
       } else {
-        return res.status(200).json({ message: "OTP sent successfully",email });
+        return res.status(200).json({ message: "OTP sent successfully", email });
       }
     });
   } catch (error) {
@@ -83,14 +83,14 @@ router.post("/otp-verify", async (req, res) => {
     if (!userDetails) {
       return res.status(400).json({ message: "Invalid OTP or user details not found" });
     }
-console.log(userDetails)
+    console.log(userDetails)
     const { otp: storedOTP, password } = JSON.parse(userDetails);
-  
+
     if (otp === storedOTP) {
       // OTP verified, register user using Passport
       const newUser = await User.register(
         new User({ strategy: "local", username: id }),
-      password
+        password
       );
 
       // Log in the new user
@@ -185,6 +185,7 @@ router.post("/forgot-password", (req, res) => {
     });
 });
 router.get("/fetchAuth", function (req, res) {
+  console.log(req.user)
   if (req.isAuthenticated()) {
     res.json(req.user);
   } else {
