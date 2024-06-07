@@ -145,7 +145,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
 router.get('/Lib_student/sendIdCard/:id', async (req, res) => {
   try {
     const { id } = req.params;
-
+console.log("server")
     // Fetch the student data from MongoDB
     const student = await Student.findOne({ userId: id }).exec();
     if (!student) {

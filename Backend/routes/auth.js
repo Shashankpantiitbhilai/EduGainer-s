@@ -81,7 +81,7 @@ router.post("/forgot-password", (req, res) => {
         from: 'shashankpant94115@gmail.com',
         to: email,
         subject: 'Reset Password Link',
-        text: `http://localhost:3000/reset-password/${user._id}/${token}`
+        text: `https://edu-gainer-s-frontend-alpha.vercel.app/reset-password/${user._id}/${token}`
       };
 
       transporter.sendMail(mailOptions, function (error, info) {
@@ -225,7 +225,7 @@ router.get(
 
 router.get("/google/addId", (req, res) => {
   // TODO: Find a more secure url
-  res.redirect(`http://localhost:3000/register/google/${req.user._id}`);
+  res.redirect(`https://edu-gainer-s-frontend-alpha.vercel.app/register/google/${req.user._id}`);
 });
 
 router.post("/google/register", async (req, res) => {

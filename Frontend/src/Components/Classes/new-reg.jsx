@@ -17,7 +17,10 @@ import { AdminContext } from "../../App.js";
 function ClassesRegistration() {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn._id;
-
+const baseURL =
+  process.env.NODE_ENV === "production"
+    ? "https://edu-gainer-s-backend.vercel.app"
+    : "http://localhost:8000";
   const {
     register,
     handleSubmit,
@@ -87,7 +90,7 @@ function ClassesRegistration() {
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          const callbackUrl = `https://edu-gainer-s-backend.vercel.app/classes/payment-verification/${user.userId}`;
+          const callbackUrl = `${baseURL}/classes/payment-verification/${user.userId}`;
 
           try {
             const verificationResponse = await axios.post(callbackUrl, {

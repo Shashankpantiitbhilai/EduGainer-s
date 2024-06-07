@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Container, Form, FormGroup, Label, Button } from "reactstrap";
+import {
+  Container,
+  Box,
+  TextField,
+  MenuItem,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { sendFormData } from "../../services/utils.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../App.js";
+
 function NewReg() {
-  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
-  console.log(IsUserLoggedIn._id);
+  const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn._id;
-  console.log(id);
+
   const {
     register,
     handleSubmit,
@@ -17,7 +25,10 @@ function NewReg() {
   } = useForm();
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const baseURL =
+    process.env.NODE_ENV === "production"
+      ? "https://edu-gainer-s-backend.vercel.app"
+      : "http://localhost:8000";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,17 +59,15 @@ function NewReg() {
   const onSubmit = async (formData) => {
     setLoading(true);
 
-    // console.log(response.data);
     const formDataWithImage = {
       ...formData,
       image: imageBase64,
-      userId: id, // Add the userId to the form data
+      userId: id,
     };
 
     try {
       const result = await sendFormData(formDataWithImage);
       const { key, order, user } = result;
-      console.log(user.userId);
       const options = {
         key,
         amount: order.amount,
@@ -81,7 +90,7 @@ function NewReg() {
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          const callbackUrl = `https://edu-gainer-s-backend.vercel.app/payment-verification/${user.userId}`;
+          const callbackUrl = `${baseURL}/payment-verification/${user.userId}`;
 
           try {
             const verificationResponse = await axios.post(callbackUrl, {
@@ -90,11 +99,8 @@ function NewReg() {
               signature: razorpay_signature,
             });
             const id = user.userId;
-            console.log(id);
-            console.log(verificationResponse.data.success);
             if (verificationResponse.data.success) {
-              const url = `/success/${id}`;
-              navigate(url); // Navigate to success page
+              navigate(`/success/${id}`);
             } else {
               throw new Error("Payment verification failed");
             }
@@ -118,142 +124,139 @@ function NewReg() {
       setLoading(false);
     }
   };
+
   return (
     <Container
-      className="d-flex justify-content-center align-items-center NewReg-container"
-      style={{ height: "100vh" }}
+      component="main"
+      maxWidth="sm"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+      }}
     >
-      <Form
+      <Box
+        component="form"
         onSubmit={handleSubmit(onSubmit)}
-        className="NewReg-form"
-        style={{ width: "30%" }}
         noValidate
+        sx={{ mt: 1 }}
       >
-        <FormGroup className="text-center mt-3">
-          <h2>Registration Form</h2>
-        </FormGroup>
+        <Typography component="h1" variant="h5" align="center">
+          Registration Form
+        </Typography>
 
-        <FormGroup className="mb-3">
-          <Label for="name">Name</Label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            className="form-control"
-            {...register("name", { required: "Name is required" })}
-            placeholder="Enter your name"
-          />
-          <p className="error">{errors.name?.message}</p>
-        </FormGroup>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="name"
+          label="Name"
+          {...register("name", { required: "Name is required" })}
+          error={!!errors.name}
+          helperText={errors.name?.message}
+        />
 
-        <FormGroup className="mb-3">
-          <Label for="shift">Shift Chosen</Label>
-          <select
-            type="select"
-            name="shift"
-            id="shift"
-            className="form-control"
-            {...register("shift", { required: "Shift selection is required" })}
-          >
-            <option value="">Select Shift</option>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          select
+          id="shift"
+          label="Shift Chosen"
+          {...register("shift", { required: "Shift selection is required" })}
+          error={!!errors.shift}
+          helperText={errors.shift?.message}
+        >
+          <MenuItem value="">Select Shift</MenuItem>
+          <MenuItem value="9 PM to 6 AM">9 PM to 6 AM</MenuItem>
+          <MenuItem value="2 PM to 11 PM">2 PM to 11 PM</MenuItem>
+          <MenuItem value="7 AM to 7 PM">7 AM to 7 PM</MenuItem>
+          <MenuItem value="24*7">24*7</MenuItem>
+          <MenuItem value="2 PM to 9 PM">2 PM to 9 PM</MenuItem>
+          <MenuItem value="7 PM to 11 PM">7 PM to 11 PM</MenuItem>
+        </TextField>
 
-            <option value="9 PM to 6 AM">9 PM to 6 AM</option>
-            <option value="2 PM to 11 PM">2 PM to 11 PM</option>
-            <option value="7 AM to 7 PM">7 AM to 7 PM</option>
-            <option value="24*7">24*7</option>
-            <option value="2 PM to 9 PM">2 PM to 9 PM</option>
-            <option value="7 PM to 11 PM">7 PM to 11 PM</option>
-            <p className="error">{errors.shift?.message}</p>
-          </select>
-        </FormGroup>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          type="number"
+          id="amount"
+          label="Amount"
+          {...register("amount", { required: "Amount is required" })}
+          error={!!errors.amount}
+          helperText={errors.amount?.message}
+        />
 
-        <FormGroup className="mb-3">
-          <Label for="amount">Amount</Label>
-          <input
-            type="number"
-            name="amount"
-            id="amount"
-            {...register("amount", { required: "Amount is required" })}
-            placeholder="Enter amount"
-            className="form-control"
-          />
-          <p className="error">{errors.amount?.message}</p>
-        </FormGroup>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="Email Address"
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+              message: "Invalid email address",
+            },
+          })}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+        />
 
-        <FormGroup className="mb-3">
-          <Label for="email">Email Address</Label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            {...register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Invalid email address",
-              },
-            })}
-            placeholder="Enter email"
-            className="form-control"
-          />
-          <p className="error">{errors.email?.message}</p>
-        </FormGroup>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="mobile"
+          label="Mobile Number"
+          {...register("mobile", {
+            required: "Mobile number is required",
+            pattern: {
+              value: /^\d{10}$/,
+              message: "Please enter a valid 10-digit mobile number",
+            },
+          })}
+          error={!!errors.mobile}
+          helperText={errors.mobile?.message}
+        />
 
-        <FormGroup className="mb-3">
-          <Label for="mobile">Mobile Number</Label>
-          <input
-            type="tel"
-            name="mobile"
-            id="mobile"
-            {...register("mobile", {
-              required: "Mobile number is required",
-              pattern: {
-                value: /^\d{10}$/,
-                message: "Please enter a valid 10-digit mobile number",
-              },
-            })}
-            placeholder="Enter mobile number"
-            className="form-control"
-          />
-          <p className="error">{errors.mobile?.message}</p>
-        </FormGroup>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="address"
+          label="Address"
+          {...register("address", { required: "Address is required" })}
+          error={!!errors.address}
+          helperText={errors.address?.message}
+        />
 
-        <FormGroup className="mb-3">
-          <Label for="address">Address</Label>
-          <input
-            type="text"
-            name="address"
-            id="address"
-            {...register("address", { required: "Address is required" })}
-            placeholder="Enter address"
-            className="form-control"
-          />
-          <p className="error">{errors.address?.message}</p>
-        </FormGroup>
+        <TextField
+          margin="normal"
+          fullWidth
+          type="file"
+          id="image"
+          inputProps={{ accept: "image/*" }}
+          onChange={handleImage}
+        />
 
-        <FormGroup className="mb-3">
-          <Label for="image">Upload Image</Label>
-          <input
-            type="file"
-            name="image"
-            id="image"
-            onChange={handleImage}
-            accept="image/*"
-            className="form-control"
-          />
-        </FormGroup>
-
-        <FormGroup className="text-center">
+        <Box sx={{ mt: 2, textAlign: "center" }}>
           <Button
             type="submit"
-            className="btn btn-warning"
-            style={{ width: "100%" }}
+            fullWidth
+            variant="contained"
+            color="primary"
             disabled={loading}
+            startIcon={loading && <CircularProgress size={20} />}
           >
             {loading ? "Submitting..." : "Submit"}
           </Button>
-        </FormGroup>
-      </Form>
+        </Box>
+      </Box>
     </Container>
   );
 }

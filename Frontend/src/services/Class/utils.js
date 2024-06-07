@@ -36,8 +36,8 @@ export async function fetchUserClassesDataById(user_id) {
 
 export async function sendIdCard(id) {
   try {
-
-    const response = await axiosInstance.get(`/Lib_student/sendIdCard/${id}`); // Adjust the endpoint as per your API
+    console.log(id, "reached utils")
+    const response = await axiosInstance.get(`/classes/sendIdCard/${id}`); // Adjust the endpoint as per your API
     return response.data; // Assuming the API returns JSON data representing the user object
   } catch (error) {
     console.error("Error fetching user data:", error);

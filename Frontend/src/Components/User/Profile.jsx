@@ -49,6 +49,21 @@ const CircularProgressWrapper = styled(CircularProgress)({
   display: "block",
 });
 
+const Details = styled(CardContent)({
+  flex: 1,
+});
+
+const ImageContainer = styled(CardContent)({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+const UploadButton = styled(Button)({
+  marginTop: 10,
+});
+
 const Profile = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const { id } = useParams(); // Assuming you're using id from the route params
@@ -126,7 +141,7 @@ const Profile = () => {
     <>
       {IsUserLoggedIn && (
         <RootCard>
-          <CardContent>
+          <Details>
             <Typography variant="h5" gutterBottom>
               Profile
             </Typography>
@@ -209,8 +224,8 @@ const Profile = () => {
                 )}
               </Grid>
             </Grid>
-          </CardContent>
-          <CardContent>
+          </Details>
+          <ImageContainer>
             {user.photoUpload && (
               <ImagePreview src={user.photoUpload} alt="Uploaded" />
             )}
@@ -219,18 +234,19 @@ const Profile = () => {
               accept="image/*"
               onChange={handleImage}
               disabled={!editing}
+              id="photo-upload-input"
             />
             <label htmlFor="photo-upload-input">
-              <Button
+              <UploadButton
                 variant="contained"
                 color="primary"
                 component="span"
                 disabled={!editing || loading}
               >
                 Upload Photo
-              </Button>
+              </UploadButton>
             </label>
-          </CardContent>
+          </ImageContainer>
         </RootCard>
       )}
     </>

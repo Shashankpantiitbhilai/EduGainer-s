@@ -1,9 +1,10 @@
 import React, { useState, useContext } from "react";
-import { Button, Form, FormGroup, Label, Input, Container } from "reactstrap";
+import { Button, TextField, Container, Typography, Box } from "@mui/material";
 import { verifyOTPAndRegisterUser } from "../../services/auth";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { AdminContext } from "../../App";
+
 function OTPVerify() {
   const {
     register,
@@ -14,13 +15,11 @@ function OTPVerify() {
   const [error, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const { setIsUserLoggedIn } = useContext(AdminContext);
+
   const onSubmit = async (data) => {
-    // console.log(data);
     try {
       const response = await verifyOTPAndRegisterUser(data.otp);
-      console.log(response);
       if (response.success) {
-        // OTP verified successfully, navigate to dashboard
         setIsUserLoggedIn(response);
         navigate("/");
       } else {
@@ -34,33 +33,43 @@ function OTPVerify() {
 
   return (
     <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ height: "100vh" }}
+      maxWidth="sm"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "100vh",
+      }}
     >
-      <Form onSubmit={handleSubmit(onSubmit)} className="otp-verify-form">
-        <FormGroup>
-          <Label for="otp">Enter OTP</Label>
-          <input
-            type="text"
-            name="otp"
-            id="otp"
-            {...register("otp", {
-              required: "OTP is required",
-              minLength: {
-                value: 6,
-                message: "OTP must be  6 characters long",
-              },
-            })}
-            placeholder="Enter OTP"
-            className="form-control"
-          />
-          {errors.otp && <p className="error">{errors.otp.message}</p>}
-        </FormGroup>
-        {error && <p className="error">{error}</p>}
-        <Button type="submit" color="primary">
+      <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
+        <Typography variant="h5" component="h1" gutterBottom>
+          Verify OTP
+        </Typography>
+        <TextField
+          fullWidth
+          id="otp"
+          label="Enter OTP"
+          variant="outlined"
+          margin="normal"
+          {...register("otp", {
+            required: "OTP is required",
+            minLength: {
+              value: 6,
+              message: "OTP must be 6 characters long",
+            },
+          })}
+          error={!!errors.otp}
+          helperText={errors.otp ? errors.otp.message : ""}
+        />
+        {error && (
+          <Typography color="error" variant="body2">
+            {error}
+          </Typography>
+        )}
+        <Button type="submit" variant="contained" color="primary" fullWidth>
           Verify OTP
         </Button>
-      </Form>
+      </Box>
     </Container>
   );
 }
