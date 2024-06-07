@@ -15,7 +15,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://edu-gainer-s-frontend.vercel.app',
+  origin: 'https://edu-gainer-s-frontend-alpha.vercel.app',
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true // Enable to include cookies
@@ -48,6 +48,6 @@ app.get("/", (req, res) => {
   res.json("Hello");
 })
 // Start the server
-app.listen(process.env.PORT || 8000, () => {
-  console.log(`connected to port ${process.env.PORT || 8000}`);
+app.listen(process.env.PORT, () => {
+  console.log(`connected to port ${process.env.PORT}`);
 });

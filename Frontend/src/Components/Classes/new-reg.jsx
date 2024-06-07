@@ -82,7 +82,7 @@ function ClassesRegistration() {
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          const callbackUrl = `https://edu-gainer-s.vercel.app/classes/payment-verification/${user.userId}`;
+          const callbackUrl = `https://edu-gainer-s-backend.vercel.app/classes/payment-verification/${user.userId}`;
 
           try {
             const verificationResponse = await axios.post(callbackUrl, {
