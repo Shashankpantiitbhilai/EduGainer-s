@@ -38,7 +38,8 @@ app.use(session({
     mongoUrl: process.env.MONGODB_URI,
     autoRemove: 'interval', // Set to 'interval' for auto removal
     autoRemoveInterval: 60 * 60  // Interval in seconds (e.g., 24 hours)
-  })
+  }),
+  cookie: { secure: true }
 }));
 
 
