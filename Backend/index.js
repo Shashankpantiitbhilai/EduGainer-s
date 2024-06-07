@@ -10,7 +10,8 @@ const { connectDB } = require("./db");
 const myPassport = require("./models/passportConfig"); // Adjust the path accordingly
 const MongoStore = require('connect-mongo');
 require("dotenv").config();
-
+const redis = require('redis');
+const client = redis.createClient();
 const app = express();
 
 // Determine the origin based on the environment

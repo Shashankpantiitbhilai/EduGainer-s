@@ -22,6 +22,95 @@ const transporter = nodemailer.createTransport({
     pass: process.env.PASSWORD
   }
 });
+const redisClient = require('../redis'); // Assuming redis client setup in separate file
+
+router.post("/register", async (req, res) => {
+  const { password, email } = req.body;
+
+  try {
+    // Check if Redis client is connected
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+    }
+
+    // Check if the email already exists
+    const existingUser = await User.findOne({ username: email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Generate OTP
+    const sentOTP = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+
+    const userDetails = JSON.stringify({ password, otp: sentOTP });
+
+    // Store the object in Redis with a TTL (Time-To-Live)
+    await redisClient.set(email, userDetails, 'EX', 30000);
+    console.log(userDetails)
+    // Send email with OTP
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'OTP Verification',
+      text: `Your OTP for registration is: ${sentOTP}`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error sending OTP email" });
+      } else {
+        return res.status(200).json({ message: "OTP sent successfully",email });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/otp-verify", async (req, res) => {
+  const { otp, id } = req.body;
+
+  try {
+    // Check if Redis client is connected
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+    }
+    console.log(id, otp)
+    // Retrieve OTP from Redis
+    const userDetails = await redisClient.get(id);
+    if (!userDetails) {
+      return res.status(400).json({ message: "Invalid OTP or user details not found" });
+    }
+console.log(userDetails)
+    const { otp: storedOTP, password } = JSON.parse(userDetails);
+  
+    if (otp === storedOTP) {
+      // OTP verified, register user using Passport
+      const newUser = await User.register(
+        new User({ strategy: "local", username: id }),
+      password
+      );
+
+      // Log in the new user
+      req.login(newUser, (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        // Respond with success message and new user object
+        res.status(201).json({ message: "User registered successfully", user: newUser });
+      });
+    } else {
+      // OTP verification failed
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 router.post('/reset-password/:id/:token', async (req, res) => {
   const { id, token } = req.params;
@@ -121,86 +210,6 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
     res.status(200).json({ message: "User Login is successful", user: req.user });
   }
 });
-
-router.post("/register", async (req, res) => {
-  const { password, email } = req.body;
-
-  console.log(req.body);
-  try {
-    // Check if the email already exists
-    const existingUser = await User.findOne({ username: email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // Generate OTP
-    const sentOTP = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
-    req.session.sentOTP = sentOTP;
-    req.session.email = email;
-    req.session.password = password;
-    console.log(req.session);
-    // Send email with OTP
-    // console.log(req.session)
-    const mailOptions = {
-      from: 'shashankpant94115@gmail.com',
-      to: email,
-      subject: 'OTP Verification',
-      text: `Your OTP for registration is: ${sentOTP}`
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error sending OTP email" });
-      } else {
-        return res.status(200).json({ message: "OTP sent successfully" });
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// Route to verify OTP and register user
-// Route to verify OTP and register user
-router.post("/otp-verify", async (req, res) => {
-  const { otp } = req.body;
-  console.log(req.session);
-  const sentOTP = req.session.sentOTP;
-  const email = req.session.email;
-  const password = req.session.password;
-
-  console.log(otp, sentOTP, email, password);
-  try {
-    // Assuming sentOTP is defined somewhere
-    if (otp === sentOTP) {
-
-      // OTP verified, register user using Passport
-      const newUser = await User.register(
-        new User({ strategy: "local", username: email }),
-        password
-      );
-
-      // Log in the new user
-      req.login(newUser, (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal Server Error" });
-        }
-        // Respond with success message and new user object
-        res.status(201).json({ message: "User registered successfully", user: newUser });
-      });
-    } else {
-      // OTP verification failed
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
 
 
 
