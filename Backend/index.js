@@ -10,7 +10,7 @@ const { connectDB } = require("./db");
 const myPassport = require("./models/passportConfig"); // Adjust the path accordingly
 const MemoryStore = require('memorystore')(session);
 require("dotenv").config();
-
+const MongoStore = require('connect-mongo');
 const app = express();
 
 // CORS configuration
@@ -25,19 +25,20 @@ app.use(cors({
   credentials: true // Enable to include cookies
 }));
 // Connect to MongoDB
-connectDB();
+
 app.options('*', cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-
+connectDB()
 app.use(session({
-  secret: 'keyboard cat',
+  secret: 'keyboard cat', // Replace with your actual secret for session encryption
   saveUninitialized: true,
   resave: false,
-  store: new MemoryStore({
-    checkPeriod: 86400 // prune expired entries every 24h
-  }),
-  cookie: { secure: true }
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    autoRemove: 'interval', // Set to 'interval' for auto removal
+    autoRemoveInterval: 60 * 60  // Interval in seconds (e.g., 24 hours)
+  })
 }));
 
 
