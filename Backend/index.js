@@ -40,7 +40,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'keyboard cat', // Use environment variable for session secret
+  secret: 'keyboard cat', // Use environment variable for session secret
   saveUninitialized: false, // Do not save uninitialized sessions
   resave: false, // Do not resave sessions that have not been modified
   store: MongoStore.create({
@@ -53,7 +53,7 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24 // Optional: specify the cookie expiration time (1 day here)
   }
 }));
-
+console.log(process.env.MONGODB_URI)
 // Passport middleware
 app.use(myPassport.initialize());
 app.use(myPassport.session());
