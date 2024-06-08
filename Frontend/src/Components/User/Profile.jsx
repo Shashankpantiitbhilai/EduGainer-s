@@ -87,8 +87,8 @@ const Profile = () => {
 
   const fetchUserDetails = async (id) => {
     try {
-      const response = await fetchCredentials();
-      setUser(response); // Ensure response.data contains the user object
+     
+      setUser(IsUserLoggedIn); // Ensure response.data contains the user object
     } catch (error) {
       console.error("Error fetching user data:", error);
       setError("Failed to fetch user data.");
