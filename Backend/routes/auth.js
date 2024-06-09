@@ -185,6 +185,7 @@ router.post("/forgot-password", (req, res) => {
     });
 });
 router.get("/fetchAuth", function (req, res) {
+  console.log(req.session)
   console.log(req.user)
   if (req.isAuthenticated()) {
     res.json(req.user);

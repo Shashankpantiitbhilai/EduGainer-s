@@ -43,8 +43,13 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(session({
   secret: 'keyboard cat', // Use environment variable for session secret
   saveUninitialized: true, // Do not save uninitialized sessions
-  resave: false, // Do not resave sessions that have not been modified
-}));
+  resave: false,
+  cookie: {
+    secure: true, // Ensure cookies are only sent over HTTPS
+    httpOnly: true, // Cookies are not accessible via JavaScript
+    sameSite: 'none' // Allow cross-site cookies
+  }
+}));// Do not resave sessions that have not been modifie
 
 // Passport middleware
 app.use(myPassport.initialize());
