@@ -20,6 +20,7 @@ const origin = process.env.NODE_ENV === 'development'
   : 'https://edu-gainer-s-frontend-alpha.vercel.app';
 
 console.log(`Running in ${process.env.NODE_ENV} mode`);
+app.set('trust proxy', 1);
 
 // CORS configuration
 app.use(cors({
@@ -34,11 +35,9 @@ app.options('*', cors());
 
 // Connect to MongoDB
 connectDB();
-
 // Body parser middleware
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.set('trust proxy', 1);
 
 // Session configuration
 app.use(session({
@@ -47,11 +46,11 @@ app.use(session({
   resave: false,
   proxy: true,
   cookie: {
-    secure: true, // Ensure cookies are only sent over HTTPS
+    secure: process.env.NODE_ENV !== 'development', // Ensure cookies are only sent over HTTPS in production
     httpOnly: true, // Cookies are not accessible via JavaScript
     sameSite: 'none' // Allow cross-site cookies
-  }
-}));// Do not resave sessions that have not been modifie
+  }// Do not resave sessions that have not been modified
+}));
 
 // Passport middleware
 app.use(myPassport.initialize());
