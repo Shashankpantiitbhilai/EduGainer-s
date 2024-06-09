@@ -11,6 +11,7 @@ function App() {
 
     useEffect(() => {
         fetchCredentials().then((User) => {
+            console.log(User)
             if (User) {
                 setIsUserLoggedIn(User);
             }

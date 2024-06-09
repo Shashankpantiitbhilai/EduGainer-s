@@ -38,12 +38,14 @@ connectDB();
 // Body parser middleware
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.set('trust proxy', 1);
 
 // Session configuration
 app.use(session({
   secret: 'keyboard cat', // Use environment variable for session secret
   saveUninitialized: true, // Do not save uninitialized sessions
   resave: false,
+  proxy: true,
   cookie: {
     secure: true, // Ensure cookies are only sent over HTTPS
     httpOnly: true, // Cookies are not accessible via JavaScript
