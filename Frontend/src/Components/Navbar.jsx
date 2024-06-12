@@ -67,13 +67,14 @@ function Navbar() {
       pages = [
         { name: "Library", link: "/admin_library" },
         { name: "Classes", link: "/admin_classes" },
-        { name: "Blog", link: "/admin_blog" },
+        { name: "Quiz", link: "/admin/quiz" },
       ];
     } else {
       pages = [
         { name: "Library", link: "/library" },
         { name: "Classes", link: "/classes" },
         { name: "Resources", link: "/resources" },
+        { name: "Chat", link: "/chat/home" },
       ];
     }
   }

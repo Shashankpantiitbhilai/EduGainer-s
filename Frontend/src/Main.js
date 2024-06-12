@@ -23,8 +23,9 @@ import ManageResources from "./Components/Admin/Resources.jsx";
 import Resources from "./Components/Resources/resources.jsx"
 import EdugainerClasses from "./Components/Classes/classes.jsx";
 import ClassesRegistration from "./Components/Classes/new-reg.jsx";
-
+import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
+import Chat from "./Components/chat/index.jsx"
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -43,6 +44,15 @@ const Main = () => {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
+                <Route path="/chat/home" element={<Chat />} />
+                <Route
+                    path="/admin/quiz"
+                    element={
+                        <ProtectedAdmin>
+                            <PdfUploader />
+                        </ProtectedAdmin>
+                    }
+                />
                 <Route
                     path="/resources"
                     element={
