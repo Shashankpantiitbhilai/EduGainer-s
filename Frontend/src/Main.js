@@ -25,7 +25,7 @@ import EdugainerClasses from "./Components/Classes/classes.jsx";
 import ClassesRegistration from "./Components/Classes/new-reg.jsx";
 import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
-import Chat from "./Components/chat/index.jsx"
+import Chat from "./Components/chat/dashboard.jsx"
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];

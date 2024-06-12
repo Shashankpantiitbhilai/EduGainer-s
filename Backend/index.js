@@ -59,11 +59,11 @@ app.use(session({
   saveUninitialized: true,
   resave: false,
   proxy: true,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: 'none'
-  }
+  // cookie: {
+  //   secure: process.env.NODE_ENV === 'production',
+  //   httpOnly: true,
+  //   sameSite: 'none'
+  // }
 }));
 
 // Passport middleware

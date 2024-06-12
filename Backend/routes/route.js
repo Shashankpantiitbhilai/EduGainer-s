@@ -9,7 +9,7 @@ const PDFDocument = require('pdfkit');
 const axios = require("axios");
 const fs = require('fs');
 const { sendEmailWithAttachment } = require("../emailSender")
-const {Message} = require("../models/chat")
+const { Message } = require("../models/chat")
 router.get('/messages', async (req, res) => {
   try {
     const messages = await Message.find({});
@@ -23,7 +23,7 @@ router.get('/messages', async (req, res) => {
 router.post('/messages', async (req, res) => {
   const { sender, receiver, message } = req.body;
   console.log(req.body);
-  const newMessage =await Message.create({ sender, receiver, message });
+  const newMessage = await Message.create({ sender, receiver, message });
   try {
     await newMessage.save();
     res.status(201).json(newMessage);
