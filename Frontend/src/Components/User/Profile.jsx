@@ -10,7 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { fetchCredentials } from "../../services/auth";
+
 import { updateUserDetails } from "../../services/utils";
 import { AdminContext } from "../../App";
 
@@ -65,7 +65,7 @@ const UploadButton = styled(Button)({
 });
 
 const Profile = () => {
-  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
+  const { IsUserLoggedIn } = useContext(AdminContext);
   const { id } = useParams(); // Assuming you're using id from the route params
   const [user, setUser] = useState({
     username: "",
@@ -83,11 +83,10 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserDetails(id);
-  }, [id]);
+  });
 
   const fetchUserDetails = async (id) => {
     try {
-     
       setUser(IsUserLoggedIn); // Ensure response.data contains the user object
     } catch (error) {
       console.error("Error fetching user data:", error);

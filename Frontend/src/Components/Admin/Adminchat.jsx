@@ -14,13 +14,9 @@ import {
 import { Send as SendIcon } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import io from "socket.io-client";
-
+import axios from "axios";
 import { AdminContext } from "../../App";
-import {
-  fetchChatMessages,
-  postChatMessages,
-  fetchAdminCredentials,
-} from "../../services/chat/utils";
+const socket = io("http://localhost:8000"); // Update with your backend URL
 
 const ChatSection = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -56,73 +52,25 @@ const InputArea = styled(Grid)(({ theme }) => ({
 
 const Chat = ({ user }) => {
   const { IsUserLoggedIn } = useContext(AdminContext);
+  console.log(IsUserLoggedIn);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [adminRoomId, setAdminRoomId] = useState(""); // State to hold admin room ID
 
   useEffect(() => {
-    const socket = io("http://localhost:8000", {
-      query: {
-        sender: IsUserLoggedIn._id,
-      },
+    axios.get("http://localhost:8000/messages").then((response) => {
+      setMessages(response.data);
     });
-    const fetchData = async () => {
-      try {
-        const [chatData, adminData] = await Promise.all([
-          fetchChatMessages(),
-          fetchAdminCredentials(),
-        ]);
-        console.log(adminData);
 
-        setMessages(chatData);
-        setAdminRoomId(adminData._id);
-
-        console.log("admin id", adminData._id, adminRoomId);
-        socket.on("receiveMessage", (message) => {
-          setMessages((prevMessages) => [...prevMessages, message]);
-        });
-
-        return () => {
-          socket.off("receiveMessage");
-        };
-      } catch (error) {
-        console.error("Error fetching resources:", error);
-      }
-    };
-
-    fetchData();
+    socket.on("receiveMessage", (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
   }, []);
 
-
-
-  const sendMessage = async () => {
-    const messageData = {
-      messages: [
-        {
-          sender: IsUserLoggedIn._id,
-          receiver: adminRoomId,
-          content: input,
-        },
-      ],
-      user: IsUserLoggedIn._id,
-      timestamp: new Date(),
-    };
-
-    try {
-      const response = await postChatMessages(messageData);
-      console.log(response);
-      const socket = io("http://localhost:8000");
-      socket.emit("sendMessage", messageData);
-      setInput("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
-
-  const handleAdminClick = () => {
-    // Join the admin's room on socket
-    const socket = io("http://localhost:8000");
-    socket.emit("join", adminRoomId);
+  const sendMessage = () => {
+    const message = { sender: user, receiver: "admin", message: input };
+    axios.post("http://localhost:8000/messages", message);
+    socket.emit("sendMessage", message);
+    setInput("");
   };
 
   return (
@@ -135,7 +83,7 @@ const Chat = ({ user }) => {
       <Grid container component={ChatSection}>
         <Sidebar item xs={12} sm={3}>
           <List>
-            <ListItem button key="admin" onClick={handleAdminClick}>
+            <ListItem button key="admin">
               <Avatar
                 alt="Admin"
                 src="https://material-ui.com/static/images/avatar/1.jpg"
