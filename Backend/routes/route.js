@@ -10,14 +10,7 @@ const axios = require("axios");
 const fs = require('fs');
 const { sendEmailWithAttachment } = require("../emailSender")
 const { Message } = require("../models/chat")
-router.get('/messages', async (req, res) => {
-  try {
-    const messages = await Message.find({});
-    res.json(messages);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+
 
 // Route to post a new message
 router.post('/messages', async (req, res) => {
