@@ -10,27 +10,27 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
 const myPassport = require("./models/passportConfig");
-const http = require('http');
+// const http = require('http');
 const socketIO = require('socket.io');
 const redis = require('redis');
 const client = redis.createClient();
 const app = express();
-app.use(require('express-status-monitor')());
+
 
 const origin = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000'
   : 'https://edu-gainer-s-frontend-alpha.vercel.app';
 
-// Create the server
-const server = http.createServer(app);
-const io = socketIO(server, {
-  cors: {
-    origin,
-    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }
-});
+// // Create the server
+// const server = http.createServer(app);
+// const io = socketIO(server, {
+//   cors: {
+//     origin,
+//     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true
+//   }
+// });
 
 console.log(`Running in ${process.env.NODE_ENV} mode`);
 app.set('trust proxy', 1);
@@ -84,32 +84,32 @@ app.get("/", (req, res) => {
 // User ID to socket ID mapping
 const userSocketMap = new Map();
 
-io.on('connection', (socket) => {
-  const userId = socket.handshake.query.sender;
-  const adminId = socket.handshake.query.admin;
+// io.on('connection', (socket) => {
+//   const userId = socket.handshake.query.sender;
+//   const adminId = socket.handshake.query.admin;
 
-  // Handle joinRoom event
-  socket.on('joinRoom', (roomId) => {
-    console.log(`User ${socket.id} joining room ${roomId}`);
-    socket.join(roomId);
-  });
+//   // Handle joinRoom event
+//   socket.on('joinRoom', (roomId) => {
+//     console.log(`User ${socket.id} joining room ${roomId}`);
+//     socket.join(roomId);
+//   });
 
   
 
-  // Handle sendMessage event
-  socket.on('sendMessage', (messageData,roomId) => {
-    console.log("messagedata", messageData);
-    const { messages, user } = messageData;
-    console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
-console.log(roomId)
-    // Broadcast the message to all clients in the room
-    io.to(roomId).emit('xyz', messageData,roomId);
-  });
+//   // Handle sendMessage event
+//   socket.on('sendMessage', (messageData,roomId) => {
+//     console.log("messagedata", messageData);
+//     const { messages, user } = messageData;
+//     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
+// console.log(roomId)
+//     // Broadcast the message to all clients in the room
+//     io.to(roomId).emit('xyz', messageData,roomId);
+//   });
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected');
+//   });
+// });
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
