@@ -9,6 +9,7 @@ module.exports = (io) => {
 
     router.post('/postChatMessages', chatController.postChatMessages);
     router.get('/fetchAdminCredentials', chatController.fetchAdminCredentials);
+   
 
     return router;
 };

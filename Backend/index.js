@@ -57,7 +57,6 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   saveUninitialized: true,
   resave: false,
-  // proxy: true,
 }));
 
 app.use(myPassport.initialize());
@@ -80,21 +79,29 @@ app.get("/", (req, res) => {
 const userSocketMap = new Map();
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
-
-  // Assuming you get the user ID from the client's query or a handshake header
   const userId = socket.handshake.query.sender;
-  if (userId) {
-    userSocketMap.set(userId, socket.id);
-    console.log(`User ${userId} connected with socket ID ${socket.id} : ${userId}  ${userSocketMap[userId]}`);
-  }
+  const adminId = socket.handshake.query.admin;
+
+  // Handle joinRoom event
+  socket.on('joinRoom', (roomId) => {
+    console.log(`User ${socket.id} joining room ${roomId}`);
+    socket.join(roomId);
+  });
+
+  
+
+  // Handle sendMessage event
+  socket.on('sendMessage', (messageData,roomId) => {
+    console.log("messagedata", messageData);
+    const { messages, user } = messageData;
+    console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
+console.log(roomId)
+    // Broadcast the message to all clients in the room
+    io.to(roomId).emit('xyz', messageData,roomId);
+  });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected');
-    if (userId) {
-      userSocketMap.delete(userId);
-      console.log(`User ${userId} disconnected and removed from map`);
-    }
   });
 });
 

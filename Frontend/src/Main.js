@@ -26,6 +26,7 @@ import ClassesRegistration from "./Components/Classes/new-reg.jsx";
 import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
 import Chat from "./Components/chat/dashboard.jsx"
+import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -45,7 +46,16 @@ const Main = () => {
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
                 <Route path="/chat/home" element={<ProtectedUser><Chat /> </ProtectedUser >} />
-                    <Route
+               
+                <Route
+                    path="/admin/chat"
+                    element={
+                        <ProtectedAdmin>
+                            <AdminChat />
+                        </ProtectedAdmin>
+                    }
+                />
+                <Route
                         path="/admin/quiz"
                         element={
                             <ProtectedAdmin>
