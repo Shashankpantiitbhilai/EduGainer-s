@@ -54,9 +54,15 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'keyboard cat',
-  saveUninitialized: true,
+  secret: 'keyboard cat', // Use environment variable for session secret
+  saveUninitialized: true, // Do not save uninitialized sessions
   resave: false,
+  proxy: true,
+  cookie: {
+    secure: true, // Ensure cookies are only sent over HTTPS
+    httpOnly: true, // Cookies are not accessible via JavaScript
+    sameSite: 'none' // Allow cross-site cookies
+  }
 }));
 
 app.use(myPassport.initialize());
@@ -106,6 +112,6 @@ console.log(roomId)
 });
 
 const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Connected to port ${PORT}`);
 });
