@@ -19,5 +19,6 @@ router.post('/uploadResource', upload.single('file'), adminController.uploadReso
 router.patch('/editLibResource/:id', adminController.editLibResource);
 
 router.delete('/deleteLibResource/:id', adminController.deleteLibResource);
-
+router.get('/fetchAllUsers', adminController.fetchAllUsers);
+router.get(`/fetchAllChats/:id`, adminController.fetchAllChats);
 module.exports = router;

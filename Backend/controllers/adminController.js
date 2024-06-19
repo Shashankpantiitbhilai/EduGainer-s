@@ -1,10 +1,24 @@
 // Assuming you have an Student model
-const { Student } = require('../models/student'); // Assuming you have a Shift model
+const { Student, User } = require('../models/student');
+const { Message } = require("../models/chat");// Assuming you have a Shift model
 const { Resource } = require('../models/Admin')
 const { uploadToCloudinary } = require("../cloudinary")
 const fs = require('fs');
 const path = require('path');
-
+const fetchAllChats = async (req, res) => {
+    const { id }=req.params// Assuming shift is sent in the request body
+    try {
+        // Query database to find admins based on the shift
+       
+       const students = await Message.find({ user: id });
+        // console.log(students)
+        // Example response structure
+        res.status(200).json(students);
+    } catch (error) {
+        console.error("Error searching Students by shift:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
 // Example function to search Students by shift
 const searchStudentsByShift = async (req, res) => {
     const { shift } = req.query;// Assuming shift is sent in the request body
@@ -18,6 +32,22 @@ const searchStudentsByShift = async (req, res) => {
             students = await Student.find({ shift: shift }).exec();
         }
         console.log(students)
+        // Example response structure
+        res.status(200).json(students);
+    } catch (error) {
+        console.error("Error searching Students by shift:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+// Example function to search Students by shift
+const fetchAllUsers = async (req, res) => {
+    // Assuming shift is sent in the request body
+    try {
+        // Query database to find admins based on the shift
+       
+       const students = await User.find({})
+        
+        // console.log(students)
         // Example response structure
         res.status(200).json(students);
     } catch (error) {
@@ -200,6 +230,8 @@ module.exports = {
     uploadResource,
     fetchLibResources,
     editLibResource,
-    deleteLibResource
+    deleteLibResource,
+    fetchAllUsers,
+    fetchAllChats
     // Add other controller functions as needed
 };

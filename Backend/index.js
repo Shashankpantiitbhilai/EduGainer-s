@@ -5,18 +5,18 @@ const routes_general = require("./routes/route");
 const routes_admin = require("./routes/admin");
 const routes_classes = require("./routes/classes");
 const routes_quiz = require("./routes/quiz");
+const routes_chat = require("./routes/chat");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
-const myPassport = require("./models/passportConfig"); // Adjust the path accordingly
+const myPassport = require("./models/passportConfig");
 const http = require('http');
 const socketIO = require('socket.io');
-const { Message } = require("./models/chat");
-require("dotenv").config();
 const redis = require('redis');
 const client = redis.createClient();
 const app = express();
 app.use(require('express-status-monitor')());
+
 const origin = process.env.NODE_ENV === 'development'
   ? 'http://localhost:3000'
   : 'https://edu-gainer-s-frontend-alpha.vercel.app';
@@ -43,7 +43,6 @@ app.use(cors({
   credentials: true
 }));
 
-// Enable pre-flight requests for all routes
 app.options('*', cors());
 
 // Connect to MongoDB
@@ -58,40 +57,47 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   saveUninitialized: true,
   resave: false,
-  proxy: true,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    sameSite: 'none'
-  }
 }));
 
-// Passport middleware
 app.use(myPassport.initialize());
 app.use(myPassport.session());
 
-// Mount your route handlers
 app.use("/", routes_general);
 app.use("/auth", routes_auth);
 app.use("/admin", routes_admin);
 app.use("/classes", routes_classes);
 app.use("/quiz", routes_quiz);
+
+// Pass Socket.IO instance to chat routes
+app.use("/chat", routes_chat(io));
+
 app.get("/", (req, res) => {
   res.json("Hello");
 });
 
-// Socket.IO connection handler
-io.on('connection', (socket) => {
-  console.log('New client connected');
+// User ID to socket ID mapping
+const userSocketMap = new Map();
 
-  socket.on('sendMessage', async (data) => {
-    // console.log(data,"in server")
-    const { sender, receiver, message } = data;
-    const newMessage = new Message({ sender, receiver, message });
-    await newMessage.save();
-    const res = Message.find({});
-    console.log(res)
-    io.emit('receiveMessage', newMessage);
+io.on('connection', (socket) => {
+  const userId = socket.handshake.query.sender;
+  const adminId = socket.handshake.query.admin;
+
+  // Handle joinRoom event
+  socket.on('joinRoom', (roomId) => {
+    console.log(`User ${socket.id} joining room ${roomId}`);
+    socket.join(roomId);
+  });
+
+  
+
+  // Handle sendMessage event
+  socket.on('sendMessage', (messageData,roomId) => {
+    console.log("messagedata", messageData);
+    const { messages, user } = messageData;
+    console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
+console.log(roomId)
+    // Broadcast the message to all clients in the room
+    io.to(roomId).emit('xyz', messageData,roomId);
   });
 
   socket.on('disconnect', () => {
@@ -99,7 +105,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Start the server
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Connected to port ${PORT}`);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Paper,
   Grid,
@@ -14,9 +14,13 @@ import {
 import { Send as SendIcon } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import io from "socket.io-client";
-import axios from "axios";
 
-const socket = io("http://localhost:8000"); // Update with your backend URL
+import { AdminContext } from "../../App";
+import {
+  fetchChatMessages,
+  postChatMessages,
+  fetchAdminCredentials,
+} from "../../services/chat/utils";
 
 const ChatSection = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -51,24 +55,83 @@ const InputArea = styled(Grid)(({ theme }) => ({
 }));
 
 const Chat = ({ user }) => {
+  const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [adminRoomId, setAdminRoomId] = useState("");
+  const socketRef = useRef(null);
+  const [roomId, setRoomId] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:8000/messages").then((response) => {
-      setMessages(response.data);
-    });
+    const fetchAdminAndMessages = async () => {
+      try {
+        const [chatData, adminData] = await Promise.all([
+          fetchChatMessages(),
+          fetchAdminCredentials(),
+        ]);
 
-    socket.on("receiveMessage", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+        if (adminData) {
+          setMessages(chatData);
+          const admin = adminData;
+          const userid = IsUserLoggedIn._id;
+          const adminid = admin._id;
+          const roomId = userid;
+          setAdminRoomId(adminid);
+          setRoomId(roomId);
+
+          const socket = io("http://localhost:8000", {
+            query: {
+              sender: IsUserLoggedIn._id,
+              admin: admin._id,
+            },
+          });
+
+          socketRef.current = socket;
+
+          socket.emit("joinRoom", roomId);
+
+          // Setting up the listener
+          socket.on("xyz", (message,roomId) => {
+            console.log("received message", message);
+            setMessages((prevMessages) => [...prevMessages, message]);
+          });
+
+          // Clean up the socket connection when the component unmounts
+          return () => {
+            socket.disconnect();
+          };
+        }
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+      }
+    };
+
+    fetchAdminAndMessages();
   }, []);
 
-  const sendMessage = () => {
-    const message = { sender: user, receiver: "admin", message: input };
-    axios.post("http://localhost:8000/messages", message);
-    socket.emit("sendMessage", message);
-    setInput("");
+  const sendMessage = async () => {
+    const messageData = {
+      messages: [
+        {
+          sender: IsUserLoggedIn._id,
+          receiver: adminRoomId,
+          content: input,
+        },
+      ],
+      user: IsUserLoggedIn._id,
+      timestamp: new Date(),
+    };
+
+    try {
+      const response = await postChatMessages(messageData);
+      if (socketRef.current) {
+        socketRef.current.emit("sendMessage", messageData, roomId);
+      }
+
+      setInput("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   return (
@@ -81,7 +144,11 @@ const Chat = ({ user }) => {
       <Grid container component={ChatSection}>
         <Sidebar item xs={12} sm={3}>
           <List>
-            <ListItem button key="admin">
+            <ListItem
+              button
+              key="admin"
+              onClick={() => socketRef.current.emit("joinRoom", adminRoomId)}
+            >
               <Avatar
                 alt="Admin"
                 src="https://material-ui.com/static/images/avatar/1.jpg"
@@ -97,13 +164,21 @@ const Chat = ({ user }) => {
                 <Grid container>
                   <Grid item xs={12}>
                     <ListItemText
-                      align={msg.sender === user ? "right" : "left"}
-                      primary={msg.message}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
+                      primary={msg.messages[0].content}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <ListItemText
-                      align={msg.sender === user ? "right" : "left"}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
                       secondary={new Date(msg.timestamp).toLocaleTimeString()}
                     />
                   </Grid>

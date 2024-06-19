@@ -26,6 +26,7 @@ import ClassesRegistration from "./Components/Classes/new-reg.jsx";
 import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
 import Chat from "./Components/chat/dashboard.jsx"
+import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -44,115 +45,124 @@ const Main = () => {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
-                <Route path="/chat/home" element={<Chat />} />
+                <Route path="/chat/home" element={<ProtectedUser><Chat /> </ProtectedUser >} />
+               
                 <Route
-                    path="/admin/quiz"
+                    path="/admin/chat"
                     element={
                         <ProtectedAdmin>
-                            <PdfUploader />
+                            <AdminChat />
                         </ProtectedAdmin>
                     }
                 />
                 <Route
-                    path="/resources"
-                    element={
-                        <ProtectedUser>
-                            <Resources />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/library"
-                    element={
-                        <ProtectedUser>
-                            <Library />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/classes"
-                    element={
-                        <ProtectedUser>
-                            <EdugainerClasses />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/classes-reg/:id"
-                    element={
-                        <ProtectedUser>
-                            <ClassesRegistration />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/classes/success/:id"
-                    element={
-                        <ProtectedUser>
-                            <SuccessClasses />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/new-reg"
-                    element={
-                        <ProtectedUser>
-                            <NewReg />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/success/:id"
-                    element={
-                        <ProtectedUser>
-                            <Success />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/dashboard/:id"
-                    element={
-                        <ProtectedUser>
-                            <Dashboard />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/profile/:id"
-                    element={
-                        <ProtectedUser>
-                            <Profile />
-                        </ProtectedUser>
-                    }
-                />
-                <Route
-                    path="/admin_Library"
-                    element={
-                        <ProtectedAdmin>
-                            <AdminLibrary />
-                        </ProtectedAdmin>
-                    }
-                />
-                <Route
-                    path="/admin_library/manage-users"
-                    element={
-                        <ProtectedAdmin>
-                            <ManageUsers />
-                        </ProtectedAdmin>
-                    }
-                />
-                <Route
-                    path="/admin_library/manage-resources"
-                    element={
-                        <ProtectedAdmin>
-                            <ManageResources />
-                        </ProtectedAdmin>
-                    }
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                        path="/admin/quiz"
+                        element={
+                            <ProtectedAdmin>
+                                <PdfUploader />
+                            </ProtectedAdmin>
+                        }
+                    />
+                    <Route
+                        path="/resources"
+                        element={
+                            <ProtectedUser>
+                                <Resources />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/library"
+                        element={
+                            <ProtectedUser>
+                                <Library />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/classes"
+                        element={
+                            <ProtectedUser>
+                                <EdugainerClasses />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/classes-reg/:id"
+                        element={
+                            <ProtectedUser>
+                                <ClassesRegistration />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/classes/success/:id"
+                        element={
+                            <ProtectedUser>
+                                <SuccessClasses />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/new-reg"
+                        element={
+                            <ProtectedUser>
+                                <NewReg />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/success/:id"
+                        element={
+                            <ProtectedUser>
+                                <Success />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/dashboard/:id"
+                        element={
+                            <ProtectedUser>
+                                <Dashboard />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/profile/:id"
+                        element={
+                            <ProtectedUser>
+                                <Profile />
+                            </ProtectedUser>
+                        }
+                    />
+                    <Route
+                        path="/admin_Library"
+                        element={
+                            <ProtectedAdmin>
+                                <AdminLibrary />
+                            </ProtectedAdmin>
+                        }
+                    />
+                    <Route
+                        path="/admin_library/manage-users"
+                        element={
+                            <ProtectedAdmin>
+                                <ManageUsers />
+                            </ProtectedAdmin>
+                        }
+                    />
+                    <Route
+                        path="/admin_library/manage-resources"
+                        element={
+                            <ProtectedAdmin>
+                                <ManageResources />
+                            </ProtectedAdmin>
+                        }
+                    />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
         </>
-    );
+            );
 };
 
-export default Main;
+            export default Main;

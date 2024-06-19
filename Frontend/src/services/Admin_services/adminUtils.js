@@ -98,3 +98,27 @@ export const deleteLibResource = async (id) => {
         throw error;
     }
 };
+
+export async function fetchAllChats(id) {
+
+    try {
+        console.log(id)
+        const response = await axiosInstance.get(`/admin/fetchAllChats/${id}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+export async function fetchAllUsers() {
+
+    try {
+        const response = await axiosInstance.get("/admin/fetchAllUsers");
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}

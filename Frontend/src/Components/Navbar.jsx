@@ -68,6 +68,7 @@ function Navbar() {
         { name: "Library", link: "/admin_library" },
         { name: "Classes", link: "/admin_classes" },
         { name: "Quiz", link: "/admin/quiz" },
+        { name: "AdminChat", link: "/admin/chat" },
       ];
     } else {
       pages = [
