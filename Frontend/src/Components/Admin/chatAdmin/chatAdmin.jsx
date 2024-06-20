@@ -60,7 +60,7 @@ const InputArea = styled(Grid)(({ theme }) => ({
   justifyContent: "space-between",
 }));
 
-const AdminChat = ({ user }) => {
+const AdminChat = ({  }) => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -84,8 +84,11 @@ const AdminChat = ({ user }) => {
         if (adminData) {
           const admin = adminData;
           setAdminRoomId(adminData._id)
-
-          const socket = io("http://localhost:8000", {
+const url =
+  process.env.NODE_ENV === "production"
+    ? "https://edu-gainer-s-backend.vercel.app"
+    : "http://localhost:8000";
+          const socket = io(url, {
             query: {
               sender: IsUserLoggedIn._id,
               admin: admin._id,

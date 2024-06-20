@@ -94,16 +94,16 @@ io.on('connection', (socket) => {
     socket.join(roomId);
   });
 
-  
+
 
   // Handle sendMessage event
-  socket.on('sendMessage', (messageData,roomId) => {
+  socket.on('sendMessage', (messageData, roomId) => {
     console.log("messagedata", messageData);
     const { messages, user } = messageData;
     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
-console.log(roomId)
+    console.log(roomId)
     // Broadcast the message to all clients in the room
-    io.to(roomId).emit('xyz', messageData,roomId);
+    io.to(roomId).emit('xyz', messageData, roomId);
   });
 
   socket.on('disconnect', () => {

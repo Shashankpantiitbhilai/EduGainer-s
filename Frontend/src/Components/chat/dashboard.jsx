@@ -54,7 +54,7 @@ const InputArea = styled(Grid)(({ theme }) => ({
   justifyContent: "space-between",
 }));
 
-const Chat = ({ user }) => {
+const Chat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -64,7 +64,7 @@ const Chat = ({ user }) => {
 
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
-      try {console.log("hi")
+      try {
         const [chatData, adminData] = await Promise.all([
           fetchChatMessages(),
           fetchAdminCredentials(),
@@ -78,8 +78,11 @@ const Chat = ({ user }) => {
           const roomId = userid;
           setAdminRoomId(adminid);
           setRoomId(roomId);
-
-          const socket = io("http://localhost:8000", {
+const url =
+  process.env.NODE_ENV === "production"
+    ? "https://edu-gainer-s-backend.vercel.app"
+    : "http://localhost:8000";
+          const socket = io(url, {
             query: {
               sender: IsUserLoggedIn._id,
               admin: admin._id,
@@ -107,7 +110,7 @@ const Chat = ({ user }) => {
     };
 
     fetchAdminAndMessages();
-  }, [IsUserLoggedIn._id]);
+  }, []);
 
   const sendMessage = async () => {
     const messageData = {
