@@ -64,12 +64,12 @@ const Chat = ({ user }) => {
 
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
-      try {
+      try {console.log("hi")
         const [chatData, adminData] = await Promise.all([
           fetchChatMessages(),
           fetchAdminCredentials(),
         ]);
-
+        // console.log(chatData);
         if (adminData) {
           setMessages(chatData);
           const admin = adminData;
@@ -91,7 +91,7 @@ const Chat = ({ user }) => {
           socket.emit("joinRoom", roomId);
 
           // Setting up the listener
-          socket.on("xyz", (message,roomId) => {
+          socket.on("xyz", (message, roomId) => {
             console.log("received message", message);
             setMessages((prevMessages) => [...prevMessages, message]);
           });
@@ -107,7 +107,7 @@ const Chat = ({ user }) => {
     };
 
     fetchAdminAndMessages();
-  }, []);
+  }, [IsUserLoggedIn._id]);
 
   const sendMessage = async () => {
     const messageData = {

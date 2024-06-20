@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 
 
-const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator')

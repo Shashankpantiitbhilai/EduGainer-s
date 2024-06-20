@@ -146,7 +146,7 @@ function Login() {
           color="secondary"
           fullWidth
           startIcon={<GoogleIcon />}
-          href="http://localhost:8000/auth/google"
+          href="https://edu-gainer-s-frontend-alpha.vercel.app/auth/google"
           sx={{ mt: 2 }}
         >
           Sign in with Google

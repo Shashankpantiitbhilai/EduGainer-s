@@ -1,15 +1,15 @@
-// routes/quizRoutes.js
-const express = require('express');
-const quizController = require('../controllers/quizController');
+// // routes/quizRoutes.js
+// const express = require('express');
+// const quizController = require('../controllers/quizController');
 
-const router = express.Router();
+// const router = express.Router();
 
-router.post('/home', quizController.getQuizText);
-{
-    console.log("reached quiz home")
-}
+// router.post('/home', quizController.getQuizText);
+// {
+//     console.log("reached quiz home")
+// }
 
-// Add your new quiz_home route
+// // Add your new quiz_home route
 
 
-module.exports = router;
+// module.exports = router;
