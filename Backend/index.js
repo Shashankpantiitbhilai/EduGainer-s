@@ -17,9 +17,9 @@ const client = redis.createClient();
 const app = express();
 
 
-const origin = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:3000'
-  : 'https://edu-gainer-s-frontend-alpha.vercel.app';
+const origin = process.env.NODE_ENV === 'production'
+  ? 'https://edu-gainer-s-frontend-alpha.vercel.app'
+  : 'http://localhost:3000';
 
 // // Create the server
 const server = http.createServer(app);
@@ -58,11 +58,11 @@ app.use(session({
   saveUninitialized: true, // Do not save uninitialized sessions
   resave: false,
   proxy: true,
-  cookie: {
-    secure: true, // Ensure cookies are only sent over HTTPS
-    httpOnly: true, // Cookies are not accessible via JavaScript
-    sameSite: 'none' // Allow cross-site cookies
-  }
+  // cookie: {
+  //   secure: true, // Ensure cookies are only sent over HTTPS
+  //   httpOnly: true, // Cookies are not accessible via JavaScript
+  //   sameSite: 'none' // Allow cross-site cookies
+  // }
 }));
 
 app.use(myPassport.initialize());
