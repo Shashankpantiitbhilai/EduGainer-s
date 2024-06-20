@@ -17,7 +17,6 @@ import io from "socket.io-client";
 
 import { AdminContext } from "../../../App";
 import {
- 
   postChatMessages,
   fetchAdminCredentials,
 } from "../../../services/chat/utils";
@@ -25,6 +24,9 @@ import {
   fetchAllChats,
   fetchAllUsers,
 } from "../../../services/Admin_services/adminUtils";
+
+// Import the background image
+import backgroundImage from "../../../images/backgroundChat.jpg";
 
 const ChatSection = styled(Paper)(({ theme }) => ({
   width: "100%",
@@ -39,7 +41,7 @@ const HeaderMessage = styled(Typography)(({ theme }) => ({
 
 const Sidebar = styled(Grid)(({ theme }) => ({
   borderRight: "1px solid #e0e0e0",
-  backgroundColor: "green",
+  backgroundColor: "#004d40", // Dark green background
   color: "white",
   [theme.breakpoints.down("sm")]: {
     borderRight: "none",
@@ -60,15 +62,29 @@ const InputArea = styled(Grid)(({ theme }) => ({
   justifyContent: "space-between",
 }));
 
-const AdminChat = ({  }) => {
+const MessageItem = styled(ListItem)(({ theme, align }) => ({
+  backgroundColor: "#ffeb3b", // Yellow background
+  marginBottom: theme.spacing(1),
+  borderRadius: "10px",
+  maxWidth: "40%",
+  alignSelf: align === "right" ? "flex-end" : "flex-start",
+  marginLeft: align === "right" ? "auto" : 0,
+  marginRight: align === "right" ? 0 : "auto",
+  whiteSpace: "pre-wrap",
+  padding: theme.spacing(1),
+  wordWrap: "break-word",
+}));
+
+const AdminChat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [adminRoomId, setAdminRoomId] = useState("");
   const [users, setUsers] = useState([]);
   const socketRef = useRef();
-   const [roomId, setRoomId] = useState("");
- const [chatId, setChatId] = useState("");
+  const [roomId, setRoomId] = useState("");
+  const [chatId, setChatId] = useState("");
+
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -83,11 +99,11 @@ const AdminChat = ({  }) => {
 
         if (adminData) {
           const admin = adminData;
-          setAdminRoomId(adminData._id)
-const url =
-  process.env.NODE_ENV === "production"
-    ? "https://edu-gainer-s-backend.vercel.app"
-    : "http://localhost:8000";
+          setAdminRoomId(adminData._id);
+          const url =
+            process.env.NODE_ENV === "production"
+              ? "https://edu-gainer-s-backend.vercel.app"
+              : "http://localhost:8000";
           const socket = io(url, {
             query: {
               sender: IsUserLoggedIn._id,
@@ -97,13 +113,12 @@ const url =
 
           socketRef.current = socket;
 
-  socket.on("xyz", (message, roomId) => {
-    console.log("received message", message);
-    setMessages((prevMessages) => [...prevMessages, message]);
-  });
-         
+          socket.on("xyz", (message, roomId) => {
+            console.log("received message", message);
+            setMessages((prevMessages) => [...prevMessages, message]);
+          });
+
           return () => {
-      
             socket.disconnect();
           };
         }
@@ -122,16 +137,15 @@ const url =
       setAdminRoomId(roomId);
       setMessages(response);
       setChatId(id);
-      setRoomId(id)
+      setRoomId(id);
       if (socketRef.current) {
-        console.log("emitted joinroom",roomId);
+        console.log("emitted joinroom", roomId);
         socketRef.current.emit("joinRoom", roomId);
       }
     } catch (error) {
       console.error("Error fetching chat messages:", error);
     }
   };
-  
 
   const sendMessage = async (id) => {
     const messageData = {
@@ -148,9 +162,9 @@ const url =
 
     try {
       const response = await postChatMessages(messageData);
-      
+
       if (socketRef.current) {
-        socketRef.current.emit("sendMessage", messageData,roomId);
+        socketRef.current.emit("sendMessage", messageData, roomId);
       }
       setInput("");
     } catch (error) {
@@ -189,30 +203,37 @@ const url =
         <Grid item xs={12} sm={8} container direction="column">
           <MessageArea>
             {messages.map((msg, index) => (
-              <ListItem key={index}>
+              <MessageItem
+                key={index}
+                align={
+                  msg.messages[0].sender === IsUserLoggedIn._id
+                    ? "right"
+                    : "left"
+                }
+              >
                 <Grid container>
                   <Grid item xs={12}>
                     <ListItemText
+                      primary={msg.messages[0].content}
                       align={
                         msg.messages[0].sender === IsUserLoggedIn._id
                           ? "right"
                           : "left"
                       }
-                      primary={msg.messages[0].content}
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <ListItemText
+                      secondary={new Date(msg.timestamp).toLocaleTimeString()}
                       align={
                         msg.messages[0].sender === IsUserLoggedIn._id
                           ? "right"
                           : "left"
                       }
-                      secondary={new Date(msg.timestamp).toLocaleTimeString()}
                     />
                   </Grid>
                 </Grid>
-              </ListItem>
+              </MessageItem>
             ))}
           </MessageArea>
           <Divider />
@@ -230,7 +251,7 @@ const url =
               <Fab
                 color="primary"
                 aria-label="send"
-                onClick={()=>sendMessage(chatId)}
+                onClick={() => sendMessage(chatId)}
                 disabled={!input.trim()}
               >
                 <SendIcon />

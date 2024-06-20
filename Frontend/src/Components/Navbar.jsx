@@ -97,7 +97,7 @@ function Navbar() {
 
   console.log(settings);
   return (
-    <AppBar position="static" className="nav">
+    <AppBar position="static" className="nav" style={{backgroundColor:"#004d40"}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />

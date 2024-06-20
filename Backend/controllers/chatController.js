@@ -8,7 +8,7 @@ module.exports = (io) => {
         try {
 
             const messages = await Message.find({ user: req.user._id });
-            console.log("messages hi reached fetchchat rouyte",messages);
+            // console.log("messages hi reached fetchchat rouyte",messages);
             res.json(messages);
         } catch (error) {
             res.status(500).json({ message: error.message });
