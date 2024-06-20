@@ -75,7 +75,7 @@ function Navbar() {
         { name: "Library", link: "/library" },
         { name: "Classes", link: "/classes" },
         { name: "Resources", link: "/resources" },
-        { name: "Chat", link: "/chat/home" },
+        { name: "Query", link: "/chat/home" },
       ];
     }
   }

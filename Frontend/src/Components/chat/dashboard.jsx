@@ -68,7 +68,7 @@ const MessageArea = styled(List)(({ theme }) => ({
   backgroundSize: "cover",
   backgroundRepeat: "no-repeat",
   backgroundPosition: "center",
-  opacity: 0.9,
+  opacity: 4.0
 }));
 
 const InputArea = styled(Grid)(({ theme }) => ({
