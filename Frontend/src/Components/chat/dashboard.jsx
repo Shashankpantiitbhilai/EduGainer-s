@@ -35,14 +35,14 @@ const ChatSection = styled(Paper)(({ theme }) => ({
   backgroundColor: "#121212",
   // backgroundImage: `url(${backgroundImage})`,
   backgroundSize: "cover",
-  opacity: 0.9,
+  
 }));
 
 const HeaderMessage = styled(Typography)(({ theme }) => ({
   margin: theme.spacing(2, 0),
   textAlign: "center",
   fontWeight: "bold",
-  color: "#004d40",
+  color: "white",
 }));
 
 const Sidebar = styled(Grid)(({ theme }) => ({
@@ -93,10 +93,7 @@ const MessageItem = styled(ListItem)(({ theme, align }) => ({
   wordWrap: "break-word",
 }));
 
-const OrangeAlert = styled(Alert)(({ theme }) => ({
-  color: 'orange',
-  borderColor: 'orange',
-}));
+
 
 const Chat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
@@ -119,12 +116,12 @@ const Chat = () => {
         if (adminData) {
           setMessages(chatData);
           const admin = adminData;
-          const userid = IsUserLoggedIn._id;
-          const adminid = admin._id;
+          const user_id = IsUserLoggedIn._id;
+          const admin_id = admin._id;
 
-          setAdminRoomId(adminid);
+          setAdminRoomId(admin_id);
           console.log(adminRoomId)
-          setUserRoomId(userid);
+          setUserRoomId(user_id);
 
           const url =
             process.env.NODE_ENV === "production"
@@ -139,9 +136,10 @@ const Chat = () => {
 
           socketRef.current = socket;
 
-          socket.on("xyz", (message, roomId) => {
+          socket.on("receiveMessage", (message, roomId) => {
             console.log("received message",message)
-            if (roomId === adminRoomId) {
+            if (roomId === admin_id) {
+               console.log("received message announcement", message);
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
                 message,
@@ -215,7 +213,7 @@ const Chat = () => {
   return (
     <Grid container spacing={2} component={ChatSection}>
       <Grid item xs={12}>
-        <HeaderMessage variant="h5">Edugainer Query Portal</HeaderMessage>
+        <HeaderMessage variant="h5" >Edugainer Query Portal</HeaderMessage>
       </Grid>
       <Grid item xs={12} sm={3} component={Sidebar}>
         <Avatar

@@ -85,9 +85,7 @@ app.get("/", (req, res) => {
 
 
 io.on('connection', (socket) => {
-  const userId = socket.handshake.query.sender;
-  const adminId = socket.handshake.query.admin;
-
+ 
   // Handle joinRoom event
   socket.on('joinRoom', (roomId) => {
     console.log(`User ${socket.id} joining room ${roomId}`);
@@ -98,13 +96,13 @@ io.on('connection', (socket) => {
 
   // Handle sendMessage event
   socket.on('sendMessage', (messageData, roomId) => {
-    console.log(roomId)
+   
     console.log("messagedata", messageData);
     const { messages, user } = messageData;
     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
-    console.log(roomId)
+   
     // Broadcast the message to all clients in the room
-    io.to(roomId).emit('xyz', messageData, roomId);
+    io.to(roomId).emit('receiveMessage', messageData, roomId);
   });
 
   socket.on('disconnect', () => {

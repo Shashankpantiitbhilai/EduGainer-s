@@ -25,20 +25,18 @@ import {
   fetchAllUsers,
 } from "../../../services/Admin_services/adminUtils";
 
-// Import the background image
-import backgroundImage from "../../../images/backgroundChat.jpg";
+
 
 const ChatSection = styled(Paper)(({ theme }) => ({
-  backgroundColor:"#121212",
   width: "100%",
   height: "80vh",
   display: "flex",
   flexDirection: "column",
+  backgroundColor: "#121212",
+  // backgroundImage: `url(${backgroundImage})`,
+  backgroundSize: "cover",
 }));
 
-const HeaderMessage = styled(Typography)(({ theme }) => ({
-  margin: theme.spacing(2, 0),
-}));
 
 const Sidebar = styled(Grid)(({ theme }) => ({
   borderRight: "1px solid #e0e0e0",
@@ -54,6 +52,7 @@ const MessageArea = styled(List)(({ theme }) => ({
   height: "70vh",
   overflowY: "auto",
   flexGrow: 1,
+  backgroundColor: "rgba(255, 255, 255, 0.8)",
 }));
 
 const InputArea = styled(Grid)(({ theme }) => ({
@@ -61,6 +60,8 @@ const InputArea = styled(Grid)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  backgroundColor: "white",
+  
 }));
 
 const MessageItem = styled(ListItem)(({ theme, align }) => ({
@@ -75,7 +76,12 @@ const MessageItem = styled(ListItem)(({ theme, align }) => ({
   padding: theme.spacing(1),
   wordWrap: "break-word",
 }));
-
+const HeaderMessage = styled(Typography)(({ theme }) => ({
+  margin: theme.spacing(2, 0),
+  textAlign: "center",
+  fontWeight: "bold",
+  color: "white",
+}));
 const AdminChat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
@@ -83,13 +89,10 @@ const AdminChat = () => {
   const [adminRoomId, setAdminRoomId] = useState("");
   const [users, setUsers] = useState([]);
   const socketRef = useRef();
-  
-
-  
 
   const [userRoomId, setUserRoomId] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("");
-  const [error, setError] = useState("");
+
   const [announcementMessages, setAnnouncementMessages] = useState([]);
 
   useEffect(() => {
@@ -107,6 +110,7 @@ const AdminChat = () => {
         if (adminData) {
           const admin = adminData;
           setAdminRoomId(adminData._id);
+   
           const url =
             process.env.NODE_ENV === "production"
               ? "https://edu-gainer-s-backend.vercel.app"
@@ -117,12 +121,13 @@ const AdminChat = () => {
               admin: admin._id,
             },
           });
-
+          const admin_id = admin._id;
+           const user_id= IsUserLoggedIn._id;
           socketRef.current = socket;
 
-          socket.on("xyz", (message, roomId) => {
-            console.log("received message", message);
-            if (userRoomId === adminRoomId) {
+          socket.on("receiveMessage", (message, roomId) => {
+            if (roomId === admin_id) {
+              console.log("received message ", message);
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
                 message,
@@ -131,7 +136,7 @@ const AdminChat = () => {
               setMessages((prevMessages) => [...prevMessages, message]);
             }
           });
-
+          console.log(messages);
           // return () => {
           //   socket.disconnect();
           // };
@@ -145,20 +150,17 @@ const AdminChat = () => {
   }, []);
 
   const handleClick = async (id) => {
-    try {
+    try {    setSelectedRoom(id);
       const response = await fetchAllChats(id);
       const roomId = id;
-      console.log(id)
+      console.log(id,userRoomId,adminRoomId,selectedRoom);
       if (id === adminRoomId) {
-        setAnnouncementMessages(
-          response
-        );
-        console.log("announcment", response, announcementMessages);
-      }
-       else {
+        setAnnouncementMessages(response);
+        // console.log("announcment", response, announcementMessages);
+      } else {
         setMessages(response);
       }
-      setSelectedRoom(id);
+  
       if (socketRef.current) {
         console.log("emitted joinroom", roomId);
         socketRef.current.emit("joinRoom", roomId);
@@ -166,6 +168,7 @@ const AdminChat = () => {
     } catch (error) {
       console.error("Error fetching chat messages:", error);
     }
+    console.log(announcementMessages.length);
   };
 
   const sendMessage = async (id) => {
@@ -182,7 +185,8 @@ const AdminChat = () => {
     };
 
     try {
-      const response = await postChatMessages(messageData);
+      console.log(id)
+      await postChatMessages(messageData);
 
       if (socketRef.current) {
         socketRef.current.emit("sendMessage", messageData, selectedRoom);
@@ -191,68 +195,86 @@ const AdminChat = () => {
     } catch (error) {
       console.error("Error sending message:", error);
     }
+    
   };
 
   return (
-    <div>
-      <Grid container>
-        <Grid item xs={12}>
-          <HeaderMessage variant="h5">Edugainer Chat</HeaderMessage>
-        </Grid>
-      </Grid>
+    <>
       <Grid container component={ChatSection}>
+        <Grid item xs={12}>
+          <HeaderMessage variant="h5">Admin Query Portal</HeaderMessage>
+        </Grid>
         <Grid item xs={12} sm={8} container direction="column">
           <MessageArea>
-            {announcementMessages.length > 0 && (
-              <MessageItem align="left">
-                <ListItemText
-                  primary={announcementMessages[0].messages[0].content}
-                  primaryTypographyProps={{
-                    variant: "subtitle1",
-                    fontWeight: "bold",
-                  }}
-                />
-                <ListItemText
-                  secondary={new Date(
-                    announcementMessages[0].timestamp
-                  ).toLocaleTimeString()}
-                  secondaryTypographyProps={{ variant: "body2" }}
-                />
-              </MessageItem>
-            )}
-            {messages.map((msg, index) => (
-              <MessageItem
-                key={index}
-                align={
-                  msg.messages[0].sender === IsUserLoggedIn._id
-                    ? "right"
-                    : "left"
-                }
-              >
-                <Grid container>
-                  <Grid item xs={12}>
-                    <ListItemText
-                      primary={msg.messages[0].content}
-                      align={
-                        msg.messages[0].sender === IsUserLoggedIn._id
-                          ? "right"
-                          : "left"
-                      }
-                    />
+            {adminRoomId === selectedRoom &&
+              announcementMessages.map((msg, index) => (
+                <MessageItem
+                  key={index}
+                  align={
+                    msg.messages[0].sender === IsUserLoggedIn._id
+                      ? "right"
+                      : "left"
+                  }
+                >
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <ListItemText
+                        primary={msg.messages[0].content}
+                        align={
+                          msg.messages[0].sender === IsUserLoggedIn._id
+                            ? "right"
+                            : "left"
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ListItemText
+                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
+                        align={
+                          msg.messages[0].sender === IsUserLoggedIn._id
+                            ? "right"
+                            : "left"
+                        }
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <ListItemText
-                      secondary={new Date(msg.timestamp).toLocaleTimeString()}
-                      align={
-                        msg.messages[0].sender === IsUserLoggedIn._id
-                          ? "right"
-                          : "left"
-                      }
-                    />
+                </MessageItem>
+              ))}
+
+            {adminRoomId !== selectedRoom &&
+              messages.map((msg, index) => (
+                <MessageItem
+                  key={index}
+                  align={
+                    msg.messages[0].sender === IsUserLoggedIn._id
+                      ? "right"
+                      : "left"
+                  }
+                >
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <ListItemText
+                        primary={msg.messages[0].content}
+                        align={
+                          msg.messages[0].sender === IsUserLoggedIn._id
+                            ? "right"
+                            : "left"
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ListItemText
+                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
+                        align={
+                          msg.messages[0].sender === IsUserLoggedIn._id
+                            ? "right"
+                            : "left"
+                        }
+                      />
+                    </Grid>
                   </Grid>
-                </Grid>
-              </MessageItem>
-            ))}
+                </MessageItem>
+              ))}
           </MessageArea>
           <Divider />
           <InputArea container>
@@ -305,7 +327,7 @@ const AdminChat = () => {
           </List>
         </Sidebar>
       </Grid>
-    </div>
+    </>
   );
 };
 
