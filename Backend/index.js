@@ -58,11 +58,11 @@ app.use(session({
   saveUninitialized: true, // Do not save uninitialized sessions
   resave: false,
   proxy: true,
-  cookie: {
-    secure: true, // Ensure cookies are only sent over HTTPS
-    httpOnly: true, // Cookies are not accessible via JavaScript
-    sameSite: 'none' // Allow cross-site cookies
-  }
+  // cookie: {
+  //   secure: true, // Ensure cookies are only sent over HTTPS
+  //   httpOnly: true, // Cookies are not accessible via JavaScript
+  //   sameSite: 'none' // Allow cross-site cookies
+  // }
 }));
 
 app.use(myPassport.initialize());
@@ -98,6 +98,7 @@ io.on('connection', (socket) => {
 
   // Handle sendMessage event
   socket.on('sendMessage', (messageData, roomId) => {
+    console.log(roomId)
     console.log("messagedata", messageData);
     const { messages, user } = messageData;
     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);

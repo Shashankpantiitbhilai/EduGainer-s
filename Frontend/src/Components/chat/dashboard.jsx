@@ -10,6 +10,8 @@ import {
   ListItemText,
   Avatar,
   Fab,
+  Alert,
+  Stack,
 } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
 import { styled } from "@mui/system";
@@ -22,16 +24,16 @@ import {
   fetchAdminCredentials,
 } from "../../services/chat/utils";
 
-// Import the background image
-import backgroundImage from "../../images/backgroundChat.jpg";
+// import backgroundImage from "../../images/backgroundChat.jpg";
+import { fetchAllChats } from "../../services/Admin_services/adminUtils";
 
 const ChatSection = styled(Paper)(({ theme }) => ({
   width: "100%",
   height: "80vh",
   display: "flex",
   flexDirection: "column",
-  backgroundColor: "#fff",
-  backgroundImage: `url(${backgroundImage})`,
+  backgroundColor: "#121212",
+  // backgroundImage: `url(${backgroundImage})`,
   backgroundSize: "cover",
   opacity: 0.9,
 }));
@@ -64,11 +66,11 @@ const MessageArea = styled(List)(({ theme }) => ({
   flexGrow: 1,
   backgroundColor: "rgba(255, 255, 255, 0.8)",
   padding: theme.spacing(2),
-  backgroundImage: `url(${backgroundImage})`,
+  // backgroundImage: `url(${backgroundImage})`,
   backgroundSize: "cover",
   backgroundRepeat: "no-repeat",
   backgroundPosition: "center",
-  opacity: 4.0
+  opacity: 4.0,
 }));
 
 const InputArea = styled(Grid)(({ theme }) => ({
@@ -91,13 +93,21 @@ const MessageItem = styled(ListItem)(({ theme, align }) => ({
   wordWrap: "break-word",
 }));
 
+const OrangeAlert = styled(Alert)(({ theme }) => ({
+  color: 'orange',
+  borderColor: 'orange',
+}));
+
 const Chat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [announcementMessages, setAnnouncementMessages] = useState([]);
   const [adminRoomId, setAdminRoomId] = useState("");
   const socketRef = useRef(null);
-  const [roomId, setRoomId] = useState("");
+  const [userRoomId, setUserRoomId] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
@@ -111,9 +121,10 @@ const Chat = () => {
           const admin = adminData;
           const userid = IsUserLoggedIn._id;
           const adminid = admin._id;
-          const roomId = userid;
+
           setAdminRoomId(adminid);
-          setRoomId(roomId);
+          console.log(adminRoomId)
+          setUserRoomId(userid);
 
           const url =
             process.env.NODE_ENV === "production"
@@ -128,15 +139,18 @@ const Chat = () => {
 
           socketRef.current = socket;
 
-          socket.emit("joinRoom", roomId);
-
-          // Setting up the listener
           socket.on("xyz", (message, roomId) => {
-            console.log("received message", message);
-            setMessages((prevMessages) => [...prevMessages, message]);
+            console.log("received message",message)
+            if (roomId === adminRoomId) {
+              setAnnouncementMessages((prevMessages) => [
+                ...prevMessages,
+                message,
+              ]);
+            } else {
+              setMessages((prevMessages) => [...prevMessages, message]);
+            }
           });
 
-          // Clean up the socket connection when the component unmounts
           return () => {
             socket.disconnect();
           };
@@ -150,30 +164,54 @@ const Chat = () => {
   }, []);
 
   const sendMessage = async () => {
-    const messageData = {
-      messages: [
-        {
-          sender: IsUserLoggedIn._id,
-          receiver: adminRoomId,
-          content: input,
-        },
-      ],
-      user: IsUserLoggedIn._id,
-      timestamp: new Date(),
-    };
+    if (selectedRoom === adminRoomId && adminRoomId !== userRoomId) {
+      setError("You are not authorized to send messages in the announcement room.");
+    } else {
+      const messageData = {
+        messages: [
+          {
+            sender: IsUserLoggedIn._id,
+            receiver: adminRoomId,
+            content: input,
+          },
+        ],
+        user: IsUserLoggedIn._id,
+        timestamp: new Date(),
+      };
+      try {
+        const response = await postChatMessages(messageData);
+        if (socketRef.current) {
+          socketRef.current.emit("sendMessage", messageData, selectedRoom);
+        }
 
-    try {
-      const response = await postChatMessages(messageData);
-      if (socketRef.current) {
-        socketRef.current.emit("sendMessage", messageData, roomId);
+        setInput("");
+        setError(""); // Clear error message after a successful send
+      } catch (error) {
+        console.error("Error sending message:", error);
       }
-
-      setInput("");
-    } catch (error) {
-      console.error("Error sending message:", error);
     }
   };
 
+ const handleRoomClick = async (id) => {
+   try {
+     const response = await fetchAllChats(id);
+     const roomId = id;
+     console.log(id);
+     if (id === adminRoomId) {
+       setAnnouncementMessages(response);
+       console.log("announcment", response, announcementMessages);
+     } else {
+       setMessages(response);
+     }
+     setSelectedRoom(id);
+     if (socketRef.current) {
+       console.log("emitted joinroom", roomId);
+       socketRef.current.emit("joinRoom", roomId);
+     }
+   } catch (error) {
+     console.error("Error fetching chat messages:", error);
+   }
+ };
   return (
     <Grid container spacing={2} component={ChatSection}>
       <Grid item xs={12}>
@@ -188,8 +226,15 @@ const Chat = () => {
         <List>
           <ListItem
             button
+            key="announcement"
+            onClick={() => handleRoomClick(adminRoomId)}
+          >
+            <ListItemText primary="Announcements" />
+          </ListItem>
+          <ListItem
+            button
             key="admin"
-            onClick={() => socketRef.current.emit("joinRoom", adminRoomId)}
+            onClick={() => handleRoomClick(userRoomId)}
           >
             <ListItemText primary="Admin" />
           </ListItem>
@@ -197,48 +242,70 @@ const Chat = () => {
       </Grid>
       <Grid item xs={12} sm={9} container direction="column">
         <MessageArea>
-          {messages.map((msg, index) => (
-            <MessageItem
-              key={index}
-              align={
-                msg.messages[0].sender === IsUserLoggedIn._id ? "right" : "left"
-              }
-            >
-              <Grid container>
-                <Grid item xs={12}>
-                  <ListItemText primary={msg.messages[0].content} />
-                </Grid>
-                <Grid item xs={12}>
-                  <ListItemText
-                    secondary={new Date(msg.timestamp).toLocaleTimeString()}
-                  />
-                </Grid>
-              </Grid>
-            </MessageItem>
-          ))}
+          {selectedRoom === adminRoomId
+            ? announcementMessages.map((msg, index) => (
+                <MessageItem key={index} align="left">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <ListItemText primary={msg.messages[0].content} />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ListItemText
+                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
+                      />
+                    </Grid>
+                  </Grid>
+                </MessageItem>
+              ))
+            : messages.map((msg, index) => (
+                <MessageItem
+                  key={index}
+                  align={
+                    msg.messages[0].sender === IsUserLoggedIn._id
+                      ? "right"
+                      : "left"
+                  }
+                >
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <ListItemText primary={msg.messages[0].content} />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ListItemText
+                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
+                      />
+                    </Grid>
+                  </Grid>
+                </MessageItem>
+              ))}
         </MessageArea>
         <Divider />
-        <InputArea container>
-          <Grid item xs={11}>
-            <TextField
-              id="outlined-basic-email"
-              label="Type Something"
-              fullWidth
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={1} align="right">
-            <Fab
-              color="primary"
-              aria-label="send"
-              onClick={sendMessage}
-              disabled={!input.trim()}
-            >
-              <SendIcon />
-            </Fab>
-          </Grid>
-        </InputArea>
+        {selectedRoom === adminRoomId && adminRoomId !== userRoomId ? (
+          <Stack sx={{ width: "100%" }} spacing={2}>
+            <Alert variant="outlined" severity="warning">
+              You are not authorized to send messages in the announcement room.
+            </Alert>
+          </Stack>
+        ) : (
+          <InputArea container>
+            <Grid item xs={11}>
+              <TextField
+                id="outlined-basic-email"
+                label="Type Something"
+                fullWidth
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                error={!!error}
+                helperText={error}
+              />
+            </Grid>
+            <Grid item xs={1} align="right">
+              <Fab color="primary" aria-label="add" onClick={sendMessage}>
+                <SendIcon />
+              </Fab>
+            </Grid>
+          </InputArea>
+        )}
       </Grid>
     </Grid>
   );

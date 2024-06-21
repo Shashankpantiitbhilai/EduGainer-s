@@ -10,10 +10,10 @@ const fetchAllChats = async (req, res) => {
     try {
         // Query database to find admins based on the shift
        
-       const students = await Message.find({ user: id });
-        // console.log(students)
+       const chats = await Message.find({ user: id });
+        // console.log(chats)
         // Example response structure
-        res.status(200).json(students);
+        res.status(200).json(chats);
     } catch (error) {
         console.error("Error searching Students by shift:", error);
         res.status(500).json({ error: "Internal server error" });
