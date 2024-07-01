@@ -11,6 +11,11 @@ EduGainer-s is a project focused on enhancing the educational experience through
 - **Interactive Learning**: Engaging and interactive educational content.
 - **User Management**: Manage user profiles and progress.
 - **Responsive Design**: Accessible on various devices.
+- **Class and Library Management System**: Developed a comprehensive system using the MERN stack.
+- **User Registration and Fee Payment**: Implemented functionalities for user registration and fee payments.
+- **Real-time Chat**: Integrated real-time chat feature using WebSockets, providing a seamless experience for students and faculty members.
+- **Data Automation**: Automated data updates following the policies of the startup.
+
 
 ## Tech Stack
 
