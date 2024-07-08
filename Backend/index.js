@@ -49,8 +49,8 @@ app.options('*', cors());
 connectDB();
 
 // Body parser middleware
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '100mb' }));
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Session configuration
 app.use(session({
@@ -58,11 +58,11 @@ app.use(session({
   saveUninitialized: true, // Do not save uninitialized sessions
   resave: false,
   proxy: true,
-  cookie: {
-    secure: true, // Ensure cookies are only sent over HTTPS
-    httpOnly: true, // Cookies are not accessible via JavaScript
-    sameSite: 'none' // Allow cross-site cookies
-  }
+  // cookie: {
+  //   secure: true, // Ensure cookies are only sent over HTTPS
+  //   httpOnly: true, // Cookies are not accessible via JavaScript
+  //   sameSite: 'none' // Allow cross-site cookies
+  // }
 }));
 
 app.use(myPassport.initialize());

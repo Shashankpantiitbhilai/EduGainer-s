@@ -43,6 +43,7 @@ router.post("/register", async (req, res) => {
 
     const userDetails = JSON.stringify({ password, otp: sentOTP });
 
+    
     // Store the object in Redis with a TTL (Time-To-Live)
     await redisClient.set(email, userDetails, 'EX', 30000);
     console.log(userDetails)

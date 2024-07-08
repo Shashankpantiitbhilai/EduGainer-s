@@ -36,6 +36,7 @@ router.put('/profile/:id', async (req, res) => {
       imageUrl = results.url;
       delete updatedUserData.image; // Remove the image from the updatedUserData object
     }
+    console.log(updatedUserData)
     console.log(imageUrl);
     const updatedUser = await User.findByIdAndUpdate(
       id,
@@ -161,7 +162,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
 router.get('/Lib_student/sendIdCard/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("server")
+   
     // Fetch the student data from MongoDB
     const student = await Student.findOne({ userId: id }).exec();
     if (!student) {
