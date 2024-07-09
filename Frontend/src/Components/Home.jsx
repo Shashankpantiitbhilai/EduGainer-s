@@ -4,7 +4,7 @@ import { AdminContext } from "../App";
 import { logoutUser } from "../services/auth";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { styled } from "@mui/system";
-
+import Footer from "./footer";
 const HeroSection = styled(Box)({
   textAlign: "center",
   padding: "40px 20px",
@@ -60,7 +60,7 @@ function Home() {
   };
 
   return (
-    <Container>
+  <div>  <Container>
       <HeroSection>
         <HeroTitle variant="h1">
           Welcome to EduGainer's Library & Classes
@@ -82,8 +82,9 @@ function Home() {
           </Button>
         </ButtonContainer>
       </HeroSection>
-      <footer>{/* Footer content */}</footer>
+      
     </Container>
+    <footer><Footer/></footer></div>
   );
 }
 
