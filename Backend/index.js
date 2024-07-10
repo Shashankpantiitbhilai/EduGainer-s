@@ -53,7 +53,7 @@ app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Session configuration
-const mode = process.env.NODE_NEV;
+const mode = process.env.NODE_ENV;
 // console.log(process.env.SESSION_SECRET)
 if (mode === "production") {
   app.use(session({
