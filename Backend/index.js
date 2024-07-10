@@ -53,23 +53,27 @@ app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Session configuration
-
-const isDevelopment = process.env.NODE_ENV === 'development';
-console.log(isDevelopment)
-const sessionOptions = {
-  secret: process.env.SESSION_SECRET || 'keyboard cat', // Use environment variable for session secret
-  saveUninitialized: isDevelopment, // Save uninitialized sessions in development
-  resave: isDevelopment, // Resave sessions in development
-  proxy: !isDevelopment,
-  cookie: {
-    secure: !isDevelopment, // Ensure cookies are only sent over HTTPS in production
-    httpOnly: !isDevelopment, // Cookies are not accessible via JavaScript
-    sameSite: isDevelopment ? 'lax' : 'none' // Allow cross-site cookies in production
-  }
-};
-
-app.use(session(sessionOptions));
-
+const mode = process.env.NODE_NEV;
+if (mode === "production") {
+  app.use(session({
+    secret: 'keyboard cat', // Use environment variable for session secret
+    saveUninitialized: true, // Do not save uninitialized sessions
+    resave: false,
+    proxy: true,
+    cookie: {
+      secure: true, // Ensure cookies are only sent over HTTPS
+      httpOnly: true, // Cookies are not accessible via JavaScript
+      sameSite: 'none' // Allow cross-site cookies
+    }
+  }));
+}
+else {
+  app.use(session({
+    secret: 'keyboard cat', // Use environment variable for session secret
+    saveUninitialized: true, // Do not save uninitialized sessions
+    resave: false,
+  }))
+}
 app.use(myPassport.initialize());
 app.use(myPassport.session());
 
@@ -90,7 +94,7 @@ app.get("/", (req, res) => {
 
 
 io.on('connection', (socket) => {
-
+ 
   // Handle joinRoom event
   socket.on('joinRoom', (roomId) => {
     console.log(`User ${socket.id} joining room ${roomId}`);
@@ -101,11 +105,11 @@ io.on('connection', (socket) => {
 
   // Handle sendMessage event
   socket.on('sendMessage', (messageData, roomId) => {
-
+   
     console.log("messagedata", messageData);
     const { messages, user } = messageData;
     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
-
+   
     // Broadcast the message to all clients in the room
     io.to(roomId).emit('receiveMessage', messageData, roomId);
   });
