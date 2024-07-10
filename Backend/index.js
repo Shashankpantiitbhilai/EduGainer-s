@@ -60,10 +60,10 @@ const sessionOptions = {
   secret: process.env.SESSION_SECRET || 'keyboard cat', // Use environment variable for session secret
   saveUninitialized: isDevelopment, // Save uninitialized sessions in development
   resave: isDevelopment, // Resave sessions in development
-  proxy: true,
+  proxy: !isDevelopment,
   cookie: {
     secure: !isDevelopment, // Ensure cookies are only sent over HTTPS in production
-    httpOnly: true, // Cookies are not accessible via JavaScript
+    httpOnly: !isDevelopment, // Cookies are not accessible via JavaScript
     sameSite: isDevelopment ? 'lax' : 'none' // Allow cross-site cookies in production
   }
 };
