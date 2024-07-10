@@ -54,9 +54,10 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 
 // Session configuration
 const mode = process.env.NODE_NEV;
+// console.log(process.env.SESSION_SECRET)
 if (mode === "production") {
   app.use(session({
-    secret: 'keyboard cat', // Use environment variable for session secret
+    secret:process.env.SESSION_SECRET, // Use environment variable for session secret
     saveUninitialized: true, // Do not save uninitialized sessions
     resave: false,
     proxy: true,
@@ -69,7 +70,7 @@ if (mode === "production") {
 }
 else {
   app.use(session({
-    secret: 'keyboard cat', // Use environment variable for session secret
+    secret: process.env.SESSION_SECRET, // Use environment variable for session secret
     saveUninitialized: true, // Do not save uninitialized sessions
     resave: false,
   }))
