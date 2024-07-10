@@ -46,7 +46,7 @@ router.post("/register", async (req, res) => {
     
     // Store the object in Redis with a TTL (Time-To-Live)
     await redisClient.set(email, userDetails, 'EX', 30000);
-    console.log(userDetails)
+    // console.log(userDetails)
     // Send email with OTP
     const mailOptions = {
       from: process.env.EMAIL,
@@ -77,13 +77,13 @@ router.post("/otp-verify", async (req, res) => {
     if (!redisClient.isOpen) {
       await redisClient.connect();
     }
-    console.log(id, otp)
+    // console.log(id, otp)
     // Retrieve OTP from Redis
     const userDetails = await redisClient.get(id);
     if (!userDetails) {
       return res.status(400).json({ message: "Invalid OTP or user details not found" });
     }
-    console.log(userDetails)
+    // console.log(userDetails)
     const { otp: storedOTP, password } = JSON.parse(userDetails);
 
     if (otp === storedOTP) {
@@ -122,16 +122,16 @@ router.post('/reset-password/:id/:token', async (req, res) => {
 
     // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("New hashed password:", hashedPassword);
+    // console.log("New hashed password:", hashedPassword);
 
     // Retrieve the user before updating the password
     const userBeforeUpdate = await User.findById(id);
-    console.log("User before update:", userBeforeUpdate);
+    // console.log("User before update:", userBeforeUpdate);
 
     // Update the user's password in the database
     const updatedUser = await User.findByIdAndUpdate(id, { password: hashedPassword });
 
-    console.log("Updated user:", updatedUser);
+    // console.log("Updated user:", updatedUser);
 
     if (updatedUser) {
       // Send a success response if the user was updated
@@ -155,7 +155,7 @@ router.post("/forgot-password", (req, res) => {
   User.findOne({ username: email })
 
     .then(user => {
-      console.log(user);
+      // console.log(user);
       if (!user) {
         return res.send({ Status: "User not existed" });
       }
@@ -185,8 +185,8 @@ router.post("/forgot-password", (req, res) => {
     });
 });
 router.get("/fetchAuth", function (req, res) {
-  console.log(req.session)
-  console.log("fetch",req.user)
+  // console.log(req.session)
+  // console.log("fetch",req.user)
   if (req.isAuthenticated()) {
     res.json(req.user);
   } else {
@@ -198,7 +198,7 @@ router.get("/fetchAuth", function (req, res) {
 router.post("/login", passport.authenticate("local"), (req, res) => {
 
   const { email, password } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   if (email == process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
 
     res.status(201).json({ message: "ADMIN Login is successful", user: req.user });
@@ -240,7 +240,7 @@ router.get("/google/addId", (req, res) => {
 
 router.post("/google/register", async (req, res) => {
   const { id, ID_No } = req.body;
-  console.log(req.user);
+  // console.log(req.user);
 
   if (id == req.user.id) {
     try {

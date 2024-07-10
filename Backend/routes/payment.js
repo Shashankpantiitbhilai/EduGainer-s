@@ -31,7 +31,7 @@ const verifyPaymentSignature = (order_id, razorpay_payment_id, razorpay_signatur
     const generated_signature = crypto.createHmac('sha256', key_secret)
         .update(order_id + "|" + razorpay_payment_id)
         .digest('hex');
-console.log(generated_signature,razorpay_signature);
+// console.log(generated_signature,razorpay_signature);
     // Compare the signatures
     return generated_signature === razorpay_signature;
 };
