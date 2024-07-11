@@ -43,6 +43,7 @@ userSchema.plugin(findOrCreate);
 // Define submodels for different 'pos_res' types
 
 
+
 const studentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -51,27 +52,24 @@ const studentSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   shift: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
-  mobile: {
-    type: String,
-    required: true
-  },
+
   address: {
     type: String,
-    required: true
+    required: true,
   },
   amount: {
     type: String,
-    required: true
+    required: true,
   },
   image: {
     publicId: {
@@ -81,7 +79,7 @@ const studentSchema = new mongoose.Schema({
     url: {
       type: String,
       required: true,
-    }
+    },
   },
   Payment_detail: {
     razorpay_order_id: {
@@ -91,11 +89,40 @@ const studentSchema = new mongoose.Schema({
     razorpay_payment_id: {
       type: String,
       required: false, // This will be updated after payment verification
-    }
-  }
-}
-
-);
+    },
+  },
+  gender: {
+    type: String,
+    required: true,
+  },
+  dob: {
+    type: Date,
+    required: true,
+  },
+  fatherName: {
+    type: String,
+    required: true,
+  },
+  motherName: {
+    type: String,
+    required: true,
+  },
+  contact1: {
+    type: String,
+    required: true,
+  },
+  contact2: {
+    type: String,
+  },
+  aadhaar: {
+    type: String,
+    required: true,
+  },
+  examPreparation: {
+    type: String,
+    required: true,
+  },
+});
 
 
 

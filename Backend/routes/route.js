@@ -58,8 +58,25 @@ router.put('/profile/:id', async (req, res) => {
 
 
 router.post("/Lib-new-reg", async (req, res) => {
-  const { name, email, image, mobile, shift, address, amount, userId } = req.body;
-  // console.log(req.body);
+  const {
+    name,
+    email,
+    image,
+    mobile,
+    shift,
+    address,
+    amount,
+    userId,
+    gender,
+    dob,
+    fatherName,
+    motherName,
+    contact1,
+    contact2,
+    aadhaar,
+    examPreparation
+  } = req.body;
+
   console.log(userId);
   try {
     let imageData = {};
@@ -86,8 +103,16 @@ router.post("/Lib-new-reg", async (req, res) => {
       },
       Payment_detail: {
         razorpay_order_id: order.id,
-        razorpay_payment_id: "" // Payment ID will be updated after payment verification
-      }
+        razorpay_payment_id: "", // Payment ID will be updated after payment verification
+      },
+      gender,
+      dob,
+      fatherName,
+      motherName,
+      contact1,
+      contact2,
+      aadhaar,
+      examPreparation
     });
 
     console.log(user);
@@ -103,7 +128,6 @@ router.post("/Lib-new-reg", async (req, res) => {
     res.status(500).json({ error: "A server error occurred with this request" });
   }
 });
-
 router.get("/Lib_student/:user_id", async (req, res) => {
   const { user_id } = req.params;
   console.log(user_id, req.params)

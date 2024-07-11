@@ -22,6 +22,8 @@ function NewReg() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm();
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,8 @@ function NewReg() {
       ? "https://edu-gainer-s-backend.vercel.app"
       : "http://localhost:8000";
   const navigate = useNavigate();
+
+  const selectedShift = watch("shift");
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -42,6 +46,21 @@ function NewReg() {
       document.body.removeChild(script);
     };
   }, []);
+
+  useEffect(() => {
+    // Update the amount based on the selected shift
+    const shiftAmounts = {
+      "6.30 AM to 2 PM": 550,
+      "2 PM to 9.30 PM": 550,
+      "6.30 PM to 11 PM": 350,
+      "9.30 PM to 6.30 AM": 500,
+      "2 PM to 11 PM": 750,
+      "6.30 AM to 6.30 PM": 850,
+      "24*7": 1100,
+    };
+
+    setValue("amount", shiftAmounts[selectedShift] || "");
+  }, [selectedShift, setValue]);
 
   const setFileToBase64 = (file) => {
     const reader = new FileReader();
@@ -134,14 +153,13 @@ function NewReg() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        height: "100vh",
       }}
     >
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         noValidate
-        sx={{ mt: 1 }}
+        sx={{ mt: 9 }}
       >
         <Typography component="h1" variant="h5" align="center">
           Registration Form
@@ -170,12 +188,13 @@ function NewReg() {
           helperText={errors.shift?.message}
         >
           <MenuItem value="">Select Shift</MenuItem>
-          <MenuItem value="9 PM to 6 AM">9 PM to 6 AM</MenuItem>
+          <MenuItem value="6.30 AM to 2 PM">6.30 AM to 2 PM</MenuItem>
+          <MenuItem value="2 PM to 9.30 PM">2 PM to 9.30 PM</MenuItem>
+          <MenuItem value="6.30 PM to 11 PM">6.30 PM to 11 PM</MenuItem>
+          <MenuItem value="9.30 PM to 6.30 AM">9.30 PM to 6.30 AM</MenuItem>
           <MenuItem value="2 PM to 11 PM">2 PM to 11 PM</MenuItem>
-          <MenuItem value="7 AM to 7 PM">7 AM to 7 PM</MenuItem>
+          <MenuItem value="6.30 AM to 6.30 PM">6.30 AM to 6.30 PM</MenuItem>
           <MenuItem value="24*7">24*7</MenuItem>
-          <MenuItem value="2 PM to 9 PM">2 PM to 9 PM</MenuItem>
-          <MenuItem value="7 PM to 11 PM">7 PM to 11 PM</MenuItem>
         </TextField>
 
         <TextField
@@ -188,6 +207,89 @@ function NewReg() {
           {...register("amount", { required: "Amount is required" })}
           error={!!errors.amount}
           helperText={errors.amount?.message}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="gender"
+          label="Gender"
+          {...register("gender", { required: "Gender is required" })}
+          error={!!errors.gender}
+          helperText={errors.gender?.message}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="dob"
+          label="Date of Birth"
+          type="date"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          {...register("dob", { required: "Date of Birth is required" })}
+          error={!!errors.dob}
+          helperText={errors.dob?.message}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="fatherName"
+          label="Father's Name"
+          {...register("fatherName", { required: "Father's Name is required" })}
+          error={!!errors.fatherName}
+          helperText={errors.fatherName?.message}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="motherName"
+          label="Mother's Name"
+          {...register("motherName", { required: "Mother's Name is required" })}
+          error={!!errors.motherName}
+          helperText={errors.motherName?.message}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="contact1"
+          label="Primary Contact Number"
+          {...register("contact1", {
+            required: "Primary contact number is required",
+            pattern: {
+              value: /^\d{10}$/,
+              message: "Please enter a valid 10-digit contact number",
+            },
+          })}
+          error={!!errors.contact1}
+          helperText={errors.contact1?.message}
+        />
+
+        <TextField
+          margin="normal"
+          fullWidth
+          id="contact2"
+          label="Secondary Contact Number"
+          {...register("contact2", {
+            pattern: {
+              value: /^\d{10}$/,
+              message: "Please enter a valid 10-digit contact number",
+            },
+          })}
+          error={!!errors.contact2}
+          helperText={errors.contact2?.message}
         />
 
         <TextField
@@ -211,28 +313,35 @@ function NewReg() {
           margin="normal"
           required
           fullWidth
-          id="mobile"
-          label="Mobile Number"
-          {...register("mobile", {
-            required: "Mobile number is required",
-            pattern: {
-              value: /^\d{10}$/,
-              message: "Please enter a valid 10-digit mobile number",
-            },
-          })}
-          error={!!errors.mobile}
-          helperText={errors.mobile?.message}
+          id="address"
+          label="Address"
+          {...register("address", { required: "Address is required" })}
+          error={!!errors.address}
+          helperText={errors.address?.message}
         />
 
         <TextField
           margin="normal"
           required
           fullWidth
-          id="address"
-          label="Address"
-          {...register("address", { required: "Address is required" })}
-          error={!!errors.address}
-          helperText={errors.address?.message}
+          id="aadhaar"
+          label="Aadhaar or Any ID No"
+          {...register("aadhaar", { required: "Aadhaar or ID No is required" })}
+          error={!!errors.aadhaar}
+          helperText={errors.aadhaar?.message}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="examPreparation"
+          label="Preparing for Exam"
+          {...register("examPreparation", {
+            required: "This field is required",
+          })}
+          error={!!errors.examPreparation}
+          helperText={errors.examPreparation?.message}
         />
 
         <TextField
