@@ -27,7 +27,7 @@ import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
 import Chat from "./Components/chat/dashboard.jsx"
 import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
-
+import ManageSeats from "./Components/Admin/Seats.jsx";
 import Policies from "./Components/policies/Policies.jsx";
 const Main = () => {
     const location = useLocation();
@@ -144,7 +144,15 @@ const Main = () => {
                                 <AdminLibrary />
                             </ProtectedAdmin>
                         }
-                    />
+                />
+                <Route
+                    path="/admin_Library/manage-seats"
+                    element={
+                        <ProtectedAdmin>
+                            <ManageSeats />
+                        </ProtectedAdmin>
+                    }
+                />
                     <Route
                         path="/admin_library/manage-users"
                         element={

@@ -1,5 +1,5 @@
 const express = require("express");
-const { Student, User } = require("../models/student");
+const { LibStudent, User } = require("../models/student");
 const { uploadToCloudinary } = require("../cloudinary");
 const { createOrder, verifyPaymentSignature } = require("./payment");
 const puppeteer = require("puppeteer")
@@ -89,7 +89,7 @@ router.post("/Lib-new-reg", async (req, res) => {
     const order = await createOrder(amount);
 
     // Create user with the order ID
-    const user = await Student.create({
+    const user = await LibStudent.create({
       userId,
       name,
       email,
@@ -133,7 +133,7 @@ router.get("/Lib_student/:user_id", async (req, res) => {
   console.log(user_id, req.params)
 
   try {
-    const user = await Student.findOne({ userId: user_id });
+    const user = await LibStudent.findOne({ userId: user_id });
     // console.log(user);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -157,7 +157,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
   if (isSignatureValid) {
     try {
       // Update the student record with the Razorpay order ID and payment ID
-      const user = await Student.findOne({ userId: user_id });
+      const user = await LibStudent.findOne({ userId: user_id });
       // console.log(user);
       if (!user) {
         return res.status(404).json({ success: false, error: 'User not found' });
@@ -188,7 +188,7 @@ router.get('/Lib_student/sendIdCard/:id', async (req, res) => {
     const { id } = req.params;
    
     // Fetch the student data from MongoDB
-    const student = await Student.findOne({ userId: id }).exec();
+    const student = await LibStudent.findOne({ userId: id }).exec();
     if (!student) {
       return res.status(404).send('Student not found');
     }

@@ -44,7 +44,7 @@ userSchema.plugin(findOrCreate);
 
 
 
-const studentSchema = new mongoose.Schema({
+const LibStudentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to the User model
@@ -124,7 +124,58 @@ const studentSchema = new mongoose.Schema({
   },
 });
 
+const bookingSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'LibStudent', // Reference to the User model
+    required: true,
+  },
+  Reg: {
+    type: Number,
+   
+  },
+  Name: {
+    type: String,
+    required: true,
+    default: ''
+  },
+  Seat: {
+    type: Number,
+    required: true
+  },
+  Date: {
+    type: String,
+    default: '#########'
+  },
+  Cash: {
+    type: Number,
+    default: 0
+  },
+  Online: {
+    type: Number,
+    default: 0
+  },
+  Shift: {
+    type: String,
+    required: true,
+    default: ''
+  },
+  Fee: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  Remarks: {
+    type: String,
+    default: ''
+  },
+  Status: {
+    type: String,
+    default: ''
+  }
+});
 
+const Booking = mongoose.model('Booking', bookingSchema);
 
 const classesSchema = new mongoose.Schema({
   userId: {
@@ -184,11 +235,12 @@ const classesSchema = new mongoose.Schema({
 
 
 const User = mongoose.model("user", userSchema);
-const Student = mongoose.model("Student", studentSchema);
+const LibStudent = mongoose.model("LibStudent", LibStudentSchema);
 const Class = mongoose.model("Class", classesSchema);
 
 module.exports = {
-  Student,
+  LibStudent,
 Class,
   User,
+  Booking
 };

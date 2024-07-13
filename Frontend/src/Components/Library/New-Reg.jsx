@@ -50,13 +50,13 @@ function NewReg() {
   useEffect(() => {
     // Update the amount based on the selected shift
     const shiftAmounts = {
-      "6.30 AM to 2 PM": 550,
-      "2 PM to 9.30 PM": 550,
-      "6.30 PM to 11 PM": 350,
-      "9.30 PM to 6.30 AM": 500,
-      "2 PM to 11 PM": 750,
-      "6.30 AM to 6.30 PM": 850,
-      "24*7": 1100,
+      "6.30 AM to 2 PM": 5,
+      "2 PM to 9.30 PM": 5,
+      "6.30 PM to 11 PM": 3,
+      "9.30 PM to 6.30 AM": 5,
+      "2 PM to 11 PM": 7,
+      "6.30 AM to 6.30 PM": 8,
+      "24*7": 1,
     };
 
     setValue("amount", shiftAmounts[selectedShift] || "");

@@ -81,6 +81,27 @@ function Admin_Library() {
           </CardActions>
         </Card>
 
+        <Card>
+          <CardContent>
+            <Typography variant="h5" component="h3">
+              Manage Library
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Manage Library Seats
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button
+              variant="contained"
+              color="primary"
+              component={Link}
+              to="/admin_library/manage-seats"
+              sx={{ marginTop: 1 }}
+            >
+              Go to Manage Library Seats
+            </Button>
+          </CardActions>
+        </Card>
         {/* Manage Resources Card */}
         <Card>
           <CardContent>
