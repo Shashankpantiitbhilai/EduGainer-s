@@ -53,9 +53,8 @@ const LegendsFunctions = ({
         name: formData.newLegendName,
         colorCode: formData.newLegendColor,
       };
-
+      setLegends([...legends, newLegend]);
       const addedLegend = await addLegendService(newLegend);
-      setLegends([...legends, addedLegend]);
 
       reset();
       setOpenDialog(false);
