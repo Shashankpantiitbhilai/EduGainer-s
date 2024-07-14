@@ -39,7 +39,7 @@ const StudentManagementTable = () => {
   const [selectedColor, setSelectedColor] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for delete confirmation dialog
   const [deleteBookingId, setDeleteBookingId] = useState(null); // State to hold booking ID to delete
-
+  const [updation, setupdation] = useState(0);
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
@@ -51,7 +51,7 @@ const StudentManagementTable = () => {
     };
 
     fetchBookingData();
-  }, []);
+  }, [updation]);
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -73,8 +73,8 @@ const StudentManagementTable = () => {
     try {
       await addBooking(formData);
       setOpenAddDialog(false);
-      const bookings = await getBookingData();
-      setData(bookings);
+      setupdation(!updation);
+     
     } catch (error) {
       console.error("Error adding new booking:", error);
     }
@@ -89,8 +89,7 @@ const StudentManagementTable = () => {
     try {
       await deleteBooking(deleteBookingId);
       setOpenDeleteDialog(false);
-      const bookings = await getBookingData();
-      setData(bookings);
+       setupdation(!updation);
     } catch (error) {
       console.error("Error deleting booking:", error);
     }
@@ -100,8 +99,7 @@ const StudentManagementTable = () => {
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);
-      const bookings = await getBookingData();
-      setData(bookings);
+     setupdation(!updation);
     } catch (error) {
       console.error("Error updating booking:", error);
     }
