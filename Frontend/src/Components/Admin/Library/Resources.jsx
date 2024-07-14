@@ -24,7 +24,7 @@ import {
   fetchLibResources,
   editLibResources,
   deleteLibResource,
-} from "../../services/Admin_services/adminUtils";
+} from "../../../services/Admin_services/adminUtils";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

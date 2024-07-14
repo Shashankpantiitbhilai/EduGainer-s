@@ -24,4 +24,63 @@ export async function makeSeatEmpty(seat,shift) {
         throw error; // Propagate the error to handle it in the calling component
     }
 }
+export async function getBookingData() {
 
+    try {
+        console.log("hi")
+        const response = await axiosInstance.get("/admin_library/getBookingData");
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+export async function updateColor(id, column, color) {
+
+    try {
+        console.log(id, column, color)
+        const response = await axiosInstance.patch("/admin_library/updateColor",{id,column,color});
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+export async function getLegends() {
+    try {
+        const response = await axiosInstance.get("/admin_library/getLegends");
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching legends:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+export async function addLegend(legend) {
+    try {
+        console.log(legend)
+        const response = await axiosInstance.post("/admin_library/addLegend", legend);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding legend:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+export async function deleteLegend(id) {
+    try {
+        console.log(id)
+        const response = await axiosInstance.delete(`/admin_library/deleteLegend/${id}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting legend:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}

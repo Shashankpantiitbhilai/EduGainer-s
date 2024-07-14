@@ -16,7 +16,7 @@ import {
   Snackbar,
   TextField,
 } from "@mui/material";
-import { getSeatsData } from "../../services/library/utils";
+import { getSeatsData } from "../../../services/library/utils";
 
 const shiftAmounts = [
   "9.30 PM to 6.30 AM",

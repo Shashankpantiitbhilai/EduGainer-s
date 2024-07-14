@@ -13,7 +13,7 @@ import {
   fetchLibSudents,
   deleteLibStudent,
   editLibStudentById,
-} from "../../services/Admin_services/adminUtils";
+} from "../../../services/Admin_services/adminUtils";
 
 export default function SearchBar() {
   const [shift, setShift] = useState([]);

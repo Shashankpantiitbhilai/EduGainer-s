@@ -106,6 +106,27 @@ function Admin_Library() {
         <Card>
           <CardContent>
             <Typography variant="h5" component="h3">
+              Manage bookings
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Manage current Bookings
+            </Typography>
+          </CardContent>
+          <CardActions>
+            <Button
+              variant="contained"
+              color="primary"
+              component={Link}
+              to="/admin_library/manage-current-month-bookings"
+              sx={{ marginTop: 1 }}
+            >
+              Go to Manage Library Bookings
+            </Button>
+          </CardActions>
+        </Card>
+        <Card>
+          <CardContent>
+            <Typography variant="h5" component="h3">
               Manage Resources
             </Typography>
             <Typography variant="body2" color="textSecondary">
