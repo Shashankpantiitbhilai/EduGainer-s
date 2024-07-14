@@ -15,6 +15,11 @@ import {
   Typography,
   Snackbar,
   TextField,
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from "@mui/material";
 import { getSeatsData } from "../../../services/library/utils";
 
@@ -25,13 +30,33 @@ const shiftAmounts = [
   "24*7",
 ];
 
-const Seat = ({ seatNumber, seatStatus, onClick }) => {
-  let seatColor = "grey"; // Default color for seats with no status
+// Dummy data for multiple persons
+const dummyPersons = [
+  { id: 1, name: "John Doe", seat: "A3", shift: "9.30 PM to 6.30 AM", avatar: "JD" },
+  { id: 2, name: "Jane Smith", seat: "B5", shift: "2 PM to 11 PM", avatar: "JS" },
+  { id: 3, name: "Bob Johnson", seat: "C7", shift: "6.30 AM to 6.30 PM", avatar: "BJ" },
+  { id: 4, name: "Alice Brown", seat: "D9", shift: "24*7", avatar: "AB" },
+];
 
+// Dummy detailed data for a person
+const dummyDetailedPerson = {
+  name: "John Doe",
+  seat: "A3",
+  shift: "9.30 PM to 6.30 AM",
+  email: "john.doe@example.com",
+  phone: "+1234567890",
+  registrationNumber: "REG12345",
+  paymentStatus: "Paid",
+  paymentAmount: "$50",
+  paymentDate: "2024-07-10",
+};
+
+const Seat = ({ seatNumber, seatStatus, onClick }) => {
+  let seatColor = "grey";
   if (seatStatus === "Paid") {
-    seatColor = "green"; // Green color for paid seats
+    seatColor = "green";
   } else if (seatStatus === "Unpaid") {
-    seatColor = "orange"; // Orange color for unpaid seats
+    seatColor = "orange";
   }
 
   return (
@@ -78,6 +103,11 @@ const ManageSeats = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [multiplePersonsDialogOpen, setMultiplePersonsDialogOpen] =
+    useState(false);
+  const [detailedPersonDialogOpen, setDetailedPersonDialogOpen] =
+    useState(false);
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const [formData, setFormData] = useState({
     Reg: "",
     Name: "",
@@ -152,12 +182,11 @@ const ManageSeats = () => {
   };
 
   const handleFormSubmit = () => {
-    // Handle form submission, e.g., send data to backend
     console.log("Form submitted with data:", formData);
     setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
     setSnackbarOpen(true);
     setFormDialogOpen(false);
-    handleCloseDialog(); // Optionally close the seat info dialog
+    handleCloseDialog();
   };
 
   const handleCloseSnackbar = (event, reason) => {
@@ -181,6 +210,17 @@ const ManageSeats = () => {
       Remarks: "",
       Status: "Paid",
     });
+  };
+
+  const handleViewDetails = () => {
+    setDialogOpen(false);
+    setMultiplePersonsDialogOpen(true);
+  };
+
+  const handlePersonClick = (person) => {
+    setSelectedPerson(person);
+    setMultiplePersonsDialogOpen(false);
+    setDetailedPersonDialogOpen(true);
   };
 
   return (
@@ -309,6 +349,7 @@ const ManageSeats = () => {
           </Box>
         </Box>
       </Box>
+
       <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
         <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -352,13 +393,15 @@ const ManageSeats = () => {
           >
             Mark as Unpaid
           </Button>
+          <Button onClick={handleViewDetails} color="info">
+            View Details
+          </Button>
           <Button onClick={handleCloseDialog} color="inherit">
             Close
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Form Dialog */}
       <Dialog open={formDialogOpen} onClose={handleFormClose}>
         <DialogTitle>Payment Form</DialogTitle>
         <DialogContent>
@@ -468,6 +511,74 @@ const ManageSeats = () => {
           </Button>
           <Button onClick={handleFormClose} color="inherit">
             Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={multiplePersonsDialogOpen}
+        onClose={() => setMultiplePersonsDialogOpen(false)}
+      >
+        <DialogTitle>Seat Occupants</DialogTitle>
+        <DialogContent>
+          <List>
+            {dummyPersons.map((person) => (
+              <ListItem
+                key={person.id}
+                button
+                onClick={() => handlePersonClick(person)}
+              >
+                <ListItemAvatar>
+                  <Avatar>{person.avatar}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={person.name}
+                  secondary={`Seat: ${person.seat}, Shift: ${person.shift}`}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setMultiplePersonsDialogOpen(false)}
+            color="inherit"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={detailedPersonDialogOpen}
+        onClose={() => setDetailedPersonDialogOpen(false)}
+      >
+        <DialogTitle>Detailed Person Information</DialogTitle>
+        <DialogContent>
+          <Typography variant="h6">{dummyDetailedPerson.name}</Typography>
+          <Typography>Seat: {dummyDetailedPerson.seat}</Typography>
+          <Typography>Shift: {dummyDetailedPerson.shift}</Typography>
+          <Typography>Email: {dummyDetailedPerson.email}</Typography>
+          <Typography>Phone: {dummyDetailedPerson.phone}</Typography>
+          <Typography>
+            Registration Number: {dummyDetailedPerson.registrationNumber}
+          </Typography>
+          <Typography>
+            Payment Status: {dummyDetailedPerson.paymentStatus}
+          </Typography>
+          <Typography>
+            Payment Amount: {dummyDetailedPerson.paymentAmount}
+          </Typography>
+          <Typography>
+            Payment Date: {dummyDetailedPerson.paymentDate}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDetailedPersonDialogOpen(false)}
+            color="inherit"
+          >
+            Close
           </Button>
         </DialogActions>
       </Dialog>
