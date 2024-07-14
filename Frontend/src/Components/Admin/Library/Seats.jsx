@@ -32,9 +32,27 @@ const shiftAmounts = [
 
 // Dummy data for multiple persons
 const dummyPersons = [
-  { id: 1, name: "John Doe", seat: "A3", shift: "9.30 PM to 6.30 AM", avatar: "JD" },
-  { id: 2, name: "Jane Smith", seat: "B5", shift: "2 PM to 11 PM", avatar: "JS" },
-  { id: 3, name: "Bob Johnson", seat: "C7", shift: "6.30 AM to 6.30 PM", avatar: "BJ" },
+  {
+    id: 1,
+    name: "John Doe",
+    seat: "A3",
+    shift: "9.30 PM to 6.30 AM",
+    avatar: "JD",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    seat: "B5",
+    shift: "2 PM to 11 PM",
+    avatar: "JS",
+  },
+  {
+    id: 3,
+    name: "Bob Johnson",
+    seat: "C7",
+    shift: "6.30 AM to 6.30 PM",
+    avatar: "BJ",
+  },
   { id: 4, name: "Alice Brown", seat: "D9", shift: "24*7", avatar: "AB" },
 ];
 

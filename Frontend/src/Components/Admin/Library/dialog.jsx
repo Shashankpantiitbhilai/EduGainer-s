@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogActions,
@@ -21,24 +21,34 @@ const BookingDialog = ({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({
-    defaultValues: defaultValues || {},
-  });
+    setValue, // Added to manually set form values
+  } = useForm();
+
+  // Reset form values whenever defaultValues change
+  useEffect(() => {
+    if (open) {
+      // Set form values from defaultValues
+      Object.keys(defaultValues).forEach((key) => {
+        setValue(key, defaultValues[key]);
+      });
+    }
+  }, [open, defaultValues, setValue]);
 
   // Handle form submission
   const onSubmit = (data) => {
     handleSubmitForm(data);
     reset(); // Reset form after submission
+    handleClose(); // Close dialog after submission
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle>
-          {defaultValues ? "Edit Booking" : "Add New Booking"}
+          {defaultValues ? `Edit Booking ${defaultValues.name}` : "Add New Booking"}
         </DialogTitle>
         <DialogContent>
-          <Grid container spacing={2}>
+            <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
                 {...register("reg", { required: "Registration is required" })}
