@@ -14,4 +14,11 @@ router.patch("/updateColor", admin_library.updateBookingColor)
 router.get("/getLegends", legend.getLegends)
 router.post("/addLegend", legend.addLegend)
 router.delete(`/deleteLegend/:id`, legend.deleteLegend)
+router.post('/addBooking', admin_library.addBookingData);
+
+// Route to update an existing booking
+router.post('/updatebooking', admin_library.updateBookingData);
+
+// Route to delete a booking
+router.delete('/deleteBooking/:id', admin_library.deleteBookingData);
 module.exports = router;

@@ -18,6 +18,94 @@ const getBookingData = async (req, res) => {
     }
 };
 
+
+const addBookingData = async (req, res) => {
+    const { reg, name, seat, date, cash, online, shift, fee, remarks, status } = req.body;;
+
+    try {
+        // Create a new booking instance
+        const newBooking = new Booking({
+            reg,
+            name,
+            seat,
+            date,
+            cash,
+            online,
+            shift,
+            fee,
+            remarks,
+            status
+        });
+console.log(newBooking)
+        // Save the new booking to the database
+        await newBooking.save();
+
+        // Send a success response
+        res.status(201).json({ message: 'Booking added successfully', booking: newBooking });
+    } catch (error) {
+        console.error('Error adding booking:', error);
+        res.status(500).json({ message: 'Failed to add booking' });
+    }
+};
+
+const updateBookingData = async (req, res) => {
+    console.log("Request body:", req.body);
+
+    const { reg, name, seat, date, cash, online, shift, fee, remarks, status } = req.body;
+    console.log("Reg value from request body:", reg);
+
+    try {
+        // Check if the booking exists before updating
+        const booking = await Booking.findOne({ reg });
+        console.log("Booking found:", booking);
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Update the booking with new data
+        const newBooking = await Booking.findOneAndUpdate(
+            { reg },
+            { reg, name, seat, date, cash, online, shift, fee, remarks, status },
+            { new: true } // Return the updated document
+        );
+
+        console.log("Updated booking:", newBooking);
+
+        // Check if the booking was found and updated
+        if (!newBooking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Send a success response
+        res.status(200).json({ message: 'Booking updated successfully', booking: newBooking });
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        res.status(500).json({ message: 'Failed to update booking' });
+    }
+};
+
+const deleteBookingData = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Find the booking by ID and delete it
+        const deletedBooking = await Booking.findByIdAndDelete(id);
+
+        // Check if the booking was found and deleted
+        if (!deletedBooking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Send a success response
+        res.status(200).json({ message: 'Booking deleted successfully', booking: deletedBooking });
+    } catch (error) {
+        console.error('Error deleting booking:', error);
+        res.status(500).json({ message: 'Failed to delete booking' });
+    }
+};
+
+
 const updateBookingColor = async (req, res) => {
     const { id, column, color } = req.body;
     // console.log("Request Body:", req.body);
@@ -50,5 +138,8 @@ const updateBookingColor = async (req, res) => {
 
 module.exports = {
     getBookingData,
-    updateBookingColor
+    updateBookingColor,
+    addBookingData,
+    updateBookingData,
+    deleteBookingData
 };

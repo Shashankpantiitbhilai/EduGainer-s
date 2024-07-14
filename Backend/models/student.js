@@ -130,46 +130,46 @@ const bookingSchema = new mongoose.Schema({
     ref: 'LibStudent', // Reference to the User model
     // required: true,
   },
-  Reg: {
-    type:String,
+  reg: {
+    type: String,
 
   },
-  Name: {
+  name: {
     type: String,
     // required: true,
     default: ''
   },
-  Seat: {
-    type:String,
+  seat: {
+    type: String,
     // required: true
   },
-  Date: {
+  date: {
     type: String,
     default: '#########'
   },
-  Cash: {
-    type:String,
+  cash: {
+    type: String,
     default: 0
   },
-  Online: {
-    type:String,
+  online: {
+    type: String,
     default: 0
   },
-  Shift: {
+  shift: {
     type: String,
     // required: true,
     default: ''
   },
-  Fee: {
-    type:String,
+  fee: {
+    type: String,
     // required: true,
     default: 0
   },
-  Remarks: {
+  remarks: {
     type: String,
     default: ''
   },
-  Status: {
+  status: {
     type: String,
     default: ''
   }

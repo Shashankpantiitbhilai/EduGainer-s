@@ -84,3 +84,37 @@ export async function deleteLegend(id) {
         throw error; // Propagate the error to handle it in the calling component
     }
 }
+
+export async function deleteBooking(id) {
+    try {
+        console.log(id)
+        const response = await axiosInstance.delete(`/admin_library/deleteBooking/${id}`);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting legend:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+export async function addBooking(data) {
+    try {
+        console.log(data)
+        const response = await axiosInstance.post(`/admin_library/addBooking`,data);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding booking:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+export async function updateBooking(data) {
+    try {
+        console.log(data)
+        const response = await axiosInstance.post(`/admin_library/updateBooking`,data);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating booking:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
