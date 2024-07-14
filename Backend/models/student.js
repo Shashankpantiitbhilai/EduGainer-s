@@ -128,41 +128,41 @@ const bookingSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'LibStudent', // Reference to the User model
-    required: true,
+    // required: true,
   },
   Reg: {
-    type: Number,
-   
+    type:String,
+
   },
   Name: {
     type: String,
-    required: true,
+    // required: true,
     default: ''
   },
   Seat: {
-    type: Number,
-    required: true
+    type:String,
+    // required: true
   },
   Date: {
     type: String,
     default: '#########'
   },
   Cash: {
-    type: Number,
+    type:String,
     default: 0
   },
   Online: {
-    type: Number,
+    type:String,
     default: 0
   },
   Shift: {
     type: String,
-    required: true,
+    // required: true,
     default: ''
   },
   Fee: {
-    type: Number,
-    required: true,
+    type:String,
+    // required: true,
     default: 0
   },
   Remarks: {
@@ -172,6 +172,12 @@ const bookingSchema = new mongoose.Schema({
   Status: {
     type: String,
     default: ''
+  }
+  ,
+  colors: {
+    type: Map,
+    of: String,
+    default: {}
   }
 });
 
@@ -240,7 +246,7 @@ const Class = mongoose.model("Class", classesSchema);
 
 module.exports = {
   LibStudent,
-Class,
+  Class,
   User,
   Booking
 };

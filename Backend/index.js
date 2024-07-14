@@ -7,6 +7,7 @@ const routes_classes = require("./routes/classes");
 const routes_quiz = require("./routes/quiz");
 const routes_chat = require("./routes/chat");
 const routes_library = require("./routes/Library");
+const routes_admin_library = require("./routes/admin_lib");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
@@ -85,7 +86,7 @@ app.use("/auth", routes_auth);
 app.use("/admin", routes_admin);
 app.use("/classes", routes_classes);
 app.use("/library", routes_library);
-
+app.use("/admin_library", routes_admin_library);
 // Pass Socket.IO instance to chat routes
 app.use("/chat", routes_chat(io));
 
