@@ -28,6 +28,7 @@ import LegendsFunctions from "./legend";
 import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// Import the LoadingAnimation component
 
 const StudentManagementTable = () => {
   const [data, setData] = useState([]);
@@ -42,12 +43,14 @@ const StudentManagementTable = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for delete confirmation dialog
   const [deleteBookingId, setDeleteBookingId] = useState(null); // State to hold booking ID to delete
   const [updation, setupdation] = useState(0);
+  const [loading, setLoading] = useState(true); // State to track loading state
 
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
         const bookings = await getBookingData();
         setData(bookings);
+        setLoading(false); // Set loading to false once data is fetched
         // toast.success("Booking data fetched successfully!");
       } catch (error) {
         console.error("Error fetching booking data:", error);
@@ -153,137 +156,149 @@ const StudentManagementTable = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Box sx={{ flexGrow: 1, p: 2 }}>
-        <Paper sx={{ p: 2, mb: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <TextField
-              label="Search"
-              variant="outlined"
-              size="small"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{ endAdornment: <Search /> }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<Add />}
-              sx={{ ml: 2 }}
-              onClick={() => setOpenAddDialog(true)}
-            >
-              Add Booking
-            </Button>
-          </Box>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox />
-                  </TableCell>
-                  {columnOrder.map((key) => (
-                    <TableCell key={key}>
-                      <TableSortLabel
-                        active={sortConfig.key === key}
-                        direction={
-                          sortConfig.key === key ? sortConfig.direction : "asc"
-                        }
-                        onClick={() => handleSort(key)}
-                      >
-                        {key}
-                      </TableSortLabel>
-                    </TableCell>
-                  ))}
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data
-                  .filter((item) =>
-                    Object.values(item).some(
-                      (value) =>
-                        typeof value === "string" &&
-                        value.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                  )
-                  .map((item) => (
-                    <TableRow key={item._id}>
+      {loading ? (
+      "loading"
+      ) : (
+        <>
+          <Box sx={{ flexGrow: 1, p: 2 }}>
+            <Paper sx={{ p: 2, mb: 2 }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TextField
+                  label="Search"
+                  variant="outlined"
+                  size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{ endAdornment: <Search /> }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<Add />}
+                  sx={{ ml: 2 }}
+                  onClick={() => setOpenAddDialog(true)}
+                >
+                  Add Booking
+                </Button>
+              </Box>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedRows.includes(item._id)}
-                          onChange={() =>
-                            setSelectedRows((prevSelectedRows) =>
-                              prevSelectedRows.includes(item._id)
-                                ? prevSelectedRows.filter(
-                                    (rowId) => rowId !== item._id
-                                  )
-                                : [...prevSelectedRows, item._id]
-                            )
-                          }
-                        />
+                        <Checkbox />
                       </TableCell>
                       {columnOrder.map((key) => (
-                        <TableCell
-                          key={key}
-                          onClick={() => handleColorChange(key, item._id)}
-                          sx={{
-                            backgroundColor:
-                              item.colors && item.colors[key]
-                                ? item.colors[key]
-                                : "inherit",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {item[key]}
+                        <TableCell key={key}>
+                          <TableSortLabel
+                            active={sortConfig.key === key}
+                            direction={
+                              sortConfig.key === key
+                                ? sortConfig.direction
+                                : "asc"
+                            }
+                            onClick={() => handleSort(key)}
+                          >
+                            {key}
+                          </TableSortLabel>
                         </TableCell>
                       ))}
-                      <TableCell>
-                        <IconButton
-                          onClick={() => handleDeleteBooking(item._id)}
-                        >
-                          <Delete color="error" />
-                        </IconButton>
-                        <IconButton onClick={() => handleOpenEditDialog(item)}>
-                          <Edit color="primary" />
-                        </IconButton>
-                      </TableCell>
+                      <TableCell>Actions</TableCell>
                     </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+                  </TableHead>
+                  <TableBody>
+                    {data
+                      .filter((item) =>
+                        Object.values(item).some(
+                          (value) =>
+                            typeof value === "string" &&
+                            value
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())
+                        )
+                      )
+                      .map((item) => (
+                        <TableRow key={item._id}>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedRows.includes(item._id)}
+                              onChange={() =>
+                                setSelectedRows((prevSelectedRows) =>
+                                  prevSelectedRows.includes(item._id)
+                                    ? prevSelectedRows.filter(
+                                        (rowId) => rowId !== item._id
+                                      )
+                                    : [...prevSelectedRows, item._id]
+                                )
+                              }
+                            />
+                          </TableCell>
+                          {columnOrder.map((key) => (
+                            <TableCell
+                              key={key}
+                              onClick={() => handleColorChange(key, item._id)}
+                              sx={{
+                                backgroundColor:
+                                  item.colors && item.colors[key]
+                                    ? item.colors[key]
+                                    : "inherit",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {item[key]}
+                            </TableCell>
+                          ))}
+                          <TableCell>
+                            <IconButton
+                              onClick={() => handleDeleteBooking(item._id)}
+                            >
+                              <Delete color="error" />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleOpenEditDialog(item)}
+                            >
+                              <Edit color="primary" />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
 
-        <BookingDialog
-          open={openAddDialog}
-          handleClose={() => setOpenAddDialog(false)}
-          handleSubmitForm={handleAddBooking}
-          defaultValues={{}}
-        />
+            <BookingDialog
+              open={openAddDialog}
+              handleClose={() => setOpenAddDialog(false)}
+              handleSubmitForm={handleAddBooking}
+              defaultValues={{}}
+            />
 
-        <BookingDialog
-          open={openEditDialog}
-          handleClose={handleCloseEditDialog}
-          handleSubmitForm={handleEditBooking}
-          defaultValues={editFormData}
-        />
+            <BookingDialog
+              open={openEditDialog}
+              handleClose={handleCloseEditDialog}
+              handleSubmitForm={handleEditBooking}
+              defaultValues={editFormData}
+            />
 
-        {/* Confirmation dialog for delete action */}
-        <ConfirmationDialog
-          open={openDeleteDialog}
-          handleClose={() => setOpenDeleteDialog(false)}
-          handleConfirm={handleConfirmDelete}
-        />
+            {/* Confirmation dialog for delete action */}
+            <ConfirmationDialog
+              open={openDeleteDialog}
+              handleClose={() => setOpenDeleteDialog(false)}
+              handleConfirm={handleConfirmDelete}
+            />
 
-        {/* Toast container for notifications */}
-        <ToastContainer />
-      </Box>
-      <LegendsFunctions
-        legends={legends}
-        setLegends={setLegends}
-        selectedColor={selectedColor}
-        setSelectedColor={setSelectedColor}
-      />
+            {/* Toast container for notifications */}
+            <ToastContainer />
+          </Box>
+          <LegendsFunctions
+            legends={legends}
+            setLegends={setLegends}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+          />
+        </>
+      )}
     </Box>
   );
 };

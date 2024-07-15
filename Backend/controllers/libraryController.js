@@ -3,19 +3,19 @@ const { Booking } = require('../models/student');
 const getCurrentMonthBookings = async (req, res) => {
     try {
         // Fetch all booking data
-        const bookings = await Booking.find({}, 'Seat Status Shift'); // Fetch all fields
-
+        const bookings = await Booking.find({}, 'seat status shift'); // Fetch all fields
+        console.log(bookings)
         // Transform the data into an object with Shift as key and array of objects as value
         const bookingsByShift = bookings.reduce((acc, booking) => {
-            const { Seat, Status, Shift } = booking;
-            if (!acc[Shift]) {
-                acc[Shift] = [];
+            const { seat, status, shift } = booking;
+            if (!acc[shift]) {
+                acc[shift] = [];
             }
-            acc[Shift].push({ Seat, Status });
+            acc[shift].push({ seat, status });
             return acc;
         }, {});
 
-        console.log(bookingsByShift);
+        // console.log(bookingsByShift);
 
         // Send the transformed data as a response
         res.status(200).json(bookingsByShift);

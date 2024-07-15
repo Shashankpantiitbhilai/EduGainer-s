@@ -64,7 +64,7 @@ const LibStudentSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-  
+
   image: {
     publicId: {
       type: String,
@@ -138,8 +138,8 @@ const bookingSchema = new mongoose.Schema({
     // required: true
   },
   date: {
-    type: String,
-    default: '#########'
+    type: Date,
+
   },
   cash: {
     type: String,

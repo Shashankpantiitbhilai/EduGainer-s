@@ -3,7 +3,6 @@ const { Student, User } = require("../models/student");
 const upload = require("../multer");
 const router = express.Router();
 
-const { sendEmailWithAttachment } = require("../emailSender");
 const admin_library= require("../controllers/library/admin_library");
 
 const legend=require("../controllers/library/color")
@@ -21,4 +20,6 @@ router.post('/updatebooking', admin_library.updateBookingData);
 
 // Route to delete a booking
 router.delete('/deleteBooking/:id', admin_library.deleteBookingData);
+router.get("/getSeatInfo/:seat", admin_library.getSeatInfo)
+router.get("/getStudentInfo/:reg", admin_library.getStudentInfo)
 module.exports = router;

@@ -22,14 +22,19 @@ import {
   ListItemText,
 } from "@mui/material";
 import { getSeatsData } from "../../../services/library/utils";
-
-const shiftAmounts = [
+import {
+  getSeatInfo,
+  getStudentInfo,
+} from "../../../services/Admin_services/admin_lib";
+const shifts = [
+  "6.30 AM to 2 PM",
+  "2 PM to 9.30 PM",
+  "6.30 PM to 11 PM",
   "9.30 PM to 6.30 AM",
   "2 PM to 11 PM",
   "6.30 AM to 6.30 PM",
   "24*7",
 ];
-
 // Dummy data for multiple persons
 const dummyPersons = [
   {
@@ -114,13 +119,14 @@ const SeatRow = ({ seats, seatStatus, onSeatClick }) => (
 );
 
 const ManageSeats = () => {
-  const [selectedShift, setSelectedShift] = useState(shiftAmounts[0]);
+  const [selectedShift, setSelectedShift] = useState(shifts[0]);
   const [seatStatus, setSeatStatus] = useState({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [seatInfo, setseatInfo] = useState(false);
   const [multiplePersonsDialogOpen, setMultiplePersonsDialogOpen] =
     useState(false);
   const [detailedPersonDialogOpen, setDetailedPersonDialogOpen] =
@@ -230,13 +236,27 @@ const ManageSeats = () => {
     });
   };
 
-  const handleViewDetails = () => {
+  const handleViewDetails = async () => {
+    console.log(`Fetching details for seat ${selectedSeat}`);
+
     setDialogOpen(false);
     setMultiplePersonsDialogOpen(true);
+
+    try {
+      const seatdata = await getSeatInfo(selectedSeat);
+      console.log("Seat data retrieved:", seatdata);
+      setseatInfo(seatdata);
+    } catch (error) {
+      console.error("Error fetching seat info:", error);
+      setSnackbarMessage("Error fetching seat details");
+      setSnackbarOpen(true);
+    }
   };
 
-  const handlePersonClick = (person) => {
-    setSelectedPerson(person);
+  const handlePersonClick = async(reg) => {
+    console.log(reg)
+    const student =await getStudentInfo(reg)
+    setSelectedPerson(student);
     setMultiplePersonsDialogOpen(false);
     setDetailedPersonDialogOpen(true);
   };
@@ -256,7 +276,7 @@ const ManageSeats = () => {
           onChange={handleShiftChange}
           label="Select Shift"
         >
-          {shiftAmounts.map((shift) => (
+          {shifts.map((shift) => (
             <MenuItem key={shift} value={shift}>
               {shift}
             </MenuItem>
@@ -540,21 +560,22 @@ const ManageSeats = () => {
         <DialogTitle>Seat Occupants</DialogTitle>
         <DialogContent>
           <List>
-            {dummyPersons.map((person) => (
-              <ListItem
-                key={person.id}
-                button
-                onClick={() => handlePersonClick(person)}
-              >
-                <ListItemAvatar>
-                  <Avatar>{person.avatar}</Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={person.name}
-                  secondary={`Seat: ${person.seat}, Shift: ${person.shift}`}
-                />
-              </ListItem>
-            ))}
+            {seatInfo &&
+              seatInfo.map((person) => (
+                <ListItem
+                  key={person._id}
+                  button
+                  onClick={() => handlePersonClick(person.reg)}
+                >
+                  <ListItemAvatar>
+                    <Avatar>{person.avatar}</Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={person.name}
+                    secondary={`Seat: ${person.seat}, Shift: ${person.shift},Reg: ${person.reg}`}
+                  />
+                </ListItem>
+              ))}
           </List>
         </DialogContent>
         <DialogActions>
@@ -573,23 +594,21 @@ const ManageSeats = () => {
       >
         <DialogTitle>Detailed Person Information</DialogTitle>
         <DialogContent>
-          <Typography variant="h6">{dummyDetailedPerson.name}</Typography>
-          <Typography>Seat: {dummyDetailedPerson.seat}</Typography>
-          <Typography>Shift: {dummyDetailedPerson.shift}</Typography>
-          <Typography>Email: {dummyDetailedPerson.email}</Typography>
-          <Typography>Phone: {dummyDetailedPerson.phone}</Typography>
+          <Typography variant="h6">{selectedPerson?.name}</Typography>
+          <Typography>Email: {selectedPerson?.email}</Typography>
+          <Typography>Address: {selectedPerson?.address}</Typography>
+          <Typography>Image URL: {selectedPerson?.image?.url}</Typography>
+          <Typography>Gender: {selectedPerson?.gender}</Typography>
+          <Typography>Date of Birth: {selectedPerson?.dob}</Typography>
+
+          <Typography>Contact No 1: {selectedPerson?.contactNo1}</Typography>
+          <Typography>Contact No 2: {selectedPerson?.contactNo2}</Typography>
+          <Typography>Aadhaar No: {selectedPerson?.aadhaarNo}</Typography>
           <Typography>
-            Registration Number: {dummyDetailedPerson.registrationNumber}
+            Exam Preparation: {selectedPerson?.examPreparation}
           </Typography>
-          <Typography>
-            Payment Status: {dummyDetailedPerson.paymentStatus}
-          </Typography>
-          <Typography>
-            Payment Amount: {dummyDetailedPerson.paymentAmount}
-          </Typography>
-          <Typography>
-            Payment Date: {dummyDetailedPerson.paymentDate}
-          </Typography>
+          <Typography>Father's Name: {selectedPerson?.fatherName}</Typography>
+          <Typography>Mother's Name: {selectedPerson?.motherName}</Typography>
         </DialogContent>
         <DialogActions>
           <Button

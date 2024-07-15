@@ -1,4 +1,49 @@
-const { Booking } = require('../../models/student');
+const { Booking ,LibStudent} = require('../../models/student');
+
+
+const getSeatInfo = async (req, res) => {
+    const { seat } = req.params;
+    try {
+        // Fetch all booking data with specified fields
+        // console.log(seat)
+        // const test = await Booking.find({ seat });
+        // console.log(test)
+        const bookings = await Booking.find({ seat: seat }).select('name seat shift image reg');
+        // console.log(bookings)
+        // Check if bookings are found
+        if (!bookings) {
+            return res.status(404).json({ message: 'No bookings found for the seat' });
+        }
+
+        // Send the transformed data as a response
+        res.status(200).json(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ message: 'Failed to fetch bookings' });
+    }
+};
+const getStudentInfo = async (req, res) => {
+    const { reg } = req.params; // Assuming registration number is passed as a parameter
+// console.log(reg)
+    try {
+        // Fetch student data from LibStudent collection
+        const student = await LibStudent.findOne({ reg: reg }).select('-_id -__v');
+// console.log(student)
+        // Check if student is found
+        if (!student) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+
+        // Send the transformed data as a response
+        res.status(200).json(student);
+    } catch (error) {
+        console.error('Error fetching student:', error);
+        res.status(500).json({ message: 'Failed to fetch student' });
+    }
+};
+
+
+
 
 const getBookingData = async (req, res) => {
     try {
@@ -36,7 +81,7 @@ const addBookingData = async (req, res) => {
             remarks,
             status
         });
-console.log(newBooking)
+        // console.log(newBooking)
         // Save the new booking to the database
         await newBooking.save();
 
@@ -49,10 +94,10 @@ console.log(newBooking)
 };
 
 const updateBookingData = async (req, res) => {
-    console.log("Request body:", req.body);
+    // console.log("Request body:", req.body);
 
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status } = req.body;
-    console.log("Reg value from request body:", reg);
+    // console.log("Reg value from request body:", reg);
 
     try {
         // Check if the booking exists before updating
@@ -70,7 +115,7 @@ const updateBookingData = async (req, res) => {
             { new: true } // Return the updated document
         );
 
-        console.log("Updated booking:", newBooking);
+        // console.log("Updated booking:", newBooking);
 
         // Check if the booking was found and updated
         if (!newBooking) {
@@ -141,5 +186,7 @@ module.exports = {
     updateBookingColor,
     addBookingData,
     updateBookingData,
-    deleteBookingData
+    deleteBookingData,
+    getSeatInfo,
+    getStudentInfo
 };

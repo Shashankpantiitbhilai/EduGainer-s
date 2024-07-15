@@ -17,7 +17,7 @@ export async function makeSeatEmpty(seat,shift) {
   
     try {
         const response = await axiosInstance.patch("/admin/makeSeatEmpty", { seat,shift });
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error sending form data:", error);
@@ -27,9 +27,9 @@ export async function makeSeatEmpty(seat,shift) {
 export async function getBookingData() {
 
     try {
-        console.log("hi")
+        // console.log("hi")
         const response = await axiosInstance.get("/admin_library/getBookingData");
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error sending form data:", error);
@@ -40,9 +40,9 @@ export async function getBookingData() {
 export async function updateColor(id, column, color) {
 
     try {
-        console.log(id, column, color)
+        // console.log(id, column, color)
         const response = await axiosInstance.patch("/admin_library/updateColor",{id,column,color});
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error sending form data:", error);
@@ -53,7 +53,7 @@ export async function updateColor(id, column, color) {
 export async function getLegends() {
     try {
         const response = await axiosInstance.get("/admin_library/getLegends");
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error fetching legends:", error);
@@ -63,9 +63,9 @@ export async function getLegends() {
 
 export async function addLegend(legend) {
     try {
-        console.log(legend)
+        // console.log(legend)
         const response = await axiosInstance.post("/admin_library/addLegend", legend);
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error adding legend:", error);
@@ -75,9 +75,9 @@ export async function addLegend(legend) {
 
 export async function deleteLegend(id) {
     try {
-        console.log(id)
+        // console.log(id)
         const response = await axiosInstance.delete(`/admin_library/deleteLegend/${id}`);
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error deleting legend:", error);
@@ -87,9 +87,9 @@ export async function deleteLegend(id) {
 
 export async function deleteBooking(id) {
     try {
-        console.log(id)
+        // console.log(id)
         const response = await axiosInstance.delete(`/admin_library/deleteBooking/${id}`);
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error deleting legend:", error);
@@ -98,9 +98,9 @@ export async function deleteBooking(id) {
 }
 export async function addBooking(data) {
     try {
-        console.log(data)
+        // console.log(data)
         const response = await axiosInstance.post(`/admin_library/addBooking`,data);
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error adding booking:", error);
@@ -109,12 +109,35 @@ export async function addBooking(data) {
 }
 export async function updateBooking(data) {
     try {
-        console.log(data)
+        // console.log(data)
         const response = await axiosInstance.post(`/admin_library/updateBooking`,data);
-        console.log(response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Error updating booking:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+export async function getSeatInfo(seat) {
+    // console.log(seat,"getseatinfo");
+    try {
+        const response = await axiosInstance.get(`/admin_library/getSeatInfo/${seat}`);
+       
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching seat info:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+export async function getStudentInfo(reg) {
+   
+    try {
+        const response = await axiosInstance.get(`/admin_library/getStudentInfo/${reg}`);
+       
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching seat info:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
