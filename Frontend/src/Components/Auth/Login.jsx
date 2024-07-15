@@ -5,7 +5,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { loginUser } from "../../services/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
+
 import { styled } from "@mui/system";
 
 const LoginContainer = styled(Container)({
@@ -156,7 +156,7 @@ function Login() {
           Don't have an account? <Link to="/register">Register</Link>
         </Typography>
       </LoginForm>
-      <DevTool control={control} />
+      
     </LoginContainer>
   );
 }
