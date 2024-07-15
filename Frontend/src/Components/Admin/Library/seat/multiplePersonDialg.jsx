@@ -36,7 +36,19 @@ const MultiplePersonsDialog = ({ open, onClose, seatInfo, onPersonClick }) => (
       </List>
     </DialogContent>
     <DialogActions>
-      <Button onClick={onClose} color="inherit">
+      <Button
+        onClick={() => {
+          seatInfo.forEach((person) => {
+            person.name = "";
+            person.seat = "";
+            person.shift = "";
+            person.reg = "";
+            person.avatar = "";
+          });
+          onClose();
+        }}
+        color="inherit"
+      >
         Close
       </Button>
     </DialogActions>

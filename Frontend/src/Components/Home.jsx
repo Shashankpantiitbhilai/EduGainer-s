@@ -1,90 +1,346 @@
-import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { AdminContext } from "../App";
-import { logoutUser } from "../services/auth";
-import { Box, Button, Container, Typography } from "@mui/material";
-import { styled } from "@mui/system";
-import Footer from "./footer";
-const HeroSection = styled(Box)({
-  textAlign: "center",
-  padding: "40px 20px",
-  backgroundColor: "#f5f5f5",
-  borderRadius: "8px",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  marginTop: "20px",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-});
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Typography,
+  Button,
+  Container,
+  Box,
+  Grid,
+  Card,
+  CardContent,
+} from "@mui/material";
+import {
+  ArrowForward,
+  Wifi,
+  PowerSettingsNew,
+  Weekend,
+  WatchLater,
+  MenuBook,
+  School,
+  EmojiEvents,
+  Psychology,
+  LocalLibrary,
+  Flag,
+} from "@mui/icons-material";
+import AcUnitIcon from "@mui/icons-material/AcUnit";
+import { motion } from "framer-motion";
 
-const HeroTitle = styled(Typography)({
-  fontSize: "2rem",
-  marginBottom: "20px",
-  "@media (min-width:600px)": {
-    fontSize: "3rem",
-  },
-});
+const colors = {
+  primary: "#006400", // Dark Green
+  secondary: "#FFA500", // Orange
+  text: "#333333",
+  background: "#F0F8FF", // Light Sky Blue
+  white: "#FFFFFF",
+  accent: "#4CAF50", // Light Green
+};
 
-const HeroSubtitle = styled(Typography)({
-  fontSize: "1.2rem",
-  marginBottom: "40px",
-  "@media (min-width:600px)": {
-    fontSize: "1.5rem",
-  },
-});
-
-const ButtonContainer = styled(Box)({
-  display: "flex",
-  flexDirection: "column",
-  gap: "20px",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "100%", // Full width for centering within parent container
-  "@media (min-width:600px)": {
-    flexDirection: "row",
-  },
-});
+const StyledCard = motion(Card);
 
 function Home() {
   const navigate = useNavigate();
-  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
-
-  const handleLogout = async () => {
-    try {
-      await logoutUser();
-      setIsUserLoggedIn(false);
-      navigate("/login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+  const libraryFacilities = [
+    { icon: <WatchLater />, text: "24/7 Accessibility" },
+    { icon: <AcUnitIcon />, text: "Climate Control (Fans, AC, Heater)" },
+    { icon: <Wifi />, text: "High-Speed WiFi" },
+    { icon: <Weekend />, text: "Comfortable Seating" },
+    { icon: <PowerSettingsNew />, text: "Individual Power Stations" },
+    { icon: <MenuBook />, text: "Extensive Study Materials" },
+  ];
+  const handleClick = async () => {
+   
+    navigate("/login");
   };
+  const classesOffered = [
+    { icon: <School />, text: "NEET & JEE Preparation" },
+    { icon: <MenuBook />, text: "Board Exams Excellence" },
+    { icon: <EmojiEvents />, text: "SSC CGL Mastery" },
+    { icon: <Flag />, text: "Uttarakhand LT Exam" },
+    { icon: <Psychology />, text: "Group C Government Exams" },
+    { icon: <LocalLibrary />, text: "General Competitive Exams" },
+  ];
 
   return (
-  <div>  <Container>
-      <HeroSection>
-        <HeroTitle variant="h1">
-          Welcome to EduGainer's Library & Classes
-        </HeroTitle>
-        <HeroSubtitle variant="body1">
-          Empowering Education Through Innovation
-        </HeroSubtitle>
-        <ButtonContainer>
-          <Button variant="contained" color="primary" className="explore">
-            Explore Our Offerings
-          </Button>
-          <Button
-            component={Link}
-            to="/learn-more"
-            color="primary"
-            className="learn-more"
+    <Box sx={{ backgroundColor: colors.background }}>
+      {/* Hero Section */}
+      <Box
+        sx={{
+          backgroundColor: colors.primary,
+          color: colors.white,
+          py: 12,
+          borderBottom: `8px solid ${colors.secondary}`,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: { xs: "3rem", md: "4.5rem" },
+              fontWeight: "bold",
+              mb: 2,
+              textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+            }}
           >
-            Learn More →
+            Ignite Your Potential with EduGainer
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{
+              fontSize: { xs: "1.5rem", md: "2rem" },
+              mb: 4,
+              fontWeight: "300",
+            }}
+          >
+            Where Curiosity, Dedication, and Perseverance Shape Your Future
+          </Typography>
+          <Button
+          onClick={handleClick}
+            variant="contained"
+            size="large"
+            endIcon={<ArrowForward />}
+            sx={{
+              backgroundColor: colors.secondary,
+              color: colors.white,
+              "&:hover": { backgroundColor: colors.accent },
+              fontSize: "1.2rem",
+              py: 1.5,
+              px: 4,
+
+              borderRadius: "50px",
+            }}
+          >
+            Begin Your Journey
           </Button>
-        </ButtonContainer>
-      </HeroSection>
-      
-    </Container>
-    <footer><Footer/></footer></div>
+        </Container>
+      </Box>
+
+      {/* Library Facilities Section */}
+      <Container maxWidth="lg" sx={{ py: 12 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            color: colors.primary,
+            fontWeight: "bold",
+            mb: 4,
+            textAlign: "center",
+            fontSize: { xs: "2.5rem", md: "3.5rem" },
+          }}
+        >
+          EduGainer's 24/7 Learning Oasis
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: colors.text,
+            fontSize: "1.2rem",
+            mb: 6,
+            textAlign: "center",
+            maxWidth: "800px",
+            margin: "0 auto",
+          }}
+        >
+          Step into a world where learning never sleeps. Our state-of-the-art
+          library is your personal sanctuary for success, open round the clock
+          to fuel your aspirations.
+        </Typography>
+        <Grid container spacing={4}>
+          {libraryFacilities.map((facility, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <StyledCard
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  p: 3,
+                  backgroundColor: colors.white,
+                  boxShadow: 3,
+                  borderRadius: "15px",
+                  transition: "all 0.3s ease-in-out",
+                }}
+              >
+                <Box sx={{ color: colors.secondary, fontSize: 64, mb: 2 }}>
+                  {facility.icon}
+                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: colors.text,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  {facility.text}
+                </Typography>
+              </StyledCard>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+
+      {/* Classes Offered Section */}
+      <Box
+        sx={{
+          backgroundColor: colors.primary,
+          color: colors.white,
+          py: 12,
+          borderTop: `8px solid ${colors.secondary}`,
+          borderBottom: `8px solid ${colors.secondary}`,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: "bold",
+              mb: 4,
+              textAlign: "center",
+              fontSize: { xs: "2.5rem", md: "3.5rem" },
+            }}
+          >
+            Forge Your Path to Excellence
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: "1.2rem",
+              mb: 6,
+              textAlign: "center",
+              maxWidth: "800px",
+              margin: "0 auto",
+            }}
+          >
+            At EduGainer, we don't just prepare you for exams; we sculpt future
+            leaders. Dive into our meticulously crafted courses designed to
+            transform your aspirations into achievements.
+          </Typography>
+          <Grid container spacing={4}>
+            {classesOffered.map((course, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <StyledCard
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    p: 3,
+                    backgroundColor: colors.white,
+                    borderRadius: "15px",
+                    transition: "all 0.3s ease-in-out",
+                  }}
+                >
+                  <Box sx={{ color: colors.secondary, fontSize: 64, mb: 2 }}>
+                    {course.icon}
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: colors.primary,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    {course.text}
+                  </Typography>
+                </StyledCard>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* EduGainer's Approach Section */}
+      <Container maxWidth="lg" sx={{ py: 12 }}>
+        <Typography
+          variant="h2"
+          sx={{
+            color: colors.primary,
+            fontWeight: "bold",
+            mb: 4,
+            textAlign: "center",
+            fontSize: { xs: "2.5rem", md: "3.5rem" },
+          }}
+        >
+          The EduGainer Edge: Where Dreams Take Flight
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
+            maxWidth: "800px",
+            margin: "0 auto",
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
+              color: colors.text,
+              fontSize: "1.2rem",
+              lineHeight: 1.8,
+              textAlign: "center",
+            }}
+          >
+            Embark on a transformative journey with EduGainer, where every class
+            is a stepping stone to greatness. Our dynamic approach blends
+            cutting-edge pedagogy with personalized mentoring, creating an
+            electrifying learning environment that ignites your potential.
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: colors.text,
+              fontSize: "1.2rem",
+              lineHeight: 1.8,
+              textAlign: "center",
+            }}
+          >
+            From cracking the code of JEE and NEET to conquering board exams and
+            government recruitments like SSC CGL and Uttarakhand LT, we're your
+            steadfast companion in every academic endeavor. Our expert faculty
+            doesn't just teach; they inspire, challenge, and nurture your
+            intellect, paving the way for unparalleled success.
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              color: colors.text,
+              fontSize: "1.2rem",
+              lineHeight: 1.8,
+              textAlign: "center",
+            }}
+          >
+            At EduGainer, we believe in the power of 'शिक्षा आभा' - the radiance
+            of education. Join us to experience a world where knowledge meets
+            ambition, and where your dreams of acing भाग 1 - शैक्षिक आभा
+            तर्कशक्ति परीक्षण सामान्य ज्ञान एवं उत्तराखंड (50 अंक) become a
+            shining reality.
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            endIcon={<ArrowForward />}
+          onClick={handleClick}
+            sx={{
+              backgroundColor: colors.secondary,
+              color: colors.white,
+              "&:hover": { backgroundColor: colors.primary },
+              fontSize: "1.2rem",
+              py: 1.5,
+              px: 4,
+              borderRadius: "50px",
+              mt: 4,
+            }}
+          >
+            Begin Your Success Story
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 

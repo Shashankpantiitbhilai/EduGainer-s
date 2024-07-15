@@ -23,7 +23,7 @@ import ManageResources from "./Components/Admin/Library/Resources.jsx";
 import Resources from "./Components/Resources/resources.jsx"
 import EdugainerClasses from "./Components/Classes/classes.jsx";
 import ClassesRegistration from "./Components/Classes/new-reg.jsx";
-import PdfUploader from "./Components/quiz/upload.jsx";
+
 import SuccessClasses from "./Components/Classes/Success.jsx";
 import Chat from "./Components/chat/dashboard.jsx"
 import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
@@ -58,14 +58,7 @@ const Main = () => {
                         </ProtectedAdmin>
                     }
                 />
-                <Route
-                    path="/admin/quiz"
-                    element={
-                        <ProtectedAdmin>
-                            <PdfUploader />
-                        </ProtectedAdmin>
-                    }
-                />
+            
                 <Route
                     path="/resources"
                     element={
