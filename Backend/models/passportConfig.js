@@ -15,40 +15,40 @@ passport.use(
 );
 
 // Google OAuth Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID:
-        "468147803346-55rcefrkn5d8ecv0oemb8ppff86mcfvk.apps.googleusercontent.com",
-      clientSecret: "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",
-      callbackURL: "https://edu-gainer-s-backend.vercel.app/auth/google/verify", // Update with your callback URL
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      // Check if the user already exists in your database
-      try {
-        const user = await User.findOne({ username: profile.emails[0].value });
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID:
+       
+//       clientSecret: 
+//       callbackURL:  // Update with your callback URL
+//     },
+//     async (accessToken, refreshToken, profile, done) => {
+//       // Check if the user already exists in your database
+//       try {
+//         const user = await User.findOne({ username: profile.emails[0].value });
 
-        if (user) {
-          // If user exists, return the user
-          return done(null, user);
-        }
+//         if (user) {
+//           // If user exists, return the user
+//           return done(null, user);
+//         }
 
-        // If user doesn't exist, create a new user in your database
-        const newUser = new User({
-          googleId: profile.id,
-          username: profile.emails[0].value,
-          name: profile.displayName,
-          strategy: "google",
-        });
+//         // If user doesn't exist, create a new user in your database
+//         const newUser = new User({
+//           googleId: profile.id,
+//           username: profile.emails[0].value,
+//           name: profile.displayName,
+//           strategy: "google",
+//         });
 
-        await newUser.save();
-        return done(null, newUser);
-      } catch (error) {
-        return done(error);
-      }
-    },
-  ),
-);
+//         await newUser.save();
+//         return done(null, newUser);
+//       } catch (error) {
+//         return done(error);
+//       }
+//     },
+//   ),
+// );
 
 passport.serializeUser((user, done) => {
   done(null, user);
