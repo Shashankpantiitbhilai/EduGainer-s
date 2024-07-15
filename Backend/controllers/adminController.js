@@ -25,13 +25,13 @@ const fetchAllUsers = async (req, res) => {
     try {
         // Query database to find admins based on the shift
        
-       const LibStudents = await LibStudent.find({})
+       const LibStudents = await User.find({})
         
         // console.log(LibStudents)
         // Example response structure
         res.status(200).json(LibStudents);
     } catch (error) {
-        console.error("Error searching LibStudents by shift:", error);
+        console.error("Error searching LibStudents:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };

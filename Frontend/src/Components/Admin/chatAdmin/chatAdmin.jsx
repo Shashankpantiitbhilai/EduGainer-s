@@ -111,10 +111,12 @@ const AdminChat = () => {
           const admin = adminData;
           setAdminRoomId(adminData._id);
    
-          const url =
-            process.env.NODE_ENV === "production"
-              ? "https://edu-gainer-s-backend.vercel.app"
-              : "http://localhost:8000";
+ 
+
+    const url =
+      process.env.NODE_ENV === "production"
+        ? process.env.REACT_APP_BACKEND_PROD
+        : process.env.REACT_APP_BACKEND_DEV;
           const socket = io(url, {
             query: {
               sender: IsUserLoggedIn._id,

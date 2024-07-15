@@ -1,9 +1,11 @@
 import axios from "axios";
 
 // Determine the baseURL based on the environment
-const baseURL = process.env.NODE_ENV === 'production'
-    ? "https://edu-gainer-s-backend.vercel.app"
-    : "http://localhost:8000";
+
+const baseURL =
+    process.env.NODE_ENV === "production"
+        ? process.env.REACT_APP_BACKEND_PROD
+        : process.env.REACT_APP_BACKEND_DEV;
 console.log(baseURL)
 const axiosInstance = axios.create({
     baseURL,

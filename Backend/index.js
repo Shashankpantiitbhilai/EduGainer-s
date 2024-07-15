@@ -17,11 +17,12 @@ const socketIO = require('socket.io');
 const redis = require('redis');
 const client = redis.createClient();
 const app = express();
-
-
+const dotenv = require("dotenv")
+dotenv.config()
+// console.log(process.env.FRONTEND_DEV)
 const origin = process.env.NODE_ENV === 'production'
-  ? 'https://edu-gainer-s-frontend-alpha.vercel.app'
-  : 'http://localhost:3000';
+  ? process.env.FRONTEND_PROD
+  : process.env.FRONTEND_DEV
 
 // // Create the server
 const server = http.createServer(app);
@@ -60,7 +61,7 @@ const mode = process.env.NODE_ENV;
 
 if (mode === "production") {
   app.use(session({
-    secret:process.env.SESSION_SECRET, // Use environment variable for session secret
+    secret: process.env.SESSION_SECRET, // Use environment variable for session secret
     saveUninitialized: true, // Do not save uninitialized sessions
     resave: false,
     proxy: true,
@@ -98,7 +99,7 @@ app.get("/", (req, res) => {
 
 
 io.on('connection', (socket) => {
- 
+
   // Handle joinRoom event
   socket.on('joinRoom', (roomId) => {
     console.log(`User ${socket.id} joining room ${roomId}`);
@@ -109,11 +110,11 @@ io.on('connection', (socket) => {
 
   // Handle sendMessage event
   socket.on('sendMessage', (messageData, roomId) => {
-   
+
     console.log("messagedata", messageData);
     const { messages, user } = messageData;
     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
-   
+
     // Broadcast the message to all clients in the room
     io.to(roomId).emit('receiveMessage', messageData, roomId);
   });
