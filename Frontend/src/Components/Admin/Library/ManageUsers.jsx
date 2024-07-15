@@ -9,18 +9,23 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CircularProgress from "@mui/material/CircularProgress";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   fetchLibSudents,
   deleteLibStudent,
   editLibStudentById,
 } from "../../../services/Admin_services/adminUtils";
 import { Search } from "@mui/icons-material";
+import ConfirmationDialog from "./confirm"; // Adjust the import path accordingly
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editModeId, setEditModeId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,20 +50,30 @@ export default function SearchBar() {
         student._id === id ? { ...student, ...data } : student
       );
       setStudents(updatedStudents);
+      toast.success("Student updated successfully");
     } catch (error) {
       console.error("Error editing student:", error);
+      toast.error("Failed to update student");
     } finally {
       setLoading(false);
       setEditModeId(null); // Exit edit mode after save
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async () => {
     try {
-      await deleteLibStudent(id);
-      setStudents(students.filter((student) => student._id !== id));
+      // console.log(studentToDelete);
+      await deleteLibStudent(studentToDelete);
+      setStudents(
+        students.filter((student) => student._id !== studentToDelete)
+      );
+      toast.success("Student deleted successfully");
     } catch (error) {
       console.error("Error deleting student:", error);
+      toast.error("Failed to delete student");
+    } finally {
+      setDeleteDialogOpen(false);
+      setStudentToDelete(null);
     }
   };
 
@@ -75,7 +90,7 @@ export default function SearchBar() {
   };
 
   const columns = [
-    { field: "reg", headerName: "Reg", width: 70 },
+    { field: "reg", headerName: "Reg", width: 30 },
     {
       field: "name",
       headerName: "Name",
@@ -85,13 +100,13 @@ export default function SearchBar() {
     {
       field: "email",
       headerName: "Email",
-      width: 200,
+      width: 150,
       editable: true,
     },
     {
       field: "address",
       headerName: "Address",
-      width: 150,
+      width: 100,
       editable: true,
     },
     {
@@ -110,14 +125,14 @@ export default function SearchBar() {
     {
       field: "gender",
       headerName: "Gender",
-      width: 80,
+      width: 50,
       renderCell: (params) =>
         params.row.gender ? <span>{params.row.gender}</span> : null,
     },
     {
       field: "dob",
       headerName: "Date of Birth",
-      width: 150,
+      width: 80,
       renderCell: (params) =>
         params.row.dob ? (
           <span>{new Date(params.row.dob).toLocaleDateString()}</span>
@@ -126,28 +141,28 @@ export default function SearchBar() {
     {
       field: "fatherName",
       headerName: "Father's Name",
-      width: 150,
+      width: 100,
       renderCell: (params) =>
         params.row.fatherName ? <span>{params.row.fatherName}</span> : null,
     },
     {
       field: "motherName",
       headerName: "Mother's Name",
-      width: 150,
+      width: 100,
       renderCell: (params) =>
         params.row.motherName ? <span>{params.row.motherName}</span> : null,
     },
     {
       field: "contactNo1",
       headerName: "Contact No 1",
-      width: 120,
+      width: 100,
       renderCell: (params) =>
         params.row.contactNo1 ? <span>{params.row.contactNo1}</span> : null,
     },
     {
       field: "contactNo2",
       headerName: "Contact No 2",
-      width: 120,
+      width: 100,
       renderCell: (params) =>
         params.row.contactNo2 ? <span>{params.row.contactNo2}</span> : null,
     },
@@ -161,7 +176,7 @@ export default function SearchBar() {
     {
       field: "examPreparation",
       headerName: "Exam Preparation",
-      width: 180,
+      width: 100,
       renderCell: (params) =>
         params.row.examPreparation ? (
           <span>{params.row.examPreparation}</span>
@@ -189,7 +204,11 @@ export default function SearchBar() {
             </IconButton>
           )}
           <IconButton
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => {
+              setDeleteDialogOpen(true);
+              setStudentToDelete(params.row._id);
+             
+            }}
             style={{ color: "blue" }}
           >
             <DeleteIcon />
@@ -209,6 +228,7 @@ export default function SearchBar() {
 
   return (
     <>
+      <ToastContainer />
       <Box
         sx={{ width: "100%", maxWidth: 500, margin: "0 auto", mt: 4, mb: 9 }}
       >
@@ -244,6 +264,12 @@ export default function SearchBar() {
           </div>
         )}
       </div>
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleConfirm={handleDelete}
+      />
+
     </>
   );
 }

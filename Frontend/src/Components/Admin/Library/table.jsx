@@ -26,6 +26,8 @@ import BookingDialog from "./dialog";
 import ConfirmationDialog from "./confirm"; // Import the ConfirmationDialog component
 import LegendsFunctions from "./legend";
 import { columnOrder } from "./constants";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const StudentManagementTable = () => {
   const [data, setData] = useState([]);
@@ -40,13 +42,16 @@ const StudentManagementTable = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // State for delete confirmation dialog
   const [deleteBookingId, setDeleteBookingId] = useState(null); // State to hold booking ID to delete
   const [updation, setupdation] = useState(0);
+
   useEffect(() => {
     const fetchBookingData = async () => {
       try {
         const bookings = await getBookingData();
         setData(bookings);
+        // toast.success("Booking data fetched successfully!");
       } catch (error) {
         console.error("Error fetching booking data:", error);
+        // toast.error("Error fetching booking data.");
       }
     };
 
@@ -74,9 +79,10 @@ const StudentManagementTable = () => {
       await addBooking(formData);
       setOpenAddDialog(false);
       setupdation(!updation);
-     
+      toast.success("Booking added successfully!");
     } catch (error) {
       console.error("Error adding new booking:", error);
+      toast.error("Error adding new booking.");
     }
   };
 
@@ -89,9 +95,11 @@ const StudentManagementTable = () => {
     try {
       await deleteBooking(deleteBookingId);
       setOpenDeleteDialog(false);
-       setupdation(!updation);
+      setupdation(!updation);
+      toast.success("Booking deleted successfully!");
     } catch (error) {
       console.error("Error deleting booking:", error);
+      toast.error("Error deleting booking.");
     }
   };
 
@@ -99,9 +107,11 @@ const StudentManagementTable = () => {
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);
-     setupdation(!updation);
+      setupdation(!updation);
+      toast.success("Booking updated successfully!");
     } catch (error) {
       console.error("Error updating booking:", error);
+      toast.error("Error updating booking.");
     }
   };
 
@@ -134,8 +144,10 @@ const StudentManagementTable = () => {
 
       setData(updatedData);
       await updateColor(rowId, columnName, selectedColor);
+      toast.success("Color updated successfully!");
     } catch (error) {
       console.error("Error updating color:", error);
+      toast.error("Error updating color.");
     }
   };
 
@@ -262,6 +274,9 @@ const StudentManagementTable = () => {
           handleClose={() => setOpenDeleteDialog(false)}
           handleConfirm={handleConfirmDelete}
         />
+
+        {/* Toast container for notifications */}
+        <ToastContainer />
       </Box>
       <LegendsFunctions
         legends={legends}

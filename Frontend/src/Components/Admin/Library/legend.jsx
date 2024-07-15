@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   addLegend as addLegendService,
   getLegends as getLegendsService,
@@ -58,8 +60,10 @@ const LegendsFunctions = ({
 
       reset();
       setOpenDialog(false);
+      toast.success("Legend added successfully!");
     } catch (error) {
       console.error("Error adding new legend:", error);
+      toast.error("Failed to add legend.");
     }
   };
 
@@ -68,8 +72,10 @@ const LegendsFunctions = ({
       await deleteLegendService(deleteLegendId);
       setLegends(legends.filter((legend) => legend._id !== deleteLegendId));
       setDeleteDialogOpen(false);
+      toast.success("Legend deleted successfully!");
     } catch (error) {
       console.error("Error deleting legend:", error);
+      toast.error("Failed to delete legend.");
     }
   };
 
@@ -84,6 +90,7 @@ const LegendsFunctions = ({
         bgcolor: "background.paper",
       }}
     >
+      <ToastContainer />
       <Typography variant="h6">Color Legend:</Typography>
       <Box sx={{ display: "flex", flexDirection: "column", mt: 1 }}>
         {legends.map((legend) => (

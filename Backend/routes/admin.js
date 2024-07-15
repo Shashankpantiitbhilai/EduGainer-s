@@ -6,7 +6,7 @@ const router = express.Router();
 const { sendEmailWithAttachment } = require("../emailSender");
 const adminController = require("../controllers/adminController");
 
-router.get('/fetchLibData', adminController.searchLibStudentsByShift);
+router.get('/fetchLibData', adminController.fetchAllUsers);
 
 router.post('/fetchLibResource', adminController.fetchLibResources);
 

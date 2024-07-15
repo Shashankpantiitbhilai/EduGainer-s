@@ -20,32 +20,12 @@ const fetchAllChats = async (req, res) => {
     }
 };
 // Example function to search LibStudents by shift
-const searchLibStudentsByShift = async (req, res) => {
-    const { shift } = req.query;// Assuming shift is sent in the request body
-    try {
-        // Query database to find admins based on the shift
-        let LibStudents = []
-        if (!shift) {
-            LibStudents = await LibStudent.find({})
-        }
-        else {
-            LibStudents = await LibStudent.find({ shift: shift }).exec();
-        }
-        console.log(LibStudents)
-        // Example response structure
-        res.status(200).json(LibStudents);
-    } catch (error) {
-        console.error("Error searching LibStudents by shift:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-};
-// Example function to search LibStudents by shift
 const fetchAllUsers = async (req, res) => {
     // Assuming shift is sent in the request body
     try {
         // Query database to find admins based on the shift
        
-       const LibStudents = await User.find({})
+       const LibStudents = await LibStudent.find({})
         
         // console.log(LibStudents)
         // Example response structure
@@ -64,7 +44,7 @@ const deleteLibStudentById = async (req, res) => {
 
         const LibStudents = await LibStudent.findByIdAndDelete(id).exec();
 
-        console.log(LibStudents);
+        // console.log(LibStudents);
         // Example response structure
         res.status(200).json(LibStudents);
     } catch (error) {
@@ -81,11 +61,11 @@ const editLibStudentById = async (req, res) => {
     try {
         // Query database to find admins based on the shift
 
-        const LibStudent = await LibStudent.findByIdAndUpdate(id, req.body, { new: true }).exec();
+        const updatedstudent = await LibStudent.findByIdAndUpdate(id, req.body, { new: true }).exec();
 
-        console.log(LibStudent);
+        // console.log(updatedstudent);
         // Example response structure
-        res.status(200).json(LibStudent);
+        res.status(200).json(updatedstudent);
     } catch (error) {
         console.error("Error searching LibStudents by shift:", error);
         res.status(500).json({ error: "Internal server error" });
@@ -224,7 +204,7 @@ const deleteLibResource = async (req, res) => {
 
 // Export controller functions
 module.exports = {
-    searchLibStudentsByShift,
+  
     deleteLibStudentById,
     editLibStudentById,
     uploadResource,
