@@ -119,23 +119,6 @@ const AdminChat = () => {
             },
           });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          
           const admin_id = admin._id;
           const user_id = IsUserLoggedIn._id;
           socketRef.current = socket;
@@ -211,16 +194,26 @@ const AdminChat = () => {
     }
   };
 
- const playBeep = () => {
-   const context = new (window.AudioContext || window.webkitAudioContext)();
-   const oscillator = context.createOscillator();
-   oscillator.type = "sine";
-   oscillator.frequency.setValueAtTime(1000, context.currentTime); // frequency in Hz
-   oscillator.connect(context.destination);
-   oscillator.start();
-   oscillator.stop(context.currentTime + 1); // beep duration in seconds (2 seconds)
- };
+  const playBeep = () => {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
 
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(1000, context.currentTime); // frequency in Hz
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    // Adjusting gain (volume) to make it a gentle reminder
+    gainNode.gain.setValueAtTime(0.3, context.currentTime);
+
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.3); // beep duration in seconds (0.3 seconds)
+
+    setTimeout(() => {
+      context.close(); // Closing the audio context after the sound is played
+    }, 300); // Close the context after 300ms (same as the beep duration)
+  };
 
   return (
     <Grid container component={ChatSection}>
