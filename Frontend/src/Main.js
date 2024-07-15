@@ -27,7 +27,7 @@ import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
 import Chat from "./Components/chat/dashboard.jsx"
 import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
-import ManageSeats from "./Components/Admin/Library/seat/ManageSeats.jsx";
+import ManageBooking from "./Components/Admin/Library/monthlyseat/table.jsx";
 import Policies from "./Components/policies/Policies.jsx";
 import StudentManagementTable from "./Components/Admin/Library/seat/ManageSeats.jsx";
 const Main = () => {
@@ -150,7 +150,7 @@ const Main = () => {
                     path="/admin_Library/manage-seats"
                     element={
                         <ProtectedAdmin>
-                            <ManageSeats />
+                            <ManageBooking />
                         </ProtectedAdmin>
                     }
                 />

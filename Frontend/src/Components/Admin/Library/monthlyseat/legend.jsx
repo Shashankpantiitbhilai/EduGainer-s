@@ -18,7 +18,7 @@ import {
   addLegend as addLegendService,
   getLegends as getLegendsService,
   deleteLegend as deleteLegendService,
-} from "../../../services/Admin_services/admin_lib";
+} from "../../../../services/Admin_services/admin_lib";
 
 const LegendsFunctions = ({
   legends,

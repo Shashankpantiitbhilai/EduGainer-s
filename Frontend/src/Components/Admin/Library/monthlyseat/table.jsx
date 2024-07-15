@@ -24,7 +24,7 @@ import {
 } from "../../../../services/Admin_services/admin_lib";
 import BookingDialog from "./dialog";
 import ConfirmationDialog from "./confirm"; // Import the ConfirmationDialog component
-import LegendsFunctions from "../legend";
+import LegendsFunctions from "./legend";
 import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -147,10 +147,10 @@ const StudentManagementTable = () => {
 
       setData(updatedData);
       await updateColor(rowId, columnName, selectedColor);
-      toast.success("Color updated successfully!");
+    
     } catch (error) {
       console.error("Error updating color:", error);
-      toast.error("Error updating color.");
+
     }
   };
 

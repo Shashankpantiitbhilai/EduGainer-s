@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LegendsFunctions from "../legend";
+
 import StudentManagementTable from "./table";
 
 const AdminPanel = () => {

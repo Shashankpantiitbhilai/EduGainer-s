@@ -95,7 +95,7 @@ function Admin_Library() {
               variant="contained"
               color="primary"
               component={Link}
-              to="/admin_library/manage-seats"
+              to="/admin_library/manage-current-month-bookings"
               sx={{ marginTop: 1 }}
             >
               Go to Manage Library Seats
@@ -117,7 +117,7 @@ function Admin_Library() {
               variant="contained"
               color="primary"
               component={Link}
-              to="/admin_library/manage-current-month-bookings"
+              to="/admin_library/manage-seats"
               sx={{ marginTop: 1 }}
             >
               Go to Manage Library Bookings
