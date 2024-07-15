@@ -25,22 +25,18 @@ import {
   fetchAllSiteUsers,
 } from "../../../services/Admin_services/adminUtils";
 
-
-
 const ChatSection = styled(Paper)(({ theme }) => ({
   width: "100%",
   height: "80vh",
   display: "flex",
   flexDirection: "column",
   backgroundColor: "#121212",
-  // backgroundImage: `url(${backgroundImage})`,
   backgroundSize: "cover",
 }));
 
-
 const Sidebar = styled(Grid)(({ theme }) => ({
   borderRight: "1px solid #e0e0e0",
-  backgroundColor: "#004d40", // Dark green background
+  backgroundColor: "#004d40",
   color: "white",
   [theme.breakpoints.down("sm")]: {
     borderRight: "none",
@@ -61,11 +57,10 @@ const InputArea = styled(Grid)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "space-between",
   backgroundColor: "white",
-  
 }));
 
 const MessageItem = styled(ListItem)(({ theme, align }) => ({
-  backgroundColor: "#ffeb3b", // Yellow background
+  backgroundColor: "#ffeb3b",
   marginBottom: theme.spacing(1),
   borderRadius: "10px",
   maxWidth: "40%",
@@ -76,12 +71,14 @@ const MessageItem = styled(ListItem)(({ theme, align }) => ({
   padding: theme.spacing(1),
   wordWrap: "break-word",
 }));
+
 const HeaderMessage = styled(Typography)(({ theme }) => ({
   margin: theme.spacing(2, 0),
   textAlign: "center",
   fontWeight: "bold",
   color: "white",
 }));
+
 const AdminChat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
@@ -110,13 +107,11 @@ const AdminChat = () => {
         if (adminData) {
           const admin = adminData;
           setAdminRoomId(adminData._id);
-   
- 
 
-    const url =
-      process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_BACKEND_PROD
-        : process.env.REACT_APP_BACKEND_DEV;
+          const url =
+            process.env.NODE_ENV === "production"
+              ? process.env.REACT_APP_BACKEND_PROD
+              : process.env.REACT_APP_BACKEND_DEV;
           const socket = io(url, {
             query: {
               sender: IsUserLoggedIn._id,
@@ -124,7 +119,7 @@ const AdminChat = () => {
             },
           });
           const admin_id = admin._id;
-           const user_id= IsUserLoggedIn._id;
+          const user_id = IsUserLoggedIn._id;
           socketRef.current = socket;
 
           socket.on("receiveMessage", (message, roomId) => {
@@ -137,11 +132,10 @@ const AdminChat = () => {
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
             }
+            // Play the beep sound
+            playBeep();
           });
           console.log(messages);
-          // return () => {
-          //   socket.disconnect();
-          // };
         }
       } catch (error) {
         console.error("Error fetching resources:", error);
@@ -152,17 +146,17 @@ const AdminChat = () => {
   }, []);
 
   const handleClick = async (id) => {
-    try {    setSelectedRoom(id);
+    try {
+      setSelectedRoom(id);
       const response = await fetchAllChats(id);
       const roomId = id;
-      console.log(id,userRoomId,adminRoomId,selectedRoom);
+      console.log(id, userRoomId, adminRoomId, selectedRoom);
       if (id === adminRoomId) {
         setAnnouncementMessages(response);
-        // console.log("announcment", response, announcementMessages);
       } else {
         setMessages(response);
       }
-  
+
       if (socketRef.current) {
         console.log("emitted joinroom", roomId);
         socketRef.current.emit("joinRoom", roomId);
@@ -187,7 +181,7 @@ const AdminChat = () => {
     };
 
     try {
-      console.log(id)
+      console.log(id);
       await postChatMessages(messageData);
 
       if (socketRef.current) {
@@ -197,139 +191,138 @@ const AdminChat = () => {
     } catch (error) {
       console.error("Error sending message:", error);
     }
-    
   };
 
-  return (
-    <>
-      <Grid container component={ChatSection}>
-        <Grid item xs={12}>
-          <HeaderMessage variant="h5">Admin Query Portal</HeaderMessage>
-        </Grid>
-        <Grid item xs={12} sm={8} container direction="column">
-          <MessageArea>
-            {adminRoomId === selectedRoom &&
-              announcementMessages.map((msg, index) => (
-                <MessageItem
-                  key={index}
-                  align={
-                    msg.messages[0].sender === IsUserLoggedIn._id
-                      ? "right"
-                      : "left"
-                  }
-                >
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <ListItemText
-                        primary={msg.messages[0].content}
-                        align={
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <ListItemText
-                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
-                        align={
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                      />
-                    </Grid>
-                  </Grid>
-                </MessageItem>
-              ))}
+ const playBeep = () => {
+   const context = new (window.AudioContext || window.webkitAudioContext)();
+   const oscillator = context.createOscillator();
+   oscillator.type = "sine";
+   oscillator.frequency.setValueAtTime(1000, context.currentTime); // frequency in Hz
+   oscillator.connect(context.destination);
+   oscillator.start();
+   oscillator.stop(context.currentTime + 2); // beep duration in seconds (2 seconds)
+ };
 
-            {adminRoomId !== selectedRoom &&
-              messages.map((msg, index) => (
-                <MessageItem
-                  key={index}
-                  align={
-                    msg.messages[0].sender === IsUserLoggedIn._id
-                      ? "right"
-                      : "left"
-                  }
-                >
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <ListItemText
-                        primary={msg.messages[0].content}
-                        align={
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <ListItemText
-                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
-                        align={
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                      />
-                    </Grid>
-                  </Grid>
-                </MessageItem>
-              ))}
-          </MessageArea>
-          <Divider />
-          <InputArea container>
-            <Grid item xs={11}>
-              <TextField
-                id="outlined-basic-email"
-                label="Type Something"
-                fullWidth
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={1} align="right">
-              <Fab
-                color="primary"
-                aria-label="send"
-                onClick={() => sendMessage(selectedRoom)}
-                disabled={!input.trim()}
+
+  return (
+    <Grid container component={ChatSection}>
+      <Grid item xs={12}>
+        <HeaderMessage variant="h5">Admin Query Portal</HeaderMessage>
+      </Grid>
+      <Grid item xs={12} sm={8} container direction="column">
+        <MessageArea>
+          {adminRoomId === selectedRoom &&
+            announcementMessages.map((msg, index) => (
+              <MessageItem
+                key={index}
+                align={
+                  msg.messages[0].sender === IsUserLoggedIn._id
+                    ? "right"
+                    : "left"
+                }
               >
-                <SendIcon />
-              </Fab>
-            </Grid>
-          </InputArea>
-        </Grid>
-        <Sidebar item xs={12} sm={4}>
-          <List>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <ListItemText
+                      primary={msg.messages[0].content}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ListItemText
+                      secondary={new Date(msg.timestamp).toLocaleTimeString()}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
+                    />
+                  </Grid>
+                </Grid>
+              </MessageItem>
+            ))}
+
+          {adminRoomId !== selectedRoom &&
+            messages.map((msg, index) => (
+              <MessageItem
+                key={index}
+                align={
+                  msg.messages[0].sender === IsUserLoggedIn._id
+                    ? "right"
+                    : "left"
+                }
+              >
+                <Grid container>
+                  <Grid item xs={12}>
+                    <ListItemText
+                      primary={msg.messages[0].content}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ListItemText
+                      secondary={new Date(msg.timestamp).toLocaleTimeString()}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
+                    />
+                  </Grid>
+                </Grid>
+              </MessageItem>
+            ))}
+        </MessageArea>
+        <Divider />
+        <InputArea container>
+          <Grid item xs={11}>
+            <TextField
+              id="outlined-basic-email"
+              label="Type Something"
+              fullWidth
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={1} align="right">
+            <Fab
+              color="primary"
+              aria-label="send"
+              onClick={() => sendMessage(selectedRoom)}
+              disabled={!input.trim()}
+            >
+              <SendIcon />
+            </Fab>
+          </Grid>
+        </InputArea>
+      </Grid>
+      <Sidebar item xs={12} sm={4}>
+        <List>
+          <ListItem button onClick={() => handleClick(adminRoomId)}>
+            <ListItemText primary="Announcement Room" />
+          </ListItem>
+          <Divider />
+          {users.map((user) => (
             <ListItem
               button
-              key={adminRoomId}
-              onClick={() => handleClick(adminRoomId)}
+              key={user._id}
+              onClick={() => handleClick(user._id)}
             >
-              <ListItemText primary="Announcements" />
+              <Avatar alt={user.name} src={user.avatarUrl} />
+              <ListItemText primary={user.name} />
             </ListItem>
-            {users.map(
-              (user) =>
-                IsUserLoggedIn._id !== user._id && (
-                  <ListItem
-                    button
-                    key={user._id}
-                    onClick={() => handleClick(user._id)}
-                  >
-                    <Avatar alt={user.username} src={user.avatar} />
-                    <ListItemText
-                      primary={user.username}
-                      style={{ color: "white" }}
-                    />
-                  </ListItem>
-                )
-            )}
-          </List>
-        </Sidebar>
-      </Grid>
-    </>
+          ))}
+        </List>
+      </Sidebar>
+    </Grid>
   );
 };
 
