@@ -25,8 +25,8 @@ const fetchAllUsers = async (req, res) => {
     try {
         // Query database to find admins based on the shift
        
-       const LibStudents = await User.find({})
-        
+       const LibStudents = await LibStudent.find({})
+
         // console.log(LibStudents)
         // Example response structure
         res.status(200).json(LibStudents);
@@ -201,6 +201,21 @@ const deleteLibResource = async (req, res) => {
 
 
 
+const fetchAllSiteUsers = async (req, res) => {
+    // Assuming shift is sent in the request body
+    try {
+        // Query database to find admins based on the shift
+
+        const LibStudents = await User.find({})
+
+        // console.log(LibStudents)
+        // Example response structure
+        res.status(200).json(LibStudents);
+    } catch (error) {
+        console.error("Error searching LibStudents:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
 
 // Export controller functions
 module.exports = {
@@ -212,6 +227,7 @@ module.exports = {
     editLibResource,
     deleteLibResource,
     fetchAllUsers,
-    fetchAllChats
+    fetchAllChats,
+    fetchAllSiteUsers
     // Add other controller functions as needed
 };

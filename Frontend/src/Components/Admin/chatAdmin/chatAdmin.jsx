@@ -22,7 +22,7 @@ import {
 } from "../../../services/chat/utils";
 import {
   fetchAllChats,
-  fetchAllUsers,
+  fetchAllSiteUsers,
 } from "../../../services/Admin_services/adminUtils";
 
 
@@ -100,7 +100,7 @@ const AdminChat = () => {
       try {
         const [adminData, usersData] = await Promise.all([
           fetchAdminCredentials(),
-          fetchAllUsers(),
+          fetchAllSiteUsers(),
         ]);
 
         if (usersData) {

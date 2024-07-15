@@ -7,7 +7,7 @@ const { sendEmailWithAttachment } = require("../emailSender");
 const adminController = require("../controllers/adminController");
 
 router.get('/fetchLibData', adminController.fetchAllUsers);
-
+router.get('/fetchAllSiteUsers', adminController.fetchAllSiteUsers);
 router.post('/fetchLibResource', adminController.fetchLibResources);
 
 router.delete('/deleteLibStudent/:id', adminController.deleteLibStudentById);

@@ -1,3 +1,0 @@
-async() = {
-    const: admindata = a
-};

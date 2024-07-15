@@ -124,3 +124,15 @@ export async function fetchAllUsers() {
         throw error; // Propagate the error to handle it in the calling component
     }
 }
+
+export async function fetchAllSiteUsers() {
+
+    try {
+        const response = await axiosInstance.get("/admin/fetchAllSiteUsers");
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending form data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
