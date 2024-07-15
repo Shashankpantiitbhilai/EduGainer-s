@@ -27,9 +27,9 @@ import PdfUploader from "./Components/quiz/upload.jsx";
 import SuccessClasses from "./Components/Classes/Success.jsx";
 import Chat from "./Components/chat/dashboard.jsx"
 import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
-import ManageSeats from "./Components/Admin/Library/Seats.jsx";
+import ManageSeats from "./Components/Admin/Library/seat/ManageSeats.jsx";
 import Policies from "./Components/policies/Policies.jsx";
-import StudentManagementTable from "./Components/Admin/Library/current-booking.jsx";
+import StudentManagementTable from "./Components/Admin/Library/seat/ManageSeats.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];

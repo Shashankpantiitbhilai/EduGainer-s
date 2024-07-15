@@ -21,10 +21,10 @@ import {
   deleteBooking,
   updateBooking,
   updateColor,
-} from "../../../services/Admin_services/admin_lib";
+} from "../../../../services/Admin_services/admin_lib";
 import BookingDialog from "./dialog";
 import ConfirmationDialog from "./confirm"; // Import the ConfirmationDialog component
-import LegendsFunctions from "./legend";
+import LegendsFunctions from "../legend";
 import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -157,7 +157,7 @@ const StudentManagementTable = () => {
   return (
     <Box sx={{ display: "flex" }}>
       {loading ? (
-      "loading"
+        "loading"
       ) : (
         <>
           <Box sx={{ flexGrow: 1, p: 2 }}>
