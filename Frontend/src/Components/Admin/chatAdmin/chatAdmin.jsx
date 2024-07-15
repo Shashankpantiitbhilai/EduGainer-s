@@ -317,7 +317,7 @@ const AdminChat = () => {
               onClick={() => handleClick(user._id)}
             >
               <Avatar alt={user.name} src={user.avatarUrl} />
-              <ListItemText primary={user.name} />
+              <ListItemText primary={user?.username} />
             </ListItem>
           ))}
         </List>
