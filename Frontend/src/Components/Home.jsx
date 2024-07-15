@@ -24,7 +24,7 @@ import {
 } from "@mui/icons-material";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { motion } from "framer-motion";
-
+import Footer from "./footer";
 const colors = {
   primary: "#006400", // Dark Green
   secondary: "#FFA500", // Orange
@@ -340,6 +340,7 @@ function Home() {
           </Button>
         </Box>
       </Container>
+      <Footer/>
     </Box>
   );
 }
