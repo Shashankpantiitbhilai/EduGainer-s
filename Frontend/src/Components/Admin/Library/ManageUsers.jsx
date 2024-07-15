@@ -14,9 +14,10 @@ import {
   deleteLibStudent,
   editLibStudentById,
 } from "../../../services/Admin_services/adminUtils";
+import { Search } from "@mui/icons-material";
 
 export default function SearchBar() {
-  const [shift, setShift] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editModeId, setEditModeId] = useState(null);
@@ -26,6 +27,7 @@ export default function SearchBar() {
       try {
         const defaultData = await fetchLibSudents(); // Fetch default data
         setStudents(defaultData);
+        console.log(defaultData);
       } catch (error) {
         console.error("Error fetching default data:", error);
       }
@@ -33,25 +35,6 @@ export default function SearchBar() {
 
     fetchData();
   }, []);
-
-  const handleSearch = async (event, newValue) => {
-    try {
-      setShift(newValue);
-      let response;
-      if (newValue.length === 0) {
-        // If input is empty, fetch default data
-        response = await fetchLibSudents();
-      } else {
-        // If user selects anything, filter data accordingly
-        response = await fetchLibSudents({
-          shift: newValue.map((item) => item.shift),
-        });
-      }
-      setStudents(response);
-    } catch (error) {
-      console.error("Error in capturing the input ", error);
-    }
-  };
 
   const handleEdit = async (id, data) => {
     setLoading(true);
@@ -92,24 +75,17 @@ export default function SearchBar() {
   };
 
   const columns = [
-    { field: "_id", headerName: "ID", width: 70 },
+    { field: "reg", headerName: "Reg", width: 70 },
     {
       field: "name",
       headerName: "Name",
       width: 150,
       editable: true,
     },
-    { field: "shift", headerName: "Shift", width: 120 },
     {
       field: "email",
       headerName: "Email",
       width: 200,
-      editable: true,
-    },
-    {
-      field: "mobile",
-      headerName: "Mobile",
-      width: 120,
       editable: true,
     },
     {
@@ -119,38 +95,77 @@ export default function SearchBar() {
       editable: true,
     },
     {
-      field: "amount",
-      headerName: "Amount",
-      width: 70,
-      editable: true,
-    },
-    {
       field: "image",
       headerName: "Image",
       width: 80,
-      renderCell: (params) => (
-        <img
-          src={params.row.image.url}
-          alt="User"
-          style={{ width: 50, height: 50, borderRadius: "50%" }}
-        />
-      ),
+      renderCell: (params) =>
+        params.row.image && params.row.image.url ? (
+          <img
+            src={params.row.image.url}
+            alt="User"
+            style={{ width: 50, height: 50, borderRadius: "50%" }}
+          />
+        ) : null,
     },
     {
-      field: "Payment_detail.razorpay_order_id",
-      headerName: "Order ID",
-      width: 180,
-      renderCell: (params) => (
-        <span>{params.row.Payment_detail.razorpay_order_id}</span>
-      ),
+      field: "gender",
+      headerName: "Gender",
+      width: 80,
+      renderCell: (params) =>
+        params.row.gender ? <span>{params.row.gender}</span> : null,
     },
     {
-      field: "Payment_detail.razorpay_payment_id",
-      headerName: "Payment ID",
+      field: "dob",
+      headerName: "Date of Birth",
+      width: 150,
+      renderCell: (params) =>
+        params.row.dob ? (
+          <span>{new Date(params.row.dob).toLocaleDateString()}</span>
+        ) : null,
+    },
+    {
+      field: "fatherName",
+      headerName: "Father's Name",
+      width: 150,
+      renderCell: (params) =>
+        params.row.fatherName ? <span>{params.row.fatherName}</span> : null,
+    },
+    {
+      field: "motherName",
+      headerName: "Mother's Name",
+      width: 150,
+      renderCell: (params) =>
+        params.row.motherName ? <span>{params.row.motherName}</span> : null,
+    },
+    {
+      field: "contactNo1",
+      headerName: "Contact No 1",
+      width: 120,
+      renderCell: (params) =>
+        params.row.contactNo1 ? <span>{params.row.contactNo1}</span> : null,
+    },
+    {
+      field: "contactNo2",
+      headerName: "Contact No 2",
+      width: 120,
+      renderCell: (params) =>
+        params.row.contactNo2 ? <span>{params.row.contactNo2}</span> : null,
+    },
+    {
+      field: "aadhaarNo",
+      headerName: "Aadhaar",
+      width: 150,
+      renderCell: (params) =>
+        params.row.aadhaarNo ? <span>{params.row.aadhaarNo}</span> : null,
+    },
+    {
+      field: "examPreparation",
+      headerName: "Exam Preparation",
       width: 180,
-      renderCell: (params) => (
-        <span>{params.row.Payment_detail.razorpay_payment_id}</span>
-      ),
+      renderCell: (params) =>
+        params.row.examPreparation ? (
+          <span>{params.row.examPreparation}</span>
+        ) : null,
     },
     {
       field: "actions",
@@ -184,48 +199,31 @@ export default function SearchBar() {
     },
   ];
 
+  const filteredStudents = students.filter((student) =>
+    Object.values(student).some(
+      (value) =>
+        typeof value === "string" &&
+        value.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
   return (
     <>
       <Box
         sx={{ width: "100%", maxWidth: 500, margin: "0 auto", mt: 4, mb: 9 }}
       >
-        <Autocomplete
-          multiple
-          id="search-bar"
-          name="shift"
-          options={shifts}
-          getOptionLabel={(option) => option.shift}
-          value={shift}
-          onChange={handleSearch}
-          filterSelectedOptions
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              <Chip
-                variant="outlined"
-                label={option.shift}
-                {...getTagProps({ index })}
-              />
-            ))
-          }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label="Search for students"
-              placeholder="Type to search..."
-              fullWidth
-              inputProps={{
-                ...params.inputProps,
-                "aria-label": "Search for students",
-              }}
-            />
-          )}
+        <TextField
+          label="Search"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{ endAdornment: <Search /> }}
         />
       </Box>
-
       <div style={{ height: 800, width: "100%", margin: 8 }}>
         <DataGrid
-          rows={students}
+          rows={filteredStudents}
           columns={columns}
           pageSize={10}
           pagination
@@ -234,7 +232,13 @@ export default function SearchBar() {
         />
         {loading && (
           <div
-            style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 9999,
+            }}
           >
             <CircularProgress />
           </div>
@@ -243,14 +247,3 @@ export default function SearchBar() {
     </>
   );
 }
-
-// Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-const shifts = [
-  { shift: "9 PM to 6 AM" },
-  { shift: "2 PM to 11 PM" },
-  { shift: "7 AM to 7 PM" },
-  { shift: "24*7" },
-  { shift: "2 PM to 9 PM" },
-  { shift: "7 PM to 11 PM" },
-  // Add more shifts as needed
-];

@@ -48,43 +48,37 @@ const LibStudentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to the User model
-    required: true,
+    // required: true,
   },
   name: {
     type: String,
-    required: true,
+    // required: true,
   },
-  shift: {
-    type: String,
-    required: true,
-  },
+
   email: {
     type: String,
-    required: true,
+    // required: true,
   },
 
   address: {
     type: String,
-    required: true,
+    // required: true,
   },
-  amount: {
-    type: String,
-    required: true,
-  },
+  
   image: {
     publicId: {
       type: String,
-      required: true,
+      // required: true,
     },
     url: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   Payment_detail: {
     razorpay_order_id: {
       type: String,
-      required: true,
+      // required: true,
     },
     razorpay_payment_id: {
       type: String,
@@ -93,34 +87,34 @@ const LibStudentSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    required: true,
+    // required: true,
   },
   dob: {
     type: Date,
-    required: true,
+    // required: true,
   },
   fatherName: {
     type: String,
-    required: true,
+    // required: true,
   },
   motherName: {
     type: String,
-    required: true,
+    // required: true,
   },
-  contact1: {
+  contactNo1: {
     type: String,
-    required: true,
+    // required: true,
   },
-  contact2: {
+  contactNo2: {
     type: String,
   },
-  aadhaar: {
+  aadhaarNo: {
     type: String,
-    required: true,
+    // required: true,
   },
   examPreparation: {
     type: String,
-    required: true,
+    // required: true,
   },
 });
 
