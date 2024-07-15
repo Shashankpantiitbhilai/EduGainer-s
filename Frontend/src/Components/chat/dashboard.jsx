@@ -148,6 +148,7 @@ const url =
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
             }
+            playBeep();
           });
 
           return () => {
@@ -190,6 +191,15 @@ const url =
       }
     }
   };
+const playBeep = () => {
+  const context = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = context.createOscillator();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(1000, context.currentTime); // frequency in Hz
+  oscillator.connect(context.destination);
+  oscillator.start();
+  oscillator.stop(context.currentTime + 1); // beep duration in seconds (2 seconds)
+};
 
  const handleRoomClick = async (id) => {
    try {
