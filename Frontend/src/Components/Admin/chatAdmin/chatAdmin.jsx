@@ -118,6 +118,24 @@ const AdminChat = () => {
               admin: admin._id,
             },
           });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
           const admin_id = admin._id;
           const user_id = IsUserLoggedIn._id;
           socketRef.current = socket;
@@ -310,16 +328,19 @@ const AdminChat = () => {
             <ListItemText primary="Announcement Room" />
           </ListItem>
           <Divider />
-          {users.map((user) => (
-            <ListItem
-              button
-              key={user._id}
-              onClick={() => handleClick(user._id)}
-            >
-              <Avatar alt={user.name} src={user.avatarUrl} />
-              <ListItemText primary={user?.username} />
-            </ListItem>
-          ))}
+          {users.map(
+            (user) =>
+              IsUserLoggedIn._id !== user._id && (
+                <ListItem
+                  button
+                  key={user._id}
+                  onClick={() => handleClick(user._id)}
+                >
+                  <Avatar alt={user.name} src={user.avatarUrl} />
+                  <ListItemText primary={user.username} />
+                </ListItem>
+              )
+          )}
         </List>
       </Sidebar>
     </Grid>
