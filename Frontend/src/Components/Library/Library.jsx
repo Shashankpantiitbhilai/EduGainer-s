@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Box,
   Button,
@@ -14,13 +14,14 @@ import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";
 import { io } from "socket.io-client";
 import { fetchAdminCredentials } from "../../services/chat/utils";
+
 const shifts = [
-  "6.30 AM to 2 PM",
-  "2 PM to 9.30 PM",
-  "6.30 PM to 11 PM",
-  "9.30 PM to 6.30 AM",
+  "6:30 AM to 2 PM",
+  "2 PM to 9:30 PM",
+  "6:30 PM to 11 PM",
+  "9:30 PM to 6:30 AM",
   "2 PM to 11 PM",
-  "6.30 AM to 6.30 PM",
+  "6:30 AM to 6:30 PM",
   "24*7",
 ];
 
@@ -32,57 +33,54 @@ const ButtonLink = ({ to, children }) => (
   </Link>
 );
 
-const Seat = ({
-  seatNumber,
+const getBackgroundColor = (status, isUserSeat) => {
+  if (isUserSeat) return "orange";
+  switch (status) {
+    case "Paid":
+      return "green";
+    case "Unpaid":
+      return "yellow";
+    case "Left":
+      return "purple";
+    default:
+      return "red";
+  }
+};
+
+const SeatRow = ({
+  seats,
   seatStatus,
   userSeat,
   selectedShift,
   userShift,
-}) => {
-  let seatColor = "gray"; // Default color for seats with unknown status
-
-  if (seatStatus == "Left") {
-    seatColor = "green"; // Green color for empty seats (status: Left)
-  } else if (seatStatus == "Paid") {
-    seatColor = "red"; // Red color for booked seats (status: Paid)
-  }
-  // console.log(userSeat,userShift)
-  if (seatNumber == userSeat && selectedShift == userShift) {
-    seatColor = "orange"; // Orange color for the logged-in user's seat
-  }
-
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        height: 20,
-        m: 0.5,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "0.75rem",
-        border: "1px solid",
-        borderColor: "gray",
-        borderRadius: 1,
-        bgcolor: seatColor,
-      }}
-    >
-      {seatNumber}
-    </Box>
-  );
-};
-
-const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => (
-  <Box sx={{ display: "flex" }}>
-    {seats.map((seatNumber) => (
-      <Seat
-        key={seatNumber}
-        seatNumber={seatNumber}
-        seatStatus={seatStatus[seatNumber]}
-        userSeat={userSeat}
-        selectedShift={selectedShift}
-        userShift={userShift}
-      />
+  onSeatClick,
+}) => (
+  <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+    {seats.map((seat) => (
+      <Button
+        key={seat}
+        variant="contained"
+        // onClick={() => onSeatClick(seat)}
+        sx={{
+          width: 40,
+          height: 40,
+          minWidth: 40,
+          p: 0,
+          backgroundColor: getBackgroundColor(
+            seatStatus[seat],
+            seat == userSeat && selectedShift == userShift
+          ),
+          "&:hover": {
+            backgroundColor: getBackgroundColor(
+              seatStatus[seat],
+              seat == userSeat && selectedShift == userShift
+            ),
+            opacity: 0.8,
+          },
+        }}
+      >
+        {seat}
+      </Button>
     ))}
   </Box>
 );
@@ -93,91 +91,73 @@ const Library = () => {
   const [userSeat, setUserSeat] = useState(null);
   const [userShift, setUserShift] = useState(null);
   const { IsUserLoggedIn } = useContext(AdminContext);
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
 
   const url =
     process.env.NODE_ENV === "production"
       ? process.env.REACT_APP_BACKEND_PROD
       : process.env.REACT_APP_BACKEND_DEV;
 
- useEffect(() => {
-   const fetchAdminData = async () => {
-     try {
-       const adminData = await fetchAdminCredentials(); // Wait for the promise to resolve
-      //  console.log(adminData); // Logs: resolved data
-       const roomId = adminData?._id;
-       const newSocket = io(url); // Replace with your server URL
-       setSocket(newSocket);
-       newSocket?.emit("joinSeatsRoom", roomId);
-
-       // Cleanup function to close socket
-       return () => newSocket.close();
-     } catch (error) {
-       console.error("Error fetching admin credentials:", error);
-     }
-   };
-
-   fetchAdminData();
- }, []);
-
   useEffect(() => {
-    if (socket) {
-      socket.on("seatStatusUpdate", ({ id, status }) => {
-        setSeatStatus((prevStatus) => ({
-          ...prevStatus,
-          [id]: status,
-        }));
-      });
-    }
-  }, [socket]);
-  const id = IsUserLoggedIn?._id;
-  useEffect(() => {
-    const fetchData = async () => {
+    const initializeData = async () => {
       try {
+        const adminData = await fetchAdminCredentials();
+        const roomId = adminData?._id;
+
+        socketRef.current = io(url, {
+          query: {
+            sender: IsUserLoggedIn._id,
+            admin: adminData._id,
+          },
+        });
+
+        socketRef.current.emit("joinSeatsRoom", roomId);
+
+        socketRef.current.on("seatStatusUpdate", ({ id, status, seat }) => {
+          console.log("Seat status update received:", { id, status, seat });
+          setSeatStatus((prevStatus) => ({
+            ...prevStatus,
+            [seat]: status,
+          }));
+        });
+
         const response = await getSeatsData();
-        console.log(response);
         const selectedShiftData = response[selectedShift];
-        console.log(selectedShiftData);
         if (selectedShiftData) {
           let statusMap = {};
           selectedShiftData.forEach((e) => {
-            console.log();
-            statusMap[e.seat] = e.status || "Unknown";
+            statusMap[e.seat] = e.status || "Unpaid";
           });
           setSeatStatus(statusMap);
         } else {
           console.error(`No data found for shift: ${selectedShift}`);
         }
-      } catch (error) {
-        console.error("Error fetching seat data:", error);
-      }
-    };
-    fetchData();
 
-    // Fetch user's seat
-    const fetchUserSeat = async () => {
-      try {
-        // Assuming you have the user's ID available. Replace 'userId' with the actual user ID.
-        // Replace this with the actual logged-in user's ID
-        const userSeatData = await getStudentLibSeat(id);
-        console.log(userSeatData.booking, id);
-        if (
-          userSeatData &&
-          userSeatData.booking.seat &&
-          userSeatData.booking.shift
-        ) {
+        const userSeatData = await getStudentLibSeat(IsUserLoggedIn?._id);
+        if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
           setUserSeat(userSeatData.booking.seat);
           setUserShift(userSeatData.booking.shift);
         }
       } catch (error) {
-        console.error("Error fetching user's seat:", error);
+        console.error("Error initializing data:", error);
       }
     };
-    fetchUserSeat();
-  }, [selectedShift]);
 
+    initializeData();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [selectedShift, IsUserLoggedIn?._id, url]);
   const handleShiftChange = (event) => {
     setSelectedShift(event.target.value);
+  };
+
+  const handleSeatClick = (seat) => {
+    console.log(`Seat ${seat} clicked`);
+    // Add your logic for seat click here
   };
 
   return (
@@ -343,6 +323,7 @@ const Library = () => {
           </Box>
         </Box>
       </Box>
+
       <Box
         sx={{
           display: "flex",
@@ -360,18 +341,22 @@ const Library = () => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box sx={{ width: 16, height: 16, bgcolor: "green", mr: 2 }}></Box>
-            <Box>Empty</Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "red", mr: 2 }}></Box>
-            <Box>Booked</Box>
+            <Box>Paid</Box>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box sx={{ width: 16, height: 16, bgcolor: "yellow", mr: 2 }}></Box>
-            <Box>No Confirmation</Box>
+            <Box>Unpaid</Box>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box sx={{ width: 16, height: 16, bgcolor: "purple", mr: 2 }}></Box>
+            <Box>Left</Box>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: "red", mr: 2 }}></Box>
+            <Box>Unknown</Box>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: "orange", mr: 2 }}></Box>
             <Box>Your Seat</Box>
           </Box>
         </Box>

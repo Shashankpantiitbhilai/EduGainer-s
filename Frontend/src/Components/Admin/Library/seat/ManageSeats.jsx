@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Snackbar, Alert } from "@mui/material";
 import {
   getSeatInfo,
@@ -41,41 +41,43 @@ const ManageSeats = () => {
     Remarks: "",
     Status: "Paid",
   });
-  const { IsUserLoggedIn } = useContext((AdminContext))
+  const { IsUserLoggedIn } = useContext(AdminContext);
   const [socket, setSocket] = useState(null);
-  const url= process.env.NODE_ENV === "production" ?
-    process.env.REACT_APP_BACKEND_PROD : process.env.REACT_APP_BACKEND_DEV;
+  const url =
+    process.env.NODE_ENV === "production"
+      ? process.env.REACT_APP_BACKEND_PROD
+      : process.env.REACT_APP_BACKEND_DEV;
   useEffect(() => {
     fetchData();
   }, [selectedShift]);
   useEffect(() => {
     const newSocket = io(url);
-    const roomId = IsUserLoggedIn?._id;// Replace with your server URL
+    const roomId = IsUserLoggedIn?._id; // Replace with your server URL
     setSocket(newSocket);
     newSocket?.emit("joinSeatsRoom", roomId);
     return () => newSocket.close();
   }, []);
-useEffect(() => {
-  if (socket) {
-    socket.on("seatStatusUpdate", ({ id, status }) => {
-      console.log("seatstatusupdateadmin",id,status)
-      setSeatStatus((prevStatus) => ({
-        ...prevStatus,
-        [id]: status,
-      }));
-      setSnackbarMessage(`Seat ${id} status updated to ${status}`);
-      setSnackbarOpen(true);
-    });
-  }
-}, [socket]);
+  useEffect(() => {
+    if (socket) {
+      socket.on("seatStatusUpdate", ({ id, status ,seat}) => {
+        console.log("seatstatusupdateadmin", id, status,seat);
+        setSeatStatus((prevStatus) => ({
+          ...prevStatus,
+          [seat]: status,
+        }));
+        setSnackbarMessage(`Seat ${seat} status updated to ${status}`);
+        setSnackbarOpen(true);
+      });
+    }
+  }, [socket]);
   const fetchData = async () => {
-    try {
+    try {let statusMap = {};
       const response = await getSeatsData();
       const selectedShiftData = response[selectedShift];
       if (selectedShiftData) {
-        let statusMap = {};
+        
         selectedShiftData.forEach((e) => {
-          statusMap[e.Seat] = e.Status || "Unpaid";
+          statusMap[e.seat] = e.status || "Unpaid";
         });
         setSeatStatus(statusMap);
       } else {
@@ -103,30 +105,12 @@ useEffect(() => {
   };
 
   const handleStatusChange = async (newStatus) => {
-   
     try {
       if (newStatus === "Paid") {
         setFormData({
-          
           Status: newStatus,
         });
         setFormDialogOpen(true);
-      } else {
-          socket.emit("updateSeatStatus", {
-            id: selectedSeat,
-            status: newStatus,
-          });
-         
-        await updateSeatStatus(selectedSeat, newStatus);
-        setSeatStatus((prevStatus) => ({
-          ...prevStatus,
-          [selectedSeat]: newStatus,
-        }));
-        setSnackbarMessage(
-          `Seat ${selectedSeat} status updated to ${newStatus || "No Status"}`
-        );
-        setSnackbarOpen(true);
-        handleCloseDialog();
       }
     } catch (error) {
       console.error("Error updating seat status:", error);
@@ -136,10 +120,10 @@ useEffect(() => {
   };
 
   const handleFormSubmit = async (reg) => {
-    console.log(reg)
+    console.log(reg);
     try {
-      await updateSeatStatus(reg, "Paid");
-       socket.emit("updateSeatStatus", { id: reg, status: "Paid" });
+      await updateSeatStatus(reg, "Paid",selectedSeat);
+      socket.emit("updateSeatStatus", { id: reg, status: "Paid",seat:selectedSeat });
       setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
       setSnackbarOpen(true);
       setFormDialogOpen(false);
@@ -203,8 +187,16 @@ useEffect(() => {
 
   const handleDeallocate = async (reg) => {
     try {
-      await updateSeatStatus(reg, "Left");
-      setSnackbarMessage(`Seat for person with reg ${reg} has been deallocated`);
+    console.log(reg)
+      await updateSeatStatus(reg, "Left","0");
+        socket.emit("updateSeatStatus", {
+          id: reg,
+          status: "Left",
+          seat:selectedSeat
+        });
+      setSnackbarMessage(
+        `Seat for person with reg ${reg} has been deallocated`
+      );
       setSnackbarOpen(true);
       fetchData(); // Refresh seat data after deallocation
     } catch (error) {
@@ -230,15 +222,8 @@ useEffect(() => {
         selectedShift={selectedShift}
         onShiftChange={handleShiftChange}
       />
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mx: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 2,
-            mx: 3,
-          }}
-        >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
           <SeatRow
             seats={["A3", "A4", "A5", "A6", "A7", "A8", "A9", "A0"]}
             seatStatus={seatStatus}
@@ -251,14 +236,7 @@ useEffect(() => {
           />
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 2,
-            mx: 3,
-          }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
           <Box>
             <SeatRow
               seats={[68, 67, 66, 65, 64, 63, 62, 61]}
@@ -285,9 +263,7 @@ useEffect(() => {
           </Box>
         </Box>
 
-        <Box
-          sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mx: 3 }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2 }}>
           <Box>
             <SeatRow
               seats={[44, 43, 42, 41, 40, 39, 38, 37]}
@@ -302,42 +278,54 @@ useEffect(() => {
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 2,
-            mx: 3,
-          }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
           <Box>
             <SeatRow
-              seats={[28, 27, 26, 25, 24, 23, 22, 21]}
+              seats={[28, 27, 26]}
+              seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+            />
+            <SeatRow
+              seats={[21, 20, 19]}
+              seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+            />
+            <SeatRow
+              seats={[14, 13, 12]}
+              seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+            />
+            <SeatRow
+              seats={[1, 2, 3]}
               seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
             />
           </Box>
           <Box>
             <SeatRow
-              seats={[13, 14, 15, 16, 17, 18, 19, 20]}
+              seats={[25, 24, 23, 22]}
               seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
             />
-          </Box>
-        </Box>
-
-        <Box
-          sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mx: 3 }}
-        >
-          <Box>
             <SeatRow
-              seats={[1, 2, 3, 4, 5, 6, 7, 8]}
+              seats={[15, 16, 17, 18]}
+              seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+            />
+            <SeatRow
+              seats={[8, 9, 10, 11]}
+              seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+            />
+            <SeatRow
+              seats={[4, 5, 6, 7]}
               seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
             />
           </Box>
         </Box>
       </Box>
+
       <SeatLegend />
       <SeatInfoDialog
         open={dialogOpen}
@@ -354,7 +342,7 @@ useEffect(() => {
         onFormChange={handleFormChange}
         onFormSubmit={handleFormSubmit}
       />
-     
+
       <MultiplePersonsDialog
         open={multiplePersonsDialogOpen}
         onClose={() => setMultiplePersonsDialogOpen(false)}

@@ -39,11 +39,11 @@ export async function getBookingData() {
     }
 }
 
-export async function updateSeatStatus(reg, status) {
-
+export async function updateSeatStatus(reg, status,seat) {
+console.log(reg,status,seat)
     try {
-        console.log(reg, status)
-        const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status });
+        console.log(reg, status,seat)
+        const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status ,seat});
 console.log(response.data)
         return response.data;
     } catch (error) {

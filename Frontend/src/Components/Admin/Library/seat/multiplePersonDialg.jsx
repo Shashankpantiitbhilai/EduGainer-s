@@ -51,6 +51,8 @@ const MultiplePersonsDialog = ({
 
   const handleConfirmDeallocate = async () => {
     try {
+      console.log(confirmDialog.person.reg)
+      console.log(confirmDialog.person.reg)
       await onDeallocate(confirmDialog.person.reg);
       setPersons((prevPersons) =>
         prevPersons.filter((p) => p._id !== confirmDialog.person._id)
@@ -110,6 +112,9 @@ const MultiplePersonsDialog = ({
                     borderRadius: 2,
                     boxShadow: 1,
                     "&:hover": { boxShadow: 3 },
+                  }}
+                  onClick={() => {
+                    onPersonClick(person?.reg)
                   }}
                 >
                   <ListItemAvatar>

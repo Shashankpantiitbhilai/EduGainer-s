@@ -185,16 +185,16 @@ const updateBookingColor = async (req, res) => {
 
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
-    const { status } = req.body;
-    // console.log(reg, status, "yo")
+    const { status ,seat} = req.body;
+    // console.log(reg, status,seat, "yo")
 
     try {
-        const updatedBooking = await Booking.findOneAndUpdate({ reg :reg}, { status }, { new: true });
+        const updatedBooking = await Booking.findOneAndUpdate({ reg :reg}, { status,seat }, { new: true });
 
         if (!updatedBooking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
-
+// console.log(updatedBooking)
         res.status(200).json({ message: 'Status updated successfully', booking: updatedBooking });
     } catch (error) {
         console.error("Error updating status:", error);
