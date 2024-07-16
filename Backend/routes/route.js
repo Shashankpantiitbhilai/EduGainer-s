@@ -2,7 +2,7 @@ const express = require("express");
 const { LibStudent, User } = require("../models/student");
 const { uploadToCloudinary } = require("../cloudinary");
 const { createOrder, verifyPaymentSignature } = require("./payment");
-const puppeteer = require("puppeteer")
+
 const router = express.Router();
 const path = require('path');
 const PDFDocument = require('pdfkit');
@@ -63,9 +63,7 @@ router.post("/Lib-new-reg", async (req, res) => {
     email,
     image,
     mobile,
-    shift,
     address,
-    amount,
     userId,
     gender,
     dob,
@@ -77,7 +75,6 @@ router.post("/Lib-new-reg", async (req, res) => {
     examPreparation
   } = req.body;
 
-  console.log(userId);
   try {
     let imageData = {};
     if (image) {
@@ -85,25 +82,15 @@ router.post("/Lib-new-reg", async (req, res) => {
       imageData = results;
     }
 
-    // Generate Razorpay order first
-    const order = await createOrder(amount);
-
-    // Create user with the order ID
     const user = await LibStudent.create({
       userId,
       name,
       email,
-      shift,
       mobile,
       address,
-      amount,
       image: {
         publicId: imageData.publicId,
         url: imageData.url,
-      },
-      Payment_detail: {
-        razorpay_order_id: order.id,
-        razorpay_payment_id: "", // Payment ID will be updated after payment verification
       },
       gender,
       dob,
@@ -115,22 +102,50 @@ router.post("/Lib-new-reg", async (req, res) => {
       examPreparation
     });
 
-    console.log(user);
-
     res.status(200).json({
       success: true,
-      order,
-      user,
-      key: process.env.KEY_ID_RZRPAY
+      user
     });
   } catch (error) {
-    console.error("Error creating user or processing payment:", error);
+    console.error("Error creating user:", error);
     res.status(500).json({ error: "A server error occurred with this request" });
   }
-});
+}
+);
+ 
+// Function for registration without payment
+
+ 
+
+// Function for handling payment (if needed in the future)
+// async function handlePayment(req, res) {
+//   const { amount, userId } = req.body;
+
+//   try {
+//     // Generate Razorpay order
+//     const order = await createOrder(amount);
+
+//     // Update user with the order ID
+//     await LibStudent.findByIdAndUpdate(userId, {
+//       amount,
+//       'Payment_detail.razorpay_order_id': order.id
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       order,
+//       key: process.env.KEY_ID_RZRPAY
+//     });
+//   } catch (error) {
+//     console.error("Error processing payment:", error);
+//     res.status(500).json({ error: "A server error occurred with this request" });
+//   }
+// }
+
+// module.exports = { registerStudent, handlePayment };
 router.get("/Lib_student/:user_id", async (req, res) => {
   const { user_id } = req.params;
-  console.log(user_id, req.params)
+  console.log(user_id, req.params,"hi")
 
   try {
     const user = await LibStudent.findOne({ userId: user_id });
@@ -138,7 +153,7 @@ router.get("/Lib_student/:user_id", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    console.log(user);
+    console.log(user,"users");
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user data:", error);

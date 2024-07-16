@@ -25,6 +25,7 @@ export async function sendFormData(formData) {
 
 export async function fetchUserDataById(user_id) {
   try {
+    console.log(user_id)
     const response = await axiosInstance.get(`/Lib_student/${user_id}`);
     console.log(response.data);// Adjust the endpoint as per your API
     return response.data; // Assuming the API returns JSON data representing the user object

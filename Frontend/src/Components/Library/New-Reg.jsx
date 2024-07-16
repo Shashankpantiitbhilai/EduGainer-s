@@ -1,66 +1,54 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState, useContext } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
-  Box,
-  TextField,
-  MenuItem,
-  Button,
+  Paper,
   Typography,
-  CircularProgress,
+  Grid,
+  TextField,
+  Button,
+  Stepper,
+  Step,
+  StepLabel,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Avatar,
 } from "@mui/material";
-import { sendFormData } from "../../services/utils.js";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { AdminContext } from "../../App.js";
+import { HowToReg } from "@mui/icons-material";
+import { AdminContext } from "../../App";
+import { sendFormData } from "../../services/utils";
 
-function NewReg() {
+const steps = [
+  "Personal Information",
+  "Contact Details",
+  "Additional Information",
+];
+
+export default function LibraryRegistration() {
   const { IsUserLoggedIn } = useContext(AdminContext);
-  const id = IsUserLoggedIn._id;
-
+  const id = IsUserLoggedIn?._id;
+  const [activeStep, setActiveStep] = useState(0);
+  const [formData, setFormData] = useState({});
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm();
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
-  const baseURL =
-    process.env.NODE_ENV === "production"
-      ? "https://edu-gainer-s-backend.vercel.app"
-      : "http://localhost:8000";
   const navigate = useNavigate();
 
-  const selectedShift = watch("shift");
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Update the amount based on the selected shift
-    const shiftAmounts = {
-      "6.30 AM to 2 PM": 5,
-      "2 PM to 9.30 PM": 5,
-      "6.30 PM to 11 PM": 3,
-      "9.30 PM to 6.30 AM": 5,
-      "2 PM to 11 PM": 7,
-      "6.30 AM to 6.30 PM": 8,
-      "24*7": 1,
-    };
-
-    setValue("amount", shiftAmounts[selectedShift] || "");
-  }, [selectedShift, setValue]);
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
 
   const setFileToBase64 = (file) => {
     const reader = new FileReader();
@@ -75,299 +63,336 @@ function NewReg() {
     setFileToBase64(file);
   };
 
-  const onSubmit = async (formData) => {
+  const handleStepSubmit = (data) => {
+    setFormData((prev) => ({ ...prev, ...data }));
+    handleNext();
+  };
+
+  const onSubmit = async () => {
     setLoading(true);
-
-    const formDataWithImage = {
-      ...formData,
-      image: imageBase64,
-      userId: id,
-    };
-
     try {
-      const result = await sendFormData(formDataWithImage);
-      const { key, order, user } = result;
-      const options = {
-        key,
-        amount: order.amount,
-        currency: "INR",
-        name: "Library Management",
-        description: "Library Registration Fee",
-        image: "https://example.com/logo.png",
-        order_id: order.id,
-        prefill: {
-          name: formData.name,
-          email: formData.email,
-          contact: formData.mobile,
-        },
-        notes: {
-          address: formData.address,
-        },
-        theme: {
-          color: "#3399cc",
-        },
-        handler: async (response) => {
-          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-            response;
-          const callbackUrl = `${baseURL}/payment-verification/${user.userId}`;
-
-          try {
-            const verificationResponse = await axios.post(callbackUrl, {
-              order_id: razorpay_order_id,
-              payment_id: razorpay_payment_id,
-              signature: razorpay_signature,
-            });
-            const id = user.userId;
-            if (verificationResponse.data.success) {
-              navigate(`/success/${id}`);
-            } else {
-              throw new Error("Payment verification failed");
-            }
-          } catch (error) {
-            console.error("Error verifying payment:", error);
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            setLoading(false);
-            console.error("Payment popup closed");
-          },
-        },
+      const finalFormData = {
+        ...formData,
+        image: imageBase64,
+        userId: id,
       };
-
-      const razor = new window.Razorpay(options);
-      razor.open();
+      await sendFormData(finalFormData);
+      navigate(`/success/${id}`);
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error submitting form:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  const getStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+         
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="name"
+                  control={control}
+                  defaultValue={formData.name || ""}
+                  rules={{ required: "Name is required" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Name"
+                      error={!!errors.name}
+                      helperText={errors.name?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="gender"
+                  control={control}
+                  defaultValue={formData.gender || ""}
+                  rules={{ required: "Gender is required" }}
+                  render={({ field }) => (
+                    <FormControl fullWidth error={!!errors.gender}>
+                      <InputLabel>Gender</InputLabel>
+                      <Select {...field} label="Gender">
+                        <MenuItem value="male">Male</MenuItem>
+                        <MenuItem value="female">Female</MenuItem>
+                        <MenuItem value="other">Other</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="dob"
+                  control={control}
+                  defaultValue={formData.dob || ""}
+                  rules={{ required: "Date of Birth is required" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Date of Birth"
+                      type="date"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      error={!!errors.dob}
+                      helperText={errors.dob?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="fatherName"
+                  control={control}
+                  defaultValue={formData.fatherName || ""}
+                  rules={{ required: "Father's Name is required" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Father's Name"
+                      error={!!errors.fatherName}
+                      helperText={errors.fatherName?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Controller
+                  name="motherName"
+                  control={control}
+                  defaultValue={formData.motherName || ""}
+                  rules={{ required: "Mother's Name is required" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Mother's Name"
+                      error={!!errors.motherName}
+                      helperText={errors.motherName?.message}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+            );
+        
+      
+    
+      case 1:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="contact1"
+                control={control}
+                defaultValue={formData.contact1 || ""}
+                rules={{
+                  required: "Primary contact number is required",
+                  pattern: {
+                    value: /^\d{10}$/,
+                    message: "Please enter a valid 10-digit contact number",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Primary Contact Number"
+                    error={!!errors.contact1}
+                    helperText={errors.contact1?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="contact2"
+                control={control}
+                defaultValue={formData.contact2 || ""}
+                rules={{
+                  pattern: {
+                    value: /^\d{10}$/,
+                    message: "Please enter a valid 10-digit contact number",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Secondary Contact Number"
+                    error={!!errors.contact2}
+                    helperText={errors.contact2?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name="email"
+                control={control}
+                defaultValue={formData.email || ""}
+                rules={{
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Invalid email address",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Email Address"
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name="address"
+                control={control}
+                defaultValue={formData.address || ""}
+                rules={{ required: "Address is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Address"
+                    multiline
+                    rows={3}
+                    error={!!errors.address}
+                    helperText={errors.address?.message}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        );
+      case 2:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="aadhaar"
+                control={control}
+                defaultValue={formData.aadhaar || ""}
+                rules={{ required: "Aadhaar or ID No is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Aadhaar or Any ID No"
+                    error={!!errors.aadhaar}
+                    helperText={errors.aadhaar?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="examPreparation"
+                control={control}
+                defaultValue={formData.examPreparation || ""}
+                rules={{ required: "This field is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Preparing for Exam"
+                    error={!!errors.examPreparation}
+                    helperText={errors.examPreparation?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                name="image"
+                control={control}
+                defaultValue=""
+                rules={{ required: "Photo is required" }}
+                render={({ field }) => (
+                  <Box>
+                    <input
+                      accept="image/*"
+                      id="image-upload"
+                      type="file"
+                      onChange={(e) => {
+                        field.onChange(e.target.files[0]);
+                        handleImage(e);
+                      }}
+                      style={{ display: "none" }}
+                    />
+                    <label htmlFor="image-upload">
+                      <Button variant="contained" component="span">
+                        Upload Photo
+                      </Button>
+                    </label>
+                    {errors.image && (
+                      <Typography color="error">
+                        {errors.image.message}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+              />
+              {imageBase64 && <Avatar src={imageBase64} alt="Uploaded Photo" />}
+            </Grid>
+          </Grid>
+        );
+      default:
+        return "Unknown step";
+    }
+  };
+
   return (
-    <Container
-      component="main"
-      maxWidth="sm"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-        sx={{ mt: 9 }}
-      >
+    <Container component="main" maxWidth="md" sx={{my:10}}>
+      <Paper elevation={6} sx={{ p: 4 }}>
         <Typography component="h1" variant="h5" align="center">
-          Registration Form
+          <HowToReg fontSize="large" /> Library Registration
         </Typography>
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="name"
-          label="Name"
-          {...register("name", { required: "Name is required" })}
-          error={!!errors.name}
-          helperText={errors.name?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          select
-          id="shift"
-          label="Shift Chosen"
-          {...register("shift", { required: "Shift selection is required" })}
-          error={!!errors.shift}
-          helperText={errors.shift?.message}
-        >
-          <MenuItem value="">Select Shift</MenuItem>
-          <MenuItem value="6.30 AM to 2 PM">6.30 AM to 2 PM</MenuItem>
-          <MenuItem value="2 PM to 9.30 PM">2 PM to 9.30 PM</MenuItem>
-          <MenuItem value="6.30 PM to 11 PM">6.30 PM to 11 PM</MenuItem>
-          <MenuItem value="9.30 PM to 6.30 AM">9.30 PM to 6.30 AM</MenuItem>
-          <MenuItem value="2 PM to 11 PM">2 PM to 11 PM</MenuItem>
-          <MenuItem value="6.30 AM to 6.30 PM">6.30 AM to 6.30 PM</MenuItem>
-          <MenuItem value="24*7">24*7</MenuItem>
-        </TextField>
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          type="number"
-          id="amount"
-          label="Amount"
-          {...register("amount", { required: "Amount is required" })}
-          error={!!errors.amount}
-          helperText={errors.amount?.message}
-          InputProps={{
-            readOnly: true,
-          }}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="gender"
-          label="Gender"
-          {...register("gender", { required: "Gender is required" })}
-          error={!!errors.gender}
-          helperText={errors.gender?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="dob"
-          label="Date of Birth"
-          type="date"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          {...register("dob", { required: "Date of Birth is required" })}
-          error={!!errors.dob}
-          helperText={errors.dob?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="fatherName"
-          label="Father's Name"
-          {...register("fatherName", { required: "Father's Name is required" })}
-          error={!!errors.fatherName}
-          helperText={errors.fatherName?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="motherName"
-          label="Mother's Name"
-          {...register("motherName", { required: "Mother's Name is required" })}
-          error={!!errors.motherName}
-          helperText={errors.motherName?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="contact1"
-          label="Primary Contact Number"
-          {...register("contact1", {
-            required: "Primary contact number is required",
-            pattern: {
-              value: /^\d{10}$/,
-              message: "Please enter a valid 10-digit contact number",
-            },
-          })}
-          error={!!errors.contact1}
-          helperText={errors.contact1?.message}
-        />
-
-        <TextField
-          margin="normal"
-          fullWidth
-          id="contact2"
-          label="Secondary Contact Number"
-          {...register("contact2", {
-            pattern: {
-              value: /^\d{10}$/,
-              message: "Please enter a valid 10-digit contact number",
-            },
-          })}
-          error={!!errors.contact2}
-          helperText={errors.contact2?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          {...register("email", {
-            required: "Email is required",
-            pattern: {
-              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: "Invalid email address",
-            },
-          })}
-          error={!!errors.email}
-          helperText={errors.email?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="address"
-          label="Address"
-          {...register("address", { required: "Address is required" })}
-          error={!!errors.address}
-          helperText={errors.address?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="aadhaar"
-          label="Aadhaar or Any ID No"
-          {...register("aadhaar", { required: "Aadhaar or ID No is required" })}
-          error={!!errors.aadhaar}
-          helperText={errors.aadhaar?.message}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="examPreparation"
-          label="Preparing for Exam"
-          {...register("examPreparation", {
-            required: "This field is required",
-          })}
-          error={!!errors.examPreparation}
-          helperText={errors.examPreparation?.message}
-        />
-
-        <TextField
-          margin="normal"
-          fullWidth
-          type="file"
-          id="image"
-          inputProps={{ accept: "image/*" }}
-          onChange={handleImage}
-        />
-
-        <Box sx={{ mt: 2, textAlign: "center" }}>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            startIcon={loading && <CircularProgress size={20} />}
-          >
-            {loading ? "Submitting..." : "Submit"}
-          </Button>
-        </Box>
-      </Box>
+        <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+        <form onSubmit={handleSubmit(handleStepSubmit)}>
+          {getStepContent(activeStep)}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+            {activeStep !== 0 && (
+              <Button onClick={handleBack} sx={{ mr: 1 }}>
+                Back
+              </Button>
+            )}
+            {activeStep === steps.length - 1 ? (
+              <Button
+                type="button"
+                variant="contained"
+                onClick={onSubmit}
+                disabled={loading}
+              >
+                Submit
+              </Button>
+            ) : (
+              <Button type="submit" variant="contained" onClick={handleNext}>
+                Next
+              </Button>
+            )}
+          </Box>
+        </form>
+      </Paper>
     </Container>
   );
 }
-
-export default NewReg;

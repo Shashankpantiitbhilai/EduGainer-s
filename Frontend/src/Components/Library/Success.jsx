@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, CardImg, CardTitle, CardSubtitle } from "reactstrap";
-import { sendIdCard, fetchUserDataById } from "../../services/utils";
+import { fetchUserDataById } from "../../services/utils";
 
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer, Bounce } from "react-toastify";
@@ -18,10 +18,11 @@ const SuccessPage = () => {
     const getUserData = async () => {
       try {
         const userData = await fetchUserDataById(id);
+        console.log(userData)
         setUserData(userData);
         setUserImage(userData.image.url);
-        await sendIdCard(id);
-        toast.success("👍 Check your mail for Id card!", {
+       
+        toast.success("👍 We will contact you soon", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,

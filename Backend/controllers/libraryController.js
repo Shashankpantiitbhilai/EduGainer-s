@@ -4,7 +4,7 @@ const getCurrentMonthBookings = async (req, res) => {
     try {
         // Fetch all booking data
         const bookings = await Booking.find({}, 'seat status shift'); // Fetch all fields
-        console.log(bookings)
+        // console.log(bookings)
         // Transform the data into an object with Shift as key and array of objects as value
         const bookingsByShift = bookings.reduce((acc, booking) => {
             const { seat, status, shift } = booking;
