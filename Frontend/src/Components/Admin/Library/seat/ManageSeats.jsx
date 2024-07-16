@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Snackbar, Alert } from "@mui/material";
+import { Box, Snackbar, Alert, Grid, Paper } from "@mui/material";
 import {
   getSeatInfo,
   getStudentInfo,
@@ -222,109 +222,151 @@ const ManageSeats = () => {
         selectedShift={selectedShift}
         onShiftChange={handleShiftChange}
       />
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-          <SeatRow
-            seats={["A3", "A4", "A5", "A6", "A7", "A8", "A9", "A0"]}
-            seatStatus={seatStatus}
-            onSeatClick={handleSeatClick}
-          />
-          <SeatRow
-            seats={[77, 78, 79, 80, 81, 82, 83, 84]}
-            seatStatus={seatStatus}
-            onSeatClick={handleSeatClick}
-          />
-        </Box>
+      <Grid item xs={12} md={8}>
+        <Paper
+          elevation={2}
+          sx={{ p: 2, borderRadius: 2, position: "relative" }}
+        >
+          <Box sx={{ border: "2px solid #ccc", borderRadius: "8px", p: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 2,
+                }}
+              >
+                <SeatRow
+                  seats={["A3", "A4", "A5", "A6", "A7", "A8", "A9", "A0"]}
+             seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+                />
+                <SeatRow
+                  seats={[77, 78, 79, 80, 81, 82, 83, 84]}
+                  seatStatus={seatStatus}
+                 
+              onSeatClick={handleSeatClick}
+                />
+              </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-          <Box>
-            <SeatRow
-              seats={[68, 67, 66, 65, 64, 63, 62, 61]}
-              seatStatus={seatStatus}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 2,
+                }}
+              >
+                <Box>
+                  <SeatRow
+                    seats={[68, 67, 66, 65, 64, 63, 62, 61]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[52, 51, 50, 49, 48, 47, 46, 45]}
-              seatStatus={seatStatus}
+                  />
+                  <SeatRow
+                    seats={[52, 51, 50, 49, 48, 47, 46, 45]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-          </Box>
-          <Box>
-            <SeatRow
-              seats={[69, 70, 71, 72, 73, 74, 75, 76]}
-              seatStatus={seatStatus}
+                  />
+                </Box>
+                <Box>
+                  <SeatRow
+                    seats={[69, 70, 71, 72, 73, 74, 75, 76]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[53, 54, 55, 56, 57, 58, 59, 60]}
-              seatStatus={seatStatus}
+                  />
+                  <SeatRow
+                    seats={[53, 54, 55, 56, 57, 58, 59, 60]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-          </Box>
-        </Box>
+                  />
+                </Box>
+              </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2 }}>
-          <Box>
-            <SeatRow
-              seats={[44, 43, 42, 41, 40, 39, 38, 37]}
-              seatStatus={seatStatus}
+              <Box
+                sx={{ display: "flex", justifyContent: "flex-start", gap: 2 }}
+              >
+                <Box>
+                  <SeatRow
+                    seats={[44, 43, 42, 41, 40, 39, 38, 37]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[36, 35, 34, 33, 32, 31, 30, 29]}
-              seatStatus={seatStatus}
+                  />
+                  <SeatRow
+                    seats={[36, 35, 34, 33, 32, 31, 30, 29]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-          </Box>
-        </Box>
+                  />
+                </Box>
+              </Box>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-          <Box>
-            <SeatRow
-              seats={[28, 27, 26]}
-              seatStatus={seatStatus}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 2,
+                }}
+              >
+                <Box>
+                  <SeatRow
+                    seats={[28, 27, 26]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[21, 20, 19]}
-              seatStatus={seatStatus}
+                  />
+                  <SeatRow
+                    seats={[21, 20, 19]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[14, 13, 12]}
-              seatStatus={seatStatus}
+                  />
+                  <SeatRow
+                    seats={[14, 13, 12]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[1, 2, 3]}
-              seatStatus={seatStatus}
+                  />
+                  <SeatRow
+                    seats={[1, 2, 3]}
+                 seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
-            />
+                  />
+                </Box>
+                <Box sx={{ mx: 50 }}>
+                  <SeatRow
+                    seats={[25, 24, 23, 22]}
+                 seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+                  />
+                  <SeatRow
+                    seats={[15, 16, 17, 18]}
+                 seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+                  />
+                  <SeatRow
+                    seats={[8, 9, 10, 11]}
+                 seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+                  />
+                  <SeatRow
+                    seats={[4, 5, 6, 7]}
+                 seatStatus={seatStatus}
+              onSeatClick={handleSeatClick}
+                  />
+                </Box>
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                mt: 4,
+              }}
+            >
+              <Box sx={{ mr: 4 }}>door →</Box>
+              <Box sx={{ width: 64, height: 4, bgcolor: "black" }}></Box>
+            </Box>
           </Box>
-          <Box>
-            <SeatRow
-              seats={[25, 24, 23, 22]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[15, 16, 17, 18]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[8, 9, 10, 11]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[4, 5, 6, 7]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-          </Box>
-        </Box>
-      </Box>
+        </Paper>
+      </Grid>
 
       <SeatLegend />
       <SeatInfoDialog

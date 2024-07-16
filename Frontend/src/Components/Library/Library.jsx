@@ -8,6 +8,7 @@ import {
   Select,
   Alert,
   AlertTitle,
+  Grid,Paper
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
@@ -187,7 +188,9 @@ const Library = () => {
         <AlertTitle>Note</AlertTitle>
         In case the seat you need is not empty, kindly contact our office.
       </Alert>
-
+     <Grid item xs={12} md={8}>
+            <Paper elevation={2} sx={{ p: 2, borderRadius: 2, position: 'relative' }}>
+              <Box sx={{ border: '2px solid #ccc', borderRadius: '8px', p: 2 }}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
           <SeatRow
@@ -291,7 +294,7 @@ const Library = () => {
               userShift={userShift}
             />
           </Box>
-          <Box>
+          <Box sx={{ mx: 50 }}>
             <SeatRow
               seats={[25, 24, 23, 22]}
               seatStatus={seatStatus}
@@ -335,7 +338,7 @@ const Library = () => {
         <Box sx={{ mr: 4 }}>door →</Box>
         <Box sx={{ width: 64, height: 4, bgcolor: "black" }}></Box>
       </Box>
-
+</Box></Paper></Grid>
       <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
         <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
