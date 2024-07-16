@@ -1,4 +1,4 @@
-const { Booking } = require('../models/student');
+const { Booking, LibStudent } = require('../models/student');
 
 const getCurrentMonthBookings = async (req, res) => {
     try {
@@ -24,7 +24,26 @@ const getCurrentMonthBookings = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch bookings' });
     }
 };
+const eligibleForRegistration = async (req, res) => {
+    const { user_id } = req.params;
+    try {
+        // Check if any booking data exists for the user_id
+        // console.log(user_id)
+        const bookingsCount = await LibStudent.countDocuments({ userId:user_id });
+
+        // If bookingsCount > 0, user is not eligible (send false), otherwise user is eligible (send true)
+        const eligible = bookingsCount === 0;
+// console.log(eligible,bookingsCount)
+        res.status(200).json({ eligible });
+    } catch (error) {
+        console.error('Error checking eligibility:', error);
+        res.status(500).json({ message: 'Failed to check eligibility' });
+    }
+};
+
+
 
 module.exports = {
-    getCurrentMonthBookings
+    getCurrentMonthBookings,
+    eligibleForRegistration
 };

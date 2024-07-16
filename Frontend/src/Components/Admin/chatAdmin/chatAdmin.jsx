@@ -183,8 +183,6 @@ const AdminChat = () => {
 
     try {
       console.log(id);
-      await postChatMessages(messageData);
-
       if (socketRef.current) {
         socketRef.current.emit("sendMessage", messageData, selectedRoom);
       }
@@ -192,6 +190,9 @@ const AdminChat = () => {
     } catch (error) {
       console.error("Error sending message:", error);
     }
+      await postChatMessages(messageData);
+
+ 
   };
 
   const playBeep = () => {

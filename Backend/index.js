@@ -107,8 +107,25 @@ io.on('connection', (socket) => {
   });
 
 
+  socket.on('updateSeatStatus', async (data) => {
+    const { id, status } = data;
 
+  
+
+    // Optionally, broadcast the updated booking status to all connected clients
+    io.emit('seatStatusUpdate', { id, status });
+  })
+  
   // Handle sendMessage event
+  socket.on('updateSeatStatus', (messageData, roomId) => {
+
+    console.log("messagedata", messageData);
+    const { messages, user } = messageData;
+    console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
+
+    // Broadcast the message to all clients in the room
+    io.to(roomId).emit('receiveMessage', messageData, roomId);
+  });
   socket.on('sendMessage', (messageData, roomId) => {
 
     console.log("messagedata", messageData);

@@ -31,11 +31,9 @@ const SeatInfoDialog = ({
     </DialogContent>
     <DialogActions>
       <Button onClick={() => onStatusChange("Paid")} color="primary">
-        Mark as Paid
+        Alott Seat
       </Button>
-      <Button onClick={() => onStatusChange("Unpaid")} color="secondary">
-        Mark as Unpaid
-      </Button>
+     
       <Button onClick={onViewDetails} color="info">
         View Details
       </Button>

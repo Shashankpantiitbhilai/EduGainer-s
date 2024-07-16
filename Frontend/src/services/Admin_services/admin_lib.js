@@ -39,6 +39,21 @@ export async function getBookingData() {
     }
 }
 
+export async function updateSeatStatus(reg, status) {
+
+    try {
+        console.log(reg, status)
+        const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status });
+console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.error("Error updating seat status:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+
+
 export async function updateColor(id, column, color) {
 
     try {

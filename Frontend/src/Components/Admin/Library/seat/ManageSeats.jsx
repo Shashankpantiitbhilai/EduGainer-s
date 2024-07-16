@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Box, Snackbar, Alert } from "@mui/material";
-import { getSeatInfo, getStudentInfo } from "../../../../services/Admin_services/admin_lib";
-import {getSeatsData} from "../../../../services/library/utils"
-import ShiftSelector from './shiftSelector';
-import SeatRow from './seatRow';
-import SeatLegend from './seatLegend';
-import SeatInfoDialog from './seatInfoDialog';
-import PaymentFormDialog from './PaymentFormDialog';
-import MultiplePersonsDialog from './multiplePersonDialg';
-import DetailedPersonDialog from './DetailedPersonDialog';
+import {
+  getSeatInfo,
+  getStudentInfo,
+  updateSeatStatus,
+} from "../../../../services/Admin_services/admin_lib";
+import { getSeatsData } from "../../../../services/library/utils";
+import ShiftSelector from "./shiftSelector";
+import SeatRow from "./seatRow";
+import SeatLegend from "./seatLegend";
+import SeatInfoDialog from "./seatInfoDialog";
+import PaymentFormDialog from "./PaymentFormDialog";
+import MultiplePersonsDialog from "./multiplePersonDialg";
+import DetailedPersonDialog from "./DetailedPersonDialog";
 
 const ManageSeats = () => {
   const [selectedShift, setSelectedShift] = useState("6.30 AM to 2 PM");
@@ -75,34 +79,47 @@ const ManageSeats = () => {
     setSelectedSeat(null);
   };
 
-  const handleStatusChange = (newStatus) => {
-    if (newStatus === "Paid") {
-      setFormData({
-        ...formData,
-        Seat: selectedSeat,
-        Shift: selectedShift,
-        Status: newStatus,
-      });
-      setFormDialogOpen(true);
-    } else {
-      setSeatStatus((prevStatus) => ({
-        ...prevStatus,
-        [selectedSeat]: newStatus,
-      }));
-      setSnackbarMessage(
-        `Seat ${selectedSeat} status updated to ${newStatus || "No Status"}`
-      );
+  const handleStatusChange = async (newStatus) => {
+   
+    try {
+      if (newStatus === "Paid") {
+        setFormData({
+          
+          Status: newStatus,
+        });
+        setFormDialogOpen(true);
+      } else {
+        await updateSeatStatus(selectedSeat, newStatus);
+        setSeatStatus((prevStatus) => ({
+          ...prevStatus,
+          [selectedSeat]: newStatus,
+        }));
+        setSnackbarMessage(
+          `Seat ${selectedSeat} status updated to ${newStatus || "No Status"}`
+        );
+        setSnackbarOpen(true);
+        handleCloseDialog();
+      }
+    } catch (error) {
+      console.error("Error updating seat status:", error);
+      setSnackbarMessage("Error updating seat status");
       setSnackbarOpen(true);
-      handleCloseDialog();
     }
   };
 
-  const handleFormSubmit = () => {
-    console.log("Form submitted with data:", formData);
-    setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
-    setSnackbarOpen(true);
-    setFormDialogOpen(false);
-    handleCloseDialog();
+  const handleFormSubmit = async (reg) => {
+    console.log(reg)
+    try {
+      await updateSeatStatus(reg, "Paid");
+      setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
+      setSnackbarOpen(true);
+      setFormDialogOpen(false);
+      handleCloseDialog();
+    } catch (error) {
+      console.error("Error updating seat status:", error);
+      setSnackbarMessage("Error updating seat status");
+      setSnackbarOpen(true);
+    }
   };
 
   const handleCloseSnackbar = (event, reason) => {
@@ -129,14 +146,11 @@ const ManageSeats = () => {
   };
 
   const handleViewDetails = async () => {
-    console.log(`Fetching details for seat ${selectedSeat}`);
-
     setDialogOpen(false);
     setMultiplePersonsDialogOpen(true);
 
     try {
       const seatdata = await getSeatInfo(selectedSeat);
-      console.log("Seat data retrieved:", seatdata);
       setSeatInfo(seatdata);
     } catch (error) {
       console.error("Error fetching seat info:", error);
@@ -146,11 +160,29 @@ const ManageSeats = () => {
   };
 
   const handlePersonClick = async (reg) => {
-    console.log(reg);
-    const student = await getStudentInfo(reg);
-    setSelectedPerson(student);
-    setMultiplePersonsDialogOpen(false);
-    setDetailedPersonDialogOpen(true);
+    try {
+      const student = await getStudentInfo(reg);
+      setSelectedPerson(student);
+      setMultiplePersonsDialogOpen(false);
+      setDetailedPersonDialogOpen(true);
+    } catch (error) {
+      console.error("Error fetching student info:", error);
+      setSnackbarMessage("Error fetching student info");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleDeallocate = async (reg) => {
+    try {
+      await updateSeatStatus(reg, "Left");
+      setSnackbarMessage(`Seat for person with reg ${reg} has been deallocated`);
+      setSnackbarOpen(true);
+      fetchData(); // Refresh seat data after deallocation
+    } catch (error) {
+      console.error("Error deallocating seat:", error);
+      setSnackbarMessage("Error deallocating seat");
+      setSnackbarOpen(true);
+    }
   };
 
   const handleFormChange = (key, value) => {
@@ -165,12 +197,10 @@ const ManageSeats = () => {
       <Box component="h1" sx={{ fontSize: "2xl", fontWeight: "bold", mb: 4 }}>
         Admin Library Seating Management
       </Box>
-
       <ShiftSelector
         selectedShift={selectedShift}
         onShiftChange={handleShiftChange}
       />
-
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mx: 3 }}>
         <Box
           sx={{
@@ -253,53 +283,33 @@ const ManageSeats = () => {
         >
           <Box>
             <SeatRow
-              seats={[28, 27, 26]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[21, 20, 19]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[14, 13, 12]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[1, 2, 3]}
+              seats={[28, 27, 26, 25, 24, 23, 22, 21]}
               seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
             />
           </Box>
-          <Box sx={{ mx: 23 }}>
+          <Box>
             <SeatRow
-              seats={[25, 24, 23, 22]}
+              seats={[13, 14, 15, 16, 17, 18, 19, 20]}
               seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
             />
+          </Box>
+        </Box>
+
+        <Box
+          sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mx: 3 }}
+        >
+          <Box>
             <SeatRow
-              seats={[15, 16, 17, 18]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[8, 9, 10, 11]}
-              seatStatus={seatStatus}
-              onSeatClick={handleSeatClick}
-            />
-            <SeatRow
-              seats={[4, 5, 6, 7]}
+              seats={[1, 2, 3, 4, 5, 6, 7, 8]}
               seatStatus={seatStatus}
               onSeatClick={handleSeatClick}
             />
           </Box>
         </Box>
       </Box>
-
       <SeatLegend />
-
       <SeatInfoDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -308,34 +318,36 @@ const ManageSeats = () => {
         onStatusChange={handleStatusChange}
         onViewDetails={handleViewDetails}
       />
-
       <PaymentFormDialog
         open={formDialogOpen}
         onClose={handleFormClose}
         formData={formData}
         onFormChange={handleFormChange}
-        onSubmit={handleFormSubmit}
+        onFormSubmit={handleFormSubmit}
       />
-
+     
       <MultiplePersonsDialog
         open={multiplePersonsDialogOpen}
         onClose={() => setMultiplePersonsDialogOpen(false)}
         seatInfo={seatInfo}
         onPersonClick={handlePersonClick}
+        onDeallocate={handleDeallocate}
       />
-
       <DetailedPersonDialog
         open={detailedPersonDialogOpen}
         onClose={() => setDetailedPersonDialogOpen(false)}
         selectedPerson={selectedPerson}
       />
-
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success">
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

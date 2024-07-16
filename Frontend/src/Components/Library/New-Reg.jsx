@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,10 +17,16 @@ import {
   MenuItem,
   Box,
   Avatar,
+  Alert,
+  AlertTitle,
+  Card,
+  CardContent,
+  Divider,
 } from "@mui/material";
-import { HowToReg } from "@mui/icons-material";
+import { HowToReg, Info } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { sendFormData } from "../../services/utils";
+import { eligibleForNewRegistration } from "../../services/library/utils";
 
 const steps = [
   "Personal Information",
@@ -41,6 +47,25 @@ export default function LibraryRegistration() {
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [isEligible, setIsEligible] = useState(null);
+
+  useEffect(() => {
+    const checkEligibility = async () => {
+      try {
+        // console.log(IsUserLoggedIn?._id);
+        const response = await eligibleForNewRegistration(id);
+        // console.log(response.eligible);
+        setIsEligible(response.eligible);
+      } catch (error) {
+        console.error("Error checking eligibility:", error);
+        setIsEligible(false);
+      }
+    };
+
+    if (id) {
+      checkEligibility();
+    }
+  }, [id]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -89,103 +114,100 @@ export default function LibraryRegistration() {
     switch (step) {
       case 0:
         return (
-         
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="name"
-                  control={control}
-                  defaultValue={formData.name || ""}
-                  rules={{ required: "Name is required" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Name"
-                      error={!!errors.name}
-                      helperText={errors.name?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="gender"
-                  control={control}
-                  defaultValue={formData.gender || ""}
-                  rules={{ required: "Gender is required" }}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.gender}>
-                      <InputLabel>Gender</InputLabel>
-                      <Select {...field} label="Gender">
-                        <MenuItem value="male">Male</MenuItem>
-                        <MenuItem value="female">Female</MenuItem>
-                        <MenuItem value="other">Other</MenuItem>
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="dob"
-                  control={control}
-                  defaultValue={formData.dob || ""}
-                  rules={{ required: "Date of Birth is required" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Date of Birth"
-                      type="date"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      error={!!errors.dob}
-                      helperText={errors.dob?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="fatherName"
-                  control={control}
-                  defaultValue={formData.fatherName || ""}
-                  rules={{ required: "Father's Name is required" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Father's Name"
-                      error={!!errors.fatherName}
-                      helperText={errors.fatherName?.message}
-                    />
-                  )}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="motherName"
-                  control={control}
-                  defaultValue={formData.motherName || ""}
-                  rules={{ required: "Mother's Name is required" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      label="Mother's Name"
-                      error={!!errors.motherName}
-                      helperText={errors.motherName?.message}
-                    />
-                  )}
-                />
-              </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="name"
+                control={control}
+                defaultValue={formData.name || ""}
+                rules={{ required: "Name is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Name"
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                  />
+                )}
+              />
             </Grid>
-            );
-        
-      
-    
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="gender"
+                control={control}
+                defaultValue={formData.gender || ""}
+                rules={{ required: "Gender is required" }}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.gender}>
+                    <InputLabel>Gender</InputLabel>
+                    <Select {...field} label="Gender">
+                      <MenuItem value="male">Male</MenuItem>
+                      <MenuItem value="female">Female</MenuItem>
+                      <MenuItem value="other">Other</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="dob"
+                control={control}
+                defaultValue={formData.dob || ""}
+                rules={{ required: "Date of Birth is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Date of Birth"
+                    type="date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    error={!!errors.dob}
+                    helperText={errors.dob?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="fatherName"
+                control={control}
+                defaultValue={formData.fatherName || ""}
+                rules={{ required: "Father's Name is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Father's Name"
+                    error={!!errors.fatherName}
+                    helperText={errors.fatherName?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="motherName"
+                control={control}
+                defaultValue={formData.motherName || ""}
+                rules={{ required: "Mother's Name is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Mother's Name"
+                    error={!!errors.motherName}
+                    helperText={errors.motherName?.message}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        );
+
       case 1:
         return (
           <Grid container spacing={3}>
@@ -355,8 +377,67 @@ export default function LibraryRegistration() {
     }
   };
 
+  if (isEligible === null) {
+    return (
+      <Container component="main" maxWidth="sm" sx={{ my: 10 }}>
+        <Card>
+          <CardContent>
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <Typography variant="h6">Checking eligibility...</Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    );
+  }
+
+  if (isEligible === false) {
+    return (
+      <Container component="main" maxWidth="md" sx={{ my: 10 }}>
+        <Card elevation={3}>
+          <CardContent>
+            <Alert
+              severity="info"
+              icon={<Info fontSize="large" />}
+              sx={{ mb: 2 }}
+            >
+              <AlertTitle>Registration Status</AlertTitle>
+              Our records indicate that you have already completed the library
+              registration process.
+            </Alert>
+            <Typography variant="body1" paragraph>
+              If you need to update your information or have any questions
+              regarding your registration, please don't hesitate to contact us:
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle1" fontWeight="bold">
+              Edugainer's Office Contact Information:
+            </Typography>
+            <Typography variant="body1">Phone: 9997999768</Typography>
+            <Typography variant="body1">Phone: 9997999765</Typography>
+            <Typography variant="body1">Phone: 8126857111</Typography>
+            <Typography variant="body1">
+              Email: edugainersclasses@gmail.com
+            </Typography>
+            <Typography variant="body1">
+              Hours: Monday to Friday, 9:00 AM - 5:00 PM
+            </Typography>
+            <Box mt={3}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate("/")}
+              >
+                Return to HomePage
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    );
+  }
   return (
-    <Container component="main" maxWidth="md" sx={{my:10}}>
+    <Container component="main" maxWidth="md" sx={{ my: 10 }}>
       <Paper elevation={6} sx={{ p: 4 }}>
         <Typography component="h1" variant="h5" align="center">
           <HowToReg fontSize="large" /> Library Registration
@@ -386,7 +467,7 @@ export default function LibraryRegistration() {
                 Submit
               </Button>
             ) : (
-              <Button type="submit" variant="contained" onClick={handleNext}>
+              <Button type="submit" variant="contained">
                 Next
               </Button>
             )}

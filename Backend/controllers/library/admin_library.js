@@ -1,4 +1,4 @@
-const { Booking ,LibStudent} = require('../../models/student');
+const { Booking, LibStudent } = require('../../models/student');
 
 
 const getSeatInfo = async (req, res) => {
@@ -8,7 +8,9 @@ const getSeatInfo = async (req, res) => {
         // console.log(seat)
         // const test = await Booking.find({ seat });
         // console.log(test)
-        const bookings = await Booking.find({ seat: seat }).select('name seat shift image reg');
+        const bookings = await Booking.find({ seat: seat, status: { $ne: "Left" } })
+            .select('name seat shift image reg');
+
         // console.log(bookings)
         // Check if bookings are found
         if (!bookings) {
@@ -24,11 +26,11 @@ const getSeatInfo = async (req, res) => {
 };
 const getStudentInfo = async (req, res) => {
     const { reg } = req.params; // Assuming registration number is passed as a parameter
-// console.log(reg)
+    // console.log(reg)
     try {
         // Fetch student data from LibStudent collection
         const student = await LibStudent.findOne({ reg: reg }).select('-_id -__v');
-// console.log(student)
+        // console.log(student)
         // Check if student is found
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
@@ -180,6 +182,24 @@ const updateBookingColor = async (req, res) => {
     }
 };
 
+const updateSeatStatus = async (req, res) => {
+    const { reg } = req.params;
+    const { status } = req.body;
+    // console.log(reg, status, "yo")
+
+    try {
+        const updatedBooking = await Booking.findOneAndUpdate({ reg :reg}, { status }, { new: true });
+
+        if (!updatedBooking) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+
+        res.status(200).json({ message: 'Status updated successfully', booking: updatedBooking });
+    } catch (error) {
+        console.error("Error updating status:", error);
+        res.status(500).json({ error: 'Failed to update status' });
+    }
+};
 
 module.exports = {
     getBookingData,
@@ -188,5 +208,6 @@ module.exports = {
     updateBookingData,
     deleteBookingData,
     getSeatInfo,
-    getStudentInfo
+    getStudentInfo,
+    updateSeatStatus
 };

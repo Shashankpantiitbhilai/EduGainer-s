@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -8,42 +8,38 @@ import {
   TextField,
 } from "@mui/material";
 
-const PaymentFormDialog = ({
-  open,
-  onClose,
-  formData,
-  onFormChange,
-  onSubmit,
-}) => (
-  <Dialog open={open} onClose={onClose}>
-    <DialogTitle>Payment Form</DialogTitle>
-    <DialogContent>
-      {Object.entries(formData).map(([key, value]) => (
+const PaymentFormDialog = ({ open, onClose, onFormSubmit }) => {
+  const [regNo, setRegNo] = useState("");
+
+  const handleSubmit = () => {
+    onFormSubmit(regNo);
+    setRegNo(""); // Reset the input after submission
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Seat Allotment Form</DialogTitle>
+      <DialogContent>
         <TextField
-          key={key}
           margin="dense"
-          id={key}
-          label={key}
-          type={
-            key === "Cash" || key === "Online" || key === "Fee"
-              ? "number"
-              : "text"
-          }
+          id="regNo"
+          label="Reg No"
+          type="text"
           fullWidth
-          value={value}
-          onChange={(e) => onFormChange(key, e.target.value)}
+          value={regNo}
+          onChange={(e) => setRegNo(e.target.value)}
         />
-      ))}
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={onSubmit} color="primary">
-        Submit
-      </Button>
-      <Button onClick={onClose} color="inherit">
-        Cancel
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleSubmit} color="primary">
+          Allot
+        </Button>
+        <Button onClick={onClose} color="inherit">
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 export default PaymentFormDialog;

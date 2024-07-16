@@ -22,4 +22,5 @@ router.post('/updatebooking', admin_library.updateBookingData);
 router.delete('/deleteBooking/:id', admin_library.deleteBookingData);
 router.get("/getSeatInfo/:seat", admin_library.getSeatInfo)
 router.get("/getStudentInfo/:reg", admin_library.getStudentInfo)
+router.patch("/updateSeatInfo/:reg", admin_library.updateSeatStatus)
 module.exports = router;
