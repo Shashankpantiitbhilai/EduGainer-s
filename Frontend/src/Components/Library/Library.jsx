@@ -12,6 +12,8 @@ import {
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";
+import { io } from "socket.io-client";
+import { fetchAdminCredentials } from "../../services/chat/utils";
 const shifts = [
   "6.30 AM to 2 PM",
   "2 PM to 9.30 PM",
@@ -37,12 +39,16 @@ const Seat = ({
   selectedShift,
   userShift,
 }) => {
-  let seatColor = "red"; // Default color for booked seats
+  let seatColor = "gray"; // Default color for seats with unknown status
 
-  if (seatStatus && seatStatus == "Unpaid") {
-    seatColor = "green"; // Green color for unpaid (empty) seats
-  } else if (seatNumber == userSeat && selectedShift == userShift) {
-    seatColor = "orange"; // Purple color for the logged-in user's seat
+  if (seatStatus == "Left") {
+    seatColor = "green"; // Green color for empty seats (status: Left)
+  } else if (seatStatus == "Paid") {
+    seatColor = "red"; // Red color for booked seats (status: Paid)
+  }
+  // console.log(userSeat,userShift)
+  if (seatNumber == userSeat && selectedShift == userShift) {
+    seatColor = "orange"; // Orange color for the logged-in user's seat
   }
 
   return (
@@ -87,6 +93,43 @@ const Library = () => {
   const [userSeat, setUserSeat] = useState(null);
   const [userShift, setUserShift] = useState(null);
   const { IsUserLoggedIn } = useContext(AdminContext);
+  const [socket, setSocket] = useState(null);
+
+  const url =
+    process.env.NODE_ENV === "production"
+      ? process.env.REACT_APP_BACKEND_PROD
+      : process.env.REACT_APP_BACKEND_DEV;
+
+ useEffect(() => {
+   const fetchAdminData = async () => {
+     try {
+       const adminData = await fetchAdminCredentials(); // Wait for the promise to resolve
+      //  console.log(adminData); // Logs: resolved data
+       const roomId = adminData?._id;
+       const newSocket = io(url); // Replace with your server URL
+       setSocket(newSocket);
+       newSocket?.emit("joinSeatsRoom", roomId);
+
+       // Cleanup function to close socket
+       return () => newSocket.close();
+     } catch (error) {
+       console.error("Error fetching admin credentials:", error);
+     }
+   };
+
+   fetchAdminData();
+ }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("seatStatusUpdate", ({ id, status }) => {
+        setSeatStatus((prevStatus) => ({
+          ...prevStatus,
+          [id]: status,
+        }));
+      });
+    }
+  }, [socket]);
   const id = IsUserLoggedIn?._id;
   useEffect(() => {
     const fetchData = async () => {
@@ -98,11 +141,10 @@ const Library = () => {
         if (selectedShiftData) {
           let statusMap = {};
           selectedShiftData.forEach((e) => {
-            statusMap[e.Seat] =
-              e.Status && e.Status[e.Status] ? e.Status[e.Status] : "Unpaid";
+            console.log();
+            statusMap[e.seat] = e.status || "Unknown";
           });
           setSeatStatus(statusMap);
-          console.log(statusMap);
         } else {
           console.error(`No data found for shift: ${selectedShift}`);
         }

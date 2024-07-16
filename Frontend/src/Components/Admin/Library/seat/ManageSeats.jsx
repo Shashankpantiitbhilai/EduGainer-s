@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import { Box, Snackbar, Alert } from "@mui/material";
 import {
   getSeatInfo,
@@ -13,7 +13,8 @@ import SeatInfoDialog from "./seatInfoDialog";
 import PaymentFormDialog from "./PaymentFormDialog";
 import MultiplePersonsDialog from "./multiplePersonDialg";
 import DetailedPersonDialog from "./DetailedPersonDialog";
-
+import io from "socket.io-client";
+import { AdminContext } from "../../../../App";
 const ManageSeats = () => {
   const [selectedShift, setSelectedShift] = useState("6.30 AM to 2 PM");
   const [seatStatus, setSeatStatus] = useState({});
@@ -40,11 +41,33 @@ const ManageSeats = () => {
     Remarks: "",
     Status: "Paid",
   });
-
+  const { IsUserLoggedIn } = useContext((AdminContext))
+  const [socket, setSocket] = useState(null);
+  const url= process.env.NODE_ENV === "production" ?
+    process.env.REACT_APP_BACKEND_PROD : process.env.REACT_APP_BACKEND_DEV;
   useEffect(() => {
     fetchData();
   }, [selectedShift]);
-
+  useEffect(() => {
+    const newSocket = io(url);
+    const roomId = IsUserLoggedIn?._id;// Replace with your server URL
+    setSocket(newSocket);
+    newSocket?.emit("joinSeatsRoom", roomId);
+    return () => newSocket.close();
+  }, []);
+useEffect(() => {
+  if (socket) {
+    socket.on("seatStatusUpdate", ({ id, status }) => {
+      console.log("seatstatusupdateadmin",id,status)
+      setSeatStatus((prevStatus) => ({
+        ...prevStatus,
+        [id]: status,
+      }));
+      setSnackbarMessage(`Seat ${id} status updated to ${status}`);
+      setSnackbarOpen(true);
+    });
+  }
+}, [socket]);
   const fetchData = async () => {
     try {
       const response = await getSeatsData();
@@ -89,6 +112,11 @@ const ManageSeats = () => {
         });
         setFormDialogOpen(true);
       } else {
+          socket.emit("updateSeatStatus", {
+            id: selectedSeat,
+            status: newStatus,
+          });
+         
         await updateSeatStatus(selectedSeat, newStatus);
         setSeatStatus((prevStatus) => ({
           ...prevStatus,
@@ -111,6 +139,7 @@ const ManageSeats = () => {
     console.log(reg)
     try {
       await updateSeatStatus(reg, "Paid");
+       socket.emit("updateSeatStatus", { id: reg, status: "Paid" });
       setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
       setSnackbarOpen(true);
       setFormDialogOpen(false);
