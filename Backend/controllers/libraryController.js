@@ -43,7 +43,41 @@ const eligibleForRegistration = async (req, res) => {
 
 
 
+const getStudentLibSeat = async (req, res) => {
+
+    const { id } = req.params;
+// console.log(id,"id")
+    try {
+        // First, find the student in LibStudent collection
+        const student = await LibStudent.findOne({ userId: id });
+// console.log(student)
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found in LibStudent collection' });
+        }
+
+        // If student is found, find and update the corresponding booking
+        const findBooking = await Booking.findOne(
+            { reg: student.reg }
+        );
+// console.log(findBooking,student.reg,"found user booking")
+        if (!findBooking) {
+            return res.status(404).json({ error: 'Booking not found for this student' });
+        }
+
+        res.status(200).json({
+            message: 'Status updated successfully',
+            booking: findBooking,
+
+        });
+    } catch (error) {
+        console.error("Error updating status:", error);
+        res.status(500).json({ error: 'Failed to update status' });
+    }
+};
+
+
 module.exports = {
     getCurrentMonthBookings,
-    eligibleForRegistration
+    eligibleForRegistration,
+    getStudentLibSeat
 };

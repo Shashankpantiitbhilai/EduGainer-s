@@ -68,7 +68,7 @@ const getBookingData = async (req, res) => {
 
 const addBookingData = async (req, res) => {
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status } = req.body;;
-
+// console.log(req.body)
     try {
         // Create a new booking instance
         const newBooking = new Booking({
@@ -88,6 +88,7 @@ const addBookingData = async (req, res) => {
         await newBooking.save();
 
         // Send a success response
+        // console.log(newBooking)
         res.status(201).json({ message: 'Booking added successfully', booking: newBooking });
     } catch (error) {
         console.error('Error adding booking:', error);
@@ -201,6 +202,10 @@ const updateSeatStatus = async (req, res) => {
     }
 };
 
+
+
+
+
 module.exports = {
     getBookingData,
     updateBookingColor,
@@ -209,5 +214,6 @@ module.exports = {
     deleteBookingData,
     getSeatInfo,
     getStudentInfo,
-    updateSeatStatus
+    updateSeatStatus,
+ 
 };

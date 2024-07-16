@@ -90,7 +90,7 @@ export default function SearchBar() {
   };
 
   const columns = [
-    { field: "reg", headerName: "Reg", width: 30 },
+    { field: "reg", headerName: "Reg", width: 30, editable: true },
     {
       field: "name",
       headerName: "Name",
@@ -207,7 +207,6 @@ export default function SearchBar() {
             onClick={() => {
               setDeleteDialogOpen(true);
               setStudentToDelete(params.row._id);
-             
             }}
             style={{ color: "blue" }}
           >

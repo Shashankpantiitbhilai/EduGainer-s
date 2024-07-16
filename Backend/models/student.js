@@ -54,7 +54,9 @@ const LibStudentSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-
+  reg: {
+  type:String
+},
   email: {
     type: String,
     // required: true,

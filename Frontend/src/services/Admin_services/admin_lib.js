@@ -115,8 +115,8 @@ export async function deleteBooking(id) {
 }
 export async function addBooking(data) {
     try {
-        // console.log(data)
-        const response = await axiosInstance.post(`/admin_library/addBooking`,data);
+    console.log(data)
+        const response = await axiosInstance.post(`/admin_library/addBooking`,  data );
        
         return response.data;
     } catch (error) {
