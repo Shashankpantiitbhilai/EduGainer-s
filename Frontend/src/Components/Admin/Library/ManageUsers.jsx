@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
@@ -16,8 +14,10 @@ import {
   deleteLibStudent,
   editLibStudentById,
 } from "../../../services/Admin_services/adminUtils";
-import { Search } from "@mui/icons-material";
-import ConfirmationDialog from "./monthlyseat/confirm"; // Adjust the import path accordingly
+import { Search, FileDownload } from "@mui/icons-material";
+import ConfirmationDialog from "./monthlyseat/confirm";
+import Button from "@mui/material/Button";
+import * as XLSX from "xlsx";
 
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,7 +30,7 @@ export default function SearchBar() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const defaultData = await fetchLibSudents(); // Fetch default data
+        const defaultData = await fetchLibSudents();
         setStudents(defaultData);
         console.log(defaultData);
       } catch (error) {
@@ -56,13 +56,12 @@ export default function SearchBar() {
       toast.error("Failed to update student");
     } finally {
       setLoading(false);
-      setEditModeId(null); // Exit edit mode after save
+      setEditModeId(null);
     }
   };
 
   const handleDelete = async () => {
     try {
-      // console.log(studentToDelete);
       await deleteLibStudent(studentToDelete);
       setStudents(
         students.filter((student) => student._id !== studentToDelete)
@@ -88,27 +87,24 @@ export default function SearchBar() {
   const isEditMode = (id) => {
     return id === editModeId;
   };
+  const exportToExcel = () => {
+    const exportData = students.map((student) => {
+      const { _id, __v, ...exportStudent } = student;
+      return exportStudent;
+    });
+
+    const workSheet = XLSX.utils.json_to_sheet(exportData);
+    const workBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workBook, workSheet, "Students");
+    XLSX.writeFile(workBook, "StudentData.xlsx");
+  };
+
 
   const columns = [
     { field: "reg", headerName: "Reg", width: 30, editable: true },
-    {
-      field: "name",
-      headerName: "Name",
-      width: 150,
-      editable: true,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      width: 150,
-      editable: true,
-    },
-    {
-      field: "address",
-      headerName: "Address",
-      width: 100,
-      editable: true,
-    },
+    { field: "name", headerName: "Name", width: 150, editable: true },
+    { field: "email", headerName: "Email", width: 150, editable: true },
+    { field: "address", headerName: "Address", width: 100, editable: true },
     {
       field: "image",
       headerName: "Image",
@@ -229,7 +225,16 @@ export default function SearchBar() {
     <>
       <ToastContainer />
       <Box
-        sx={{ width: "100%", maxWidth: 500, margin: "0 auto", mt: 4, mb: 9 }}
+        sx={{
+          width: "100%",
+          maxWidth: 500,
+          margin: "0 auto",
+          mt: 4,
+          mb: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
         <TextField
           label="Search"
@@ -239,6 +244,14 @@ export default function SearchBar() {
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{ endAdornment: <Search /> }}
         />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<FileDownload />}
+          onClick={exportToExcel}
+        >
+          Export to Excel
+        </Button>
       </Box>
       <div style={{ height: 800, width: "100%", margin: 8 }}>
         <DataGrid
@@ -268,7 +281,6 @@ export default function SearchBar() {
         handleClose={() => setDeleteDialogOpen(false)}
         handleConfirm={handleDelete}
       />
-
     </>
   );
 }

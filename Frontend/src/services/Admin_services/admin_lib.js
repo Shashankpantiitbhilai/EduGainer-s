@@ -31,7 +31,7 @@ export async function getBookingData() {
     try {
         // console.log("hi")
         const response = await axiosInstance.get("/admin_library/getBookingData");
-       
+       console.log(response.data)
         return response.data;
     } catch (error) {
         console.error("Error sending form data:", error);
