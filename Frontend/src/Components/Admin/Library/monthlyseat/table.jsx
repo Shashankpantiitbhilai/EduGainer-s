@@ -15,7 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Search, Delete, Add, Edit, GetApp } from "@mui/icons-material";
-import * as XLSX from "xlsx";
+
 import {
   getBookingData,
   addBooking,
@@ -29,7 +29,7 @@ import LegendsFunctions from "./legend";
 import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import ExcelJS from "exceljs";
 const StudentManagementTable = () => {
   const [data, setData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -153,54 +153,53 @@ const StudentManagementTable = () => {
 
 
 
-const handleExport = () => {
-  const exportData = data.map((item) => {
-    const rowData = {};
-    columnOrder.forEach((key) => {
-      rowData[key] = item[key];
-    });
-    return rowData;
-  });
 
-  const ws = XLSX.utils.json_to_sheet(exportData);
 
-  // Create a new workbook
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Bookings");
 
-  // Apply styles to the cells
-  const cellStyles = [];
 
-  data.forEach((item, rowIndex) => {
+const handleExport = async () => {
+  // Create a new workbook and worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Bookings");
+
+  // Add headers
+  worksheet.addRow(columnOrder);
+
+  // Add data and apply colors
+  data.forEach((item) => {
+    const row = worksheet.addRow(columnOrder.map((key) => item[key]));
+
+    // Apply colors to cells based on item.colors
     if (item.colors) {
       Object.entries(item.colors).forEach(([key, color]) => {
         const colIndex = columnOrder.indexOf(key);
         if (colIndex !== -1) {
-          const cellRef = XLSX.utils.encode_cell({
-            r: rowIndex + 1, // +1 because row 0 is the header
-            c: colIndex,
-          });
-          cellStyles.push({
-            cell: cellRef,
-            fill: { fgColor: { rgb: color.replace("#", "") } },
-          });
+          const cell = row.getCell(colIndex + 1);
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: color.replace("#", "") },
+          };
         }
       });
     }
   });
 
-  // Set column widths
-  const colWidths = columnOrder.map(() => ({ wch: 20 }));
-  ws["!cols"] = colWidths;
-
-  // Apply cell styles
-  if (!ws["!styles"]) ws["!styles"] = {};
-  cellStyles.forEach((style) => {
-    ws["!styles"][style.cell] = style;
+  // Auto-fit columns
+  worksheet.columns.forEach((column) => {
+    column.width = 15;
   });
 
-  // Write the workbook to a file
-  XLSX.writeFile(wb, "bookings_export.xlsx", { cellStyles: true });
+  // Generate Excel file
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "bookings_export.xlsx";
+  link.click();
+  URL.revokeObjectURL(link.href);
 
   toast.success("Table exported successfully with colors!");
 };

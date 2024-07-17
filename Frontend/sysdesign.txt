@@ -1,1 +1,0 @@
-map each user id to socket id

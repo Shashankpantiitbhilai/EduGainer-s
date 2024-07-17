@@ -3,7 +3,8 @@ import { Button, Container, TextField, Typography, Box } from "@mui/material";
 import { registerUser } from "../../services/auth";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function Register() {
   const { control, handleSubmit, setError, formState } = useForm();
   const { errors } = formState;

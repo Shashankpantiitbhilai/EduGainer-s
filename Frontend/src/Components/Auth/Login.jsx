@@ -5,7 +5,8 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { loginUser } from "../../services/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { styled } from "@mui/system";
 
 const LoginContainer = styled(Container)({
@@ -58,16 +59,24 @@ function Login() {
       console.log(response);
       if (response && response.user.role === "user") {
         setIsUserLoggedIn(response.user);
-        navigate("/");
+          toast.success("Login successful", { autoClose: 2000 });
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
       } else if (response && response.user.role === "admin") {
         setIsUserLoggedIn(response.user);
-        navigate("/admin_home");
+         toast.success("Login successful", { autoClose: 2000 });
+         setTimeout(() => {
+           navigate("/admin_home");
+         }, 1000);
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });
         // Clear the error after a short delay
+        toast.error("Invalid credentials", { autoClose: 2000 });
+        // Clear the error after a short delay
         setTimeout(() => {
           clearErrors("login");
-        }, 3000);
+        }, 2000);
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -76,6 +85,7 @@ function Login() {
 
   return (
     <LoginContainer>
+      <ToastContainer/>
       <LoginForm component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <Typography variant="h4" gutterBottom>
           Sign In
