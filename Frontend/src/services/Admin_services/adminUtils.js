@@ -15,13 +15,13 @@ const axiosInstance = axios.create({
 });
 
 export async function fetchLibSudents() {
-   
+
     try {
         const response = await axiosInstance.get("/admin/fetchLibData");
         // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -32,7 +32,7 @@ export async function deleteLibStudent(id) {
         const response = await axiosInstance.delete(`/admin/deleteLibStudent/${id}`);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -44,7 +44,7 @@ export async function editLibStudentById(id, data) {
         // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -54,7 +54,7 @@ export const fileUpload = async (data, onUploadProgress) => {
     formData.append('file', data);
     // console.log(data);
     // for (let pair of formData.entries()) {
-    //     console.log(pair[0], pair[1]);
+
     // }
     const response = await axiosInstance.post('/admin/uploadResource', data, {
         onUploadProgress,
@@ -68,24 +68,24 @@ export const fileUpload = async (data, onUploadProgress) => {
 
 export const fetchLibResources = async (data) => {
     try {
-        console.log(data);
+        // console.log(data);
         const response = await axiosInstance.post('/admin/fetchLibResource', { data });
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("error fetching data:", error);
+        // console.error("error fetching data:", error);
         throw error;
     }
 };
 
 export const editLibResources = async (id, data) => {
-    console.log(data);
+    // console.log(data);
     try {
         const response = await axiosInstance.patch(`/admin/editLibResource/${id}`, data);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("error fetching data:", error);
+        // console.error("error fetching data:", error);
         throw error;
     }
 };
@@ -93,10 +93,10 @@ export const editLibResources = async (id, data) => {
 export const deleteLibResource = async (id) => {
     try {
         const response = await axiosInstance.delete(`/admin/deleteLibResource/${id}`);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("error fetching data:", error);
+        // console.error("error fetching data:", error);
         throw error;
     }
 };
@@ -104,12 +104,12 @@ export const deleteLibResource = async (id) => {
 export async function fetchAllChats(id) {
 
     try {
-        console.log(id)
+        // console.log(id)
         const response = await axiosInstance.get(`/admin/fetchAllChats/${id}`);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -117,10 +117,10 @@ export async function fetchAllUsers() {
 
     try {
         const response = await axiosInstance.get("/admin/fetchAllUsers");
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -129,10 +129,10 @@ export async function fetchAllSiteUsers() {
 
     try {
         const response = await axiosInstance.get("/admin/fetchAllSiteUsers");
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }

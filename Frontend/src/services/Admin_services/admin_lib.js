@@ -6,7 +6,7 @@ const baseURL =
     process.env.NODE_ENV === "production"
         ? process.env.REACT_APP_BACKEND_PROD
         : process.env.REACT_APP_BACKEND_DEV;
-console.log(baseURL)
+// console.log(baseURL)
 const axiosInstance = axios.create({
     baseURL,
     withCredentials: true,
@@ -40,11 +40,11 @@ export async function getBookingData() {
 }
 
 export async function updateSeatStatus(reg, status,seat) {
-console.log(reg,status,seat)
+// console.log(reg,status,seat)
     try {
         // console.log(reg, status,seat)
         const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status ,seat});
-console.log(response.data)
+// console.log(response.data)
         return response.data;
     } catch (error) {
         // console.error("Error updating seat status:", error);
@@ -115,7 +115,7 @@ export async function deleteBooking(id) {
 }
 export async function addBooking(data) {
     try {
-    console.log(data)
+    // console.log(data)
         const response = await axiosInstance.post(`/admin_library/addBooking`,  data );
        
         return response.data;
