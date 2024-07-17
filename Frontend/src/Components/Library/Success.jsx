@@ -18,10 +18,10 @@ const SuccessPage = () => {
     const getUserData = async () => {
       try {
         const userData = await fetchUserDataById(id);
-        console.log(userData)
+        // console.log(userData)
         setUserData(userData);
         setUserImage(userData.image.url);
-       
+
         toast.success("👍 We will contact you soon", {
           position: "top-right",
           autoClose: 5000,
@@ -39,8 +39,8 @@ const SuccessPage = () => {
         }, 6000);
         setIsFetched(true); // Mark as fetched
       } catch (error) {
-        console.error("Error fetching user data or sending ID card:", error);
-        toast.error("Error sending ID card. Please try again.");
+        // console.error("Error fetching user data or sending ID card:", error);
+      
       }
     };
 

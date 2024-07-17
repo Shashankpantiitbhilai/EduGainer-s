@@ -50,10 +50,10 @@ const App = () => {
         const data = await fetchLibResources();
         setResources(data);
       } catch (error) {
-        console.error("Error fetching resources:", error);
+        // console.error("Error fetching resources:", error);
       }
     };
-    console.log(resourceUpdated);
+    // console.log(resourceUpdated);
 
     fetchResources();
   }, [resourceUpdated]);
@@ -66,7 +66,7 @@ const App = () => {
       );
       setResources(updatedResources);
     } catch (error) {
-      console.error("Error editing resource:", error);
+      // console.error("Error editing resource:", error);
     } finally {
       setLoading(false);
       setEditModeId(null);
@@ -80,7 +80,7 @@ const App = () => {
       toast.success("Resource deleted successfully");
       //  setResources(resources.filter((resource) => resource._id !== id));
     } catch (error) {
-      console.error("error in deleting", error);
+      // console.error("error in deleting", error);
       throw error;
     }
   };
@@ -114,11 +114,11 @@ const App = () => {
       setNewResource({ name: "", tags: [], file: null });
       setOpen(false);
       setUploadProgress(0);
-      console.log(resourceUpdated);
+      // console.log(resourceUpdated);
       setResourceUpdated(!resourceUpdated);
-      console.log(resourceUpdated);
+      // console.log(resourceUpdated);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      // console.error("Error uploading file:", error);
       toast.error("Failed to upload resource");
     }
   };

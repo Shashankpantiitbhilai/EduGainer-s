@@ -125,7 +125,7 @@ const AdminChat = () => {
 
           socket.on("receiveMessage", (message, roomId) => {
             if (roomId === admin_id) {
-              console.log("received message ", message);
+              // console.log("received message ", message);
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
                 message,
@@ -136,10 +136,10 @@ const AdminChat = () => {
             // Play the beep sound
             playBeep();
           });
-          console.log(messages);
+          // console.log(messages);
         }
       } catch (error) {
-        console.error("Error fetching resources:", error);
+        // console.error("Error fetching resources:", error);
       }
     };
 
@@ -151,7 +151,7 @@ const AdminChat = () => {
       setSelectedRoom(id);
       const response = await fetchAllChats(id);
       const roomId = id;
-      console.log(id, userRoomId, adminRoomId, selectedRoom);
+      // console.log(id, userRoomId, adminRoomId, selectedRoom);
       if (id === adminRoomId) {
         setAnnouncementMessages(response);
       } else {
@@ -159,13 +159,13 @@ const AdminChat = () => {
       }
 
       if (socketRef.current) {
-        console.log("emitted joinroom", roomId);
+        // console.log("emitted joinroom", roomId);
         socketRef.current.emit("joinRoom", roomId);
       }
     } catch (error) {
-      console.error("Error fetching chat messages:", error);
+      // console.error("Error fetching chat messages:", error);
     }
-    console.log(announcementMessages.length);
+    // console.log(announcementMessages.length);
   };
 
   const sendMessage = async (id) => {
@@ -182,13 +182,13 @@ const AdminChat = () => {
     };
 
     try {
-      console.log(id);
+      // console.log(id);
       if (socketRef.current) {
         socketRef.current.emit("sendMessage", messageData, selectedRoom);
       }
       setInput("");
     } catch (error) {
-      console.error("Error sending message:", error);
+      // console.error("Error sending message:", error);
     }
       await postChatMessages(messageData);
 

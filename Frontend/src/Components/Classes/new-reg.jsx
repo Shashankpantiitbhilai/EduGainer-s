@@ -105,13 +105,13 @@ const baseURL =
               throw new Error("Payment verification failed");
             }
           } catch (error) {
-            console.error("Error verifying payment:", error);
+            // console.error("Error verifying payment:", error);
           }
         },
         modal: {
           ondismiss: () => {
             setLoading(false);
-            console.error("Payment popup closed");
+            // console.error("Payment popup closed");
           },
         },
       };
@@ -119,7 +119,7 @@ const baseURL =
       const razor = new window.Razorpay(options);
       razor.open();
     } catch (error) {
-      console.error("Error processing payment:", error);
+      // console.error("Error processing payment:", error);
     } finally {
       setLoading(false);
     }

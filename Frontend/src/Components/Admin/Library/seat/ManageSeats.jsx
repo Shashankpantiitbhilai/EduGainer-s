@@ -15,6 +15,7 @@ import MultiplePersonsDialog from "./multiplePersonDialg";
 import DetailedPersonDialog from "./DetailedPersonDialog";
 import io from "socket.io-client";
 import { AdminContext } from "../../../../App";
+
 const ManageSeats = () => {
   const [selectedShift, setSelectedShift] = useState("6.30 AM to 2 PM");
   const [seatStatus, setSeatStatus] = useState({});
@@ -47,9 +48,11 @@ const ManageSeats = () => {
     process.env.NODE_ENV === "production"
       ? process.env.REACT_APP_BACKEND_PROD
       : process.env.REACT_APP_BACKEND_DEV;
+
   useEffect(() => {
     fetchData();
   }, [selectedShift]);
+
   useEffect(() => {
     const newSocket = io(url);
     const roomId = IsUserLoggedIn?._id; // Replace with your server URL
@@ -57,10 +60,10 @@ const ManageSeats = () => {
     newSocket?.emit("joinSeatsRoom", roomId);
     return () => newSocket.close();
   }, []);
+
   useEffect(() => {
     if (socket) {
-      socket.on("seatStatusUpdate", ({ id, status ,seat}) => {
-        console.log("seatstatusupdateadmin", id, status,seat);
+      socket.on("seatStatusUpdate", ({ id, status, seat }) => {
         setSeatStatus((prevStatus) => ({
           ...prevStatus,
           [seat]: status,
@@ -70,21 +73,22 @@ const ManageSeats = () => {
       });
     }
   }, [socket]);
+
   const fetchData = async () => {
-    try {let statusMap = {};
+    try {
+      let statusMap = {};
       const response = await getSeatsData();
       const selectedShiftData = response[selectedShift];
       if (selectedShiftData) {
-        
         selectedShiftData.forEach((e) => {
           statusMap[e.seat] = e.status || "Unpaid";
         });
         setSeatStatus(statusMap);
       } else {
-        console.error(`No data found for shift: ${selectedShift}`);
+        // Handle case where no data is found
       }
     } catch (error) {
-      console.error("Error fetching seat data:", error);
+      // Handle error fetching data
       setSnackbarMessage("Error fetching seat data");
       setSnackbarOpen(true);
     }
@@ -113,23 +117,26 @@ const ManageSeats = () => {
         setFormDialogOpen(true);
       }
     } catch (error) {
-      console.error("Error updating seat status:", error);
+      // Handle error updating status
       setSnackbarMessage("Error updating seat status");
       setSnackbarOpen(true);
     }
   };
 
   const handleFormSubmit = async (reg) => {
-    console.log(reg);
     try {
-      await updateSeatStatus(reg, "Paid",selectedSeat);
-      socket.emit("updateSeatStatus", { id: reg, status: "Paid",seat:selectedSeat });
+      await updateSeatStatus(reg, "Paid", selectedSeat);
+      socket.emit("updateSeatStatus", {
+        id: reg,
+        status: "Paid",
+        seat: selectedSeat,
+      });
       setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
       setSnackbarOpen(true);
       setFormDialogOpen(false);
       handleCloseDialog();
     } catch (error) {
-      console.error("Error updating seat status:", error);
+      // Handle error updating status
       setSnackbarMessage("Error updating seat status");
       setSnackbarOpen(true);
     }
@@ -166,7 +173,7 @@ const ManageSeats = () => {
       const seatdata = await getSeatInfo(selectedSeat);
       setSeatInfo(seatdata);
     } catch (error) {
-      console.error("Error fetching seat info:", error);
+      // Handle error fetching seat info
       setSnackbarMessage("Error fetching seat details");
       setSnackbarOpen(true);
     }
@@ -179,7 +186,7 @@ const ManageSeats = () => {
       setMultiplePersonsDialogOpen(false);
       setDetailedPersonDialogOpen(true);
     } catch (error) {
-      console.error("Error fetching student info:", error);
+      // Handle error fetching student info
       setSnackbarMessage("Error fetching student info");
       setSnackbarOpen(true);
     }
@@ -187,20 +194,19 @@ const ManageSeats = () => {
 
   const handleDeallocate = async (reg) => {
     try {
-    console.log(reg)
-      await updateSeatStatus(reg, "Left","0");
-        socket.emit("updateSeatStatus", {
-          id: reg,
-          status: "Left",
-          seat:selectedSeat
-        });
+      await updateSeatStatus(reg, "Left", "0");
+      socket.emit("updateSeatStatus", {
+        id: reg,
+        status: "Left",
+        seat: selectedSeat,
+      });
       setSnackbarMessage(
         `Seat for person with reg ${reg} has been deallocated`
       );
       setSnackbarOpen(true);
       fetchData(); // Refresh seat data after deallocation
     } catch (error) {
-      console.error("Error deallocating seat:", error);
+      // Handle error deallocating seat
       setSnackbarMessage("Error deallocating seat");
       setSnackbarOpen(true);
     }
@@ -214,7 +220,7 @@ const ManageSeats = () => {
   };
 
   return (
-    <Box sx={{ p: 4, maxWidth: "lg", mx: "auto" }}>
+    <Box sx={{ p: 4, maxWidth: "100%", mx: "auto" }}>
       <Box component="h1" sx={{ fontSize: "2xl", fontWeight: "bold", mb: 4 }}>
         Admin Library Seating Management
       </Box>
@@ -222,8 +228,9 @@ const ManageSeats = () => {
         selectedShift={selectedShift}
         onShiftChange={handleShiftChange}
       />
-      <Grid item xs={12} md={8}>
-        <Paper
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
+          <Paper
           elevation={2}
           sx={{ p: 2, borderRadius: 2, position: "relative" }}
         >
@@ -351,23 +358,11 @@ const ManageSeats = () => {
                   />
                 </Box>
               </Box>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                mt: 4,
-              }}
-            >
-              <Box sx={{ mr: 4 }}>door →</Box>
-              <Box sx={{ width: 64, height: 4, bgcolor: "black" }}></Box>
-            </Box>
-          </Box>
-        </Paper>
+              </Box>
+              </Box>
+          </Paper>
+        </Grid>
       </Grid>
-
       <SeatLegend />
       <SeatInfoDialog
         open={dialogOpen}
@@ -384,7 +379,6 @@ const ManageSeats = () => {
         onFormChange={handleFormChange}
         onFormSubmit={handleFormSubmit}
       />
-
       <MultiplePersonsDialog
         open={multiplePersonsDialogOpen}
         onClose={() => setMultiplePersonsDialogOpen(false)}
@@ -401,12 +395,9 @@ const ManageSeats = () => {
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
+        <Alert severity="info" onClose={handleCloseSnackbar}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

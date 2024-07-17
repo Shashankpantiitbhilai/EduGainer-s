@@ -19,10 +19,10 @@ function ResetPassword() {
       if (response && response.success) {
         navigate("/login");
       } else {
-        console.error("Error resetting password:", response.message);
+        // console.error("Error resetting password:", response.message);
       }
     } catch (error) {
-      console.error("Error resetting password:", error);
+      // console.error("Error resetting password:", error);
     }
   };
 

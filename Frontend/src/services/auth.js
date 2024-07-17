@@ -14,10 +14,10 @@ const axiosInstance = axios.create({
 export async function fetchCredentials() {
   try {
     const response = await axiosInstance.get("/auth/fetchAuth");
-    console.log(response.data)
+    // console.log(response.data)
     return response.data;
   } catch (error) {
-    console.error("Error fetching credentials:", error);
+    // console.error("Error fetching credentials:", error);
     return null;
   }
 }
@@ -28,14 +28,14 @@ export async function registerUser(email, password) {
       email,
       password,
     });
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 400) {
       return { message: "User already exists" }; // Return error message to handle on the client side
     } else {
 
-      console.error("Error registering user:", error);
+      // console.error("Error registering user:", error);
       return null;
     }
   }
@@ -43,12 +43,12 @@ export async function registerUser(email, password) {
 
 
 export async function verifyOTPAndRegisterUser(otp, id) {
-  console.log(otp);
+  // console.log(otp);
   try {
     const response = await axiosInstance.post("/auth/otp-verify", { otp, id });
-    console.log(response);
+    // console.log(response);
     if (response.status === 201) {
-      console.log("User registered successfully!");
+      // console.log("User registered successfully!");
       return { success: true, message: "User registered successfully", user: response };
     } else if (response.status === 400) {
       throw new Error("Invalid OTP: " + response.data.message);
@@ -62,12 +62,12 @@ export async function verifyOTPAndRegisterUser(otp, id) {
 
 export async function loginUser(email, password) {
   try {
-    console.log(email, password);
+    // console.log(email, password);
     const response = await axiosInstance.post("/auth/login", { email, password });
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (error) {
-    console.error("Error logging in user:", error);
+    // console.error("Error logging in user:", error);
     return null;
   }
 }
@@ -77,7 +77,7 @@ export async function registerStudentId(id, ID_No) {
     const response = await axiosInstance.post("/auth/google/register", { id, ID_No });
     return response.data;
   } catch (error) {
-    console.error("Error registering student ID:", error);
+    // console.error("Error registering student ID:", error);
     return null;
   }
 }
@@ -87,28 +87,28 @@ export async function logoutUser() {
     await axiosInstance.post("/auth/logout");
     return;
   } catch (error) {
-    console.error("Error logging out user:", error);
+    // console.error("Error logging out user:", error);
   }
 }
 
 export async function forgotPassword(email) {
   try {
     const response = await axiosInstance.post("/auth/forgot-password", { email });
-    console.log(response);
+    // console.log(response);
     if (response.data.Status === "Success") {
       // Redirect to login page upon successful password reset
       return response.data
     }
   } catch (error) {
-    console.error("Error resetting password:", error);
+    // console.error("Error resetting password:", error);
   }
 }
 export async function resetPassword(password, id, token) {
   try {
     const response = await axiosInstance.post(`/auth/reset-password/${id}/${token}`, { password });
-    console.log(response);
+    // console.log(response);
     if (response.data.success) {
-      console.log("Password reset successfully!");
+      // console.log("Password reset successfully!");
       return { success: true, message: "Password reset successfully" };
     } else {
       throw new Error("Error resetting password: " + response.data.message);

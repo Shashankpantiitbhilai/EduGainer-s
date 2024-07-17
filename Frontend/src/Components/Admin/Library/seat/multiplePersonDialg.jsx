@@ -51,15 +51,15 @@ const MultiplePersonsDialog = ({
 
   const handleConfirmDeallocate = async () => {
     try {
-      console.log(confirmDialog.person.reg)
-      console.log(confirmDialog.person.reg)
+      // console.log(confirmDialog.person.reg)
+      // console.log(confirmDialog.person.reg)
       await onDeallocate(confirmDialog.person.reg);
       setPersons((prevPersons) =>
         prevPersons.filter((p) => p._id !== confirmDialog.person._id)
       );
       setConfirmDialog({ open: false, person: null });
     } catch (error) {
-      console.error("Error deallocating person:", error);
+      // console.error("Error deallocating person:", error);
     }
   };
 

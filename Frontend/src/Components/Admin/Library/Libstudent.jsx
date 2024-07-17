@@ -92,10 +92,10 @@ const ManageSeats = () => {
         });
         setSeatStatus(statusMap);
       } else {
-        console.error(`No data found for shift: ${selectedShift}`);
+        // console.error(`No data found for shift: ${selectedShift}`);
       }
     } catch (error) {
-      console.error("Error fetching seat data:", error);
+      // console.error("Error fetching seat data:", error);
       setSnackbarMessage("Error fetching seat data");
       setSnackbarOpen(true);
     }

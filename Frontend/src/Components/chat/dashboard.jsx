@@ -120,9 +120,9 @@ const Chat = () => {
           const admin_id = admin._id;
 
           setAdminRoomId(admin_id);
-          console.log(adminRoomId)
+         
           setUserRoomId(user_id);
-console.log(process.env.REACT_APP_BACKEND_DEV);
+
 
 const url =
   process.env.NODE_ENV === "production"
@@ -138,9 +138,9 @@ const url =
           socketRef.current = socket;
 
           socket.on("receiveMessage", (message, roomId) => {
-            console.log("received message",message)
+           
             if (roomId === admin_id) {
-               console.log("received message announcement", message);
+              //  console.log("received message announcement", message);
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
                 message,
@@ -156,7 +156,7 @@ const url =
           };
         }
       } catch (error) {
-        console.error("Error fetching resources:", error);
+        // console.error("Error fetching resources:", error);
       }
     };
 
@@ -187,7 +187,7 @@ const url =
         setInput("");
         setError(""); // Clear error message after a successful send
       } catch (error) {
-        console.error("Error sending message:", error);
+        // console.error("Error sending message:", error);
       }
     }
   };
@@ -216,20 +216,20 @@ const playBeep = () => {
    try {
      const response = await fetchAllChats(id);
      const roomId = id;
-     console.log(id);
+   
      if (id === adminRoomId) {
        setAnnouncementMessages(response);
-       console.log("announcment", response, announcementMessages);
+      //  console.log("announcment", response, announcementMessages);
      } else {
        setMessages(response);
      }
      setSelectedRoom(id);
      if (socketRef.current) {
-       console.log("emitted joinroom", roomId);
+      //  console.log("emitted joinroom", roomId);
        socketRef.current.emit("joinRoom", roomId);
      }
    } catch (error) {
-     console.error("Error fetching chat messages:", error);
+    //  console.error("Error fetching chat messages:", error);
    }
  };
   return (

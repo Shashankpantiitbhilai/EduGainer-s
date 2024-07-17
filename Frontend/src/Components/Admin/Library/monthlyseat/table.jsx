@@ -52,7 +52,7 @@ const StudentManagementTable = () => {
         setData(bookings);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching booking data:", error);
+        // console.error("Error fetching booking data:", error);
         toast.error("Error fetching booking data.");
       }
     };
@@ -83,7 +83,7 @@ const StudentManagementTable = () => {
       setupdation(!updation);
       toast.success("Booking added successfully!");
     } catch (error) {
-      console.error("Error adding new booking:", error);
+      // console.error("Error adding new booking:", error);
       toast.error("Error adding new booking.");
     }
   };
@@ -100,7 +100,7 @@ const StudentManagementTable = () => {
       setupdation(!updation);
       toast.success("Booking deleted successfully!");
     } catch (error) {
-      console.error("Error deleting booking:", error);
+      // console.error("Error deleting booking:", error);
       toast.error("Error deleting booking.");
     }
   };
@@ -112,7 +112,7 @@ const StudentManagementTable = () => {
       setupdation(!updation);
       toast.success("Booking updated successfully!");
     } catch (error) {
-      console.error("Error updating booking:", error);
+      // console.error("Error updating booking:", error);
       toast.error("Error updating booking.");
     }
   };
@@ -147,62 +147,63 @@ const StudentManagementTable = () => {
       setData(updatedData);
       await updateColor(rowId, columnName, selectedColor);
     } catch (error) {
-      console.error("Error updating color:", error);
+      // console.error("Error updating color:", error);
     }
   };
 
+  const handleExport = async () => {
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Bookings");
 
+    // Add headers
+    worksheet.addRow(columnOrder);
 
+    // Add data and apply colors
+    data.forEach((item, rowIndex) => {
+      const row = worksheet.addRow(columnOrder.map((key) => item[key]));
 
+      // Apply colors to cells based on item.colors
+      if (item.colors) {
+        Object.entries(item.colors).forEach(([key, color]) => {
+          const colIndex = columnOrder.indexOf(key);
+          if (colIndex !== -1) {
+            const cell = row.getCell(colIndex + 1);
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: color.replace("#", "") },
+            };
+          }
+        });
+      }
+    });
 
-
-
-const handleExport = async () => {
-  // Create a new workbook and worksheet
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Bookings");
-
-  // Add headers
-  worksheet.addRow(columnOrder);
-
-  // Add data and apply colors
-  data.forEach((item) => {
-    const row = worksheet.addRow(columnOrder.map((key) => item[key]));
-
-    // Apply colors to cells based on item.colors
-    if (item.colors) {
-      Object.entries(item.colors).forEach(([key, color]) => {
-        const colIndex = columnOrder.indexOf(key);
-        if (colIndex !== -1) {
-          const cell = row.getCell(colIndex + 1);
-          cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: color.replace("#", "") },
-          };
+    // Auto-fit columns
+    worksheet.columns.forEach((column, index) => {
+      let maxLength = columnOrder[index].length;
+      column.eachCell({ includeEmpty: true }, (cell) => {
+        const columnLength = cell.value ? cell.value.toString().length : 10;
+        if (columnLength > maxLength) {
+          maxLength = columnLength;
         }
       });
-    }
-  });
+      column.width = maxLength < 10 ? 10 : maxLength + 2;
+    });
 
-  // Auto-fit columns
-  worksheet.columns.forEach((column) => {
-    column.width = 15;
-  });
+    // Generate Excel file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "bookings_export.xlsx";
+    link.click();
+    URL.revokeObjectURL(link.href);
 
-  // Generate Excel file
-  const buffer = await workbook.xlsx.writeBuffer();
-  const blob = new Blob([buffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "bookings_export.xlsx";
-  link.click();
-  URL.revokeObjectURL(link.href);
-
-  toast.success("Table exported successfully with colors!");
-};
+    toast.success("Booking Data exported successfully ");
+  };
   return (
     <Box sx={{ display: "flex" }}>
       {loading ? (

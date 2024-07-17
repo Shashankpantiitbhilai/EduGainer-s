@@ -14,12 +14,12 @@ const axiosInstance = axios.create({
 
 export async function quizUpload(url) {
     try {
-        console.log(url)
+        // console.log(url)
         const response = await axiosInstance.post("/quiz/home", { url });
-        console.log(response.data)
+        // console.log(response.data)
         return response.data;
     } catch (error) {
-        console.error("Error fetching credentials:", error);
+        // console.error("Error fetching credentials:", error);
         return null;
     }
 }

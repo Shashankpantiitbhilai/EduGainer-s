@@ -52,7 +52,7 @@ export async function editLibStudentById(id, data) {
 export const fileUpload = async (data, onUploadProgress) => {
     const formData = new FormData();
     formData.append('file', data);
-    console.log(data);
+    // console.log(data);
     // for (let pair of formData.entries()) {
     //     console.log(pair[0], pair[1]);
     // }

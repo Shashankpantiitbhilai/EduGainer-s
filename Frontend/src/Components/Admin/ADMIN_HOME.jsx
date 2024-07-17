@@ -26,7 +26,7 @@ function ADMIN_HOME() {
       setIsUserLoggedIn(false); // Update context to reflect logged out state
       navigate("/login"); // Redirect to login page after successful logout
     } catch (error) {
-      console.error("Error logging out:", error);
+      // console.error("Error logging out:", error);
     }
   };
 

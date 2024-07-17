@@ -58,7 +58,7 @@ const Dashboard = () => {
         const details = await fetchUserDataById(id);
         setLibraryDetails(details);
       } catch (error) {
-        console.error("Error fetching library details:", error);
+        // console.error("Error fetching library details:", error);
       }
     };
     const getStudentClassesDetails = async () => {
@@ -66,7 +66,7 @@ const Dashboard = () => {
         const details = await fetchUserClassesDataById(id);
         setClassesDetails(details);
       } catch (error) {
-        console.error("Error fetching library details:", error);
+        // console.error("Error fetching library details:", error);
       }
     };
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { sendFormData } from "../../services/utils";
 const Payment = ({ formData, imageBase64, userId, setLoading }) => {
   const navigate = useNavigate();
   const baseURL =
@@ -67,13 +67,13 @@ const Payment = ({ formData, imageBase64, userId, setLoading }) => {
               throw new Error("Payment verification failed");
             }
           } catch (error) {
-            console.error("Error verifying payment:", error);
+            // console.error("Error verifying payment:", error);
           }
         },
         modal: {
           ondismiss: () => {
             setLoading(false);
-            console.error("Payment popup closed");
+            // console.error("Payment popup closed");
           },
         },
       };
@@ -81,7 +81,7 @@ const Payment = ({ formData, imageBase64, userId, setLoading }) => {
       const razor = new window.Razorpay(options);
       razor.open();
     } catch (error) {
-      console.error("Error processing payment:", error);
+      // console.error("Error processing payment:", error);
     } finally {
       setLoading(false);
     }

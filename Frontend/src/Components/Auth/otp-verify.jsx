@@ -4,6 +4,8 @@ import { verifyOTPAndRegisterUser } from "../../services/auth";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { AdminContext } from "../../App";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function OTPVerify() {
   const {
@@ -15,24 +17,25 @@ function OTPVerify() {
   const [error, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const { id } = useParams();
-  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
+  const { setIsUserLoggedIn } = useContext(AdminContext);
 
   const onSubmit = async (data) => {
     try {
-      console.log(data);
       const response = await verifyOTPAndRegisterUser(data.otp, id);
       if (response.success) {
         setIsUserLoggedIn(response);
         navigate("/");
+        toast.success("OTP verified successfully!", {
+          position: toast.POSITION.TOP_CENTER,
+        });
       } else {
         setErrorMsg("OTP verification failed");
       }
     } catch (error) {
-      console.error("OTP verification error:", error);
       setErrorMsg("An error occurred while verifying OTP");
     }
   };
-  console.log(id);
+
   return (
     <Container
       maxWidth="sm"
@@ -43,6 +46,7 @@ function OTPVerify() {
         height: "100vh",
       }}
     >
+      <ToastContainer />
       <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
         <Typography variant="h5" component="h1" gutterBottom>
           Verify OTP

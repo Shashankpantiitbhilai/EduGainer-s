@@ -15,11 +15,11 @@ const Resources = () => {
     const fetchResources = async (query) => {
       try {
         const data = await fetchLibResources(query);
-        console.log(data);
+        // console.log(data);
 
         setResources(data);
       } catch (error) {
-        console.error("Error fetching resources:", error);
+        // console.error("Error fetching resources:", error);
       }
     };
 

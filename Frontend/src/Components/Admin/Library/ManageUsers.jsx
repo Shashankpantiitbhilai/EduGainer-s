@@ -17,8 +17,7 @@ import {
 import { Search, FileDownload } from "@mui/icons-material";
 import ConfirmationDialog from "./monthlyseat/confirm";
 import Button from "@mui/material/Button";
-import * as XLSX from "xlsx";
-
+import ExcelJS from "exceljs";
 export default function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [students, setStudents] = useState([]);
@@ -32,9 +31,9 @@ export default function SearchBar() {
       try {
         const defaultData = await fetchLibSudents();
         setStudents(defaultData);
-        console.log(defaultData);
+        // console.log(defaultData);
       } catch (error) {
-        console.error("Error fetching default data:", error);
+        // console.error("Error fetching default data:", error);
       }
     };
 
@@ -43,7 +42,7 @@ export default function SearchBar() {
 
   const handleEdit = async (id, data) => {
     setLoading(true);
-    console.log(id, data);
+    // console.log(id, data);
     try {
       await editLibStudentById(id, data);
       const updatedStudents = students.map((student) =>
@@ -52,7 +51,7 @@ export default function SearchBar() {
       setStudents(updatedStudents);
       toast.success("Student updated successfully");
     } catch (error) {
-      console.error("Error editing student:", error);
+      // console.error("Error editing student:", error);
       toast.error("Failed to update student");
     } finally {
       setLoading(false);
@@ -68,7 +67,7 @@ export default function SearchBar() {
       );
       toast.success("Student deleted successfully");
     } catch (error) {
-      console.error("Error deleting student:", error);
+      // console.error("Error deleting student:", error);
       toast.error("Failed to delete student");
     } finally {
       setDeleteDialogOpen(false);
@@ -87,19 +86,7 @@ export default function SearchBar() {
   const isEditMode = (id) => {
     return id === editModeId;
   };
-  const exportToExcel = () => {
-    const exportData = students.map((student) => {
-      const { _id, __v, ...exportStudent } = student;
-      return exportStudent;
-    });
-
-    const workSheet = XLSX.utils.json_to_sheet(exportData);
-    const workBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workBook, workSheet, "Students");
-    XLSX.writeFile(workBook, "StudentData.xlsx");
-  };
-
-
+ 
   const columns = [
     { field: "reg", headerName: "Reg", width: 30, editable: true },
     { field: "name", headerName: "Name", width: 150, editable: true },
@@ -212,6 +199,40 @@ export default function SearchBar() {
       ),
     },
   ];
+ const exportToExcel = async () => {
+   const exportData = students.map((student) => {
+     const { _id, __v, ...exportStudent } = student;
+     return exportStudent;
+   });
+  //  console.log(columns);
+   const workbook = new ExcelJS.Workbook();
+   const worksheet = workbook.addWorksheet("Students");
+  //  console.log(exportData[0], exportData, exportData.length);
+   // Add columns
+
+  if (exportData.length > 0) {
+    const excelColumns = columns.map((col) => ({
+      header: col.headerName,
+      key: col.field,
+    }));
+    worksheet.columns = excelColumns;
+  }
+   // Add rows
+   worksheet.addRows(exportData);
+
+   // Generate blob
+   const blob = await workbook.xlsx.writeBuffer();
+
+   // Create a download link
+   const url = window.URL.createObjectURL(new Blob([blob]));
+   const link = document.createElement("a");
+   link.href = url;
+   link.setAttribute("download", "StudentData.xlsx");
+   document.body.appendChild(link);
+   link.click();
+   link.remove();
+   toast.success("Library Database exported successfully");
+ };
 
   const filteredStudents = students.filter((student) =>
     Object.values(student).some(

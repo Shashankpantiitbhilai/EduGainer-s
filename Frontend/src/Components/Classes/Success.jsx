@@ -41,7 +41,7 @@ const SuccessClasses = () => {
         }, 6000);
         setIsFetched(true); // Mark as fetched
       } catch (error) {
-        console.error("Error fetching user data or sending ID card:", error);
+        // console.error("Error fetching user data or sending ID card:", error);
         toast.error("Error sending ID card. Please try again.");
       }
     };

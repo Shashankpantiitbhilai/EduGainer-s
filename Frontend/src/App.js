@@ -18,7 +18,7 @@ function App() {
     useEffect(() => {
         setIsLoading(true);
         fetchCredentials().then((User) => {
-            console.log(User);
+            // console.log(User);
             if (User) {
                 setIsUserLoggedIn(User);
             }
@@ -26,7 +26,7 @@ function App() {
         });
     }, []);
 
-    console.log(IsUserLoggedIn);
+    // console.log(IsUserLoggedIn);
 
     if (isLoading) {
         return <LoadingAnimation />;

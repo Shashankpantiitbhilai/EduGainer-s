@@ -57,7 +57,7 @@ export default function LibraryRegistration() {
         // console.log(response.eligible);
         setIsEligible(response.eligible);
       } catch (error) {
-        console.error("Error checking eligibility:", error);
+        // console.error("Error checking eligibility:", error);
         setIsEligible(false);
       }
     };
@@ -104,7 +104,7 @@ export default function LibraryRegistration() {
       await sendFormData(finalFormData);
       navigate(`/success/${id}`);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      // console.error("Error submitting form:", error);
     } finally {
       setLoading(false);
     }

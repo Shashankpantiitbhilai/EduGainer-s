@@ -22,7 +22,7 @@ export async function makeSeatEmpty(seat,shift) {
        
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -31,10 +31,10 @@ export async function getBookingData() {
     try {
         // console.log("hi")
         const response = await axiosInstance.get("/admin_library/getBookingData");
-       console.log(response.data)
+    //    console.log(response.data)
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -42,12 +42,12 @@ export async function getBookingData() {
 export async function updateSeatStatus(reg, status,seat) {
 console.log(reg,status,seat)
     try {
-        console.log(reg, status,seat)
+        // console.log(reg, status,seat)
         const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status ,seat});
 console.log(response.data)
         return response.data;
     } catch (error) {
-        console.error("Error updating seat status:", error);
+        // console.error("Error updating seat status:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -62,7 +62,7 @@ export async function updateColor(id, column, color) {
        
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -73,7 +73,7 @@ export async function getLegends() {
        
         return response.data;
     } catch (error) {
-        console.error("Error fetching legends:", error);
+        // console.error("Error fetching legends:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -85,7 +85,7 @@ export async function addLegend(legend) {
        
         return response.data;
     } catch (error) {
-        console.error("Error adding legend:", error);
+        // console.error("Error adding legend:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -97,7 +97,7 @@ export async function deleteLegend(id) {
        
         return response.data;
     } catch (error) {
-        console.error("Error deleting legend:", error);
+        // console.error("Error deleting legend:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -109,7 +109,7 @@ export async function deleteBooking(id) {
        
         return response.data;
     } catch (error) {
-        console.error("Error deleting legend:", error);
+        // console.error("Error deleting legend:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -120,7 +120,7 @@ export async function addBooking(data) {
        
         return response.data;
     } catch (error) {
-        console.error("Error adding booking:", error);
+        // console.error("Error adding booking:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -131,7 +131,7 @@ export async function updateBooking(data) {
        
         return response.data;
     } catch (error) {
-        console.error("Error updating booking:", error);
+        // console.error("Error updating booking:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -143,7 +143,7 @@ export async function getSeatInfo(seat) {
        
         return response.data;
     } catch (error) {
-        console.error("Error fetching seat info:", error);
+        // console.error("Error fetching seat info:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -154,7 +154,7 @@ export async function getStudentInfo(reg) {
        
         return response.data;
     } catch (error) {
-        console.error("Error fetching seat info:", error);
+        // console.error("Error fetching seat info:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }

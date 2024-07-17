@@ -57,13 +57,13 @@ function Navbar() {
       setIsUserLoggedIn(false); // Update context to reflect logged out state
       navigate("/"); // Redirect to login page after successful logout
     } catch (error) {
-      console.error("Error logging out:", error);
+      // console.error("Error logging out:", error);
     }
   };
   let pages = [];
   if (IsUserLoggedIn) {
     const role = IsUserLoggedIn.role;
-    console.log(role);
+    // console.log(role);
     if (role === "admin") {
       pages = [
         { name: "Library", link: "/admin_library" },
@@ -82,7 +82,7 @@ function Navbar() {
       ];
     }
   }
-  console.log(pages);
+  // console.log(pages);
 
   const settingsLoggedIn = [
     {
@@ -97,7 +97,7 @@ function Navbar() {
   ];
   const settings = settingsLoggedIn;
 
-  console.log(settings);
+  // console.log(settings);
   return (
     <div>
       <AppBar

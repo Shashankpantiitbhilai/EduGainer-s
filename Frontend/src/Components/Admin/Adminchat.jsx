@@ -52,7 +52,7 @@ const InputArea = styled(Grid)(({ theme }) => ({
 
 const Chat = ({ user }) => {
   const { IsUserLoggedIn } = useContext(AdminContext);
-  console.log(IsUserLoggedIn);
+  // console.log(IsUserLoggedIn);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 

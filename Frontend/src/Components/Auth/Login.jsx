@@ -56,7 +56,7 @@ function Login() {
   const onSubmit = async (data) => {
     try {
       const response = await loginUser(data.email, data.password);
-      console.log(response);
+      // console.log(response);
       if (response && response.user.role === "user") {
         setIsUserLoggedIn(response.user);
           toast.success("Login successful", { autoClose: 2000 });
@@ -79,7 +79,7 @@ function Login() {
         }, 2000);
       }
     } catch (error) {
-      console.error("Login error:", error);
+      // console.error("Login error:", error);
     }
   };
 

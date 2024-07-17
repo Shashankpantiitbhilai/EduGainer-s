@@ -33,7 +33,7 @@ function ForgotPassword() {
         });
       }
     } catch (error) {
-      console.log("Error:", error);
+     
       setError("email", {
         type: "manual",
         message: "Error: Something went wrong",

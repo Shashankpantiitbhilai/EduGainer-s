@@ -89,7 +89,7 @@ const Profile = () => {
     try {
       setUser(IsUserLoggedIn); // Ensure response.data contains the user object
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      // console.error("Error fetching user data:", error);
       setError("Failed to fetch user data.");
     }
   };
@@ -129,7 +129,7 @@ const Profile = () => {
       setEditing(false);
       setError(null); // Clear any previous errors
     } catch (error) {
-      console.error("Error saving user data:", error);
+      // console.error("Error saving user data:", error);
       setError("Failed to save user data."); // Set an error message
     } finally {
       setLoading(false);

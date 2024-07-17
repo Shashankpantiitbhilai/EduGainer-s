@@ -19,10 +19,10 @@ export async function fetchChatMessages() {
 
     try {
         const response = await axiosInstance.get("/chat/fetchChatMessages");
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -30,12 +30,12 @@ export async function fetchChatMessages() {
 export async function postChatMessages(messagedata) {
 
     try {
-        console.log(messagedata)
+        // console.log(messagedata)
         const response = await axiosInstance.post("/chat/postChatMessages", messagedata);
-        console.log(response.data);
+        // console.log(response.data);
         return response.data;
     } catch (error) {
-        console.error("Error sending form data:", error);
+        // console.error("Error sending form data:", error);
         throw error; // Propagate the error to handle it in the calling component
     }
 }
@@ -43,18 +43,18 @@ export async function postChatMessages(messagedata) {
 export async function fetchAdminCredentials() {
     try {
         const response = await axiosInstance.get("/chat/fetchAdminCredentials");
-        console.log("utils", response);
+        // console.log("utils", response);
         const { _id, role, strategy, username } = response.data[0];
 
         // Log individual properties to ensure they are correctly parsed
-        console.log("Parsed _id:", _id);
-        console.log("Role:", role);
-        console.log("Strategy:", strategy);
-        console.log("Username:", username);
+        // console.log("Parsed _id:", _id);
+        // console.log("Role:", role);
+        // console.log("Strategy:", strategy);
+        // console.log("Username:", username);
 
         return response.data[0];
     } catch (error) {
-        console.error("Error fetching credentials:", error);
+        // console.error("Error fetching credentials:", error);
         return null;
     }
 }
