@@ -61,12 +61,17 @@ const LibStudentSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-
+  amount: {
+  type:String
+},
   address: {
     type: String,
     // required: true,
   },
-
+  shift: {
+    type: String,
+    
+},
   image: {
     publicId: {
       type: String,
@@ -118,6 +123,10 @@ const LibStudentSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
+  consent: {
+    type: String,
+    default:"Agreed"
+  }
 });
 
 const bookingSchema = new mongoose.Schema({

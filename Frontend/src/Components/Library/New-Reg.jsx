@@ -2,6 +2,10 @@ import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import {
+  Alert,
+  
+  AlertTitle,
+  Divider,
   Container,
   Paper,
   Typography,
@@ -17,21 +21,27 @@ import {
   MenuItem,
   Box,
   Avatar,
-  Alert,
-  AlertTitle,
   Card,
   CardContent,
-  Divider,
+  Checkbox,
+  FormControlLabel,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
-import { HowToReg, Info } from "@mui/icons-material";
+
+import { HowToReg, CheckCircleOutline,Info } from "@mui/icons-material";
 import { AdminContext } from "../../App";
-import { sendFormData } from "../../services/utils";
 import { eligibleForNewRegistration } from "../../services/library/utils";
+import Payment from "../payment/payment"; // Import the Payment function
 
 const steps = [
+  "Benefits",
   "Personal Information",
   "Contact Details",
   "Additional Information",
+  "Payment",
 ];
 
 export default function LibraryRegistration() {
@@ -48,16 +58,23 @@ export default function LibraryRegistration() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [isEligible, setIsEligible] = useState(null);
+  const [consentGiven, setConsentGiven] = useState(false);
+
+  // Use the Payment function
+  const { initializePayment } = Payment({
+    formData,
+    imageBase64,
+    amount: 1,
+    userId: id,
+    setLoading,
+  });
 
   useEffect(() => {
     const checkEligibility = async () => {
       try {
-        // console.log(IsUserLoggedIn?._id);
         const response = await eligibleForNewRegistration(id);
-        // console.log(response.eligible);
         setIsEligible(response.eligible);
       } catch (error) {
-        // console.error("Error checking eligibility:", error);
         setIsEligible(false);
       }
     };
@@ -94,25 +111,57 @@ export default function LibraryRegistration() {
   };
 
   const onSubmit = async () => {
-    setLoading(true);
-    try {
-      const finalFormData = {
-        ...formData,
-        image: imageBase64,
-        userId: id,
-      };
-      await sendFormData(finalFormData);
-      navigate(`/success/${id}`);
-    } catch (error) {
-      // console.error("Error submitting form:", error);
-    } finally {
-      setLoading(false);
+    console.log(formData)
+    if (activeStep === steps.length - 1) {
+     
+      await initializePayment();
+    } else {
+      handleNext();
     }
   };
-
+  const shifts = [
+    "6:30 AM to 2 PM",
+    "2 PM to 9:30 PM",
+    "6:30 PM to 11 PM",
+    "9:30 PM to 6:30 AM",
+    "2 PM to 11 PM",
+    "6:30 AM to 6:30 PM",
+    "24*7",
+  ];
   const getStepContent = (step) => {
     switch (step) {
       case 0:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Benefits of Online Library Registration
+              </Typography>
+              <List>
+                {[
+                  "Guaranteed Seats and Priority Access",
+                  "Secure Your Spot in Advance",
+                  "Priority Processing",
+                  "Reserve Your Preferred Time Slot",
+                  "Complete Registration from Anywhere",
+                  "Be Among the First",
+                ].map((benefit, index) => (
+                  <ListItem key={index}>
+                    <ListItemIcon>
+                      <CheckCircleOutline color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary={benefit} />
+                  </ListItem>
+                ))}
+              </List>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                Don't wait - register online now and step into a world of
+                knowledge with confidence and ease!
+              </Typography>
+            </Grid>
+          </Grid>
+        );
+      case 1:
         return (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
@@ -208,7 +257,7 @@ export default function LibraryRegistration() {
           </Grid>
         );
 
-      case 1:
+      case 2:
         return (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
@@ -300,7 +349,7 @@ export default function LibraryRegistration() {
             </Grid>
           </Grid>
         );
-      case 2:
+      case 3:
         return (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
@@ -337,6 +386,31 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="shift"
+                control={control}
+                defaultValue={formData.shift || ""}
+                rules={{ required: "Shift selection is required" }}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.shift}>
+                    <InputLabel>Preferred Shift</InputLabel>
+                    <Select {...field} label="Preferred Shift">
+                      {shifts.map((shift) => (
+                        <MenuItem key={shift} value={shift}>
+                          {shift}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.shift && (
+                      <Typography color="error" variant="caption">
+                        {errors.shift.message}
+                      </Typography>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
             <Grid item xs={12}>
               <Controller
                 name="image"
@@ -369,6 +443,35 @@ export default function LibraryRegistration() {
                 )}
               />
               {imageBase64 && <Avatar src={imageBase64} alt="Uploaded Photo" />}
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={consentGiven}
+                    onChange={(e) => setConsentGiven(e.target.checked)}
+                    name="consentCheckbox"
+                    color="primary"
+                  />
+                }
+                label="I agree to the privacy policy, terms of conditions, and agree to abide by the rules and regulations of the library."
+              />
+            </Grid>
+          </Grid>
+        );
+      case 4:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="h6">Payment Details</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1">Registration Fee: ₹100</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body2">
+                Click "Submit" to proceed with the payment.
+              </Typography>
             </Grid>
           </Grid>
         );
@@ -436,6 +539,7 @@ export default function LibraryRegistration() {
       </Container>
     );
   }
+
   return (
     <Container component="main" maxWidth="md" sx={{ my: 10 }}>
       <Paper elevation={6} sx={{ p: 4 }}>
@@ -462,12 +566,16 @@ export default function LibraryRegistration() {
                 type="button"
                 variant="contained"
                 onClick={onSubmit}
-                disabled={loading}
+                disabled={loading || !consentGiven}
               >
-                Submit
+                Submit and Pay ₹100
               </Button>
             ) : (
-              <Button type="submit" variant="contained">
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={activeStep === 3 && !consentGiven}
+              >
                 Next
               </Button>
             )}

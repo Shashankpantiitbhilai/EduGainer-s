@@ -31,7 +31,7 @@ export default function SearchBar() {
       try {
         const defaultData = await fetchLibSudents();
         setStudents(defaultData);
-        // console.log(defaultData);
+        console.log(defaultData);
       } catch (error) {
         // console.error("Error fetching default data:", error);
       }
@@ -164,6 +164,12 @@ export default function SearchBar() {
         params.row.examPreparation ? (
           <span>{params.row.examPreparation}</span>
         ) : null,
+    },
+    {
+      field: "consent",
+      headerName: "Consent",
+      width: 150,
+    
     },
     {
       field: "actions",

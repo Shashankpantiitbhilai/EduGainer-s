@@ -57,24 +57,13 @@ router.put('/profile/:id', async (req, res) => {
 
 
 
-router.post("/Lib-new-reg", async (req, res) => {
-  const {
-    name,
-    email,
-    image,
-    mobile,
-    address,
-    userId,
-    gender,
-    dob,
-    fatherName,
-    motherName,
-    contact1,
-    contact2,
-    aadhaar,
-    examPreparation
-  } = req.body;
 
+ 
+
+router.post("/Lib-new-reg", async (req, res) => {
+  const { reg,name, email, image, mobile, shift, address, amount, userId ,consent} = req.body;
+  // console.log(req.body);
+  console.log(userId,name);
   try {
     let imageData = {};
     if (image) {
@@ -82,37 +71,44 @@ router.post("/Lib-new-reg", async (req, res) => {
       imageData = results;
     }
 
+    // Generate Razorpay order first
+    const order = await createOrder(amount);
+console.log(order)
+    // Create user with the order ID
     const user = await LibStudent.create({
+      consent,
+      reg,
       userId,
       name,
       email,
+      shift,
       mobile,
       address,
+      amount,
       image: {
         publicId: imageData.publicId,
         url: imageData.url,
-      },
-      gender,
-      dob,
-      fatherName,
-      motherName,
-      contact1,
-      contact2,
-      aadhaar,
-      examPreparation
+      }, Payment_detail: {
+        razorpay_order_id: order.id,
+        razorpay_payment_id: "" // Payment ID will be updated after payment verification
+      }
     });
+
+    // console.log(user);
 
     res.status(200).json({
       success: true,
-      user
+      order,
+      user,
+      key: process.env.KEY_ID_RZRPAY
     });
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Error creating user or processing payment:", error);
     res.status(500).json({ error: "A server error occurred with this request" });
   }
-}
-);
- 
+});
+
+
 // Function for registration without payment
 
  
@@ -166,7 +162,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
   const { user_id } = req.params; // Capture user ID from URL parameters
 
   // Verify the payment signature
-  console.log(user_id, "paymentverify");
+  console.log(user_id, "paymentverify","jjjjjjjjjjjjjjjjjjjj");
   const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
   console.log(isSignatureValid, "payment verify")
   if (isSignatureValid) {
