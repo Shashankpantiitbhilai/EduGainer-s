@@ -55,23 +55,23 @@ const LibStudentSchema = new mongoose.Schema({
     // required: true,
   },
   reg: {
-  type:String
-},
+    type: String
+  },
   email: {
     type: String,
     // required: true,
   },
   amount: {
-  type:String
-},
+    type: String
+  },
   address: {
     type: String,
     // required: true,
   },
   shift: {
     type: String,
-    
-},
+
+  },
   image: {
     publicId: {
       type: String,
@@ -89,7 +89,7 @@ const LibStudentSchema = new mongoose.Schema({
     },
     razorpay_payment_id: {
       type: String,
-      required: false, // This will be updated after payment verification
+       // This will be updated after payment verification
     },
   },
   gender: {
@@ -97,7 +97,7 @@ const LibStudentSchema = new mongoose.Schema({
     // required: true,
   },
   dob: {
-    type: Date,
+    type: String,
     // required: true,
   },
   fatherName: {
@@ -108,14 +108,14 @@ const LibStudentSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-  contactNo1: {
+  contact1: {
     type: String,
     // required: true,
   },
-  contactNo2: {
+  contact2: {
     type: String,
   },
-  aadhaarNo: {
+  aadhaar: {
     type: String,
     // required: true,
   },
@@ -125,7 +125,7 @@ const LibStudentSchema = new mongoose.Schema({
   },
   consent: {
     type: String,
-    default:"Agreed"
+    default: "Agreed"
   }
 });
 
@@ -149,12 +149,19 @@ const bookingSchema = new mongoose.Schema({
     // required: true
   },
   date: {
-    type: Date,
+    type: String,
 
   },
   cash: {
     type: String,
     default: 0
+  },
+  TotalMoney: {
+    type: String,
+  },
+  DueOrAdvance: {
+    type: String,
+
   },
   online: {
     type: String,
@@ -173,6 +180,16 @@ const bookingSchema = new mongoose.Schema({
   remarks: {
     type: String,
     default: ''
+  },
+  Payment_detail: {
+    razorpay_order_id: {
+      type: String,
+      // required: true,
+    },
+    razorpay_payment_id: {
+      type: String,
+      required: false, // This will be updated after payment verification
+    },
   },
   status: {
     type: String,

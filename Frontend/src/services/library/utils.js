@@ -37,12 +37,40 @@ export async function eligibleForNewRegistration(user_id) {
     }
 }
 
+export async function fetchLibStudent(reg) {
+    console.log(reg)
+    try {
+        // console.log(user_id)
+        const response = await axiosInstance.get(`/library/fetchStudent/${reg}`);
+        console.log(response.data);// Adjust the endpoint as per your API
+        return response.data; // Assuming the API returns JSON data representing the user object
+    } catch (error) {
+        // console.error("Error fetching user data:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
 
 
 export async function getStudentLibSeat(id) {
     try {
         // console.log(id)
         const response = await axiosInstance.get(`/library/getStudentLibSeat/${id}`);
+        // console.log(response.data);// Adjust the endpoint as per your API
+        return response.data; // Assuming the API returns JSON data representing the user object
+    } catch (error) {
+        // console.error("Error fetching user seats:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+
+
+export async function sendFeeData(formData) {
+    try {
+        console.log(formData)
+        console.log(formData)
+        const response = await axiosInstance.post("/library/sendFeeData", formData);
+        console.log(response.data)
         // console.log(response.data);// Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object
     } catch (error) {

@@ -9,4 +9,6 @@ export const columnOrder = [
     "fee",
     "remarks",
     "status",
+    "DueOrAdvance",
+    "Total"
 ];

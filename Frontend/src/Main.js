@@ -30,6 +30,8 @@ import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
 import ManageBooking from "./Components/Admin/Library/monthlyseat/table.jsx";
 import Policies from "./Components/policies/Policies.jsx";
 import StudentManagementTable from "./Components/Admin/Library/seat/ManageSeats.jsx";
+import  Fee from "./Components/Library/fee.jsx"
+// import FeePaymentSuccess from "./Components/Library/fee-pay-success.jsx"
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -50,6 +52,24 @@ const Main = () => {
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
                 <Route path="/chat/home" element={<ProtectedUser><Chat /> </ProtectedUser >} />
                 <Route path="/Policies" element={<Policies />} />
+                <Route
+                    path="/library/fee-pay"
+                    element={
+                        <ProtectedUser>
+                            <Fee />
+                        </ProtectedUser>
+                    }
+                />
+                
+                  {/* <Route
+                    path="/fee-payment-success/:id"
+                    element={
+                        <ProtectedUser>
+                            <FeePaymentSuccess/>
+                        </ProtectedUser>
+                    }
+                /> */}
+                
                 <Route
                     path="/admin/chat"
                     element={

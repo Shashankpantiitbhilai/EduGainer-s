@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CircularProgress from "@mui/material/CircularProgress";
+import {
+  TextField,
+  Box,
+  Button,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+import { Search, FileDownload, Edit, Save, Delete } from "@mui/icons-material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -14,26 +18,29 @@ import {
   deleteLibStudent,
   editLibStudentById,
 } from "../../../services/Admin_services/adminUtils";
-import { Search, FileDownload } from "@mui/icons-material";
 import ConfirmationDialog from "./monthlyseat/confirm";
-import Button from "@mui/material/Button";
 import ExcelJS from "exceljs";
-export default function SearchBar() {
+
+export default function EnhancedStudentGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editModeId, setEditModeId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [cellDialogOpen, setCellDialogOpen] = useState(false);
+  const [cellDialogContent, setCellDialogContent] = useState({
+    title: "",
+    content: "",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const defaultData = await fetchLibSudents();
         setStudents(defaultData);
-        console.log(defaultData);
       } catch (error) {
-        // console.error("Error fetching default data:", error);
+        toast.error("Error fetching student data");
       }
     };
 
@@ -42,7 +49,6 @@ export default function SearchBar() {
 
   const handleEdit = async (id, data) => {
     setLoading(true);
-    // console.log(id, data);
     try {
       await editLibStudentById(id, data);
       const updatedStudents = students.map((student) =>
@@ -51,7 +57,6 @@ export default function SearchBar() {
       setStudents(updatedStudents);
       toast.success("Student updated successfully");
     } catch (error) {
-      // console.error("Error editing student:", error);
       toast.error("Failed to update student");
     } finally {
       setLoading(false);
@@ -67,7 +72,6 @@ export default function SearchBar() {
       );
       toast.success("Student deleted successfully");
     } catch (error) {
-      // console.error("Error deleting student:", error);
       toast.error("Failed to delete student");
     } finally {
       setDeleteDialogOpen(false);
@@ -75,170 +79,122 @@ export default function SearchBar() {
     }
   };
 
-  const enterEditMode = (id) => {
-    setEditModeId(id);
+  const handleCellClick = (params) => {
+    if (params.field !== "actions" && editModeId === null) {
+      setCellDialogContent({
+        title: params.colDef.headerName,
+        content: params.value,
+      });
+      setCellDialogOpen(true);
+    }
   };
 
-  const exitEditMode = () => {
-    setEditModeId(null);
-  };
-
-  const isEditMode = (id) => {
-    return id === editModeId;
-  };
- 
   const columns = [
     { field: "reg", headerName: "Reg", width: 30, editable: true },
+    { field: "amount", headerName: "Amount", width: 30, editable: true },
     { field: "name", headerName: "Name", width: 150, editable: true },
     { field: "email", headerName: "Email", width: 150, editable: true },
     { field: "address", headerName: "Address", width: 100, editable: true },
+    { field: "shift", headerName: "Shift", width: 150, editable: true },
+    { field: "contact1", headerName: "ContactNo1", width: 150, editable: true },
+    { field: "contact2", headerName: "ContactNo2", width: 150, editable: true },
     {
       field: "image",
       headerName: "Image",
       width: 80,
+      editable: true,
       renderCell: (params) =>
-        params.row.image && params.row.image.url ? (
+        params.value && params.value.url ? (
           <img
-            src={params.row.image.url}
+            src={params.value.url}
             alt="User"
-            style={{ width: 50, height: 50, borderRadius: "50%" }}
+            style={{ width: 40, height: 40, borderRadius: "50%" }}
           />
         ) : null,
     },
-    {
-      field: "gender",
-      headerName: "Gender",
-      width: 50,
-      renderCell: (params) =>
-        params.row.gender ? <span>{params.row.gender}</span> : null,
-    },
+    { field: "gender", headerName: "Gender", width: 50 },
     {
       field: "dob",
+      editable: true,
       headerName: "Date of Birth",
       width: 80,
-      renderCell: (params) =>
-        params.row.dob ? (
-          <span>{new Date(params.row.dob).toLocaleDateString()}</span>
-        ) : null,
     },
     {
       field: "fatherName",
+      editable: true,
       headerName: "Father's Name",
       width: 100,
-      renderCell: (params) =>
-        params.row.fatherName ? <span>{params.row.fatherName}</span> : null,
     },
     {
       field: "motherName",
+      editable: true,
       headerName: "Mother's Name",
       width: 100,
-      renderCell: (params) =>
-        params.row.motherName ? <span>{params.row.motherName}</span> : null,
     },
-    {
-      field: "contactNo1",
-      headerName: "Contact No 1",
-      width: 100,
-      renderCell: (params) =>
-        params.row.contactNo1 ? <span>{params.row.contactNo1}</span> : null,
-    },
-    {
-      field: "contactNo2",
-      headerName: "Contact No 2",
-      width: 100,
-      renderCell: (params) =>
-        params.row.contactNo2 ? <span>{params.row.contactNo2}</span> : null,
-    },
-    {
-      field: "aadhaarNo",
-      headerName: "Aadhaar",
-      width: 150,
-      renderCell: (params) =>
-        params.row.aadhaarNo ? <span>{params.row.aadhaarNo}</span> : null,
-    },
+    { field: "aadhaar", editable: true, headerName: "Aadhaar", width: 150 },
     {
       field: "examPreparation",
+      editable: true,
       headerName: "Exam Preparation",
       width: 100,
-      renderCell: (params) =>
-        params.row.examPreparation ? (
-          <span>{params.row.examPreparation}</span>
-        ) : null,
     },
-    {
-      field: "consent",
-      headerName: "Consent",
-      width: 150,
-    
-    },
+    { field: "consent", editable: true, headerName: "Consent", width: 150 },
     {
       field: "actions",
       headerName: "Actions",
       width: 150,
       renderCell: (params) => (
-        <div>
-          {isEditMode(params.row._id) ? (
-            <IconButton
-              onClick={() => handleEdit(params.row._id, params.row)}
-              style={{ color: "light-green" }}
-            >
-              <SaveIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={() => enterEditMode(params.row._id)}
-              style={{ color: "red" }}
-            >
-              <EditIcon />
-            </IconButton>
-          )}
+        <Box>
+          <IconButton
+            onClick={() => {
+              if (editModeId === params.row._id) {
+                handleEdit(params.row._id, params.row);
+              } else {
+                setEditModeId(params.row._id);
+              }
+            }}
+            color="primary"
+          >
+            {editModeId === params.row._id ? <Save /> : <Edit />}
+          </IconButton>
           <IconButton
             onClick={() => {
               setDeleteDialogOpen(true);
               setStudentToDelete(params.row._id);
             }}
-            style={{ color: "blue" }}
+            color="error"
           >
-            <DeleteIcon />
+            <Delete />
           </IconButton>
-        </div>
+        </Box>
       ),
     },
   ];
- const exportToExcel = async () => {
-   const exportData = students.map((student) => {
-     const { _id, __v, ...exportStudent } = student;
-     return exportStudent;
-   });
-  //  console.log(columns);
-   const workbook = new ExcelJS.Workbook();
-   const worksheet = workbook.addWorksheet("Students");
-  //  console.log(exportData[0], exportData, exportData.length);
-   // Add columns
 
-  if (exportData.length > 0) {
-    const excelColumns = columns.map((col) => ({
-      header: col.headerName,
-      key: col.field,
-    }));
-    worksheet.columns = excelColumns;
-  }
-   // Add rows
-   worksheet.addRows(exportData);
+  const exportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Students");
 
-   // Generate blob
-   const blob = await workbook.xlsx.writeBuffer();
+    // Add headers
+    worksheet.addRow(columns.map((col) => col.headerName));
 
-   // Create a download link
-   const url = window.URL.createObjectURL(new Blob([blob]));
-   const link = document.createElement("a");
-   link.href = url;
-   link.setAttribute("download", "StudentData.xlsx");
-   document.body.appendChild(link);
-   link.click();
-   link.remove();
-   toast.success("Library Database exported successfully");
- };
+    // Add data
+    students.forEach((student) => {
+      worksheet.addRow(columns.map((col) => student[col.field]));
+    });
+
+    // Generate blob
+    const blob = await workbook.xlsx.writeBuffer();
+
+    // Create download link
+    const url = window.URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "students.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
 
   const filteredStudents = students.filter((student) =>
     Object.values(student).some(
@@ -249,18 +205,14 @@ export default function SearchBar() {
   );
 
   return (
-    <>
+    <Box sx={{ height: "80vh", width: "100%", p: 2 }}>
       <ToastContainer />
       <Box
         sx={{
-          width: "100%",
-          maxWidth: 500,
-          margin: "0 auto",
-          mt: 4,
-          mb: 2,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mb: 2,
         }}
       >
         <TextField
@@ -280,34 +232,78 @@ export default function SearchBar() {
           Export to Excel
         </Button>
       </Box>
-      <div style={{ height: 800, width: "100%", margin: 8 }}>
-        <DataGrid
-          rows={filteredStudents}
-          columns={columns}
-          pageSize={10}
-          pagination
-          getRowId={(row) => row._id}
-          checkboxSelection
-        />
-        {loading && (
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 9999,
-            }}
-          >
-            <CircularProgress />
-          </div>
-        )}
-      </div>
+      <DataGrid
+        rows={filteredStudents}
+        columns={columns}
+        pageSize={30}
+        rowsPerPageOptions={[10, 25, 50]}
+       
+        loading={loading}
+        getRowId={(row) => row._id}
+        onCellClick={handleCellClick}
+        sx={{
+          "& .MuiDataGrid-root": {
+            border: "1px solid #ddd",
+          },
+          "& .MuiDataGrid-cell": {
+            borderRight: "1px solid #ddd",
+            borderBottom: "1px solid #ddd",
+            maxHeight: "40px!important",
+            minHeight: "40px!important",
+            display: "flex",
+            alignItems: "center",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "orange",
+            color: "#fff",
+            fontWeight: "bold",
+            borderBottom: "2px solid #1565c0",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            borderRight: "1px solid #1565c0",
+            backgroundColor: "orange",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-row": {
+            maxHeight: "40px!important",
+            minHeight: "40px!important",
+          },
+          "& .MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
+          "& .MuiDataGrid-cell:hover": {
+            backgroundColor: "green",
+          },
+        }}
+      />
       <ConfirmationDialog
         open={deleteDialogOpen}
         handleClose={() => setDeleteDialogOpen(false)}
         handleConfirm={handleDelete}
       />
-    </>
+      <Dialog open={cellDialogOpen} onClose={() => setCellDialogOpen(false)}>
+        <DialogTitle>{cellDialogContent.title}</DialogTitle>
+        <DialogContent>
+          {cellDialogContent.title === "Image" ? (
+            <img
+              src={cellDialogContent.content?.url}
+              alt="User"
+              style={{
+                width: "100%",
+                maxHeight: "300px",
+                objectFit: "contain",
+              }}
+            />
+          ) : (
+            <p>{cellDialogContent.content}</p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCellDialogOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }

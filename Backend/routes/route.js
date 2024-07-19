@@ -61,9 +61,9 @@ router.put('/profile/:id', async (req, res) => {
  
 
 router.post("/Lib-new-reg", async (req, res) => {
-  const { reg,name, email, image, mobile, shift, address, amount, userId ,consent} = req.body;
+  const { reg,name, email, image,  shift, address, amount, userId ,consent,gender,dob,fatherName,motherName,aadhaar,contact1,contact2,examPreparation} = req.body;
   // console.log(req.body);
-  console.log(userId,name);
+  console.log(req.body,"dnnddndn");
   try {
     let imageData = {};
     if (image) {
@@ -79,10 +79,18 @@ console.log(order)
       consent,
       reg,
       userId,
+      fatherName,
+      motherName,
+      gender,
+      dob,
+      contact1,
+      contact2,
+      aadhaar,
+      examPreparation,
       name,
       email,
       shift,
-      mobile,
+    
       address,
       amount,
       image: {
@@ -162,7 +170,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
   const { user_id } = req.params; // Capture user ID from URL parameters
 
   // Verify the payment signature
-  console.log(user_id, "paymentverify","jjjjjjjjjjjjjjjjjjjj");
+
   const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
   console.log(isSignatureValid, "payment verify")
   if (isSignatureValid) {
