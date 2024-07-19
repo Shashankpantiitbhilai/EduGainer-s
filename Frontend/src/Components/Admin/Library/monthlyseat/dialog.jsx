@@ -7,8 +7,23 @@ import {
   Button,
   TextField,
   Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  FormHelperText,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
+
+const shifts = [
+  "6:30 AM to 2 PM",
+  "2 PM to 9:30 PM",
+  "6:30 PM to 11 PM",
+  "9:30 PM to 6:30 AM",
+  "2 PM to 11 PM",
+  "6:30 AM to 6:30 PM",
+  "24*7",
+];
 
 const BookingDialog = ({
   open,
@@ -21,34 +36,33 @@ const BookingDialog = ({
     handleSubmit,
     formState: { errors },
     reset,
-    setValue, // Added to manually set form values
+    setValue,
   } = useForm();
 
-  // Reset form values whenever defaultValues change
   useEffect(() => {
     if (open) {
-      // Set form values from defaultValues
       Object.keys(defaultValues).forEach((key) => {
         setValue(key, defaultValues[key]);
       });
     }
   }, [open, defaultValues, setValue]);
 
-  // Handle form submission
   const onSubmit = (data) => {
     handleSubmitForm(data);
-    reset(); // Reset form after submission
-    handleClose(); // Close dialog after submission
+    reset();
+    handleClose();
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle>
-          {defaultValues ? `Edit Booking ${defaultValues.name}` : "Add New Booking"}
+          {defaultValues
+            ? `Edit Booking ${defaultValues.name}`
+            : "Add New Booking"}
         </DialogTitle>
         <DialogContent>
-            <Grid container spacing={2}>
+          <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
                 {...register("reg", { required: "Registration is required" })}
@@ -114,14 +128,21 @@ const BookingDialog = ({
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                {...register("shift", { required: "Shift is required" })}
-                label="Shift"
-                fullWidth
-                error={!!errors.shift}
-                helperText={errors.shift?.message}
-                defaultValue={defaultValues?.shift || ""}
-              />
+              <FormControl fullWidth error={!!errors.shift}>
+                <InputLabel id="shift-label">Shift</InputLabel>
+                <Select
+                  labelId="shift-label"
+                  {...register("shift", { required: "Shift is required" })}
+                  defaultValue={defaultValues?.shift || ""}
+                >
+                  {shifts.map((shift, index) => (
+                    <MenuItem key={index} value={shift}>
+                      {shift}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>{errors.shift?.message}</FormHelperText>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -144,14 +165,91 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.remarks || ""}
               />
             </Grid>
+           <Grid item xs={12}>
+  <TextField
+    {...register("status", { required: "Status is required" })}
+    label="Status"
+    fullWidth
+    select
+    error={!!errors.status}
+    helperText={errors.status?.message}
+    defaultValue={defaultValues?.status || ""}
+  >
+    <MenuItem value="Paid">Paid</MenuItem>
+    <MenuItem value="Empty">Empty Confirmation</MenuItem>
+    <MenuItem value="Confirmation">Paid</MenuItem>
+    
+  </TextField>
+</Grid>
+
+          
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("due", { required: "Due is required" })}
+                label="Due"
+                type="number"
+                fullWidth
+                error={!!errors.due}
+                helperText={errors.due?.message}
+                defaultValue={defaultValues?.due || 0}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("advance", { required: "Advance is required" })}
+                label="Advance"
+                type="number"
+                fullWidth
+                error={!!errors.advance}
+                helperText={errors.advance?.message}
+                defaultValue={defaultValues?.advance || 0}
+              />
+            </Grid>
             <Grid item xs={12}>
               <TextField
-                {...register("status", { required: "Status is required" })}
-                label="Status"
+                {...register("receipt")}
+                label="Receipt"
                 fullWidth
-                error={!!errors.status}
-                helperText={errors.status?.message}
-                defaultValue={defaultValues?.status || ""}
+                defaultValue={defaultValues?.receipt || ""}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                {...register("TotalMoney", {})}
+                label="Total Money"
+                type="number"
+                fullWidth
+                error={!!errors.TotalMoney}
+                helperText={errors.TotalMoney?.message}
+                defaultValue={defaultValues?.TotalMoney || ""}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                {...register("Payment_detail.razorpay_order_id")}
+                label="Razorpay Order ID"
+                fullWidth
+                defaultValue={
+                  defaultValues?.Payment_detail?.razorpay_order_id || ""
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                {...register("Payment_detail.razorpay_payment_id")}
+                label="Razorpay Payment ID"
+                fullWidth
+                defaultValue={
+                  defaultValues?.Payment_detail?.razorpay_payment_id || ""
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                {...register("colors")}
+                label="Colors"
+                fullWidth
+                defaultValue={defaultValues?.colors || ""}
               />
             </Grid>
           </Grid>

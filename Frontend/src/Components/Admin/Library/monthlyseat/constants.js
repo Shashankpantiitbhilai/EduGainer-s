@@ -7,8 +7,10 @@ export const columnOrder = [
     "online",
     "shift",
     "fee",
-    "remarks",
+  
     "status",
-    "DueOrAdvance",
-    "Total"
+    "remarks",
+    "Total",
+    "due",
+    "advance"
 ];

@@ -1,42 +1,36 @@
-const { Booking, LibStudent } = require('../../models/student');
+const { LibStudent, getModelForMonth } = require('../../models/student');
 
+// Helper function to get the current month's Booking model
+const getCurrentMonthBookingModel = () => {
+    const now = new Date();
+    return getModelForMonth(now.getMonth() + 1);
+};
 
 const getSeatInfo = async (req, res) => {
     const { seat } = req.params;
     try {
-        // Fetch all booking data with specified fields
-        // console.log(seat)
-        // const test = await Booking.find({ seat });
-        // console.log(test)
-        const bookings = await Booking.find({ seat: seat, status: { $ne: "Left" } })
+        const BookingModel = getCurrentMonthBookingModel();
+        const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Left" } })
             .select('name seat shift image reg');
 
-        // console.log(bookings)
-        // Check if bookings are found
-        if (!bookings) {
+        if (!bookings || bookings.length === 0) {
             return res.status(404).json({ message: 'No bookings found for the seat' });
         }
 
-        // Send the transformed data as a response
         res.status(200).json(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
         res.status(500).json({ message: 'Failed to fetch bookings' });
     }
 };
+
 const getStudentInfo = async (req, res) => {
-    const { reg } = req.params; // Assuming registration number is passed as a parameter
-    // console.log(reg)
+    const { reg } = req.params;
     try {
-        // Fetch student data from LibStudent collection
         const student = await LibStudent.findOne({ reg: reg }).select('-_id -__v');
-        // console.log(student)
-        // Check if student is found
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
-
-        // Send the transformed data as a response
         res.status(200).json(student);
     } catch (error) {
         console.error('Error fetching student:', error);
@@ -44,20 +38,26 @@ const getStudentInfo = async (req, res) => {
     }
 };
 
-
-
-
 const getBookingData = async (req, res) => {
+    const { month } = req.params;
+    console.log("Requested month:", month);
+
     try {
-        // Fetch all booking data
-        const bookings = await Booking.find({}); // Fetch all fields
+        let BookingModel;
+        const year = new Date().getFullYear(); // Use the current year
 
-        // Transform the data into an object with Shift as key and array of objects as value
+        if (month && month.toLowerCase() !== 'all') {
+            // If a specific month is selected, use the corresponding model
+            BookingModel = getModelForMonth(month);
+            console.log("Using specific month model:", month);
+        } else {
+            // If no month is selected or "all" is selected, use the current month's model
+            BookingModel = getCurrentMonthBookingModel();
+            console.log("Using current month model");
+        }
 
-
-        // console.log(bookings);
-
-        // Send the transformed data as a response
+        const bookings = await BookingModel.find({});
+        console.log("Fetched bookings:", bookings.length);
         res.status(200).json(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -65,30 +65,14 @@ const getBookingData = async (req, res) => {
     }
 };
 
-
 const addBookingData = async (req, res) => {
-    const { reg, name, seat, date, cash, online, shift, fee, remarks, status } = req.body;;
-// console.log(req.body)
+    const { reg, name, seat, date, cash, online, shift, fee, remarks, status ,total,due,advance} = req.body;
     try {
-        // Create a new booking instance
-        const newBooking = new Booking({
-            reg,
-            name,
-            seat,
-            date,
-            cash,
-            online,
-            shift,
-            fee,
-            remarks,
-            status
+        const BookingModel = getCurrentMonthBookingModel();
+        const newBooking = new BookingModel({
+            reg, name, seat, date, cash, online, shift, fee, remarks, status, total, due, advance
         });
-        // console.log(newBooking)
-        // Save the new booking to the database
         await newBooking.save();
-
-        // Send a success response
-        // console.log(newBooking)
         res.status(201).json({ message: 'Booking added successfully', booking: newBooking });
     } catch (error) {
         console.error('Error adding booking:', error);
@@ -97,35 +81,35 @@ const addBookingData = async (req, res) => {
 };
 
 const updateBookingData = async (req, res) => {
-    // console.log("Request body:", req.body);
-
-    const { reg, name, seat, date, cash, online, shift, fee, remarks, status } = req.body;
-    // console.log("Reg value from request body:", reg);
-
+    const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
     try {
-        // Check if the booking exists before updating
-        const booking = await Booking.findOne({ reg });
-        console.log("Booking found:", booking);
-
-        if (!booking) {
-            return res.status(404).json({ message: 'Booking not found' });
-        }
-
-        // Update the booking with new data
-        const newBooking = await Booking.findOneAndUpdate(
+        const BookingModel = getCurrentMonthBookingModel();
+        const newBooking = await BookingModel.findOneAndUpdate(
             { reg },
-            { reg, name, seat, date, cash, online, shift, fee, remarks, status },
-            { new: true } // Return the updated document
+            {
+                reg,
+                name,
+                seat,
+                date,
+                cash,
+                online,
+                shift,
+                fee,
+                remarks,
+                status,
+                due,
+                advance,
+                receipt,
+                TotalMoney,
+                Payment_detail,
+                
+            },
+            { new: true }
         );
-
-        // console.log("Updated booking:", newBooking);
-
-        // Check if the booking was found and updated
+        console.log(newBooking)
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
         }
-
-        // Send a success response
         res.status(200).json({ message: 'Booking updated successfully', booking: newBooking });
     } catch (error) {
         console.error('Error updating booking:', error);
@@ -135,17 +119,12 @@ const updateBookingData = async (req, res) => {
 
 const deleteBookingData = async (req, res) => {
     const { id } = req.params;
-
     try {
-        // Find the booking by ID and delete it
-        const deletedBooking = await Booking.findByIdAndDelete(id);
-
-        // Check if the booking was found and deleted
+        const BookingModel = getCurrentMonthBookingModel();
+        const deletedBooking = await BookingModel.findByIdAndDelete(id);
         if (!deletedBooking) {
             return res.status(404).json({ message: 'Booking not found' });
         }
-
-        // Send a success response
         res.status(200).json({ message: 'Booking deleted successfully', booking: deletedBooking });
     } catch (error) {
         console.error('Error deleting booking:', error);
@@ -153,29 +132,20 @@ const deleteBookingData = async (req, res) => {
     }
 };
 
-
 const updateBookingColor = async (req, res) => {
     const { id, column, color } = req.body;
-    // console.log("Request Body:", req.body);
-
     try {
-        const booking = await Booking.findById(id);
+        const BookingModel = getCurrentMonthBookingModel();
+        const booking = await BookingModel.findById(id);
         if (!booking) {
             return res.status(404).json({ error: 'Booking not found' });
         }
-
-        // console.log("Booking before update:", booking);
-
         if (!booking.colors) {
             booking.colors = {};
         }
-
-        booking.colors.set(column, color); // Set color as hex string in the Map
+        booking.colors.set(column, color);
         await booking.save();
-
-        const updatedBooking = await Booking.findById(id);
-        // console.log("Booking after update:", updatedBooking);
-
+        const updatedBooking = await BookingModel.findById(id);
         res.status(200).json({ message: 'Color updated successfully', booking: updatedBooking });
     } catch (error) {
         console.error("Error updating color:", error);
@@ -185,26 +155,42 @@ const updateBookingColor = async (req, res) => {
 
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
-    const { status ,seat} = req.body;
-    // console.log(reg, status,seat, "yo")
-
+    const { seat, status ,shift} = req.body; // assuming these are sent in the request body
+console.log(req.body,"jjjjjjjjjjjjjjj")
     try {
-        const updatedBooking = await Booking.findOneAndUpdate({ reg :reg}, { status,seat }, { new: true });
+        const BookingModel = getCurrentMonthBookingModel();
 
-        if (!updatedBooking) {
-            return res.status(404).json({ error: 'Booking not found' });
+        // Find the booking by reg
+    //   const booking=await BookingModel.findOne({reg})
+
+    //     if (!booking) {
+    //         return res.status(404).json({ error: 'Booking not found' });
+    //     }
+
+        if (status=="Empty") {
+            // If status is empty, delete the booking
+            await BookingModel.findOneAndDelete({ reg });
+            return res.status(200).json({ message: 'Booking deleted successfully' });
+        } else {
+            // Update the 
+
+            const currentDate = new Date().toISOString().split('T')[0];
+            const student = await LibStudent.findOne({ reg });
+            const updatedBooking = await BookingModel.findOneAndUpdate(
+                { reg },
+                { name:student?.name,seat, reg: reg, status: "Paid",shift ,date:currentDate},
+                { new: true ,upsert:true}
+            );
+console.log(updatedBooking,"kkkkkkkkkkkkkk")
+            return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
         }
-// console.log(updatedBooking)
-        res.status(200).json({ message: 'Status updated successfully', booking: updatedBooking });
     } catch (error) {
         console.error("Error updating status:", error);
         res.status(500).json({ error: 'Failed to update status' });
     }
 };
 
-
-
-
+module.exports = updateSeatStatus;
 
 module.exports = {
     getBookingData,
@@ -215,5 +201,4 @@ module.exports = {
     getSeatInfo,
     getStudentInfo,
     updateSeatStatus,
- 
 };

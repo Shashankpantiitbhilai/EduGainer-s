@@ -26,12 +26,12 @@ export async function makeSeatEmpty(seat,shift) {
         throw error; // Propagate the error to handle it in the calling component
     }
 }
-export async function getBookingData() {
-
+export async function getBookingData(month) {
+console.log(month)
     try {
         // console.log("hi")
-        const response = await axiosInstance.get("/admin_library/getBookingData");
-    //    console.log(response.data)
+        const response = await axiosInstance.get(`/admin_library/getBookingData/${month}`);
+       console.log(response.data)
         return response.data;
     } catch (error) {
         // console.error("Error sending form data:", error);
@@ -39,11 +39,11 @@ export async function getBookingData() {
     }
 }
 
-export async function updateSeatStatus(reg, status,seat) {
+export async function updateSeatStatus(reg, status,seat,shift) {
 // console.log(reg,status,seat)
     try {
         // console.log(reg, status,seat)
-        const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status ,seat});
+        const response = await axiosInstance.patch(`/admin_library/updateSeatInfo/${reg}`, { status ,seat,shift});
 // console.log(response.data)
         return response.data;
     } catch (error) {

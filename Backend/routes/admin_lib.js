@@ -7,7 +7,7 @@ const admin_library= require("../controllers/library/admin_library");
 
 const legend=require("../controllers/library/color")
 
-router.get("/getBookingData", admin_library.getBookingData)
+router.get("/getBookingData/:month", admin_library.getBookingData)
 
 router.patch("/updateColor", admin_library.updateBookingColor)
 router.get("/getLegends", legend.getLegends)

@@ -13,9 +13,12 @@ import {
   Button,
   IconButton,
   TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Search, Delete, Add, Edit, GetApp } from "@mui/icons-material";
-
 import {
   getBookingData,
   addBooking,
@@ -30,6 +33,22 @@ import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ExcelJS from "exceljs";
+
+const months = [
+  { display: "January", value: "1" },
+  { display: "February", value: "2" },
+  { display: "March", value: "3" },
+  { display: "April", value: "4" },
+  { display: "May", value: "5" },
+  { display: "June", value: "6" },
+  { display: "July", value: "7" },
+  { display: "August", value: "8" },
+  { display: "September", value: "9" },
+  { display: "October", value: "10" },
+  { display: "November", value: "11" },
+  { display: "December", value: "12" },
+];
+
 const StudentManagementTable = () => {
   const [data, setData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -44,21 +63,38 @@ const StudentManagementTable = () => {
   const [deleteBookingId, setDeleteBookingId] = useState(null);
   const [updation, setupdation] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  const [selectedMonth, setSelectedMonth] = useState("");
+ useEffect(() => {
+   const d = new Date();
+   const currentMonth = d.getMonth() + 1; // Months are zero-indexed in JavaScript Date
+   setSelectedMonth(currentMonth.toString());
+ }, []);
   useEffect(() => {
-    const fetchBookingData = async () => {
-      try {
-        const bookings = await getBookingData();
-        setData(bookings);
-        setLoading(false);
-      } catch (error) {
-        // console.error("Error fetching booking data:", error);
-        toast.error("Error fetching booking data.");
-      }
-    };
+   
+   
+    fetchBookingData(selectedMonth);
+  }, [selectedMonth, updation]);
 
-    fetchBookingData();
-  }, [updation]);
+  const fetchBookingData = async (month) => {
+    setLoading(true);
+    try {
+      const bookings = await getBookingData(month);
+      console.log(bookings)
+      setData(bookings);
+     
+    } catch (error) {
+      // toast.error("Error fetching booking data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+ 
+  const handleMonthChange = (event) => {
+    const selectedMonth = months.find(
+      (month) => month.display === event.target.value
+    );
+    setSelectedMonth(selectedMonth ? selectedMonth.value : "");
+  };
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -106,6 +142,7 @@ const StudentManagementTable = () => {
   };
 
   const handleEditBooking = async (formData) => {
+    console.log(formData)
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);
@@ -229,6 +266,29 @@ const StudentManagementTable = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     InputProps={{ endAdornment: <Search /> }}
                   />
+                  <FormControl sx={{ ml: 2, minWidth: 120 }}>
+                    <InputLabel id="month-select-label">Month</InputLabel>
+                    <Select
+                      labelId="month-select-label"
+                      id="month-select"
+                      // default={}
+                      value={
+                        months.find((month) => month.value === selectedMonth)
+                          ?.display || ""
+                      }
+                      label="Month"
+                      onChange={handleMonthChange}
+                    >
+                      <MenuItem value="">
+                        <em>All</em>
+                      </MenuItem>
+                      {months.map((month) => (
+                        <MenuItem key={month.value} value={month.display}>
+                          {month.display}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <Button
                     variant="contained"
                     color="primary"

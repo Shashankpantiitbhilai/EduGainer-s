@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import {
+import {Grid,
   Box,
   Typography,
   TextField,
@@ -38,7 +38,7 @@ const shifts = {
 };
 
 const deals = [
-  { id: 1, fee: 550, months: 3, discount: 3, totalFee: 1 },
+  { id: 1, fee: 1, months: 3, discount: 3, totalFee: 1 },
   // ... (other deals)
 ];
 
@@ -51,7 +51,7 @@ const Fee = () => {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
- const [shouldInitiatePayment, setShouldInitiatePayment] = useState(false);
+  const [shouldInitiatePayment, setShouldInitiatePayment] = useState(false);
   const {
     control,
     handleSubmit,
@@ -76,7 +76,6 @@ const Fee = () => {
     userId: id,
     setLoading,
     status: "fee-payment",
-   
   });
 
   useEffect(() => {
@@ -100,35 +99,39 @@ const Fee = () => {
       initiatePayment();
     }
   }, [shouldInitiatePayment]);
+
   const autoGenerateFee = async () => {
     setLoading(true);
     try {
       const data = await fetchLibStudent(regNo);
       setStudentData(data.student);
+      console.log(data.student,"hhhhhhhhhhhhhhhhhhhhhhh")
       setValue("name", data?.student?.name);
       setValue("shift", data?.student?.shift);
       if (data.student.shift) {
-const date = new Date();
-const monthNames = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-const currentMonthName = monthNames[date.getMonth()];
-
-
+        const date = new Date();
+        const monthNames = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        const currentMonthName = monthNames[date.getMonth()];
 
         const currentMonthFee = shifts[data.student.shift] || 0;
-        setCalculatedFee(currentMonthFee);
+        const totalFee =
+          currentMonthFee +
+          (data.student?.due || 0) -
+          (data.student?.advance || 0);
+        setCalculatedFee(totalFee);
         setAdvancePaymentPeriod(currentMonthName);
         setSelectedDeal("current month");
       }
@@ -161,14 +164,17 @@ const currentMonthName = monthNames[date.getMonth()];
     const currentMonthName = monthNames[date.getMonth()];
     if (selectedValue === "current") {
       if (studentData && studentData.shift) {
-        
         const currentMonthFee = shifts[studentData.shift] || 0;
-        setCalculatedFee(currentMonthFee);
+        const totalFee =
+          currentMonthFee + (studentData.due || 0) - (studentData.advance || 0);
+        setCalculatedFee(totalFee);
         setAdvancePaymentPeriod(currentMonthName);
       }
     } else {
       const deal = deals.find((d) => d.id === selectedValue);
-      setCalculatedFee(deal.totalFee);
+      const totalFee =
+        deal.totalFee + (studentData.due || 0) - (studentData.advance || 0);
+      setCalculatedFee(totalFee);
       updateAdvancePaymentPeriod(deal.months);
     }
   };
@@ -188,23 +194,24 @@ const currentMonthName = monthNames[date.getMonth()];
       `Advance Payment from ${currentMonth} ${currentYear} - ${endMonth} ${endYear}`
     );
   };
- const onSubmit = async (data) => {
-   if (!selectedDeal) {
-     toast.error("Please select a deal or generate the current month's fee");
-     return;
-   }
 
-   const newFormData = {
-     reg: data.regNo,
-     fee: calculatedFee,
-     shift: data.shift,
-     name: data.name,
-     advancePaymentPeriod,
-   };
+  const onSubmit = async (data) => {
+    if (!selectedDeal) {
+      toast.error("Please select a deal or generate the current month's fee");
+      return;
+    }
 
-   setFormData(newFormData);
-   setShouldInitiatePayment(true);
- };
+    const newFormData = {
+      reg: data.regNo,
+      fee: calculatedFee,
+      shift: data.shift,
+      name: data.name,
+      advancePaymentPeriod,
+    };
+
+    setFormData(newFormData);
+    setShouldInitiatePayment(true);
+  };
 
   return (
     <Container maxWidth="sm">
@@ -291,27 +298,58 @@ const currentMonthName = monthNames[date.getMonth()];
               {deals.map((deal) => (
                 <MenuItem key={deal.id} value={deal.id}>
                   ₹{deal.fee} for {deal.months} months - Discount:{" "}
-                  {deal.discount}% - Total: ₹{deal.totalFee}
+                  {deal.discount}%
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
+          {selectedDeal && (
+            <>
+              <Box mt={2}>
+                <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
+                  Fee Details:
+                </Typography>
+                <Typography variant="body1">
+                  Advance Payment Period: {advancePaymentPeriod}
+                </Typography>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="body1" color="textSecondary">
+                    Due Fee:
+                  </Typography>
+                  <Typography variant="h6" color="red">
+                    ₹{studentData?.due || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="body1" color="textSecondary">
+                    Advance Fee:
+                  </Typography>
+                  <Typography variant="h6" color="primary">
+                    ₹{studentData?.advance || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="body1" color="textSecondary">
+                    Calculated Net Fee:
+                  </Typography>
+                  <Typography variant="h6" color="blue">
+                    ₹{(calculatedFee)}
+                  </Typography>
+                </Grid>
+              </Box>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3 }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : "Pay Now"}
+              </Button>
+            </>
+          )}
         </Box>
-        {advancePaymentPeriod && (
-          <Typography variant="body1" sx={{ mt: 2, mb: 2 }}>
-            {advancePaymentPeriod}
-          </Typography>
-        )}
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 2, py: 1.5 }}
-          onClick={handleSubmit(onSubmit)}
-          disabled={!selectedDeal}
-        >
-          Pay Now (₹{calculatedFee})
-        </Button>
       </StyledPaper>
     </Container>
   );

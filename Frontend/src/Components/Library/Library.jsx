@@ -8,7 +8,12 @@ import {
   Select,
   Alert,
   AlertTitle,
-  Grid,Paper
+  Grid,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
@@ -38,13 +43,11 @@ const getBackgroundColor = (status, isUserSeat) => {
   if (isUserSeat) return "orange";
   switch (status) {
     case "Paid":
-      return "green";
-    case "Unpaid":
-      return "yellow";
-    case "Left":
-      return "purple";
-    default:
       return "red";
+    
+   
+    default:
+      return "green";
   }
 };
 
@@ -93,11 +96,41 @@ const Library = () => {
   const [userShift, setUserShift] = useState(null);
   const { IsUserLoggedIn } = useContext(AdminContext);
   const socketRef = useRef(null);
-
+  const [showNotification, setShowNotification] = useState(false);
   const url =
     process.env.NODE_ENV === "production"
       ? process.env.REACT_APP_BACKEND_PROD
       : process.env.REACT_APP_BACKEND_DEV;
+   useEffect(() => {
+     const checkTime = () => {
+       const now = new Date();
+       const hours = now.getHours();
+       const minutes = now.getMinutes();
+
+       if (hours === 14 && minutes === 50) {
+         setShowNotification(true);
+       }
+     };
+
+     // Check immediately on component mount
+     checkTime();
+
+     // Set up an interval to check every minute
+     const interval = setInterval(checkTime, 60 * 1000);
+
+     return () => clearInterval(interval);
+   }, []);
+  const handleContinue = () => {
+    // Add logic here to handle user's decision to continue
+    console.log("User decided to continue for the next month");
+    setShowNotification(false);
+  };
+
+  const handleDiscontinue = () => {
+    // Add logic here to handle user's decision to discontinue
+    console.log("User decided to discontinue for the next month");
+    setShowNotification(false);
+  };
 
   useEffect(() => {
     const initializeData = async () => {
@@ -410,8 +443,23 @@ const Library = () => {
           </Box>
         </Box>
       </Alert>
-
-     
+      <Dialog
+        open={showNotification}
+        onClose={() => setShowNotification(false)}
+      >
+        <DialogTitle>Monthly Continuation</DialogTitle>
+        <DialogContent>
+          Do you want to continue using the library for the next month?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDiscontinue} color="secondary">
+            Discontinue
+          </Button>
+          <Button onClick={handleContinue} color="primary" variant="contained">
+            Continue
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

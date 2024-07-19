@@ -79,9 +79,10 @@ const ManageSeats = () => {
       let statusMap = {};
       const response = await getSeatsData();
       const selectedShiftData = response[selectedShift];
+      console.log(selectedShiftData)
       if (selectedShiftData) {
         selectedShiftData.forEach((e) => {
-          statusMap[e.seat] = e.status || "Unpaid";
+          statusMap[e.seat] = e.status || "Empty";
         });
         setSeatStatus(statusMap);
       } else {
@@ -125,11 +126,12 @@ const ManageSeats = () => {
 
   const handleFormSubmit = async (reg) => {
     try {
-      await updateSeatStatus(reg, "Paid", selectedSeat);
+      await updateSeatStatus(reg, "Paid", selectedSeat,selectedShift);
       socket.emit("updateSeatStatus", {
         id: reg,
         status: "Paid",
         seat: selectedSeat,
+        shift:selectedShift
       });
       setSnackbarMessage(`Seat ${selectedSeat} marked as Paid`);
       setSnackbarOpen(true);
@@ -162,6 +164,7 @@ const ManageSeats = () => {
       Fee: "0",
       Remarks: "",
       Status: "Paid",
+      
     });
   };
 
@@ -194,11 +197,12 @@ const ManageSeats = () => {
 
   const handleDeallocate = async (reg) => {
     try {
-      await updateSeatStatus(reg, "Left", "0");
+      await updateSeatStatus(reg, "Empty", selectedSeat, selectedShift);
       socket.emit("updateSeatStatus", {
         id: reg,
-        status: "Left",
+        status: "Empty",
         seat: selectedSeat,
+        shift: selectedShift,
       });
       setSnackbarMessage(
         `Seat for person with reg ${reg} has been deallocated`

@@ -1,7 +1,8 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const passportLocalMongoose = require("passport-local-mongoose");
-var findOrCreate = require("mongoose-findorcreate");
+const findOrCreate = require("mongoose-findorcreate");
 
+// Define the user schema
 const userSchema = new mongoose.Schema({
   strategy: {
     type: String,
@@ -36,175 +37,42 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
-// Define submodels for different 'pos_res' types
-
-
-
-const LibStudentSchema = new mongoose.Schema({
+// Define the library student schema
+const libStudentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to the User model
     required: true,
   },
-  name: {
-    type: String,
-    // required: true,
-  },
-  reg: {
-    type: String
-  },
-  email: {
-    type: String,
-    // required: true,
-  },
-  amount: {
-    type: String
-  },
-  address: {
-    type: String,
-    // required: true,
-  },
-  shift: {
-    type: String,
-
-  },
+  name: { type: String },
+  reg: { type: String },
+  email: { type: String },
+  amount: { type: String },
+  address: { type: String },
+  shift: { type: String },
   image: {
-    publicId: {
-      type: String,
-      // required: true,
-    },
-    url: {
-      type: String,
-      // required: true,
-    },
+    publicId: { type: String },
+    url: { type: String },
   },
   Payment_detail: {
-    razorpay_order_id: {
-      type: String,
-      // required: true,
-    },
-    razorpay_payment_id: {
-      type: String,
-       // This will be updated after payment verification
-    },
+    razorpay_order_id: { type: String },
+    razorpay_payment_id: { type: String },
   },
-  gender: {
-    type: String,
-    // required: true,
-  },
-  dob: {
-    type: String,
-    // required: true,
-  },
-  fatherName: {
-    type: String,
-    // required: true,
-  },
-  motherName: {
-    type: String,
-    // required: true,
-  },
-  contact1: {
-    type: String,
-    // required: true,
-  },
-  contact2: {
-    type: String,
-  },
-  aadhaar: {
-    type: String,
-    // required: true,
-  },
-  examPreparation: {
-    type: String,
-    // required: true,
-  },
-  consent: {
-    type: String,
-    default: "Agreed"
-  }
+  gender: { type: String },
+  dob: { type: String },
+  fatherName: { type: String },
+  motherName: { type: String },
+  contact1: { type: String },
+  contact2: { type: String },
+  aadhaar: { type: String },
+  examPreparation: { type: String },
+  consent: { type: String, default: "Agreed" }
 });
 
-const bookingSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'LibStudent', // Reference to the User model
-    // required: true,
-  },
-  reg: {
-    type: String,
-
-  },
-  name: {
-    type: String,
-    // required: true,
-    default: ''
-  },
-  seat: {
-    type: String,
-    // required: true
-  },
-  date: {
-    type: String,
-
-  },
-  cash: {
-    type: String,
-    default: 0
-  },
-  TotalMoney: {
-    type: String,
-  },
-  DueOrAdvance: {
-    type: String,
-
-  },
-  online: {
-    type: String,
-    default: 0
-  },
-  shift: {
-    type: String,
-    // required: true,
-    default: ''
-  },
-  fee: {
-    type: String,
-    // required: true,
-    default: 0
-  },
-  remarks: {
-    type: String,
-    default: ''
-  },
-  Payment_detail: {
-    razorpay_order_id: {
-      type: String,
-      // required: true,
-    },
-    razorpay_payment_id: {
-      type: String,
-      required: false, // This will be updated after payment verification
-    },
-  },
-  status: {
-    type: String,
-    default: ''
-  }
-  ,
-  colors: {
-    type: Map,
-    of: String,
-    default: {}
-  }
-});
-
-const Booking = mongoose.model('Booking', bookingSchema);
-
+// Define the class schema
 const classesSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -255,20 +123,50 @@ const classesSchema = new mongoose.Schema({
       required: false, // This will be updated after payment verification
     }
   }
-}
+});
 
-);
+// Define the booking schema
+const bookingSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'LibStudent', // Reference to the LibStudent model
+  },
+  due: { type: Number, default: 0 },
+  receipt: { type: String },
+  advance: { type: Number, default: 0 },
+  reg: { type: String },
+  name: { type: String, default: '' },
+  seat: { type: String },
+  date: { type: String },
+  cash: { type: String, default: 0 },
+  TotalMoney: { type: String },
+  
+  online: { type: String, default: 0 },
+  shift: { type: String, default: '' },
+  fee: { type: String, default: 0 },
+  remarks: { type: String, default: '' },
+  Payment_detail: {
+    razorpay_order_id: { type: String },
+    razorpay_payment_id: { type: String, required: false },
+  },
+  status: { type: String, default: '' },
+  colors: { type: Map, of: String, default: {} }
+});
 
+// Function to get the model for a specific month
+const getModelForMonth = (month) => {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const collectionName = `${monthNames[month - 1]}`;
+  return mongoose.model(collectionName, bookingSchema);
+};
 
-
-
-const User = mongoose.model("user", userSchema);
-const LibStudent = mongoose.model("LibStudent", LibStudentSchema);
-const Class = mongoose.model("Class", classesSchema);
-
+// Export all models and the getModelForMonth function
 module.exports = {
-  LibStudent,
-  Class,
-  User,
-  Booking
+  User: mongoose.model('User', userSchema),
+  LibStudent: mongoose.model('LibStudent', libStudentSchema),
+  Class: mongoose.model('Class', classesSchema),
+  getModelForMonth // Export the function directly
 };

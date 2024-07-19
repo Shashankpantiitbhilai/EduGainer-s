@@ -494,51 +494,51 @@ export default function LibraryRegistration() {
     );
   }
 
-  // if (isEligible === false) {
-  //   return (
-  //     <Container component="main" maxWidth="md" sx={{ my: 10 }}>
-  //       <Card elevation={3}>
-  //         <CardContent>
-  //           <Alert
-  //             severity="info"
-  //             icon={<Info fontSize="large" />}
-  //             sx={{ mb: 2 }}
-  //           >
-  //             <AlertTitle>Registration Status</AlertTitle>
-  //             Our records indicate that you have already completed the library
-  //             registration process.
-  //           </Alert>
-  //           <Typography variant="body1" paragraph>
-  //             If you need to update your information or have any questions
-  //             regarding your registration, please don't hesitate to contact us:
-  //           </Typography>
-  //           <Divider sx={{ my: 2 }} />
-  //           <Typography variant="subtitle1" fontWeight="bold">
-  //             Edugainer's Office Contact Information:
-  //           </Typography>
-  //           <Typography variant="body1">Phone: 9997999768</Typography>
-  //           <Typography variant="body1">Phone: 9997999765</Typography>
-  //           <Typography variant="body1">Phone: 8126857111</Typography>
-  //           <Typography variant="body1">
-  //             Email: edugainersclasses@gmail.com
-  //           </Typography>
-  //           <Typography variant="body1">
-  //             Hours: Monday to Friday, 9:00 AM - 5:00 PM
-  //           </Typography>
-  //           <Box mt={3}>
-  //             <Button
-  //               variant="contained"
-  //               color="primary"
-  //               onClick={() => navigate("/")}
-  //             >
-  //               Return to HomePage
-  //             </Button>
-  //           </Box>
-  //         </CardContent>
-  //       </Card>
-  //     </Container>
-  //   );
-  // }
+  if (isEligible === false) {
+    return (
+      <Container component="main" maxWidth="md" sx={{ my: 10 }}>
+        <Card elevation={3}>
+          <CardContent>
+            <Alert
+              severity="info"
+              icon={<Info fontSize="large" />}
+              sx={{ mb: 2 }}
+            >
+              <AlertTitle>Registration Status</AlertTitle>
+              Our records indicate that you have already completed the library
+              registration process.
+            </Alert>
+            <Typography variant="body1" paragraph>
+              If you need to update your information or have any questions
+              regarding your registration, please don't hesitate to contact us:
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle1" fontWeight="bold">
+              Edugainer's Office Contact Information:
+            </Typography>
+            <Typography variant="body1">Phone: 9997999768</Typography>
+            <Typography variant="body1">Phone: 9997999765</Typography>
+            <Typography variant="body1">Phone: 8126857111</Typography>
+            <Typography variant="body1">
+              Email: edugainersclasses@gmail.com
+            </Typography>
+            <Typography variant="body1">
+              Hours: Monday to Friday, 9:00 AM - 5:00 PM
+            </Typography>
+            <Box mt={3}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate("/")}
+              >
+                Return to HomePage
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    );
+  }
 
   return (
     <Container component="main" maxWidth="md" sx={{ my: 10 }}>
