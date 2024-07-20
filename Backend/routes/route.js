@@ -61,53 +61,15 @@ router.put('/profile/:id', async (req, res) => {
  
 
 router.post("/Lib-new-reg", async (req, res) => {
-  const { reg,name, email, image,  shift, address, amount, userId ,consent,gender,dob,fatherName,motherName,aadhaar,contact1,contact2,examPreparation} = req.body;
-  // console.log(req.body);
-  console.log(req.body,"dnnddndn");
-  try {
-    let imageData = {};
-    if (image) {
-      const results = await uploadToCloudinary(image, "Library_Students");
-      imageData = results;
-    }
-
-    // Generate Razorpay order first
-    const order = await createOrder(amount);
-console.log(order)
-    // Create user with the order ID
-    const user = await LibStudent.create({
-      consent,
-      reg,
-      userId,
-      fatherName,
-      motherName,
-      gender,
-      dob,
-      contact1,
-      contact2,
-      aadhaar,
-      examPreparation,
-      name,
-      email,
-      shift,
-    
-      address,
-      amount,
-      image: {
-        publicId: imageData.publicId,
-        url: imageData.url,
-      }, Payment_detail: {
-        razorpay_order_id: order.id,
-        razorpay_payment_id: "" // Payment ID will be updated after payment verification
-      }
-    });
-
+  const { amount } = req.body;
+  try{
+ const order= await createOrder(amount)
     // console.log(user);
-
+console.log(order,amount)
     res.status(200).json({
       success: true,
       order,
-      user,
+      
       key: process.env.KEY_ID_RZRPAY
     });
   } catch (error) {
@@ -121,32 +83,7 @@ console.log(order)
 
  
 
-// Function for handling payment (if needed in the future)
-// async function handlePayment(req, res) {
-//   const { amount, userId } = req.body;
 
-//   try {
-//     // Generate Razorpay order
-//     const order = await createOrder(amount);
-
-//     // Update user with the order ID
-//     await LibStudent.findByIdAndUpdate(userId, {
-//       amount,
-//       'Payment_detail.razorpay_order_id': order.id
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       order,
-//       key: process.env.KEY_ID_RZRPAY
-//     });
-//   } catch (error) {
-//     console.error("Error processing payment:", error);
-//     res.status(500).json({ error: "A server error occurred with this request" });
-//   }
-// }
-
-// module.exports = { registerStudent, handlePayment };
 router.get("/Lib_student/:user_id", async (req, res) => {
   const { user_id } = req.params;
   console.log(user_id, req.params,"hi")
@@ -165,42 +102,85 @@ router.get("/Lib_student/:user_id", async (req, res) => {
   }
 });
 
+
+
 router.post('/payment-verification/:user_id', async (req, res) => {
-  const { order_id, payment_id, signature } = req.body;
-  const { user_id } = req.params; // Capture user ID from URL parameters
+  const { order_id, payment_id, signature, formData } = req.body;
+  console.log(req.body)
+  console.log(formData)
+  const {reg,
+    name, email, shift, address, amount, consent,
+    gender, dob, fatherName, motherName, aadhaar, contact1, contact2, examPreparation, image
+  } = formData;
+  const { user_id } = req.params;
 
-  // Verify the payment signature
+  console.log(req.body, "Request body");
 
-  const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
-  console.log(isSignatureValid, "payment verify")
-  if (isSignatureValid) {
-    try {
-      // Update the student record with the Razorpay order ID and payment ID
-      const user = await LibStudent.findOne({ userId: user_id });
-      // console.log(user);
-      if (!user) {
-        return res.status(404).json({ success: false, error: 'User not found' });
+  try {
+    // Generate Razorpay order first
+    const order = await createOrder(amount);
+    console.log(order, "Created order");
+
+    // Verify the payment signature
+    const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
+    console.log(isSignatureValid, "Payment verification result");
+
+    if (isSignatureValid) {
+      try {
+        // Create new LibStudent document
+        const newStudent = new LibStudent({
+          userId: user_id,
+          reg,
+          name,
+          email,
+          shift,
+          address,
+          amount,
+          consent,
+          gender,
+          dob,
+          fatherName,
+          motherName,
+          aadhaar,
+          contact1,
+          contact2,
+          examPreparation,
+          Payment_detail: {
+            razorpay_order_id: order_id,
+            razorpay_payment_id: payment_id
+          },
+          image: {} // Will be updated after image upload
+        });
+
+        // Upload image if it exists
+        if (image) {
+          const results = await uploadToCloudinary(image, "Library_Students");
+
+          // Update the student record with image data
+          newStudent.image.publicId = results.publicId;
+          newStudent.image.url = results.url;
+        }
+
+        // Save the student document
+        await newStudent.save();
+
+        console.log(newStudent, "Newly created student");
+        res.status(200).json({ success: true, message: 'Payment verified and student record created successfully' });
+      } catch (error) {
+        console.error("Error creating student record:", error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
       }
-
-      // Add Razorpay order ID and payment ID to the user record
-      user.Payment_detail.razorpay_order_id = order_id;
-      user.Payment_detail.razorpay_payment_id = payment_id;
-
-      // Save the updated user record
-      await user.save();
-
-      // console.log(user);
-      // res.redirect(`/success/${user_id}`) // Log the updated user record
-      res.status(200).json({ success: true, message: 'Payment verified successfully' });
-    } catch (error) {
-      console.error("Error updating student record:", error);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+    } else {
+      // Signature does not match, payment is not verified
+      res.status(400).json({ success: false, error: 'Invalid signature' });
     }
-  } else {
-    // Signature does not match, payment is not verified
-    res.status(400).json({ success: false, error: 'Invalid signature' });
+  } catch (error) {
+    console.error("Error in payment verification process:", error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
+
+
 
 router.get('/Lib_student/sendIdCard/:id', async (req, res) => {
   try {

@@ -15,27 +15,38 @@ const SeatInfoDialog = ({
   seatStatus,
   onStatusChange,
   onViewDetails,
-}) => (
-  <Dialog open={open} onClose={onClose}>
-    <DialogTitle>Seat Information</DialogTitle>
-    <DialogContent>
-      <Typography>Seat Number: {selectedSeat}</Typography>
-      <Typography>Status: {seatStatus[selectedSeat] || "No Status"}</Typography>
-    
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={() => onStatusChange("Paid")} color="primary">
-        Alott Seat
-      </Button>
-     
-      <Button onClick={onViewDetails} color="info">
-        View Details
-      </Button>
-      <Button onClick={onClose} color="inherit">
-        Close
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+}) => {
+  const seatStatusInfo =
+    seatStatus && seatStatus[selectedSeat] ? seatStatus[selectedSeat] : {};
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Seat Information</DialogTitle>
+      <DialogContent>
+        <Typography>Seat Number: {selectedSeat}</Typography>
+        <Typography>
+          Status:{" "}
+          {Object.entries(seatStatusInfo).map(([shift, status]) => (
+            <span key={shift}>
+              {shift}: {status}
+              <br />
+            </span>
+          ))}
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => onStatusChange("Paid")} color="primary">
+          Allot Seat
+        </Button>
+        <Button onClick={onViewDetails} color="info">
+          View Details
+        </Button>
+        <Button onClick={onClose} color="inherit">
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 export default SeatInfoDialog;

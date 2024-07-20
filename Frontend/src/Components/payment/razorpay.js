@@ -13,8 +13,8 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
       ? process.env.REACT_APP_BACKEND_PROD
       : process.env.REACT_APP_BACKEND_DEV;
 
-  console.log(baseURL, process.env.REACT_APP_BACKEND_DEV);
-console.log(status)
+  // console.log(baseURL, process.env.REACT_APP_BACKEND_DEV);
+  // console.log(status)
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -24,30 +24,34 @@ console.log(status)
       document.body.removeChild(script);
     };
   }, []);
-  console.log(formData);
+  // console.log(formData);
   const initializePayment = async () => {
     setLoading(true);
-    console.log(formData, "jjjjj");
+    // console.log(formData, "jjjjj");
     const formDataWithImage = {
-      ...formData ,
-      image: imageBase64,
-      userId: userId,
-      amount: amount
+      ...formData,
+
+
+      amount,
+      image: imageBase64
+
     };
+
+
     // console.log(amount);
-    console.log(formData);
+
     try {
       let result;
       if (status === "newRegistration") {
-        console.log("hi",formDataWithImage)
-        result = await sendFormData(formDataWithImage);
+
+        result = await sendFormData(amount);
       }
       else {
-        console.log("bi",formDataWithImage)
-        result = await sendFeeData(formDataWithImage);
+
+        result = await sendFeeData(amount);
       }
-      const { key, order, user } = result;
-      console.log(result);
+      const { key, order } = result;
+      // console.log(result);
       const options = {
         key,
         amount: order.amount,
@@ -59,7 +63,7 @@ console.log(status)
         prefill: {
           name: formData.name,
           email: formData.email,
-          contact: formData.mobile,
+          contact: formData.contact1,
         },
         notes: {
           address: formData.address,
@@ -70,30 +74,48 @@ console.log(status)
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-    
+          // console.log(formDataWithImage)
           let callbackUrl;
           if (status === "newRegistration")
             callbackUrl = `${baseURL}/payment-verification/${userId}`;
           else {
             callbackUrl = `${baseURL}/library/verify-payment/${userId}`;
           }
-          console.log(baseURL, callbackUrl);
-          try {
-            const verificationResponse = await axios.post(callbackUrl, {
-              amount,
-              order_id: razorpay_order_id,
-              payment_id: razorpay_payment_id,
-              signature: razorpay_signature,
-              formData
-            });
-          
+          // console.log(baseURL, callbackUrl);
+          // try {
+          try{
+            let verificationResponse;
+            if (status === "newRegistration") {
+              // console.log("jjjj")
+              verificationResponse = await axios.post(callbackUrl, {
+
+                order_id: razorpay_order_id,
+                payment_id: razorpay_payment_id,
+                signature: razorpay_signature,
+formData:formDataWithImage
+
+                //for fee no image is sent
+              });
+            }
+            else {
+              verificationResponse = await axios.post(callbackUrl, {
+
+                order_id: razorpay_order_id,
+                payment_id: razorpay_payment_id,
+                signature: razorpay_signature,
+                formData: formDataWithImage
+                //for fee no image is sent
+              });
+
+            }
+
             if (verificationResponse.data.success) {
               if (status === "newRegistration") {
                 // toast.success("Registration successful!");
                 navigate(`/success/${userId}`);
               } else {
                 // toast.success("Fee paid successfully!");
-                navigate(`/`);
+                navigate(`/`)
               }
             } else {
               throw new Error("Payment verification failed");

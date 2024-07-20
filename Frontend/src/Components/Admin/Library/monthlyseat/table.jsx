@@ -11,6 +11,7 @@ import {
   Checkbox,
   TableSortLabel,
   Button,
+  Grid,
   IconButton,
   TextField,
   Select,
@@ -111,7 +112,7 @@ const StudentManagementTable = () => {
   const handleAddBooking = async (formData) => {
     try {
       await addBooking(formData);
-      console.log(formData)
+      console.log(formData);
       setOpenAddDialog(false);
       setupdation(!updation);
       toast.success("Booking added successfully!");
@@ -139,9 +140,7 @@ const StudentManagementTable = () => {
   };
 
   const handleEditBooking = async (formData) => {
-    console.log(formData
-      
-    );
+    console.log(formData);
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);
@@ -241,12 +240,12 @@ const StudentManagementTable = () => {
     toast.success("Booking Data exported successfully ");
   };
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ flexGrow: 1 }}>
       {loading ? (
-        "loading"
+        "Loading..."
       ) : (
-        <>
-          <Box sx={{ flexGrow: 1, p: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={10}>
             <Paper sx={{ p: 2, mb: 2 }}>
               <Box
                 sx={{
@@ -307,29 +306,27 @@ const StudentManagementTable = () => {
                   Export to Excel
                 </Button>
               </Box>
-               <TableContainer>
-                <Table sx={{ border: '1px solid #ddd' }}>
+              <TableContainer>
+                <Table sx={{ border: "1px solid #ddd" }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell 
-                        padding="checkbox" 
-                        sx={{ 
-                          backgroundColor: 'orange', 
-                          color: 'white', 
-                          fontWeight: 'bold',
-                          height: '40px' // Reduced height for header
+                      <TableCell
+                        padding="checkbox"
+                        sx={{
+                          backgroundColor: "orange",
+                          color: "white",
+                          fontWeight: "bold",
+                          height: "40px", // Reduced height for header
                         }}
-                      >
-                        <Checkbox />
-                      </TableCell>
+                      ></TableCell>
                       {columnOrder.map((key) => (
-                        <TableCell 
+                        <TableCell
                           key={key}
-                          sx={{ 
-                            backgroundColor: 'orange', 
-                            color: 'white', 
-                            fontWeight: 'bold',
-                            height: '40px' // Reduced height for header
+                          sx={{
+                            backgroundColor: "orange",
+                            color: "white",
+                            fontWeight: "bold",
+                            height: "40px", // Reduced height for header
                           }}
                         >
                           <TableSortLabel
@@ -341,17 +338,17 @@ const StudentManagementTable = () => {
                             }
                             onClick={() => handleSort(key)}
                             sx={{
-                              '&.MuiTableSortLabel-root': {
-                                color: 'white',
+                              "&.MuiTableSortLabel-root": {
+                                color: "white",
                               },
-                              '&.MuiTableSortLabel-root:hover': {
-                                color: 'white',
+                              "&.MuiTableSortLabel-root:hover": {
+                                color: "white",
                               },
-                              '&.Mui-active': {
-                                color: 'white',
+                              "&.Mui-active": {
+                                color: "white",
                               },
-                              '& .MuiTableSortLabel-icon': {
-                                color: 'white !important',
+                              "& .MuiTableSortLabel-icon": {
+                                color: "white !important",
                               },
                             }}
                           >
@@ -359,12 +356,12 @@ const StudentManagementTable = () => {
                           </TableSortLabel>
                         </TableCell>
                       ))}
-                      <TableCell 
-                        sx={{ 
-                          backgroundColor: 'orange', 
-                          color: 'white', 
-                          fontWeight: 'bold',
-                          height: '40px' // Reduced height for header
+                      <TableCell
+                        sx={{
+                          backgroundColor: "orange",
+                          color: "white",
+                          fontWeight: "bold",
+                          height: "40px", // Reduced height for header
                         }}
                       >
                         Actions
@@ -383,9 +380,9 @@ const StudentManagementTable = () => {
                         )
                       )
                       .map((item) => (
-                        <TableRow 
+                        <TableRow
                           key={item._id}
-                          sx={{ height: '40px' }} // Reduced height for each row
+                          sx={{ height: "40px" }} // Reduced height for each row
                         >
                           <TableCell padding="checkbox">
                             <Checkbox
@@ -411,7 +408,7 @@ const StudentManagementTable = () => {
                                     ? item.colors[key]
                                     : "inherit",
                                 cursor: "pointer",
-                                height: '40px', // Reduced height for each cell
+                                height: "40px", // Reduced height for each cell
                               }}
                             >
                               {item[key]}
@@ -436,7 +433,6 @@ const StudentManagementTable = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-      
             </Paper>
 
             <BookingDialog
@@ -460,14 +456,16 @@ const StudentManagementTable = () => {
             />
 
             <ToastContainer />
-          </Box>
-          <LegendsFunctions
-            legends={legends}
-            setLegends={setLegends}
-            selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
-          />
-        </>
+          </Grid>
+          <Grid item xs={2}>
+            <LegendsFunctions
+              legends={legends}
+              setLegends={setLegends}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+            />
+          </Grid>
+        </Grid>
       )}
     </Box>
   );

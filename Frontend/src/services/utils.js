@@ -12,10 +12,10 @@ const axiosInstance = axios.create({
   },
 });
 
-export async function sendFormData(formData) {
-  console.log(formData)
+export async function sendFormData(amount) {
+  console.log(amount)
   try {
-    const response = await axiosInstance.post("/Lib-new-reg", formData);
+    const response = await axiosInstance.post("/Lib-new-reg", { amount });
     console.log(response.data)
     return response.data;
   } catch (error) {

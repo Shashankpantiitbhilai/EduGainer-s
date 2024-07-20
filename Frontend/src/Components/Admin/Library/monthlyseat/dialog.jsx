@@ -257,14 +257,7 @@ const BookingDialog = ({
                 }
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                {...register("colors")}
-                label="Colors"
-                fullWidth
-                defaultValue={defaultValues?.colors || ""}
-              />
-            </Grid>
+         
           </Grid>
         </DialogContent>
         <DialogActions>

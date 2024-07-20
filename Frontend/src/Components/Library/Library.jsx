@@ -29,24 +29,47 @@ const shifts = [
   "24*7",
 ];
 
-const getBackgroundColor = (status, isUserSeat) => {
-  if (isUserSeat) return "orange";
-  switch (status) {
-    case "Paid":
-      return "red";
-    default:
-      return "green";
-  }
+const isOverlapping = (shift1, shift2) => {
+  const shiftRanges = {
+    "6:30 AM to 2 PM": [6.5, 14],
+    "2 PM to 9:30 PM": [14, 21.5],
+    "6:30 PM to 11 PM": [18.5, 23],
+    "9:30 PM to 6:30 AM": [21.5, 30.5],
+    "2 PM to 11 PM": [14, 23],
+    "6:30 AM to 6:30 PM": [6.5, 18.5],
+    "24*7": [0, 24],
+  };
+
+  const [start1, end1] = shiftRanges[shift1];
+  const [start2, end2] = shiftRanges[shift2];
+
+  return (
+    (start1 < end2 && start2 < end1) || shift1 === "24*7" || shift2 === "24*7"
+  );
 };
 
-const SeatRow = ({
-  seats,
-  seatStatus,
-  userSeat,
-  selectedShift,
-  userShift,
-  onSeatClick,
-}) => {
+const getAvailableShifts = (bookedShift) => {
+  return shifts.filter((shift) => !isOverlapping(bookedShift, shift));
+};
+
+const getBackgroundColor = (status, seatStatuses, seat, selectedShift) => {
+  if (status === "Paid") return "red";
+
+  const bookedShifts = Object.entries(seatStatuses)
+    .filter(([key, value]) => key.startsWith(seat) && value === "Paid")
+    .map(([key]) => key.split("-")[1]);
+
+  if (bookedShifts.includes("24*7")) return "red";
+
+  const availableShifts =
+    bookedShifts.length > 0 ? getAvailableShifts(bookedShifts[0]) : shifts;
+
+  if (availableShifts.includes(selectedShift)) return "green";
+
+  return "yellow";
+};
+
+const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -63,13 +86,17 @@ const SeatRow = ({
             p: 0,
             fontSize: isMobile ? "0.7rem" : "0.875rem",
             backgroundColor: getBackgroundColor(
-              seatStatus[seat],
-              seat === userSeat && selectedShift === userShift
+              seatStatus[`${seat}-${selectedShift}`],
+              seatStatus,
+              seat,
+              selectedShift
             ),
             "&:hover": {
               backgroundColor: getBackgroundColor(
-                seatStatus[seat],
-                seat === userSeat && selectedShift === userShift
+                seatStatus[`${seat}-${selectedShift}`],
+                seatStatus,
+                seat,
+                selectedShift
               ),
               opacity: 0.8,
             },
@@ -113,25 +140,31 @@ const Library = () => {
 
         socketRef.current.emit("joinSeatsRoom", roomId);
 
-        socketRef.current.on("seatStatusUpdate", ({ id, status, seat }) => {
-          console.log("Seat status update received:", { id, status, seat });
-          setSeatStatus((prevStatus) => ({
-            ...prevStatus,
-            [seat]: status,
-          }));
-        });
+        socketRef.current.on(
+          "seatStatusUpdate",
+          ({ id, status, seat, shift }) => {
+            console.log("Seat status update received:", {
+              id,
+              status,
+              seat,
+              shift,
+            });
+            setSeatStatus((prevStatus) => ({
+              ...prevStatus,
+              [`${seat}-${shift}`]: status,
+            }));
+          }
+        );
 
         const response = await getSeatsData();
-        const selectedShiftData = response[selectedShift];
-        if (selectedShiftData) {
-          let statusMap = {};
-          selectedShiftData.forEach((e) => {
-            statusMap[e.seat] = e.status || "Unpaid";
+        let statusMap = {};
+        shifts.forEach((shift) => {
+          const shiftData = response[shift] || [];
+          shiftData.forEach((e) => {
+            statusMap[`${e.seat}-${shift}`] = e.status || "Unpaid";
           });
-          setSeatStatus(statusMap);
-        } else {
-          console.error(`No data found for shift: ${selectedShift}`);
-        }
+        });
+        setSeatStatus(statusMap);
 
         const userSeatData = await getStudentLibSeat(IsUserLoggedIn?._id);
         if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
@@ -150,7 +183,8 @@ const Library = () => {
         socketRef.current.disconnect();
       }
     };
-  }, [selectedShift, IsUserLoggedIn?._id, url]);
+  }, [IsUserLoggedIn?._id, url]);
+
   const handleShiftChange = (event) => {
     setSelectedShift(event.target.value);
   };
@@ -425,7 +459,6 @@ const Library = () => {
             <Box sx={{ width: 16, height: 16, bgcolor: "yellow", mr: 2 }}></Box>
             <Box>Pending</Box>
           </Box>
-          
         </Box>
       </Alert>
     </Box>

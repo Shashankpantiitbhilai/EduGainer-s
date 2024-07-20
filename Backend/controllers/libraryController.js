@@ -115,9 +115,10 @@ const getLibStudentData = async (req, res) => {
 
 
 const verifyLibfeePayment = async (req, res) => {
-    const { order_id, payment_id, signature, amount, formData } = req.body;
+    const { order_id, payment_id, signature, formData } = req.body;
+    console.log(req.body)
     const { user_id } = req.params;
-    const { name, shift, reg, online, fee, advancePaymentPeriod } = formData;
+    const { name, shift, reg, fee, advancePaymentPeriod } = formData;
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
 
     if (isSignatureValid) {
@@ -161,7 +162,7 @@ console.log(typeof(fee))
 };
 
 const sendFeeData = async (req, res) => {
-    const { reg, name, shift, amount } = req.body;
+    const {  amount } = req.body;
     try {
         const order = await createOrder(amount);
         res.status(200).json({

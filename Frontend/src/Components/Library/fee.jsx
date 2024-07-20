@@ -31,7 +31,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const shifts = {
   "6:30 AM to 2 PM": 550,
-  "2 PM to 9:30 PM": 1,
+  "2 PM to 9:30 PM": 550,
   "6:30 PM to 11 PM": 350,
   "9:30 PM to 6:30 AM": 500,
   "2 PM to 11 PM": 750,
@@ -110,6 +110,7 @@ const Fee = () => {
       if (!data || !data.student) {
         setError("Student not registered");
       }
+   
       setStudentData(data.student);
       setValue("name", data.student.name);
       setValue("shift", data.student.shift);
