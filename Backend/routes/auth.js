@@ -7,7 +7,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator')
 const {
-  Student,
+  LibStudent,
 
   User,
 } = require("../models/student");
@@ -69,6 +69,8 @@ router.post("/register", async (req, res) => {
   }
 });
 
+
+
 router.post("/otp-verify", async (req, res) => {
   const { otp, id } = req.body;
 
@@ -77,13 +79,14 @@ router.post("/otp-verify", async (req, res) => {
     if (!redisClient.isOpen) {
       await redisClient.connect();
     }
-    // console.log(id, otp)
+
     // Retrieve OTP from Redis
+    console.log(id)
     const userDetails = await redisClient.get(id);
     if (!userDetails) {
       return res.status(400).json({ message: "Invalid OTP or user details not found" });
     }
-    // console.log(userDetails)
+
     const { otp: storedOTP, password } = JSON.parse(userDetails);
 
     if (otp === storedOTP) {
@@ -94,11 +97,21 @@ router.post("/otp-verify", async (req, res) => {
       );
 
       // Log in the new user
-      req.login(newUser, (err) => {
+      req.login(newUser, async (err) => {
         if (err) {
           console.error(err);
           return res.status(500).json({ message: "Internal Server Error" });
         }
+
+        // Find LibStudent by email
+        const libStudent = await LibStudent.findOne({ email: id });
+        if (libStudent) {
+          // Update LibStudent with userId
+          libStudent.userId = newUser._id;
+          await libStudent.save();
+         
+        }
+
         // Respond with success message and new user object
         res.status(201).json({ message: "User registered successfully", user: newUser });
       });
@@ -111,6 +124,8 @@ router.post("/otp-verify", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+
 
 router.post('/reset-password/:id/:token', async (req, res) => {
   const { id, token } = req.params;

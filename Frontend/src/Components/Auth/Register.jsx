@@ -18,6 +18,7 @@ function Register() {
       if (response && response.message === "User already exists") {
         setError("email", { type: "manual", message: "Email already exists" });
       } else if (response && response.message === "OTP sent successfully") {
+        toast.success("OTP sent successfully ,check your entered email Id")
         navigate(`/otp-verify/${response.email}`);
       } else {
         navigate("/");

@@ -31,13 +31,7 @@ const shifts = [
   "24*7",
 ];
 
-const ButtonLink = ({ to, children }) => (
-  <Link to={to} style={{ textDecoration: "none" }}>
-    <Button variant="contained" color="primary">
-      {children}
-    </Button>
-  </Link>
-);
+
 
 const getBackgroundColor = (status, isUserSeat) => {
   if (isUserSeat) return "orange";

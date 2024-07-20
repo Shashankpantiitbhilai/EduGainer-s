@@ -1,32 +1,33 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
-  Button,
   Card,
   CardContent,
   Box,
+  CircularProgress,
+  Grid,
 } from "@mui/material";
-import { AdminContext } from "../../App";
-// ButtonLink Component
-function ButtonLink({ to, children }) {
-  return (
-    <Link to={to} style={{ textDecoration: "none" }}>
-      <Button variant="contained" color="primary">
-        {children}
-      </Button>
-    </Link>
-  );
-}
 
-// EdugainerClasses Component
 function EdugainerClasses() {
-  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
-  let id = 0;
-  if (IsUserLoggedIn) {
-    id = IsUserLoggedIn._id;
-  }
+  const [comingSoonText, setComingSoonText] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const text = "Coming Soon";
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index <= text.length) {
+        setComingSoonText(text.slice(0, index));
+        index++;
+      } else {
+        clearInterval(interval);
+        setIsLoading(false);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Container maxWidth="lg" style={{ marginTop: "2rem" }}>
       <Box textAlign="center" marginBottom="2rem">
@@ -37,66 +38,57 @@ function EdugainerClasses() {
           Empowering Education Through Innovation
         </Typography>
       </Box>
-
-      <Box textAlign="center" marginBottom="4rem">
-        <Button
-          variant="contained"
-          color="secondary"
-          style={{ marginRight: "1rem" }}
-        >
-          Explore Our Classes
-        </Button>
-        <Button variant="outlined" color="secondary">
-          Learn More →
-        </Button>
-      </Box>
-
-      <Typography variant="h4" component="h2" gutterBottom>
-        Registration Batches
-      </Typography>
-      <Box
-        display="grid"
-        gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" }}
-        gap="1rem"
-      >
-        {/* Card 1 */}
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Batch 12
-            </Typography>
-            <Typography variant="body2">
-              Join our latest batch for comprehensive learning.
-            </Typography>
-            <ButtonLink to={`/classes-reg/${id}`}>Register</ButtonLink>
-          </CardContent>
-        </Card>
-        {/* Card 2 */}
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Batch 13
-            </Typography>
-            <Typography variant="body2">
-              Enroll now for an immersive learning experience.
-            </Typography>
-            <ButtonLink to="/batch-13-reg">Register</ButtonLink>
-          </CardContent>
-        </Card>
-        {/* Card 3 */}
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Batch 14
-            </Typography>
-            <Typography variant="body2">
-              Secure your spot in our upcoming batch.
-            </Typography>
-            <ButtonLink to="/batch-14-reg">Register</ButtonLink>
-          </CardContent>
-        </Card>
-        {/* Add more cards as needed */}
-      </Box>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          <Card
+            sx={{
+              minHeight: 200,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CardContent>
+              <Typography variant="h5" component="h3" gutterBottom>
+                Online Classes
+              </Typography>
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <>
+                  <Typography variant="h4" color="primary" gutterBottom>
+                    {comingSoonText}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Stay tuned for our upcoming offerings!!
+                  </Typography>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Card sx={{ minHeight: 200 }}>
+            <CardContent>
+              <Typography variant="h5" component="h3" gutterBottom>
+                Offline Classes Available
+              </Typography>
+              <Typography variant="body1" paragraph>
+                We currently support offline Procedure . Visit us at our center!
+              </Typography>
+              <Typography variant="body1" paragraph>
+                Address: Uttarkashi near Court Road
+              </Typography>
+              <Typography variant="body1" paragraph>
+                Contact us:
+              </Typography>
+              <Typography variant="body1">
+                Phone: 9997999768 / 8126857111 /9997999765
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

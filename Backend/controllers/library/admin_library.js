@@ -9,13 +9,12 @@ const getCurrentMonthBookingModel = () => {
 const getSeatInfo = async (req, res) => {
     const { seat } = req.params;
     try {
+        console.log(seat)
         const BookingModel = getCurrentMonthBookingModel();
-        const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Left" } })
+        const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Empty" } })
             .select('name seat shift image reg');
-
-        if (!bookings || bookings.length === 0) {
-            return res.status(404).json({ message: 'No bookings found for the seat' });
-        }
+console.log(bookings)
+       
 
         res.status(200).json(bookings);
     } catch (error) {
@@ -82,6 +81,7 @@ const addBookingData = async (req, res) => {
 
 const updateBookingData = async (req, res) => {
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
+    console.log(req.body,"jjjjjjj")
     try {
         const BookingModel = getCurrentMonthBookingModel();
         const newBooking = await BookingModel.findOneAndUpdate(
@@ -181,7 +181,7 @@ console.log(req.body,"jjjjjjjjjjjjjjj")
                 { name:student?.name,seat, reg: reg, status: "Paid",shift ,date:currentDate},
                 { new: true ,upsert:true}
             );
-console.log(updatedBooking,"kkkkkkkkkkkkkk")
+// console.log(updatedBooking,"kkkkkkkkkkkkkk")
             return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
         }
     } catch (error) {
@@ -190,7 +190,7 @@ console.log(updatedBooking,"kkkkkkkkkkkkkk")
     }
 };
 
-module.exports = updateSeatStatus;
+
 
 module.exports = {
     getBookingData,

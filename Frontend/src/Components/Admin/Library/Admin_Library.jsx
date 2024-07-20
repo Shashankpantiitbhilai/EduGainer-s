@@ -8,145 +8,139 @@ import {
   CardContent,
   CardActions,
   Box,
+  Grid,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  Person as PersonIcon,
+  LibraryBooks as LibraryBooksIcon,
+  EventSeat as EventSeatIcon,
+  Inventory as InventoryIcon,
+  ArrowForward as ArrowForwardIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
 
-// ButtonLink Component
-function ButtonLink({ to, children }) {
-  return (
-    <Link to={to} style={{ textDecoration: "none" }}>
-      <Button variant="contained" color="primary">
-        {children}
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    transform: "translateY(-5px)",
+    boxShadow: theme.shadows[10],
+  },
+}));
+
+const CardIcon = styled(Box)(({ theme }) => ({
+  fontSize: 48,
+  marginBottom: theme.spacing(2),
+  color: theme.palette.primary.main,
+  transition: "transform 0.3s ease-in-out",
+  "&:hover": {
+    transform: "scale(1.1)",
+  },
+}));
+
+const AdminCard = ({ title, description, link, icon: Icon }) => (
+  <StyledCard>
+    <CardContent sx={{ flexGrow: 1, position: "relative" }}>
+      <Tooltip title={`Information about ${title}`} placement="top">
+        <IconButton
+          sx={{ position: "absolute", top: 8, right: 8 }}
+          aria-label={`Info about ${title}`}
+        >
+          <InfoIcon />
+        </IconButton>
+      </Tooltip>
+      <CardIcon>
+        <Icon fontSize="inherit" />
+      </CardIcon>
+      <Typography variant="h5" component="h3" gutterBottom>
+        {title}
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {description}
+      </Typography>
+    </CardContent>
+    <CardActions>
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to={link}
+        fullWidth
+        endIcon={<ArrowForwardIcon />}
+        sx={{
+          transition: "background-color 0.3s",
+          "&:hover": {
+            backgroundColor: "primary.dark",
+          },
+        }}
+      >
+        {title}
       </Button>
-    </Link>
-  );
-}
+    </CardActions>
+  </StyledCard>
+);
 
-// Admin_Library Component
 function Admin_Library() {
-  return (
-    <Container maxWidth="lg" sx={{ marginTop: 4 }}>
-      <Box textAlign="center" mb={4}>
-        <Typography variant="h3" component="h1" gutterBottom>
-          Welcome to EduGainer's Library (Admin View)
-        </Typography>
-        <Typography variant="h6" component="p" color="textSecondary">
-          Manage Library Resources and Users
-        </Typography>
-      </Box>
+  const adminCards = [
+    {
+      title: "Manage Library Database",
+      description:
+        "View, edit, and delete user profiles. Manage user roles and monitor user activity.",
+      link: "/admin_library/manage-users",
+      icon: PersonIcon,
+    },
+    {
+      title: "Manage Library Seats",
+      description: "Manage Library Seats and overall library operations.",
+      link: "/admin_library/manage-current-month-bookings",
+      icon: LibraryBooksIcon,
+    },
+    {
+      title: "Manage Monthly Bookings",
+      description: "Oversee and manage current library seat bookings.",
+      link: "/admin_library/manage-seats",
+      icon: EventSeatIcon,
+    },
+    {
+      title: "Manage Library Resources",
+      description:
+        "Add, edit, and delete library resources. Categorize and tag resources for easier search and organization.",
+      link: "/admin_library/manage-resources",
+      icon: InventoryIcon,
+    },
+  ];
 
-      <Box textAlign="center" mb={6}>
-        <Button variant="contained" color="secondary" sx={{ marginRight: 2 }}>
-          Explore Library Offerings
-        </Button>
-        <Button variant="outlined" color="secondary">
-          Learn More →
-        </Button>
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Box sx={{ textAlign: "center", mb: 6 }}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          Welcome to EduGainer's Library
+        </Typography>
+        <Typography
+          variant="h5"
+          component="h2"
+          color="text.secondary"
+          gutterBottom
+        >
+          Admin Dashboard
+        </Typography>
       </Box>
 
       <Typography variant="h4" component="h2" gutterBottom>
         Manage Sections
       </Typography>
-      <Box
-        display="grid"
-        gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" }}
-        gap={4}
-      >
-        {/* Manage Users Card */}
-        <Card
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Manage Users
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              View, edit, and delete user profiles. Manage user roles and
-              monitor user activity.
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/admin_library/manage-users"
-              sx={{ marginTop: 1, marginBottom: 0 }}
-            >
-              Go to Manage Users
-            </Button>
-          </CardActions>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Manage Library
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Manage Library Seats
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/admin_library/manage-current-month-bookings"
-              sx={{ marginTop: 1 }}
-            >
-              Go to Manage Library Seats
-            </Button>
-          </CardActions>
-        </Card>
-        {/* Manage Resources Card */}
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Manage bookings
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Manage current Bookings
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/admin_library/manage-seats"
-              sx={{ marginTop: 1 }}
-            >
-              Go to Manage Library Bookings
-            </Button>
-          </CardActions>
-        </Card>
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h3">
-              Manage Resources
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Add, edit, and delete library resources. Categorize and tag
-              resources for easier search and organization.
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/admin_library/manage-resources"
-              sx={{ marginTop: 1 }}
-            >
-              Go to Manage Resources
-            </Button>
-          </CardActions>
-        </Card>
-      </Box>
+      <Grid container spacing={4}>
+        {adminCards.map((card, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <AdminCard {...card} />
+          </Grid>
+        ))}
+      </Grid>
     </Container>
   );
 }

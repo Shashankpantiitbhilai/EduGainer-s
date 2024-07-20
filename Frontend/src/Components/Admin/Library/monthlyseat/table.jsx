@@ -33,7 +33,6 @@ import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ExcelJS from "exceljs";
-
 const months = [
   { display: "January", value: "1" },
   { display: "February", value: "2" },
@@ -64,14 +63,12 @@ const StudentManagementTable = () => {
   const [updation, setupdation] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState("");
- useEffect(() => {
-   const d = new Date();
-   const currentMonth = d.getMonth() + 1; // Months are zero-indexed in JavaScript Date
-   setSelectedMonth(currentMonth.toString());
- }, []);
   useEffect(() => {
-   
-   
+    const d = new Date();
+    const currentMonth = d.getMonth() + 1; // Months are zero-indexed in JavaScript Date
+    setSelectedMonth(currentMonth.toString());
+  }, []);
+  useEffect(() => {
     fetchBookingData(selectedMonth);
   }, [selectedMonth, updation]);
 
@@ -79,16 +76,15 @@ const StudentManagementTable = () => {
     setLoading(true);
     try {
       const bookings = await getBookingData(month);
-      console.log(bookings)
+      console.log(bookings);
       setData(bookings);
-     
     } catch (error) {
       // toast.error("Error fetching booking data.");
     } finally {
       setLoading(false);
     }
   };
- 
+
   const handleMonthChange = (event) => {
     const selectedMonth = months.find(
       (month) => month.display === event.target.value
@@ -115,6 +111,7 @@ const StudentManagementTable = () => {
   const handleAddBooking = async (formData) => {
     try {
       await addBooking(formData);
+      console.log(formData)
       setOpenAddDialog(false);
       setupdation(!updation);
       toast.success("Booking added successfully!");
@@ -142,7 +139,7 @@ const StudentManagementTable = () => {
   };
 
   const handleEditBooking = async (formData) => {
-    console.log(formData)
+    console.log(formData);
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);
@@ -308,15 +305,31 @@ const StudentManagementTable = () => {
                   Export to Excel
                 </Button>
               </Box>
-              <TableContainer>
-                <Table>
+               <TableContainer>
+                <Table sx={{ border: '1px solid #ddd' }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell padding="checkbox">
+                      <TableCell 
+                        padding="checkbox" 
+                        sx={{ 
+                          backgroundColor: 'orange', 
+                          color: 'white', 
+                          fontWeight: 'bold',
+                          height: '40px' // Reduced height for header
+                        }}
+                      >
                         <Checkbox />
                       </TableCell>
                       {columnOrder.map((key) => (
-                        <TableCell key={key}>
+                        <TableCell 
+                          key={key}
+                          sx={{ 
+                            backgroundColor: 'orange', 
+                            color: 'white', 
+                            fontWeight: 'bold',
+                            height: '40px' // Reduced height for header
+                          }}
+                        >
                           <TableSortLabel
                             active={sortConfig.key === key}
                             direction={
@@ -325,12 +338,35 @@ const StudentManagementTable = () => {
                                 : "asc"
                             }
                             onClick={() => handleSort(key)}
+                            sx={{
+                              '&.MuiTableSortLabel-root': {
+                                color: 'white',
+                              },
+                              '&.MuiTableSortLabel-root:hover': {
+                                color: 'white',
+                              },
+                              '&.Mui-active': {
+                                color: 'white',
+                              },
+                              '& .MuiTableSortLabel-icon': {
+                                color: 'white !important',
+                              },
+                            }}
                           >
                             {key}
                           </TableSortLabel>
                         </TableCell>
                       ))}
-                      <TableCell>Actions</TableCell>
+                      <TableCell 
+                        sx={{ 
+                          backgroundColor: 'orange', 
+                          color: 'white', 
+                          fontWeight: 'bold',
+                          height: '40px' // Reduced height for header
+                        }}
+                      >
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -345,7 +381,10 @@ const StudentManagementTable = () => {
                         )
                       )
                       .map((item) => (
-                        <TableRow key={item._id}>
+                        <TableRow 
+                          key={item._id}
+                          sx={{ height: '40px' }} // Reduced height for each row
+                        >
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={selectedRows.includes(item._id)}
@@ -370,6 +409,7 @@ const StudentManagementTable = () => {
                                     ? item.colors[key]
                                     : "inherit",
                                 cursor: "pointer",
+                                height: '40px', // Reduced height for each cell
                               }}
                             >
                               {item[key]}
@@ -378,13 +418,15 @@ const StudentManagementTable = () => {
                           <TableCell>
                             <IconButton
                               onClick={() => handleDeleteBooking(item._id)}
+                              size="small" // Reduced size for icons
                             >
-                              <Delete color="error" />
+                              <Delete color="error" fontSize="small" />
                             </IconButton>
                             <IconButton
                               onClick={() => handleOpenEditDialog(item)}
+                              size="small" // Reduced size for icons
                             >
-                              <Edit color="primary" />
+                              <Edit color="primary" fontSize="small" />
                             </IconButton>
                           </TableCell>
                         </TableRow>
@@ -392,6 +434,7 @@ const StudentManagementTable = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+      
             </Paper>
 
             <BookingDialog

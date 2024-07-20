@@ -1,7 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import {Grid,
+import {
+  Grid,
+  Alert,
   Box,
   Typography,
   TextField,
@@ -51,6 +53,7 @@ const Fee = () => {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
+    const [error, setError] = useState("");
   const [shouldInitiatePayment, setShouldInitiatePayment] = useState(false);
   const {
     control,
@@ -100,48 +103,55 @@ const Fee = () => {
     }
   }, [shouldInitiatePayment]);
 
-  const autoGenerateFee = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchLibStudent(regNo);
-      setStudentData(data.student);
-      console.log(data.student,"hhhhhhhhhhhhhhhhhhhhhhh")
-      setValue("name", data?.student?.name);
-      setValue("shift", data?.student?.shift);
-      if (data.student.shift) {
-        const date = new Date();
-        const monthNames = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ];
-        const currentMonthName = monthNames[date.getMonth()];
+ const autoGenerateFee = async () => {
+   setLoading(true);
+   setError(""); // Clear any previous errors
+   try {
+     const data = await fetchLibStudent(regNo);
+     if (!data || !data.student) {
+       setError("Student not registered");
+     }
+     setStudentData(data.student);
+     setValue("name", data.student.name);
+     setValue("shift", data.student.shift);
+     if (data.student.shift) {
+       const date = new Date();
+       const monthNames = [
+         "January",
+         "February",
+         "March",
+         "April",
+         "May",
+         "June",
+         "July",
+         "August",
+         "September",
+         "October",
+         "November",
+         "December",
+       ];
+       const currentMonthName = monthNames[date.getMonth()];
 
-        const currentMonthFee = shifts[data.student.shift] || 0;
-        const totalFee =
-          currentMonthFee +
-          (data.student?.due || 0) -
-          (data.student?.advance || 0);
-        setCalculatedFee(totalFee);
-        setAdvancePaymentPeriod(currentMonthName);
-        setSelectedDeal("current month");
-      }
-    } catch (error) {
-      console.error("Error fetching student data:", error);
-      setStudentData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+       const currentMonthFee = shifts[data.student.shift] || 0;
+       const totalFee =
+         currentMonthFee +
+         (data.student.due || 0) -
+         (data.student.advance || 0);
+       setCalculatedFee(totalFee);
+       setAdvancePaymentPeriod(currentMonthName);
+       setSelectedDeal("current month");
+     }
+   } catch (error) {
+     console.error("Error fetching student data:", error);
+     setStudentData(null);
+     setError(error.message || "An error occurred while fetching student data");
+     toast.error(
+       "Not registered, if you have already registred then kindly Contact Us"
+     );
+   } finally {
+     setLoading(false);
+   }
+ };
 
   const handleDealSelect = (event) => {
     const selectedValue = event.target.value;
@@ -255,6 +265,11 @@ const Fee = () => {
           >
             {loading ? <CircularProgress size={24} /> : "Auto Generate Fee"}
           </Button>
+          {error && (
+            <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <Controller
             name="name"
             control={control}
@@ -333,7 +348,7 @@ const Fee = () => {
                     Calculated Net Fee:
                   </Typography>
                   <Typography variant="h6" color="blue">
-                    ₹{(calculatedFee)}
+                    ₹{calculatedFee}
                   </Typography>
                 </Grid>
               </Box>

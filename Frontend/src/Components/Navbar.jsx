@@ -1,25 +1,39 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  Menu,
+  Container,
+  Avatar,
+  Button,
+  Tooltip,
+  MenuItem,
+  Fade,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import { AdminContext } from "../App";
 import { logoutUser } from "../services/auth";
-import Footer from "./footer"; // Import the Footer component
+import logoImage from "../images/logo.jpg";
+const colors = {
+  primary: "#006400", // Dark Green
+  secondary: "#FFA500", // Orange
+  text: "#333333",
+  background: "#F0F8FF", // Light Sky Blue
+  white: "#FFFFFF",
+  accent: "#4CAF50", // Light Green
+};
 
 function Navbar() {
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
   const [initials, setInitials] = useState("");
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (IsUserLoggedIn && IsUserLoggedIn.username) {
       const userInitials = IsUserLoggedIn.username
@@ -28,22 +42,18 @@ function Navbar() {
         .join("");
       setInitials(userInitials.toUpperCase());
     } else {
-      setInitials(""); // Reset initials if user is not logged in or username is undefined
+      setInitials("");
     }
-  }, [IsUserLoggedIn]); // Trigger effect whenever IsUserLoggedIn changes
+  }, [IsUserLoggedIn]);
 
-  const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-  const navigate = useNavigate();
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-  const handlelogin = () => {
-    navigate("/login");
-  };
+
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
@@ -51,222 +61,244 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   const handleLogout = async () => {
     try {
-      await logoutUser(); // Call the logout function
-      setIsUserLoggedIn(false); // Update context to reflect logged out state
-      navigate("/"); // Redirect to login page after successful logout
+      await logoutUser();
+      setIsUserLoggedIn(false);
+      navigate("/");
     } catch (error) {
-      // console.error("Error logging out:", error);
+      console.error("Error logging out:", error);
     }
   };
-  let pages = [];
-  if (IsUserLoggedIn) {
-    const role = IsUserLoggedIn.role;
-    // console.log(role);
-    if (role === "admin") {
-      pages = [
-        { name: "Library", link: "/admin_library" },
-        { name: "Classes", link: "/admin_classes" },
-        { name: "Quiz", link: "/admin/quiz" },
-        { name: "AdminChat", link: "/admin/chat" },
-        { name: "Policies", link: "/Policies" },
-      ];
-    } else {
-      pages = [
-        { name: "Library", link: "/library" },
-        { name: "Classes", link: "/classes" },
-        { name: "Resources", link: "/resources" },
-        { name: "Query", link: "/chat/home" },
-        { name: "Policies", link: "/Policies" },
-      ];
-    }
-  }
-  // console.log(pages);
 
-  const settingsLoggedIn = [
+  const pages = IsUserLoggedIn
+    ? IsUserLoggedIn?.role === "admin"
+      ? [
+          { name: "Library", link: "/admin_library" },
+
+          { name: "AdminChat", link: "/admin/chat" },
+          { name: "Policies", link: "/Policies" },
+        ]
+      : [
+          { name: "Library", link: "/library" },
+          { name: "Classes", link: "/classes" },
+          { name: "Resources", link: "/resources" },
+          { name: "Query", link: "/chat/home" },
+          { name: "Policies", link: "/Policies" },
+        ]
+    : [];
+  const homeURL = IsUserLoggedIn?.role === "user" ? "/" : "/admin_home";
+  const settings = [
     {
       name: "Profile",
       link: `/profile/${IsUserLoggedIn ? IsUserLoggedIn._id : ""}`,
     },
     {
-      name: `Dashboard`,
+      name: "Dashboard",
       link: `/dashboard/${IsUserLoggedIn ? IsUserLoggedIn._id : ""}`,
     },
     { name: "Logout", link: "/logout", action: handleLogout },
   ];
-  const settings = settingsLoggedIn;
 
-  // console.log(settings);
   return (
-    <div>
-      <AppBar
-        position="static"
-        className="nav"
-        style={{ backgroundColor: "#004d40" }}
-      >
-        <Container maxWidth="xl">
-          <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
-                display: { xs: "none", md: "flex" },
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
-              }}
-            >
-              EduGainer's
-            </Typography>
+    <AppBar position="static" sx={{ backgroundColor: colors.primary }}>
+      <Container maxWidth="lg">
+        <Toolbar disableGutters>
+          <Box
+            component="img"
+            src={logoImage}
+            alt="EduGainer's Logo"
+            sx={{
+              height: 40,
+              marginRight: 2,
+              display: { xs: "none", md: "flex" },
+            }}
+          />
+          <Typography
+            variant="h6"
+            noWrap
+            component={Link}
+            to={homeURL}
+            sx={{
+              mr: 2,
+              display: { xs: "none", md: "flex" },
+              fontFamily: "monospace",
+              fontWeight: 700,
+              letterSpacing: ".3rem",
+              color: colors.white,
+              textDecoration: "none",
+              "&:hover": {
+                color: colors.secondary,
+                transition: "color 0.3s ease-in-out",
+              },
+            }}
+          >
+            EduGainer
+          </Typography>
 
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                }}
-              >
-                {pages.map((page) => (
-                  <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">
-                      <Link
-                        to={page.link}
-                        style={{ textDecoration: "none", color: "inherit" }}
-                      >
-                        {page.name}
-                      </Link>
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-            <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-            <Typography
-              variant="h5"
-              noWrap
-              component="a"
-              href="/"
+          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
               sx={{
-                mr: 2,
-                display: { xs: "flex", md: "none" },
-                flexGrow: 1,
-                fontFamily: "monospace",
-                fontWeight: 700,
-                letterSpacing: ".3rem",
-                color: "inherit",
-                textDecoration: "none",
+                display: { xs: "block", md: "none" },
               }}
             >
-              EduGainer's
-            </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {pages.map((page) => (
-                <Button
-                  key={page.name}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  <Link
-                    to={page.link}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {page.name}
-                  </Link>
-                </Button>
+                <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+                  <Typography textAlign="center">
+                    <Link
+                      to={page.link}
+                      style={{ textDecoration: "none", color: colors.text }}
+                    >
+                      {page.name}
+                    </Link>
+                  </Typography>
+                </MenuItem>
               ))}
-            </Box>
+            </Menu>
+          </Box>
 
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title={IsUserLoggedIn ? "Open Settings" : ""}>
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  {IsUserLoggedIn ? (
-                    <Avatar
-                      alt={IsUserLoggedIn.username}
-                      src="/static/images/avatar/2.jpg"
-                    >
-                      {initials}
-                    </Avatar>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      onClick={handlelogin}
-                    >
-                      Get Started
-                    </Button>
-                  )}
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+          <Typography
+            variant="h5"
+            noWrap
+            component={Link}
+            to="/"
+            sx={{
+              mr: 2,
+              display: { xs: "flex", md: "none" },
+              flexGrow: 1,
+              fontFamily: "monospace",
+              fontWeight: 700,
+              letterSpacing: ".3rem",
+              color: colors.white,
+              textDecoration: "none",
+              "&:hover": {
+                color: colors.secondary,
+                transition: "color 0.3s ease-in-out",
+              },
+            }}
+          >
+            EduGainer
+          </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            {pages.map((page) => (
+              <Button
+                key={page.name}
+                component={Link}
+                to={page.link}
+                onClick={handleCloseNavMenu}
+                sx={{
+                  my: 2,
+                  color: colors.white,
+                  display: "block",
+                  "&:hover": {
+                    backgroundColor: colors.accent,
+                    transition: "background-color 0.3s ease-in-out",
+                  },
                 }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
-                  <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
-                    {setting.action ? (
-                      <Typography textAlign="center" onClick={setting.action}>
-                        {setting.name}
-                      </Typography>
-                    ) : (
-                      <Typography textAlign="center">
-                        <Link
-                          to={setting.link}
-                          style={{ textDecoration: "none", color: "inherit" }}
-                        >
-                          {setting.name}
-                        </Link>
-                      </Typography>
-                    )}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-          </Toolbar>
-        </Container>
-      </AppBar>
-   
-    </div>
+                {page.name}
+              </Button>
+            ))}
+          </Box>
+
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title={IsUserLoggedIn ? "Open settings" : "Login"}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                {IsUserLoggedIn ? (
+                  <Avatar
+                    alt={IsUserLoggedIn.username}
+                    src="/static/images/avatar/2.jpg"
+                    sx={{
+                      bgcolor: colors.secondary,
+                      "&:hover": {
+                        bgcolor: colors.accent,
+                        transition: "background-color 0.3s ease-in-out",
+                      },
+                    }}
+                  >
+                    {initials}
+                  </Avatar>
+                ) : (
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate("/login")}
+                    sx={{
+                      backgroundColor: colors.secondary,
+                      color: colors.white,
+                      "&:hover": {
+                        backgroundColor: colors.accent,
+                        transition: "background-color 0.3s ease-in-out",
+                      },
+                    }}
+                  >
+                    Begin Your Journey
+                  </Button>
+                )}
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: "45px" }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+              TransitionComponent={Fade}
+            >
+              {settings.map((setting) => (
+                <MenuItem
+                  key={setting.name}
+                  onClick={setting.action || handleCloseUserMenu}
+                  component={setting.action ? "div" : Link}
+                  to={setting.link}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: colors.background,
+                      transition: "background-color 0.3s ease-in-out",
+                    },
+                  }}
+                >
+                  <Typography textAlign="center">{setting.name}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 }
+
 export default Navbar;

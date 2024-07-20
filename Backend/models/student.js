@@ -131,6 +131,10 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'LibStudent', // Reference to the LibStudent model
   },
+  reg: {
+    type: String,
+    required: true, // Ensure the reg field is provided
+  },
   due: { type: Number, default: 0 },
   receipt: { type: String },
   advance: { type: Number, default: 0 },
@@ -139,8 +143,12 @@ const bookingSchema = new mongoose.Schema({
   seat: { type: String },
   date: { type: String },
   cash: { type: String, default: 0 },
-  TotalMoney: { type: String },
-  
+  TotalMoney: {
+    type: Number,
+    default: function () {
+      return this.advance - this.due;
+    }
+  },
   online: { type: String, default: 0 },
   shift: { type: String, default: '' },
   fee: { type: String, default: 0 },
@@ -152,6 +160,19 @@ const bookingSchema = new mongoose.Schema({
   status: { type: String, default: '' },
   colors: { type: Map, of: String, default: {} }
 });
+bookingSchema.pre('save', async function (next) {
+  this.TotalMoney = this.advance - this.due;
+
+  // Verify if the reg field corresponds to a LibStudent reg
+  const libStudent = await mongoose.model('LibStudent').findOne({ reg: this.reg });
+  if (!libStudent) {
+    const err = new Error('Invalid reg reference');
+    return next(err);
+  }
+
+  next();
+});
+
 
 // Function to get the model for a specific month
 const getModelForMonth = (month) => {

@@ -140,7 +140,7 @@ export async function getSeatInfo(seat) {
     // console.log(seat,"getseatinfo");
     try {
         const response = await axiosInstance.get(`/admin_library/getSeatInfo/${seat}`);
-       
+       console.log(response.data)
         return response.data;
     } catch (error) {
         // console.error("Error fetching seat info:", error);
