@@ -81,7 +81,7 @@ const addBookingData = async (req, res) => {
 
 const updateBookingData = async (req, res) => {
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
-  
+  console.log(typeof(due),typeof(advance))
     try {
         const BookingModel = getCurrentMonthBookingModel();
         const newBooking = await BookingModel.findOneAndUpdate(
@@ -176,6 +176,7 @@ const updateSeatStatus = async (req, res) => {
 
             const currentDate = new Date().toISOString().split('T')[0];
             const student = await LibStudent.findOne({ reg });
+            console.log(typeof(reg),"kkkkkkkkk")
             const updatedBooking = await BookingModel.findOneAndUpdate(
                 { reg },
                 { name:student?.name,seat, reg: reg, status: "Paid",shift ,date:currentDate},

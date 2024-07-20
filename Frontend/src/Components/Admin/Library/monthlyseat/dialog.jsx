@@ -48,6 +48,7 @@ const BookingDialog = ({
   }, [open, defaultValues, setValue]);
 
   const onSubmit = (data) => {
+    console.log(data, "kkkkkkkkk");
     handleSubmitForm(data);
     reset();
     handleClose();
@@ -107,7 +108,10 @@ const BookingDialog = ({
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                {...register("cash", { required: "Cash is required" })}
+                {...register("cash", {
+                  required: "Cash is required",
+                  valueAsNumber: true,
+                })}
                 label="Cash"
                 type="number"
                 fullWidth
@@ -118,7 +122,10 @@ const BookingDialog = ({
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                {...register("online", { required: "Online is required" })}
+                {...register("online", {
+                  required: "Online is required",
+                  valueAsNumber: true,
+                })}
                 label="Online"
                 type="number"
                 fullWidth
@@ -146,7 +153,10 @@ const BookingDialog = ({
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                {...register("fee", { required: "Fee is required" })}
+                {...register("fee", {
+                  required: "Fee is required",
+                  valueAsNumber: true,
+                })}
                 label="Fee"
                 type="number"
                 fullWidth
@@ -165,27 +175,27 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.remarks || ""}
               />
             </Grid>
-           <Grid item xs={12}>
-  <TextField
-    {...register("status", { required: "Status is required" })}
-    label="Status"
-    fullWidth
-    select
-    error={!!errors.status}
-    helperText={errors.status?.message}
-    defaultValue={defaultValues?.status || ""}
-  >
-    <MenuItem value="Paid">Paid</MenuItem>
-    <MenuItem value="Empty">Empty Confirmation</MenuItem>
-    <MenuItem value="Confirmation">Paid</MenuItem>
-    
-  </TextField>
-</Grid>
-
-          
+            <Grid item xs={12}>
+              <TextField
+                {...register("status", { required: "Status is required" })}
+                label="Status"
+                fullWidth
+                select
+                error={!!errors.status}
+                helperText={errors.status?.message}
+                defaultValue={defaultValues?.status || ""}
+              >
+                <MenuItem value="Paid">Paid</MenuItem>
+                <MenuItem value="Empty">Empty Confirmation</MenuItem>
+                <MenuItem value="Confirmation">Paid</MenuItem>
+              </TextField>
+            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                {...register("due", { required: "Due is required" })}
+                {...register("due", {
+                  required: "Due is required",
+                  valueAsNumber: true,
+                })}
                 label="Due"
                 type="number"
                 fullWidth
@@ -196,7 +206,10 @@ const BookingDialog = ({
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                {...register("advance", { required: "Advance is required" })}
+                {...register("advance", {
+                  required: "Advance is required",
+                  valueAsNumber: true,
+                })}
                 label="Advance"
                 type="number"
                 fullWidth
@@ -215,7 +228,7 @@ const BookingDialog = ({
             </Grid>
             <Grid item xs={12}>
               <TextField
-                {...register("TotalMoney", {})}
+                {...register("TotalMoney", { valueAsNumber: true })}
                 label="Total Money"
                 type="number"
                 fullWidth

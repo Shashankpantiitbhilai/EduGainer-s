@@ -29,7 +29,7 @@ const ManageSeats = () => {
   const [selectedShift, setSelectedShift] = useState("6:30 AM to 6:30 PM");
   const [seatStatus, setSeatStatus] = useState({});
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedSeat, setSelectedSeat] = useState(null);
+  const [selectedSeat, setSelectedSeat] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [formDialogOpen, setFormDialogOpen] = useState(false);

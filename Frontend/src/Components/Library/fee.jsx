@@ -53,7 +53,7 @@ const Fee = () => {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
-    const [error, setError] = useState("");
+  const [error, setError] = useState("");
   const [shouldInitiatePayment, setShouldInitiatePayment] = useState(false);
   const {
     control,
@@ -86,7 +86,6 @@ const Fee = () => {
       const initiatePayment = async () => {
         try {
           await initializePayment();
-          toast.success("Fee payment successful");
         } catch (error) {
           console.error("Payment failed:", error);
           if (error.response) {
@@ -103,55 +102,58 @@ const Fee = () => {
     }
   }, [shouldInitiatePayment]);
 
- const autoGenerateFee = async () => {
-   setLoading(true);
-   setError(""); // Clear any previous errors
-   try {
-     const data = await fetchLibStudent(regNo);
-     if (!data || !data.student) {
-       setError("Student not registered");
-     }
-     setStudentData(data.student);
-     setValue("name", data.student.name);
-     setValue("shift", data.student.shift);
-     if (data.student.shift) {
-       const date = new Date();
-       const monthNames = [
-         "January",
-         "February",
-         "March",
-         "April",
-         "May",
-         "June",
-         "July",
-         "August",
-         "September",
-         "October",
-         "November",
-         "December",
-       ];
-       const currentMonthName = monthNames[date.getMonth()];
+  const autoGenerateFee = async () => {
+    setLoading(true);
+    setError(""); // Clear any previous errors
+    try {
+      const data = await fetchLibStudent(regNo);
+      if (!data || !data.student) {
+        setError("Student not registered");
+      }
+      setStudentData(data.student);
+      setValue("name", data.student.name);
+      setValue("shift", data.student.shift);
+      if (data.student.shift) {
+        const date = new Date();
+        const monthNames = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        const currentMonthName = monthNames[date.getMonth()];
 
-       const currentMonthFee = shifts[data.student.shift] || 0;
-       const totalFee =
-         currentMonthFee +
-         (data.student.due || 0) -
-         (data.student.advance || 0);
-       setCalculatedFee(totalFee);
-       setAdvancePaymentPeriod(currentMonthName);
-       setSelectedDeal("current month");
-     }
-   } catch (error) {
-     console.error("Error fetching student data:", error);
-     setStudentData(null);
-     setError(error.message || "An error occurred while fetching student data");
-     toast.error(
-       "Not registered, if you have already registred then kindly Contact Us"
-     );
-   } finally {
-     setLoading(false);
-   }
- };
+        const currentMonthFee = shifts[data.student.shift] || 0;
+        console.log(typeof data.student.due, typeof data.student.advance);
+        const totalFee =
+          currentMonthFee +
+          (data.student.due || 0) -
+          (data.student.advance || 0);
+        setCalculatedFee(totalFee);
+        setAdvancePaymentPeriod(currentMonthName);
+        setSelectedDeal("current month");
+      }
+    } catch (error) {
+      console.error("Error fetching student data:", error);
+      setStudentData(null);
+      setError(
+        error.message || "An error occurred while fetching student data"
+      );
+      toast.error(
+        "Not registered, if you have already registred then kindly Contact Us"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDealSelect = (event) => {
     const selectedValue = event.target.value;
@@ -220,7 +222,7 @@ const Fee = () => {
     };
 
     setFormData(newFormData);
-    setShouldInitiatePayment(true);
+    if (calculatedFee > 0) setShouldInitiatePayment(true);
   };
 
   return (
@@ -360,7 +362,13 @@ const Fee = () => {
                 sx={{ mt: 3 }}
                 disabled={loading}
               >
-                {loading ? <CircularProgress size={24} /> : "Pay Now"}
+                {loading ? (
+                  <CircularProgress size={24} />
+                ) : calculatedFee > 0 ? (
+                  `Pay Now: ${calculatedFee}`
+                ) : (
+                  "No fee to be paid"
+                )}
               </Button>
             </>
           )}

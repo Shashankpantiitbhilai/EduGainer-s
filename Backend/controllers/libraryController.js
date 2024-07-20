@@ -5,9 +5,9 @@ const { getModelForMonth } = require('../models/student'); // Assume the functio
 const getCurrentMonthBookings = async (req, res) => {
     try {
         const currentMonth = new Date().getMonth() + 1;
-      
+
         const Booking = getModelForMonth(currentMonth);
-console.log(Booking)
+        console.log(Booking)
         const bookings = await Booking.find({}, 'seat status shift');
         const bookingsByShift = bookings.reduce((acc, booking) => {
             const { seat, status, shift } = booking;
@@ -41,14 +41,14 @@ const getStudentLibSeat = async (req, res) => {
     const { id } = req.params;
     try {
         const currentMonth = new Date().getMonth() + 1;
-      
+
         const Booking = getModelForMonth(currentMonth);
 
         const student = await LibStudent.findOne({ userId: id });
         if (!student) {
             return res.status(404).json({ error: 'Student not found in LibStudent collection' });
         }
-console.log(student)
+        console.log(student)
         const findBooking = await Booking.findOne({ reg: student.reg });
         if (!findBooking) {
             return res.status(404).json({ error: 'Booking not found for this student' });
@@ -73,7 +73,7 @@ const getLibStudentData = async (req, res) => {
 
         // Try to find the student in the Booking collection
         const bookingData = await Booking.findOne({ reg }).select('name shift due advance');
-console.log(bookingData)
+        console.log(bookingData)
         if (bookingData) {
             // If student is found in Booking, respond with their details
             res.status(200).json({
@@ -119,14 +119,14 @@ const verifyLibfeePayment = async (req, res) => {
     if (isSignatureValid) {
         try {
             const currentMonth = new Date().getMonth() + 1;
-          
+
             const Booking = getModelForMonth(currentMonth);
 
             const user = await LibStudent.findOne({ userId: user_id });
             if (!user) {
                 return res.status(404).json({ success: false, error: 'User not found' });
             }
-
+console.log(typeof(fee))
             const currentDate = new Date().toISOString().split('T')[0];
             const updatedBooking = await Booking.findOneAndUpdate(
                 { reg },
@@ -137,15 +137,15 @@ const verifyLibfeePayment = async (req, res) => {
                     Online: fee,
                     date: currentDate,
                     fee,
-                    TotalMoney: fee,
+
                     remarks: advancePaymentPeriod,
-                    status:"Paid",
+                    status: "Paid",
                     'Payment_detail.razorpay_order_id': order_id,
                     'Payment_detail.razorpay_payment_id': payment_id
                 },
-                { new: true ,upsert:true}
+                { new: true, upsert: true }
             );
-console.log(updatedBooking)
+            console.log(updatedBooking)
             res.status(200).json({ success: true, message: 'Payment verified successfully', booking: updatedBooking });
         } catch (error) {
             console.error("Error updating student record:", error);
@@ -182,7 +182,7 @@ const sendFeeData = async (req, res) => {
 //         }
 
 //         const currentMonth = new Date().getMonth() + 1;
-      
+
 //         const Booking = getModelForMonth(currentMonth);
 
 //         const order = await createOrder(amount);

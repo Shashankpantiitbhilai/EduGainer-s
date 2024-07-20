@@ -138,20 +138,18 @@ const bookingSchema = new mongoose.Schema({
   due: { type: Number, default: 0 },
   receipt: { type: String },
   advance: { type: Number, default: 0 },
-  reg: { type: String },
+
   name: { type: String, default: '' },
   seat: { type: String },
   date: { type: String },
-  cash: { type: String, default: 0 },
+  cash: { type: Number, default: 0 },
   TotalMoney: {
     type: Number,
-    default: function () {
-      return this.advance - this.due;
-    }
+    default: 0
   },
-  online: { type: String, default: 0 },
+  online: { type: Number, default: 0 },
   shift: { type: String, default: '' },
-  fee: { type: String, default: 0 },
+  fee: { type: Number, default: 0 },
   remarks: { type: String, default: '' },
   Payment_detail: {
     razorpay_order_id: { type: String },
@@ -161,17 +159,26 @@ const bookingSchema = new mongoose.Schema({
   colors: { type: Map, of: String, default: {} }
 });
 bookingSchema.pre('save', async function (next) {
-  this.TotalMoney = this.advance - this.due;
+  try {
+    // Ensure advance and due are numbers
+    const advance = isNaN(this.advance) ? 0 : this.advance;
+    const due = isNaN(this.due) ? 0 : this.due;
+    this.TotalMoney = advance - due;
 
-  // Verify if the reg field corresponds to a LibStudent reg
-  const libStudent = await mongoose.model('LibStudent').findOne({ reg: this.reg });
-  if (!libStudent) {
-    const err = new Error('Invalid reg reference');
-    return next(err);
+    // Verify if the reg field corresponds to a LibStudent reg
+    const libStudent = await mongoose.model('LibStudent').findOne({ reg: this.reg });
+    if (!libStudent) {
+      const err = new Error('Invalid reg reference');
+      return next(err);
+    }
+
+    next();
+  } catch (err) {
+    next(err);
   }
-
-  next();
 });
+
+
 
 
 // Function to get the model for a specific month
