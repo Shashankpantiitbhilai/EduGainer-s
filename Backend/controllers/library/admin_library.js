@@ -9,12 +9,11 @@ const getCurrentMonthBookingModel = () => {
 const getSeatInfo = async (req, res) => {
     const { seat } = req.params;
     try {
-        console.log(seat)
+      
         const BookingModel = getCurrentMonthBookingModel();
         const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Empty" } })
             .select('name seat shift image reg');
-console.log(bookings)
-       
+
 
         res.status(200).json(bookings);
     } catch (error) {
@@ -39,7 +38,8 @@ const getStudentInfo = async (req, res) => {
 
 const getBookingData = async (req, res) => {
     const { month } = req.params;
-    console.log("Requested month:", month);
+    
+
 
     try {
         let BookingModel;
@@ -48,15 +48,15 @@ const getBookingData = async (req, res) => {
         if (month && month.toLowerCase() !== 'all') {
             // If a specific month is selected, use the corresponding model
             BookingModel = getModelForMonth(month);
-            console.log("Using specific month model:", month);
+        
         } else {
             // If no month is selected or "all" is selected, use the current month's model
             BookingModel = getCurrentMonthBookingModel();
-            console.log("Using current month model");
+          
         }
 
         const bookings = await BookingModel.find({});
-        console.log("Fetched bookings:", bookings.length);
+       
         res.status(200).json(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -81,7 +81,7 @@ const addBookingData = async (req, res) => {
 
 const updateBookingData = async (req, res) => {
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
-    console.log(req.body,"jjjjjjj")
+  
     try {
         const BookingModel = getCurrentMonthBookingModel();
         const newBooking = await BookingModel.findOneAndUpdate(
@@ -106,7 +106,7 @@ const updateBookingData = async (req, res) => {
             },
             { new: true }
         );
-        console.log(newBooking)
+   
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
         }
@@ -156,7 +156,7 @@ const updateBookingColor = async (req, res) => {
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
     const { seat, status ,shift} = req.body; // assuming these are sent in the request body
-console.log(req.body,"jjjjjjjjjjjjjjj")
+
     try {
         const BookingModel = getCurrentMonthBookingModel();
 

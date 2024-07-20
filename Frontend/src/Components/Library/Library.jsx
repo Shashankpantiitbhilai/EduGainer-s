@@ -10,17 +10,15 @@ import {
   AlertTitle,
   Grid,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";
 import { io } from "socket.io-client";
 import { fetchAdminCredentials } from "../../services/chat/utils";
-import { fetchLibStudent } from "../../services/library/utils";
+
 const shifts = [
   "6:30 AM to 2 PM",
   "2 PM to 9:30 PM",
@@ -31,15 +29,11 @@ const shifts = [
   "24*7",
 ];
 
-
-
 const getBackgroundColor = (status, isUserSeat) => {
   if (isUserSeat) return "orange";
   switch (status) {
     case "Paid":
       return "red";
-    
-   
     default:
       return "green";
   }
@@ -52,36 +46,41 @@ const SeatRow = ({
   selectedShift,
   userShift,
   onSeatClick,
-}) => (
-  <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-    {seats.map((seat) => (
-      <Button
-        key={seat}
-        variant="contained"
-        // onClick={() => onSeatClick(seat)}
-        sx={{
-          width: 40,
-          height: 40,
-          minWidth: 40,
-          p: 0,
-          backgroundColor: getBackgroundColor(
-            seatStatus[seat],
-            seat == userSeat && selectedShift == userShift
-          ),
-          "&:hover": {
+}) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  return (
+    <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
+      {seats.map((seat) => (
+        <Button
+          key={seat}
+          variant="contained"
+          sx={{
+            width: isMobile ? 30 : 40,
+            height: isMobile ? 30 : 40,
+            minWidth: isMobile ? 30 : 40,
+            p: 0,
+            fontSize: isMobile ? "0.7rem" : "0.875rem",
             backgroundColor: getBackgroundColor(
               seatStatus[seat],
-              seat == userSeat && selectedShift == userShift
+              seat === userSeat && selectedShift === userShift
             ),
-            opacity: 0.8,
-          },
-        }}
-      >
-        {seat}
-      </Button>
-    ))}
-  </Box>
-);
+            "&:hover": {
+              backgroundColor: getBackgroundColor(
+                seatStatus[seat],
+                seat === userSeat && selectedShift === userShift
+              ),
+              opacity: 0.8,
+            },
+          }}
+        >
+          {seat}
+        </Button>
+      ))}
+    </Box>
+  );
+};
 
 const Library = () => {
   const [selectedShift, setSelectedShift] = useState(shifts[0]);
@@ -90,41 +89,14 @@ const Library = () => {
   const [userShift, setUserShift] = useState(null);
   const { IsUserLoggedIn } = useContext(AdminContext);
   const socketRef = useRef(null);
-  const [showNotification, setShowNotification] = useState(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const url =
     process.env.NODE_ENV === "production"
       ? process.env.REACT_APP_BACKEND_PROD
       : process.env.REACT_APP_BACKEND_DEV;
-   useEffect(() => {
-     const checkTime = () => {
-       const now = new Date();
-       const hours = now.getHours();
-       const minutes = now.getMinutes();
-
-       if (hours === 14 && minutes === 50) {
-         setShowNotification(true);
-       }
-     };
-
-     // Check immediately on component mount
-     checkTime();
-
-     // Set up an interval to check every minute
-     const interval = setInterval(checkTime, 60 * 1000);
-
-     return () => clearInterval(interval);
-   }, []);
-  const handleContinue = () => {
-    // Add logic here to handle user's decision to continue
-    console.log("User decided to continue for the next month");
-    setShowNotification(false);
-  };
-
-  const handleDiscontinue = () => {
-    // Add logic here to handle user's decision to discontinue
-    console.log("User decided to discontinue for the next month");
-    setShowNotification(false);
-  };
 
   useEffect(() => {
     const initializeData = async () => {
@@ -183,24 +155,30 @@ const Library = () => {
     setSelectedShift(event.target.value);
   };
 
-  const handleSeatClick = (seat) => {
-    console.log(`Seat ${seat} clicked`);
-    // Add your logic for seat click here
-  };
-
   return (
-    <Box sx={{ p: 4, maxWidth: "lg", mx: "auto" }}>
-      <Box component="h1" sx={{ fontSize: "2xl", fontWeight: "bold", mb: 4 }}>
+    <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: "lg", mx: "auto" }}>
+      <Box
+        component="h1"
+        sx={{ fontSize: { xs: "xl", sm: "2xl" }, fontWeight: "bold", mb: 4 }}
+      >
         EduGainer's Library Seating
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 4, mb: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "center",
+          gap: 2,
+          mb: 4,
+        }}
+      >
         <Button
           component={Link}
           to="/new-reg"
           variant="contained"
           color="primary"
-          size="large"
-          sx={{ minWidth: 150, fontSize: "1.1rem" }}
+          size={isMobile ? "medium" : "large"}
+          sx={{ minWidth: 150, fontSize: { xs: "1rem", sm: "1.1rem" } }}
         >
           Register
         </Button>
@@ -209,13 +187,15 @@ const Library = () => {
           to="/library/fee-pay"
           variant="contained"
           color="secondary"
-          size="large"
-          sx={{ minWidth: 150, fontSize: "1.1rem" }}
+          size={isMobile ? "medium" : "large"}
+          sx={{ minWidth: 150, fontSize: { xs: "1rem", sm: "1.1rem" } }}
         >
           Pay Fee
         </Button>
       </Box>
-      <FormControl sx={{ mb: 4, minWidth: 200 }}>
+      <FormControl
+        sx={{ mb: 4, minWidth: 200, width: { xs: "100%", sm: "auto" } }}
+      >
         <InputLabel id="shift-select-label">Select Shift</InputLabel>
         <Select
           labelId="shift-select-label"
@@ -236,224 +216,218 @@ const Library = () => {
         <AlertTitle>Note</AlertTitle>
         In case the seat you need is not empty, kindly contact our office.
       </Alert>
-      <Grid item xs={12} md={8}>
-        <Paper
-          elevation={2}
-          sx={{ p: 2, borderRadius: 2, position: "relative" }}
-        >
-          <Box sx={{ border: "2px solid #ccc", borderRadius: "8px", p: 2 }}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 2,
-                }}
-              >
-                <SeatRow
-                  seats={["A3", "A4", "A5", "A6", "A7", "A8", "A9", "A0"]}
-                  seatStatus={seatStatus}
-                  userSeat={userSeat}
-                  selectedShift={selectedShift}
-                  userShift={userShift}
-                />
-                <SeatRow
-                  seats={[77, 78, 79, 80, 81, 82, 83, 84]}
-                  seatStatus={seatStatus}
-                  userSeat={userSeat}
-                  selectedShift={selectedShift}
-                  userShift={userShift}
-                />
+
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              position: "relative",
+              overflow: "auto",
+            }}
+          >
+            <Box sx={{ border: "2px solid #ccc", borderRadius: "8px", p: 2 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
+                    justifyContent: "space-between",
+                    gap: 2,
+                  }}
+                >
+                  <SeatRow
+                    seats={["A3", "A4", "A5", "A6", "A7", "A8", "A9", "A0"]}
+                    seatStatus={seatStatus}
+                    userSeat={userSeat}
+                    selectedShift={selectedShift}
+                    userShift={userShift}
+                  />
+                  <SeatRow
+                    seats={[77, 78, 79, 80, 81, 82, 83, 84]}
+                    seatStatus={seatStatus}
+                    userSeat={userSeat}
+                    selectedShift={selectedShift}
+                    userShift={userShift}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
+                    justifyContent: "space-between",
+                    gap: 2,
+                  }}
+                >
+                  <Box>
+                    <SeatRow
+                      seats={[68, 67, 66, 65, 64, 63, 62, 61]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[52, 51, 50, 49, 48, 47, 46, 45]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                  </Box>
+                  <Box>
+                    <SeatRow
+                      seats={[69, 70, 71, 72, 73, 74, 75, 76]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[53, 54, 55, 56, 57, 58, 59, 60]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-start", gap: 2 }}
+                >
+                  <Box>
+                    <SeatRow
+                      seats={[44, 43, 42, 41, 40, 39, 38, 37]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[36, 35, 34, 33, 32, 31, 30, 29]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
+                    justifyContent: "space-between",
+                    gap: 2,
+                  }}
+                >
+                  <Box>
+                    <SeatRow
+                      seats={[28, 27, 26]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[21, 20, 19]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[14, 13, 12]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[1, 2, 3]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                  </Box>
+                  <Box sx={{ mx: { xs: 0, sm: 2, md: 4, lg: 5 } }}>
+                    <SeatRow
+                      seats={[25, 24, 23, 22]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[15, 16, 17, 18]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[8, 9, 10, 11]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                    <SeatRow
+                      seats={[4, 5, 6, 7]}
+                      seatStatus={seatStatus}
+                      userSeat={userSeat}
+                      selectedShift={selectedShift}
+                      userShift={userShift}
+                    />
+                  </Box>
+                </Box>
               </Box>
 
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  gap: 2,
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  mt: 4,
                 }}
               >
-                <Box>
-                  <SeatRow
-                    seats={[68, 67, 66, 65, 64, 63, 62, 61]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[52, 51, 50, 49, 48, 47, 46, 45]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                </Box>
-                <Box>
-                  <SeatRow
-                    seats={[69, 70, 71, 72, 73, 74, 75, 76]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[53, 54, 55, 56, 57, 58, 59, 60]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                </Box>
-              </Box>
-
-              <Box
-                sx={{ display: "flex", justifyContent: "flex-start", gap: 2 }}
-              >
-                <Box>
-                  <SeatRow
-                    seats={[44, 43, 42, 41, 40, 39, 38, 37]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[36, 35, 34, 33, 32, 31, 30, 29]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 2,
-                }}
-              >
-                <Box>
-                  <SeatRow
-                    seats={[28, 27, 26]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[21, 20, 19]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[14, 13, 12]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[1, 2, 3]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                </Box>
-                <Box sx={{ mx: 50 }}>
-                  <SeatRow
-                    seats={[25, 24, 23, 22]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[15, 16, 17, 18]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[8, 9, 10, 11]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                  <SeatRow
-                    seats={[4, 5, 6, 7]}
-                    seatStatus={seatStatus}
-                    userSeat={userSeat}
-                    selectedShift={selectedShift}
-                    userShift={userShift}
-                  />
-                </Box>
+                <Box sx={{ mr: 4 }}>door →</Box>
+                <Box sx={{ width: 64, height: 4, bgcolor: "black" }}></Box>
               </Box>
             </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                mt: 4,
-              }}
-            >
-              <Box sx={{ mr: 4 }}>door →</Box>
-              <Box sx={{ width: 64, height: 4, bgcolor: "black" }}></Box>
-            </Box>
-          </Box>
-        </Paper>
+          </Paper>
+        </Grid>
       </Grid>
       <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: "flex-start",
+            gap: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: "red", mr: 2 }}></Box>
+            <Box>Booked</Box>
+          </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box sx={{ width: 16, height: 16, bgcolor: "green", mr: 2 }}></Box>
-            <Box>Paid</Box>
+            <Box>Empty</Box>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box sx={{ width: 16, height: 16, bgcolor: "yellow", mr: 2 }}></Box>
-            <Box>Unpaid</Box>
+            <Box>Pending</Box>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "purple", mr: 2 }}></Box>
-            <Box>Left</Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "red", mr: 2 }}></Box>
-            <Box>Unknown</Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "orange", mr: 2 }}></Box>
-            <Box>Your Seat</Box>
-          </Box>
+          
         </Box>
       </Alert>
-      <Dialog
-        open={showNotification}
-        onClose={() => setShowNotification(false)}
-      >
-        <DialogTitle>Monthly Continuation</DialogTitle>
-        <DialogContent>
-          Do you want to continue using the library for the next month?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDiscontinue} color="secondary">
-            Discontinue
-          </Button>
-          <Button onClick={handleContinue} color="primary" variant="contained">
-            Continue
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

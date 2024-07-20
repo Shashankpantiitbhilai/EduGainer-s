@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Snackbar, Alert, Grid, Paper } from "@mui/material";
+import {
+  Box,
+  Snackbar,
+  Alert,
+  Grid,
+  Paper,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import {
   getSeatInfo,
   getStudentInfo,
@@ -17,7 +26,7 @@ import io from "socket.io-client";
 import { AdminContext } from "../../../../App";
 
 const ManageSeats = () => {
-  const [selectedShift, setSelectedShift] = useState("6.30 AM to 2 PM");
+  const [selectedShift, setSelectedShift] = useState("6:30 AM to 6:30 PM");
   const [seatStatus, setSeatStatus] = useState({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedSeat, setSelectedSeat] = useState(null);
@@ -44,6 +53,9 @@ const ManageSeats = () => {
   });
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [socket, setSocket] = useState(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const url =
     process.env.NODE_ENV === "production"
       ? process.env.REACT_APP_BACKEND_PROD
@@ -55,7 +67,7 @@ const ManageSeats = () => {
 
   useEffect(() => {
     const newSocket = io(url);
-    const roomId = IsUserLoggedIn?._id; // Replace with your server URL
+    const roomId = IsUserLoggedIn?._id;
     setSocket(newSocket);
     newSocket?.emit("joinSeatsRoom", roomId);
     return () => newSocket.close();
@@ -79,18 +91,17 @@ const ManageSeats = () => {
       let statusMap = {};
       const response = await getSeatsData();
       const selectedShiftData = response[selectedShift];
-      console.log(selectedShiftData);
+      console.log(selectedShift)
+      console.log(selectedShiftData)
       if (selectedShiftData) {
         selectedShiftData.forEach((e) => {
           statusMap[e.seat] = e.status || "Empty";
         });
         setSeatStatus(statusMap);
       } else {
-        // Handle case where no data is found
-        setSeatStatus("Seat is Empty")
+        setSeatStatus({});
       }
     } catch (error) {
-      // Handle error fetching data
       setSnackbarMessage("Error fetching seat data");
       setSnackbarOpen(true);
     }
@@ -119,7 +130,6 @@ const ManageSeats = () => {
         setFormDialogOpen(true);
       }
     } catch (error) {
-      // Handle error updating status
       setSnackbarMessage("Error updating seat status");
       setSnackbarOpen(true);
     }
@@ -139,7 +149,6 @@ const ManageSeats = () => {
       setFormDialogOpen(false);
       handleCloseDialog();
     } catch (error) {
-      // Handle error updating status
       setSnackbarMessage("Error updating seat status");
       setSnackbarOpen(true);
     }
@@ -168,23 +177,18 @@ const ManageSeats = () => {
     });
   };
 
- const handleViewDetails = async () => {
-   setDialogOpen(false);
-   setMultiplePersonsDialogOpen(true);
+  const handleViewDetails = async () => {
+    setDialogOpen(false);
+    setMultiplePersonsDialogOpen(true);
 
-   try {
-     const seatdata = await getSeatInfo(selectedSeat);
-console.log(seatdata)
-   
-       setSeatInfo(seatdata);
-     
-   } catch (error) {
-     // Handle error fetching seat info
-     setSnackbarMessage("Error fetching seat details");
-     setSnackbarOpen(true);
-   }
- };
-
+    try {
+      const seatdata = await getSeatInfo(selectedSeat);
+      setSeatInfo(seatdata);
+    } catch (error) {
+      setSnackbarMessage("Error fetching seat details");
+      setSnackbarOpen(true);
+    }
+  };
 
   const handlePersonClick = async (reg) => {
     try {
@@ -193,7 +197,6 @@ console.log(seatdata)
       setMultiplePersonsDialogOpen(false);
       setDetailedPersonDialogOpen(true);
     } catch (error) {
-      // Handle error fetching student info
       setSnackbarMessage("Error fetching student info");
       setSnackbarOpen(true);
     }
@@ -212,9 +215,8 @@ console.log(seatdata)
         `Seat for person with reg ${reg} has been deallocated`
       );
       setSnackbarOpen(true);
-      fetchData(); // Refresh seat data after deallocation
+      fetchData();
     } catch (error) {
-      // Handle error deallocating seat
       setSnackbarMessage("Error deallocating seat");
       setSnackbarOpen(true);
     }
@@ -228,25 +230,35 @@ console.log(seatdata)
   };
 
   return (
-    <Box sx={{ p: 4, maxWidth: "100%", mx: "auto" }}>
-      <Box component="h1" sx={{ fontSize: "2xl", fontWeight: "bold", mb: 4 }}>
+    <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: "100%", mx: "auto" }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={{ fontWeight: "bold", mb: 4 }}
+      >
         Admin Library Seating Management
-      </Box>
+      </Typography>
       <ShiftSelector
         selectedShift={selectedShift}
         onShiftChange={handleShiftChange}
       />
       <Grid container spacing={2}>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12}>
           <Paper
-            elevation={2}
-            sx={{ p: 2, borderRadius: 2, position: "relative" }}
+            elevation={3}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              position: "relative",
+              overflow: "auto",
+            }}
           >
             <Box sx={{ border: "2px solid #ccc", borderRadius: "8px", p: 2 }}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Box
                   sx={{
                     display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
                     justifyContent: "space-between",
                     gap: 2,
                   }}
@@ -266,6 +278,7 @@ console.log(seatdata)
                 <Box
                   sx={{
                     display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
                     justifyContent: "space-between",
                     gap: 2,
                   }}
@@ -316,6 +329,7 @@ console.log(seatdata)
                 <Box
                   sx={{
                     display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
                     justifyContent: "space-between",
                     gap: 2,
                   }}
@@ -342,7 +356,7 @@ console.log(seatdata)
                       onSeatClick={handleSeatClick}
                     />
                   </Box>
-                  <Box sx={{ mx: 50 }}>
+                  <Box sx={{ mx: { xs: 0, sm: 2, md: 4, lg: 5 } }}>
                     <SeatRow
                       seats={[25, 24, 23, 22]}
                       seatStatus={seatStatus}

@@ -13,12 +13,12 @@ const shifts = [
 
 const ShiftSelector = ({ selectedShift, onShiftChange }) => (
   <FormControl sx={{ mb: 4, minWidth: 200 }}>
-    <InputLabel id="shift-select-label">Select Shift</InputLabel>
+    <InputLabel id="shift-select">Select Shift</InputLabel>
     <Select
       labelId="shift-select-label"
       id="shift-select"
-      value={selectedShift}
-      onChange={onShiftChange}
+      value={selectedShift} // Sets the value of the Select component to the selectedShift
+      onChange={onShiftChange} // Handles the change event
       label="Select Shift"
     >
       {shifts.map((shift) => (
