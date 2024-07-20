@@ -1,77 +1,92 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  TextField,
-  Grid,
   CircularProgress,
+  Typography,
+  Box,
 } from "@mui/material";
+import { styled } from "@mui/system";
+import {
+  updateMonthlyStatus,
+  getStudentLibSeat,
+} from "../../services/library/utils";
+import { AdminContext } from "../../App";
+
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: 16,
+    padding: theme.spacing(2),
+  },
+}));
+
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  padding: theme.spacing(2),
+}));
 
 const NotificationWrapper = ({ children }) => {
   const [showNotification, setShowNotification] = useState(false);
-  const [registrationData, setRegistrationData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [bookingReg, setBookingReg] = useState(null);
+  const { IsUserLoggedIn } = useContext(AdminContext);
+  const id = IsUserLoggedIn?._id;
 
   useEffect(() => {
-    const checkTime = () => {
+    const checkSeatAndSetInterval = async () => {
+      try {
+        const response = await getStudentLibSeat(id);
+        console.log(response);
+        if (response.booking && response.booking.reg) {
+          setBookingReg(response.booking.reg);
+          const interval = setInterval(checkTimeAndShowNotification, 1000);
+          return () => clearInterval(interval);
+        }
+      } catch (error) {
+        console.error("Error checking library seat:", error);
+      }
+    };
+
+    const checkTimeAndShowNotification = () => {
       const now = new Date();
       const lastNotificationDate = localStorage.getItem("lastNotificationDate");
       const currentDate = now.toDateString();
-    //   console.log(lastNotificationDate);
 
       if (
-        now.getHours() === 15 &&
-        now.getMinutes() >= 11 &&
+        now.getHours() >= 18 &&
+        now.getMinutes() >= 30 &&
         (!lastNotificationDate ||
           new Date(lastNotificationDate).toDateString() !== currentDate)
       ) {
+     
         setShowNotification(true);
         localStorage.setItem("lastNotificationDate", now.toISOString());
       }
     };
 
-    // Initial check
-    checkTime();
-
-    // Set up an interval to check every second
-    const interval = setInterval(checkTime, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setRegistrationData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    checkSeatAndSetInterval();
+  }, [id]);
 
   const handleSubmit = async () => {
-    if (
-      !registrationData.name ||
-      !registrationData.email ||
-      !registrationData.phone
-    ) {
-      alert("All fields are required!");
+    if (!bookingReg) {
+      setError("No active booking found.");
       return;
     }
 
     setLoading(true);
     try {
-    //   console.log("Submitting registration data:", registrationData);
-      // Simulate an API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+      
+      await updateMonthlyStatus(bookingReg, "Confirmed");
       setShowNotification(false);
     } catch (error) {
-      console.error("Error submitting registration data:", error);
+      console.error("Error updating monthly status:", error);
+      setError("Failed to update status. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -79,42 +94,56 @@ const NotificationWrapper = ({ children }) => {
 
   const handleClose = () => {
     setShowNotification(false);
+    setError("");
   };
+
+  if (!bookingReg) {
+    return <>{children}</>;
+  }
 
   return (
     <>
       {children}
-      <Dialog open={showNotification} onClose={handleClose}>
-        <DialogTitle>Daily Registration</DialogTitle>
+      <StyledDialog open={showNotification} onClose={handleClose}>
+        <StyledDialogTitle>Continue with EduGainer's Library</StyledDialogTitle>
         <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="reg"
-                name="reg"
-                value={registrationData.reg}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-          </Grid>
+          <Typography variant="body1" gutterBottom>
+            Do you wish to continue with EduGainer's Library next month?
+          </Typography>
+          {error && (
+            <Typography color="error" variant="body2" gutterBottom>
+              {error}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">
             Cancel
           </Button>
-          <Button
-            onClick={handleSubmit}
-            color="primary"
-            variant="contained"
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : "Submit"}
-          </Button>
+          <Box position="relative">
+            <Button
+              onClick={handleSubmit}
+              color="primary"
+              variant="contained"
+              disabled={loading}
+            >
+              {loading ? "Submitting..." : "Continue Subscription"}
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-12px",
+                  marginLeft: "-12px",
+                }}
+              />
+            )}
+          </Box>
         </DialogActions>
-      </Dialog>
+      </StyledDialog>
     </>
   );
 };

@@ -159,33 +159,48 @@ const updateSeatStatus = async (req, res) => {
 
     try {
         const BookingModel = getCurrentMonthBookingModel();
-
+        const currentDate = new Date().toISOString().split('T')[0];
         // Find the booking by reg
-    //   const booking=await BookingModel.findOne({reg})
+        //   const booking=await BookingModel.findOne({reg})
 
-    //     if (!booking) {
-    //         return res.status(404).json({ error: 'Booking not found' });
-    //     }
+        //     if (!booking) {
+        //         return res.status(404).json({ error: 'Booking not found' });
+        //     }
 
-        if (status=="Empty") {
+        if (status === "Empty") {
             // If status is empty, delete the booking
             await BookingModel.findOneAndDelete({ reg });
             return res.status(200).json({ message: 'Booking deleted successfully' });
-        } else {
+        } else if (status === "Paid") {
             // Update the 
 
-            const currentDate = new Date().toISOString().split('T')[0];
+           
             const student = await LibStudent.findOne({ reg });
-            console.log(typeof(reg),"kkkkkkkkk")
+            console.log(typeof (reg), "kkkkkkkkk")
             const updatedBooking = await BookingModel.findOneAndUpdate(
                 { reg },
-                { name:student?.name,seat, reg: reg, status: "Paid",shift ,date:currentDate},
-                { new: true ,upsert:true}
+                { name: student?.name, seat, reg: reg, status: "Paid", shift, date: currentDate },
+                { new: true, upsert: true }
             );
-// console.log(updatedBooking,"kkkkkkkkkkkkkk")
+            return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
+            // console.log(updatedBooking,"kkkkkkkkkkkkkk")
+           
+        }
+        else if (status === "Confirmed") {
+            
+            const updatedBooking = await BookingModel.findOneAndUpdate(
+                { reg },
+                { status: "Confirmed", date: currentDate },
+                { new: true }
+            );
             return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
         }
-    } catch (error) {
+    
+    
+    
+      
+    }
+    catch (error) {
         console.error("Error updating status:", error);
         res.status(500).json({ error: 'Failed to update status' });
     }

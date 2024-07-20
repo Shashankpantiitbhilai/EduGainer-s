@@ -48,7 +48,7 @@ const BookingDialog = ({
   }, [open, defaultValues, setValue]);
 
   const onSubmit = (data) => {
-    console.log(data, "kkkkkkkkk");
+   
     handleSubmitForm(data);
     reset();
     handleClose();
@@ -117,7 +117,7 @@ const BookingDialog = ({
                 fullWidth
                 error={!!errors.cash}
                 helperText={errors.cash?.message}
-                defaultValue={defaultValues?.cash || ""}
+                defaultValue={defaultValues?.cash ||0}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -131,7 +131,7 @@ const BookingDialog = ({
                 fullWidth
                 error={!!errors.online}
                 helperText={errors.online?.message}
-                defaultValue={defaultValues?.online || ""}
+                defaultValue={defaultValues?.online || 0}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -162,7 +162,7 @@ const BookingDialog = ({
                 fullWidth
                 error={!!errors.fee}
                 helperText={errors.fee?.message}
-                defaultValue={defaultValues?.fee || ""}
+                defaultValue={defaultValues?.fee || 0}
               />
             </Grid>
             <Grid item xs={12}>
@@ -234,7 +234,7 @@ const BookingDialog = ({
                 fullWidth
                 error={!!errors.TotalMoney}
                 helperText={errors.TotalMoney?.message}
-                defaultValue={defaultValues?.TotalMoney || ""}
+                defaultValue={defaultValues?.TotalMoney || 0}
               />
             </Grid>
             <Grid item xs={12}>

@@ -1,6 +1,10 @@
 const { LibStudent } = require('../models/student');
 const { createOrder, verifyPaymentSignature } = require("../routes/payment");
 const { getModelForMonth } = require('../models/student'); // Assume the function is defined in utils/modelUtils.js
+const getCurrentMonthBookingModel = () => {
+    const now = new Date();
+    return getModelForMonth(now.getMonth() + 1);
+};
 
 const getCurrentMonthBookings = async (req, res) => {
     try {
@@ -41,7 +45,7 @@ const getStudentLibSeat = async (req, res) => {
     const { id } = req.params;
     try {
         const currentMonth = new Date().getMonth() + 1;
-
+console.log(id)
         const Booking = getModelForMonth(currentMonth);
 
         const student = await LibStudent.findOne({ userId: id });
@@ -56,7 +60,7 @@ const getStudentLibSeat = async (req, res) => {
         console.log(findBooking)
 
         res.status(200).json({
-            message: 'Status updated successfully',
+            message: 'Student found monthly sheet successfully',
             booking: findBooking,
         });
     } catch (error) {
@@ -217,6 +221,44 @@ const sendFeeData = async (req, res) => {
 //         res.status(500).json({ error: "A server error occurred with this request" });
 //     }
 // };
+const updateNotificationStatus = async (req, res) => {
+    const { reg } = req.params;
+
+    try {
+        const BookingModel = getCurrentMonthBookingModel();
+      
+       console.log(reg)
+       
+        const updatedBooking = await BookingModel.findOneAndUpdate(
+            { reg },
+            { status: "Confirmed" },
+            {new:true}
+           
+        );
+        console.log(updatedBooking)
+        // Find the booking by reg
+        //   const booking=await BookingModel.findOne({reg})
+
+        //     if (!booking) {
+        //         return res.status(404).json({ error: 'Booking not found' });
+        //     }
+
+      
+        return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
+        // console.log(updatedBooking,"kkkkkkkkkkkkkk")
+
+    }
+
+
+      
+
+    
+    catch (error) {
+        console.error("Error updating status:", error);
+        res.status(500).json({ error: 'Failed to update status' });
+    }
+}
+
 
 module.exports = {
     getCurrentMonthBookings,
@@ -225,5 +267,6 @@ module.exports = {
     // feePayment,
     verifyLibfeePayment,
     getLibStudentData,
-    sendFeeData
+    sendFeeData,
+    updateNotificationStatus
 };

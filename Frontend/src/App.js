@@ -36,9 +36,9 @@ function App() {
             <AdminContext.Provider value={{ IsUserLoggedIn, setIsUserLoggedIn }}>
                 <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
                     <BrowserRouter>
-                        {IsUserLoggedIn ? <NotificationWrapper>
+                        {IsUserLoggedIn ? (<NotificationWrapper>
                             <Main />
-                        </NotificationWrapper> :< Main/>}
+                        </NotificationWrapper> ):(< Main/>)}
                     </BrowserRouter>
                 </LoadingContext.Provider>
             </AdminContext.Provider>
