@@ -25,7 +25,7 @@ import MultiplePersonsDialog from "./multiplePersonDialg";
 import DetailedPersonDialog from "./DetailedPersonDialog";
 import io from "socket.io-client";
 import { AdminContext } from "../../../../App";
-import getSeatColor from "./getSeatColor";
+import {getSeatColor} from "./getSeatColor";
 const shifts = [
   "6:30 AM to 2 PM",
   "2 PM to 9:30 PM",
@@ -40,21 +40,34 @@ const checkOverlap = (currentShift, bookedShifts) => {
   if (bookedShifts.includes("24*7")) return true;
 
   const overlapMap = {
-    "6:30 AM to 2 PM": ["6:30 AM to 6:30 PM", "24*7"],
-    "2 PM to 9:30 PM": ["2 PM to 11 PM", "6:30 AM to 6:30 PM", "24*7"],
-    "6:30 PM to 11 PM": ["2 PM to 11 PM", "24*7"],
-    "9:30 PM to 6:30 AM": ["24*7"],
+    "6:30 AM to 2 PM": ["6:30 AM to 6:30 PM", "24*7", "6:30 AM to 2 PM"],
+    "2 PM to 9:30 PM": [
+      "2 PM to 11 PM",
+      "2 PM to 9:30 PM",
+      "6:30 AM to 6:30 PM",
+      "24*7",
+    ],
+    "6:30 PM to 11 PM": [
+      "2 PM to 11 PM",
+      "24*7",
+      "2 PM to 9:30 PM",
+      "9:30 PM to 6:30 AM",
+      "6:30 PM to 11 PM",
+    ],
+    "9:30 PM to 6:30 AM": ["24*7", "6:30 PM to 11 PM", "2 PM to 11 PM"],
     "2 PM to 11 PM": [
       "2 PM to 9:30 PM",
       "6:30 PM to 11 PM",
       "6:30 AM to 6:30 PM",
       "24*7",
+      "2 PM to 11 PM",
     ],
     "6:30 AM to 6:30 PM": [
       "6:30 AM to 2 PM",
       "2 PM to 9:30 PM",
       "2 PM to 11 PM",
       "24*7",
+      "6:30 AM to 6:30 PM",
     ],
     "24*7": shifts,
   };
@@ -113,6 +126,8 @@ const ManageSeats = () => {
   useEffect(() => {
     if (socket) {
       socket.on("seatStatusUpdate", ({ id, status, seat, shift }) => {
+        console.log("recievd i n socketssssssssss");
+        console.log(status,seat,shift)
         setSeatStatus((prevStatus) => ({
           ...prevStatus,
           [seat]: {
@@ -135,14 +150,19 @@ const ManageSeats = () => {
       shifts.forEach((shift) => {
         const shiftData = response[shift];
         if (shiftData) {
-          shiftData.forEach((e) => {
+          shiftData.forEach((e, key) => {
             if (!statusMap[e.seat]) {
+              if(e.seat=="19")
+              console.log(e.seat,"seatttttttttttt")
               statusMap[e.seat] = {};
             }
-            statusMap[e.seat][shift] = e.status || "Empty";
+          
+            statusMap[e.seat][shift] = e.status || "Confirmed";
           });
         }
       });
+       console.log(statusMap,"kkkkkkk")
+    
       setSeatStatus(statusMap);
     } catch (error) {
       setSnackbarMessage("Error fetching seat data");
@@ -178,46 +198,60 @@ const ManageSeats = () => {
     }
   };
 
-  const handleFormSubmit = async (reg) => {
-    try {
-      const currentSeatStatus = seatStatus[selectedSeat];
-      const bookedShifts = Object.keys(currentSeatStatus).filter(
-        (shift) => currentSeatStatus[shift] === "Paid"
-      );
+ const handleFormSubmit = async (reg) => {
+   try {
+    
+     const currentSeatStatus = seatStatus[selectedSeat];
+console.log(currentSeatStatus)
+     // Check for overlapping Paid or Confirmed shifts
+     if (currentSeatStatus) {
+       const overlappingShifts = Object.keys(currentSeatStatus).filter(
+         (shift) =>
+           (currentSeatStatus[shift] === "Paid" ||
+             currentSeatStatus[shift] === "Confirmed") &&
+           checkOverlap(selectedShift, [shift])
+       );
+     
+       if (overlappingShifts.length > 0) {
+         const statusType =
+           currentSeatStatus[overlappingShifts[0]] === "Paid"
+             ? "paid booking"
+             : "confirmed reservation";
+         setSnackbarMessage(
+           `Cannot book seat ${selectedSeat} for ${selectedShift} due to overlapping ${statusType}`
+         );
+         setSnackbarOpen(true);
+         return;
+       }
+     }
+       console.log("submit")
+       const response = await updateSeatStatus(
+         reg,
+         "Paid",
+         selectedSeat,
+         selectedShift
+       );
 
-      if (checkOverlap(selectedShift, bookedShifts)) {
-        setSnackbarMessage(
-          `Cannot book seat ${selectedSeat} for ${selectedShift} due to overlapping bookings`
-        );
-        setSnackbarOpen(true);
-        return;
-      }
-
-      const response = await updateSeatStatus(
-        reg,
-        "Paid",
-        selectedSeat,
-        selectedShift
-      );
-      socket.emit("updateSeatStatus", {
-        id: reg,
-        status: "Paid",
-        seat: selectedSeat,
-        shift: selectedShift,
-      });
-      console.log(selectedShift, response, "l");
-      setSnackbarMessage(
-        `Seat ${selectedSeat} marked as Paid for ${selectedShift}`
-      );
-      setSnackbarOpen(true);
-      setFormDialogOpen(false);
-      handleCloseDialog();
-    } catch (error) {
-      setSnackbarMessage("Error updating seat status");
-      setSnackbarOpen(true);
-    }
-  };
-
+       socket.emit("updateSeatStatus", {
+         id: reg,
+         status: "Paid",
+         seat: selectedSeat,
+         shift: selectedShift,
+       });
+       console.log(response, "kkkkkkkkk")
+  
+       setSnackbarMessage(
+         `Seat ${selectedSeat} marked as Paid for ${selectedShift}`
+       );
+       setSnackbarOpen(true);
+       setFormDialogOpen(false);
+       handleCloseDialog();
+     }
+    catch (error) {
+     setSnackbarMessage("Error updating seat status");
+     setSnackbarOpen(true);
+   }
+ };
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -269,13 +303,6 @@ const ManageSeats = () => {
   const handleDeallocate = async (reg) => {
     try {
       const currentSeatStatus = seatStatus[selectedSeat];
-      if (currentSeatStatus[selectedShift] !== "Paid") {
-        setSnackbarMessage(
-          `Cannot deallocate seat ${selectedSeat} for ${selectedShift} as it is not in Paid status`
-        );
-        setSnackbarOpen(true);
-        return;
-      }
 
       await updateSeatStatus(reg, "Empty", selectedSeat, selectedShift);
       socket.emit("updateSeatStatus", {
@@ -301,7 +328,6 @@ const ManageSeats = () => {
       [key]: value,
     }));
   };
-
 
   return (
     <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: "100%", mx: "auto" }}>
@@ -339,14 +365,16 @@ const ManageSeats = () => {
                 >
                   <SeatRow
                     seats={["A3", "A4", "A5", "A6", "A7", "A8", "A9", "A0"]}
-                     getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                  
+                    getSeatColor={(seatNumber) =>
+                      getSeatColor(seatNumber, seatStatus, selectedShift)
+                    }
                     onSeatClick={handleSeatClick}
                   />
                   <SeatRow
                     seats={[77, 78, 79, 80, 81, 82, 83, 84]}
-                     getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                  
+                    getSeatColor={(seatNumber) =>
+                      getSeatColor(seatNumber, seatStatus, selectedShift)
+                    }
                     onSeatClick={handleSeatClick}
                   />
                 </Box>
@@ -362,28 +390,32 @@ const ManageSeats = () => {
                   <Box>
                     <SeatRow
                       seats={[68, 67, 66, 65, 64, 63, 62, 61]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[52, 51, 50, 49, 48, 47, 46, 45]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                   </Box>
                   <Box>
                     <SeatRow
                       seats={[69, 70, 71, 72, 73, 74, 75, 76]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[53, 54, 55, 56, 57, 58, 59, 60]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                   </Box>
@@ -395,14 +427,16 @@ const ManageSeats = () => {
                   <Box>
                     <SeatRow
                       seats={[44, 43, 42, 41, 40, 39, 38, 37]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[36, 35, 34, 33, 32, 31, 30, 29]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                   </Box>
@@ -419,52 +453,60 @@ const ManageSeats = () => {
                   <Box>
                     <SeatRow
                       seats={[28, 27, 26]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[21, 20, 19]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[14, 13, 12]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[1, 2, 3]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                   </Box>
                   <Box sx={{ mx: { xs: 0, sm: 2, md: 4, lg: 5 } }}>
                     <SeatRow
                       seats={[25, 24, 23, 22]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[15, 16, 17, 18]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[8, 9, 10, 11]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                     <SeatRow
                       seats={[4, 5, 6, 7]}
-                       getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
-                    
+                      getSeatColor={(seatNumber) =>
+                        getSeatColor(seatNumber, seatStatus, selectedShift)
+                      }
                       onSeatClick={handleSeatClick}
                     />
                   </Box>
@@ -479,7 +521,9 @@ const ManageSeats = () => {
         open={dialogOpen}
         onClose={handleCloseDialog}
         selectedSeat={selectedSeat}
-         getSeatColor={(seatNumber) => getSeatColor(seatNumber, seatStatus, selectedShift)}
+        getSeatColor={(seatNumber) =>
+          getSeatColor(seatNumber, seatStatus, selectedShift)
+        }
         onStatusChange={handleStatusChange}
         onViewDetails={handleViewDetails}
       />

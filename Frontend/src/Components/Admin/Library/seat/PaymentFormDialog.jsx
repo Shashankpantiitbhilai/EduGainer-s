@@ -12,6 +12,7 @@ const PaymentFormDialog = ({ open, onClose, onFormSubmit }) => {
   const [regNo, setRegNo] = useState("");
 
   const handleSubmit = () => {
+    console.log(regNo,"hdefej")
     onFormSubmit(regNo);
     setRegNo(""); // Reset the input after submission
   };

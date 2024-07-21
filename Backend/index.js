@@ -119,7 +119,7 @@ io.on('connection', (socket) => {
   
   // Handle sendMessage event
   socket.on('updateSeatStatus', async (data) => {
-    const { id, status, seat } = data;
+    const { id, status, seat ,shift} = data;
     console.log(data)
     console.log(`Updating seat ${id} status to ${status}`);
 
@@ -128,7 +128,7 @@ io.on('connection', (socket) => {
       // For example: await updateSeatInDatabase(id, status);
 
       // Broadcast the updated seat status to all connected clients
-      io.emit('seatStatusUpdate', { id, status,seat });
+      io.emit('seatStatusUpdate', { id, status,seat,shift });
     } catch (error) {
       console.error('Error updating seat status:', error);
       // Optionally, you can emit an error event back to the client

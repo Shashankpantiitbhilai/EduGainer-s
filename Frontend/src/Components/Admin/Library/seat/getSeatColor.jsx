@@ -1,3 +1,4 @@
+// Define the shifts
 const shifts = [
   "6:30 AM to 2 PM",
   "2 PM to 9:30 PM",
@@ -8,37 +9,77 @@ const shifts = [
   "24*7",
 ];
 
-const checkOverlap = (currentShift, bookedShifts) => {
+// checkOverlap function
+export const checkOverlap = (currentShift, bookedShifts) => {
+  // console.log(bookedShifts);
   if (bookedShifts.includes("24*7")) return true;
 
   const overlapMap = {
-    "6:30 AM to 2 PM": ["6:30 AM to 6:30 PM", "24*7"],
-    "2 PM to 9:30 PM": ["2 PM to 11 PM", "6:30 AM to 6:30 PM", "24*7"],
-    "6:30 PM to 11 PM": ["2 PM to 11 PM", "24*7"],
-    "9:30 PM to 6:30 AM": ["24*7"],
-    "2 PM to 11 PM": ["2 PM to 9:30 PM", "6:30 PM to 11 PM", "6:30 AM to 6:30 PM", "24*7"],
-    "6:30 AM to 6:30 PM": ["6:30 AM to 2 PM", "2 PM to 9:30 PM", "2 PM to 11 PM", "24*7"],
+    "6:30 AM to 2 PM": ["6:30 AM to 6:30 PM", "24*7", "6:30 AM to 2 PM"],
+    "2 PM to 9:30 PM": [
+      "2 PM to 11 PM",
+      "2 PM to 9:30 PM",
+      "6:30 AM to 6:30 PM",
+      "24*7",
+    ],
+    "6:30 PM to 11 PM": [
+      "2 PM to 11 PM",
+      "24*7",
+      "2 PM to 9:30 PM",
+      "9:30 PM to 6:30 AM",
+      "6:30 PM to 11 PM",
+    ],
+    "9:30 PM to 6:30 AM": ["24*7", "6:30 PM to 11 PM", "2 PM to 11 PM"],
+    "2 PM to 11 PM": [
+      "2 PM to 9:30 PM",
+      "6:30 PM to 11 PM",
+      "6:30 AM to 6:30 PM",
+      "24*7",
+      "2 PM to 11 PM",
+    ],
+    "6:30 AM to 6:30 PM": [
+      "6:30 AM to 2 PM",
+      "2 PM to 9:30 PM",
+      "2 PM to 11 PM",
+      "24*7",
+      "6:30 AM to 6:30 PM",
+    ],
     "24*7": shifts,
   };
 
-  return bookedShifts.some(shift => overlapMap[currentShift].includes(shift));
+  const ans = bookedShifts.some((shift) =>
+    overlapMap[currentShift].includes(shift)
+  );
+
+  return ans;
 };
 
-const getSeatColor = (seatNumber, seatStatus, selectedShift) => {
-    const seatShifts = seatStatus[seatNumber];
-    if (!seatShifts) return "grey";
+// getSeatColor function
+export const getSeatColor = (seatNumber, seatStatus, selectedShift) => {
+  if (!seatStatus[seatNumber]) {
+    return "red"; // Default color if seat status is not available
+  }
 
-    if (seatShifts["24*7"] === "Paid") return "green";
-    if (seatShifts[selectedShift] === "Paid") return "green";
+  // Check if there's a Confirmed status in any overlapping shift
+  const hasOverlappingConfirmed = shifts.some(
+    (shift) =>
+      seatStatus[seatNumber][shift] === "Confirmed" &&
+      checkOverlap(selectedShift, [shift])
+  );
 
-    const bookedShifts = Object.keys(seatShifts).filter(shift => seatShifts[shift] === "Paid");
- 
-    if (checkOverlap(selectedShift, bookedShifts)) {
-        return "green"; // Can't be booked due to overlap
-    } else {
-        return "red"; // Can be booked
-    }
-return "grey"
+  if (hasOverlappingConfirmed) {
+    return "yellow"; // Seat is confirmed in an overlapping shift
+  }
 
-  };
-export default getSeatColor;
+  // Get all booked (Paid) shifts for this seat
+  const bookedShifts = shifts.filter(
+    (shift) => seatStatus[seatNumber][shift] === "Paid"
+  );
+
+  // Check for overlapping booked shifts
+  if (checkOverlap(selectedShift, bookedShifts)) {
+    return "green"; // Seat has an overlapping booking
+  } else {
+    return "red"; // Seat can be allocated
+  }
+};

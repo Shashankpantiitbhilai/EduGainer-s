@@ -156,7 +156,7 @@ const updateBookingColor = async (req, res) => {
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
     const { seat, status ,shift} = req.body; // assuming these are sent in the request body
-
+console.log("yo",req.body)
     try {
         const BookingModel = getCurrentMonthBookingModel();
         const currentDate = new Date().toISOString().split('T')[0];
@@ -171,7 +171,7 @@ const updateSeatStatus = async (req, res) => {
             // If status is empty, delete the booking
             await BookingModel.findOneAndDelete({ reg });
             return res.status(200).json({ message: 'Booking deleted successfully' });
-        } else if (status === "Paid") {
+        } else if (status === "Paid" || !status) {
             // Update the 
 
            
