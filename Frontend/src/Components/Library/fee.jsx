@@ -32,16 +32,34 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const shifts = {
   "6:30 AM to 2 PM": 550,
   "2 PM to 9:30 PM": 550,
-  "6:30 PM to 11 PM": 350,
-  "9:30 PM to 6:30 AM": 500,
-  "2 PM to 11 PM": 750,
-  "6:30 AM to 6:30 PM": 850,
+  "6:30 AM to 6:30 PM": 900,
   "24*7": 1100,
+  "6:30 AM to 11 PM": 350,
+  "2 PM to 11 PM": 700,
+  "9:30 PM to 6:30 AM": 500,
 };
 
 const deals = [
-  { id: 1, fee: 1, months: 3, discount: 3, totalFee: 1 },
-  // ... (other deals)
+  { id: 1, fee: 550, months: 3, discount: 3, totalFee: 1600.5 },
+  { id: 2, fee: 350, months: 3, discount: 3, totalFee: 1018.5 },
+  { id: 3, fee: 750, months: 3, discount: 3, totalFee: 2182.5 },
+  { id: 4, fee: 850, months: 3, discount: 3, totalFee: 2473.5 },
+  { id: 5, fee: 1100, months: 3, discount: 3, totalFee: 3201 },
+  { id: 6, fee: 550, months: 6, discount: 6, totalFee: 3102 },
+  { id: 7, fee: 350, months: 6, discount: 6, totalFee: 1974 },
+  { id: 8, fee: 750, months: 6, discount: 6, totalFee: 4230 },
+  { id: 9, fee: 850, months: 6, discount: 6, totalFee: 4794 },
+  { id: 10, fee: 1100, months: 6, discount: 6, totalFee: 6204 },
+  { id: 11, fee: 550, months: 9, discount: 9, totalFee: 4504.5 },
+  { id: 12, fee: 350, months: 9, discount: 9, totalFee: 2866.5 },
+  { id: 13, fee: 750, months: 9, discount: 9, totalFee: 6142.5 },
+  { id: 14, fee: 850, months: 9, discount: 9, totalFee: 6961.5 },
+  { id: 15, fee: 1100, months: 9, discount: 9, totalFee: 9009 },
+  { id: 16, fee: 550, months: 12, discount: 12, totalFee: 5808 },
+  { id: 17, fee: 350, months: 12, discount: 12, totalFee: 3696 },
+  { id: 18, fee: 750, months: 12, discount: 12, totalFee: 7920 },
+  { id: 19, fee: 850, months: 12, discount: 12, totalFee: 8976 },
+  { id: 20, fee: 1100, months: 12, discount: 12, totalFee: 11616 },
 ];
 
 const Fee = () => {
@@ -55,6 +73,8 @@ const Fee = () => {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
   const [shouldInitiatePayment, setShouldInitiatePayment] = useState(false);
+  const [availableDeals, setAvailableDeals] = useState([]);
+
   const {
     control,
     handleSubmit,
@@ -104,43 +124,33 @@ const Fee = () => {
 
   const autoGenerateFee = async () => {
     setLoading(true);
-    setError(""); // Clear any previous errors
+    setError("");
     try {
       const data = await fetchLibStudent(regNo);
       if (!data || !data.student) {
         setError("Student not registered");
+        return;
       }
-   
+console.log(data,"kkkkk")
       setStudentData(data.student);
       setValue("name", data.student.name);
       setValue("shift", data.student.shift);
-      if (data.student.shift) {
-        const date = new Date();
-        const monthNames = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ];
-        const currentMonthName = monthNames[date.getMonth()];
 
-        const currentMonthFee = shifts[data.student.shift] || 0;
-        console.log(typeof data.student.due, typeof data.student.advance);
+      if (data.student.shift) {
+        const shiftFee = shifts[data.student.shift] || 0;
+        const currentMonthFee = shiftFee;
+        console.log(currentMonthFee,shiftFee,data.student.shift,"feeees")
         const totalFee =
           currentMonthFee +
           (data.student.due || 0) -
           (data.student.advance || 0);
         setCalculatedFee(totalFee);
-        setAdvancePaymentPeriod(currentMonthName);
-        setSelectedDeal("current month");
+        setAdvancePaymentPeriod("Current Month");
+        setSelectedDeal("current");
+
+        // Filter deals based on the student's shift fee
+        const filteredDeals = deals.filter((deal) => deal.fee === shiftFee);
+        setAvailableDeals(filteredDeals);
       }
     } catch (error) {
       console.error("Error fetching student data:", error);
@@ -149,7 +159,7 @@ const Fee = () => {
         error.message || "An error occurred while fetching student data"
       );
       toast.error(
-        "Not registered, if you have already registred then kindly Contact Us"
+        "Not registered, if you have already registered then kindly Contact Us"
       );
     } finally {
       setLoading(false);
@@ -159,29 +169,14 @@ const Fee = () => {
   const handleDealSelect = (event) => {
     const selectedValue = event.target.value;
     setSelectedDeal(selectedValue);
-    const date = new Date();
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const currentMonthName = monthNames[date.getMonth()];
+
     if (selectedValue === "current") {
       if (studentData && studentData.shift) {
         const currentMonthFee = shifts[studentData.shift] || 0;
         const totalFee =
           currentMonthFee + (studentData.due || 0) - (studentData.advance || 0);
         setCalculatedFee(totalFee);
-        setAdvancePaymentPeriod(currentMonthName);
+        setAdvancePaymentPeriod("Current Month");
       }
     } else {
       const deal = deals.find((d) => d.id === selectedValue);
@@ -204,7 +199,7 @@ const Fee = () => {
     const endMonth = endDate.toLocaleString("default", { month: "long" });
     const endYear = endDate.getFullYear();
     setAdvancePaymentPeriod(
-      `Advance Payment from ${currentMonth} ${currentYear} - ${endMonth} ${endYear}`
+      `${currentMonth} ${currentYear} - ${endMonth} ${endYear}`
     );
   };
 
@@ -301,26 +296,28 @@ const Fee = () => {
               />
             )}
           />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="deal-select-label">
-              Select Deal or Current Month
-            </InputLabel>
-            <Select
-              labelId="deal-select-label"
-              id="deal-select"
-              value={selectedDeal}
-              label="Select Deal or Current Month"
-              onChange={handleDealSelect}
-            >
-              <MenuItem value="current">Current Month</MenuItem>
-              {deals.map((deal) => (
-                <MenuItem key={deal.id} value={deal.id}>
-                  ₹{deal.fee} for {deal.months} months - Discount:{" "}
-                  {deal.discount}%
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          {studentData && (
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="deal-select-label">
+                Select Deal or Current Month
+              </InputLabel>
+              <Select
+                labelId="deal-select-label"
+                id="deal-select"
+                value={selectedDeal}
+                label="Select Deal or Current Month"
+                onChange={handleDealSelect}
+              >
+                <MenuItem value="current">Current Month</MenuItem>
+                {availableDeals.map((deal) => (
+                  <MenuItem key={deal.id} value={deal.id}>
+                    ₹{deal.totalFee.toFixed(2)} for {deal.months} months -
+                    Discount: {deal.discount}%
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
           {selectedDeal && (
             <>
               <Box mt={2}>
@@ -330,29 +327,31 @@ const Fee = () => {
                 <Typography variant="body1">
                   Advance Payment Period: {advancePaymentPeriod}
                 </Typography>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="body1" color="textSecondary">
-                    Due Fee:
-                  </Typography>
-                  <Typography variant="h6" color="red">
-                    ₹{studentData?.due || 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="body1" color="textSecondary">
-                    Advance Fee:
-                  </Typography>
-                  <Typography variant="h6" color="primary">
-                    ₹{studentData?.advance || 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="body1" color="textSecondary">
-                    Calculated Net Fee:
-                  </Typography>
-                  <Typography variant="h6" color="blue">
-                    ₹{calculatedFee}
-                  </Typography>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid item xs={12} sm={4}>
+                    <Typography variant="body2" color="textSecondary">
+                      Due Fee:
+                    </Typography>
+                    <Typography variant="h6" color="error">
+                      ₹{studentData?.due || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Typography variant="body2" color="textSecondary">
+                      Advance Fee:
+                    </Typography>
+                    <Typography variant="h6" color="primary">
+                      ₹{studentData?.advance || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Typography variant="body2" color="textSecondary">
+                      Net Fee:
+                    </Typography>
+                    <Typography variant="h6" color="success.main">
+                      ₹{calculatedFee.toFixed(2)}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </Box>
               <Button
@@ -366,7 +365,7 @@ const Fee = () => {
                 {loading ? (
                   <CircularProgress size={24} />
                 ) : calculatedFee > 0 ? (
-                  `Pay Now: ${calculatedFee}`
+                  `Pay Now: ₹${calculatedFee.toFixed(2)}`
                 ) : (
                   "No fee to be paid"
                 )}

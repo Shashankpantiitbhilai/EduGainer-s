@@ -88,13 +88,6 @@ const AdminCard = ({ title, description, link, icon: Icon }) => (
 function Admin_Library() {
   const adminCards = [
     {
-      title: "Manage Library Database",
-      description:
-        "View, edit, and delete user profiles. Manage user roles and monitor user activity.",
-      link: "/admin_library/manage-users",
-      icon: PersonIcon,
-    },
-    {
       title: "Manage Library Seats",
       description: "Manage Library Seats and overall library operations.",
       link: "/admin_library/manage-current-month-bookings",
@@ -112,6 +105,13 @@ function Admin_Library() {
         "Add, edit, and delete library resources. Categorize and tag resources for easier search and organization.",
       link: "/admin_library/manage-resources",
       icon: InventoryIcon,
+    },
+    {
+      title: "Manage Library Database",
+      description:
+        "View, edit, and delete user profiles. Manage user roles and monitor user activity.",
+      link: "/admin_library/manage-users",
+      icon: PersonIcon,
     },
   ];
 

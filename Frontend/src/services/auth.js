@@ -63,6 +63,7 @@ export async function verifyOTPAndRegisterUser(otp, id) {
 export async function loginUser(email, password) {
   try {
     // console.log(email, password);
+    email = email.toLowerCase();
     const response = await axiosInstance.post("/auth/login", { email, password });
     // console.log(response);
     return response.data;

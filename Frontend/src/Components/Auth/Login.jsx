@@ -101,9 +101,12 @@ function Login() {
       if (response && response.user) {
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        
+        if (response.user.role === "admin")
+          navigate("/admin_home");
+        else {
+          navigate("/")
+        }
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });
         toast.error("Invalid credentials", { autoClose: 2000 });

@@ -24,8 +24,8 @@ const transporter = nodemailer.createTransport({
 const redisClient = require('../redis'); // Assuming redis client setup in separate file
 
 router.post("/register", async (req, res) => {
-  const { password, email } = req.body;
-
+  let { password, email } = req.body;
+  email = email.toLowerCase();
   try {
     // Check if Redis client is connected
     if (!redisClient.isOpen) {
@@ -43,7 +43,7 @@ router.post("/register", async (req, res) => {
 
     const userDetails = JSON.stringify({ password, otp: sentOTP });
 
-    
+
     // Store the object in Redis with a TTL (Time-To-Live)
     await redisClient.set(email, userDetails, 'EX', 30000);
     // console.log(userDetails)
@@ -72,8 +72,8 @@ router.post("/register", async (req, res) => {
 
 
 router.post("/otp-verify", async (req, res) => {
-  const { otp, id } = req.body;
-
+  let { otp, id } = req.body;
+  id = id.toLowerCase();
   try {
     // Check if Redis client is connected
     if (!redisClient.isOpen) {
@@ -106,11 +106,11 @@ router.post("/otp-verify", async (req, res) => {
         // Find LibStudent by email
         const libStudent = await LibStudent.findOne({ email: id });
         if (libStudent) {
-         
+
           // Update LibStudent with userId
           libStudent.userId = newUser._id;
           await libStudent.save();
-        
+
         }
 
         // Respond with success message and new user object
@@ -167,7 +167,8 @@ router.post('/reset-password/:id/:token', async (req, res) => {
 });
 
 router.post("/forgot-password", (req, res) => {
-  const { email } = req.body;
+let { email } = req.body;
+  email = email.toLowerCase();
   User.findOne({ username: email })
 
     .then(user => {
@@ -236,30 +237,30 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // Callback route after successful authentication
 router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
-    (req, res) => {
-      // Successful authentication
-      
-     const frontendUrl =
-    process.env.NODE_ENV === 'production'
+  passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
+  (req, res) => {
+    // Successful authentication
+
+    const frontendUrl =
+      process.env.NODE_ENV === 'production'
         ? `${process.env.FRONTEND_PROD}`
         : `${process.env.FRONTEND_DEV}`
-console.log(frontendUrl,"kkkkkkk")
-        // Prepare user info
-        // console.log("ncjcnd", req.user)
-        const userInfo = {
-            id: req.user._id,
-           username: req.user.username,
-           
-            // Assuming you have a way to determine the user's role
-        };
+    console.log(frontendUrl, "kkkkkkk")
+    // Prepare user info
+    // console.log("ncjcnd", req.user)
+    const userInfo = {
+      id: req.user._id,
+      username: req.user.username,
 
-      console.log(userInfo)
-        // Encode and stringify user info
-        const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
+      // Assuming you have a way to determine the user's role
+    };
 
-        res.redirect(`${frontendUrl}/login?auth_success=true&user_info=${encodedUserInfo}`);
-    }
+    console.log(userInfo)
+    // Encode and stringify user info
+    const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
+
+    res.redirect(`${frontendUrl}/login?auth_success=true&user_info=${encodedUserInfo}`);
+  }
 );
 // Google OAuth Authentication
 

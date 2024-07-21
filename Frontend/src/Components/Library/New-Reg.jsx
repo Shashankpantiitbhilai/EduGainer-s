@@ -33,7 +33,7 @@ import {
 import { HowToReg, CheckCircleOutline, Info } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { eligibleForNewRegistration } from "../../services/library/utils";
-import Payment from "../payment/razorpay"; // Import the Payment function
+import Payment from "../payment/razorpay";
 
 const steps = [
   "Benefits",
@@ -43,6 +43,8 @@ const steps = [
   "Payment",
 ];
 
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB in bytes
+
 export default function LibraryRegistration() {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn?._id;
@@ -50,7 +52,8 @@ export default function LibraryRegistration() {
   const [formData, setFormData] = useState({});
   const {
     control,
-    handleSubmit,reset,
+    handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
   const [imageBase64, setImageBase64] = useState("");
@@ -58,8 +61,8 @@ export default function LibraryRegistration() {
   const navigate = useNavigate();
   const [isEligible, setIsEligible] = useState(null);
   const [consentGiven, setConsentGiven] = useState(false);
+  const [fileError, setFileError] = useState("");
 
-  // Use the Payment function
   const { initializePayment } = Payment({
     formData,
     imageBase64,
@@ -102,7 +105,15 @@ export default function LibraryRegistration() {
   };
 
   const handleImage = (e) => {
+   
     const file = e.target.files[0];
+     console.log(file.size, "size", MAX_FILE_SIZE);
+    if (file && file.size > MAX_FILE_SIZE) {
+      console.log("size large")
+      setFileError("File size should not exceed 3 MB");
+      return;
+    }
+    setFileError("");
     setFileToBase64(file);
   };
 
@@ -112,13 +123,14 @@ export default function LibraryRegistration() {
   };
 
   const onSubmit = async () => {
-    console.log(formData);
+   
     if (activeStep === steps.length - 1) {
       await initializePayment();
     } else {
       handleNext();
     }
   };
+
   const shifts = [
     "6:30 AM to 2 PM",
     "2 PM to 9:30 PM",
@@ -128,6 +140,7 @@ export default function LibraryRegistration() {
     "6:30 AM to 6:30 PM",
     "24*7",
   ];
+
   const getStepContent = (step) => {
     switch (step) {
       case 0:
@@ -161,7 +174,7 @@ export default function LibraryRegistration() {
             </Grid>
           </Grid>
         );
-      case 1:
+         case 1:
         return (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
@@ -195,6 +208,11 @@ export default function LibraryRegistration() {
                       <MenuItem value="female">Female</MenuItem>
                       <MenuItem value="other">Other</MenuItem>
                     </Select>
+                    {errors.gender && (
+                      <Typography color="error" variant="caption">
+                        {errors.gender.message}
+                      </Typography>
+                    )}
                   </FormControl>
                 )}
               />
@@ -289,6 +307,7 @@ export default function LibraryRegistration() {
                 control={control}
                 defaultValue={formData.contact2 || ""}
                 rules={{
+                  required: "Secondary contact number is required",
                   pattern: {
                     value: /^\d{10}$/,
                     message: "Please enter a valid 10-digit contact number",
@@ -357,7 +376,13 @@ export default function LibraryRegistration() {
                 name="aadhaar"
                 control={control}
                 defaultValue={formData.aadhaar || ""}
-                rules={{ required: "Aadhaar or ID No is required" }}
+                rules={{
+                  required: "Aadhaar or ID No is required",
+                  pattern: {
+                    value: /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/,
+                    message: "Please enter a valid Aadhaar number (e.g., 2234 5678 9012)",
+                  },
+                }}
                 render={({ field }) => (
                   <TextField
                     {...field}
@@ -416,7 +441,10 @@ export default function LibraryRegistration() {
                 name="image"
                 control={control}
                 defaultValue=""
-                rules={{ required: "Photo is required" }}
+                rules={{
+                  required: "Photo is required",
+                 
+                }}
                 render={({ field }) => (
                   <Box>
                     <input
@@ -439,6 +467,9 @@ export default function LibraryRegistration() {
                         {errors.image.message}
                       </Typography>
                     )}
+                    {fileError && (
+                      <Typography color="error">{fileError}</Typography>
+                    )}
                   </Box>
                 )}
               />
@@ -459,6 +490,8 @@ export default function LibraryRegistration() {
             </Grid>
           </Grid>
         );
+    
+
       case 4:
         return (
           <Grid container spacing={3}>
