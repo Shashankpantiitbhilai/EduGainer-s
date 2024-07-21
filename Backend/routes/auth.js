@@ -177,12 +177,14 @@ router.post("/forgot-password", (req, res) => {
       // console.log(user);
       const token = jwt.sign({ id: user._id }, "jwt_secret_key", { expiresIn: "1d" });
 
-
+      const url = process.env.NODE_ENV === 'production'
+        ? process.env.FRONTEND_PROD
+        : process.env.FRONTEND_DEV
       var mailOptions = {
         from: 'shashankpant94115@gmail.com',
         to: email,
         subject: 'Reset Password Link',
-        text: `https://edu-gainer-s-frontend-alpha.vercel.app/reset-password/${user._id}/${token}`
+        text: `${url}/${user._id}/${token}`
       };
 
       transporter.sendMail(mailOptions, function (error, info) {
@@ -235,21 +237,23 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
     (req, res) => {
-        // Successful authentication
+      // Successful authentication
+      console.log("jjjjjjjjjj")
      const frontendUrl =
     process.env.NODE_ENV === 'production'
         ? `${process.env.FRONTEND_PROD}`
         : `${process.env.FRONTEND_DEV}`
-
+console.log(frontendUrl)
         // Prepare user info
         // console.log("ncjcnd", req.user)
         const userInfo = {
             id: req.user._id,
             name: req.user.username,
-            email: req.user.email,
+            email: req.user.emai,
             // Assuming you have a way to determine the user's role
         };
 
+      console.log(userInfo)
         // Encode and stringify user info
         const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
 

@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext,useEffect } from "react";
 import { AdminContext } from "../../App";
 import { Button, TextField, Container, Box, Typography } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { loginUser } from "../../services/auth";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link ,useLocation} from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,6 +47,29 @@ function Login() {
   const { errors } = formState;
   const { setIsUserLoggedIn } = useContext(AdminContext);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const authSuccess = params.get("auth_success");
+    const userInfo = params.get("user_info");
+
+    if (authSuccess === "true" && userInfo) {
+      try {
+        const decodedUserInfo = JSON.parse(decodeURIComponent(userInfo));
+        setIsUserLoggedIn(decodedUserInfo);
+        toast.success("Google Sign-In successful", { autoClose: 2000 });
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } catch (error) {
+        console.error("Error parsing user info:", error);
+        toast.error("An error occurred during Google Sign-In", {
+          autoClose: 2000,
+        });
+      }
+    }
+  }, [location, setIsUserLoggedIn, navigate]);
 
   const onSubmit = async (data) => {
     try {
@@ -55,7 +78,7 @@ function Login() {
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
         setTimeout(() => {
-          navigate(response.user.role === "admin" ? "/admin_home" : "/");
+          navigate("/");
         }, 1000);
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });
@@ -69,16 +92,13 @@ function Login() {
       toast.error("An error occurred during login", { autoClose: 2000 });
     }
   };
- const url =
-            process.env.NODE_ENV === "production"
-              ? process.env.REACT_APP_BACKEND_PROD
-              : process.env.REACT_APP_BACKEND_DEV;
+
   const handleGoogleSignIn = () => {
-     const url =
-            process.env.NODE_ENV === "production"
-              ? process.env.REACT_APP_BACKEND_PROD
-              : process.env.REACT_APP_BACKEND_DEV;
-    window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
+    const url =
+      process.env.NODE_ENV === "production"
+        ? process.env.REACT_APP_BACKEND_PROD
+        : process.env.REACT_APP_BACKEND_DEV;
+    window.location.href = `${url}/auth/google`;
   };
 
   return (

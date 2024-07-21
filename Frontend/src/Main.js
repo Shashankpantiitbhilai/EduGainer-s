@@ -4,7 +4,7 @@ import Home from "./Components/Home.jsx";
 import Login from "./Components/Auth/Login";
 import Register from "./Components/Auth/Register";
 import OTPVerify from "./Components/Auth/otp-verify.jsx";
-import GoogleRegister from "./Components/Auth/GoogleRegister";
+
 import ForgotPassword from "./Components/Auth/forgot-password.jsx";
 import ResetPassword from "./Components/Auth/Reset-Password.jsx";
 import Library from "./Components/Library/Library.jsx";
@@ -46,7 +46,7 @@ const Main = () => {
                 <Route path="/login" element={<Login />} />
 
                 <Route path="/register" element={<Register />} />
-                <Route path="/register/google/:id" element={<GoogleRegister />} />
+              
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />

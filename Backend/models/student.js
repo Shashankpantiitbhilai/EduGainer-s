@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["local", "google"],
     required: true,
+  }, googleId: {
+    type: String,
+  
   },
   firstName: {
     type: String,
