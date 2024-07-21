@@ -93,6 +93,7 @@ const addBookingData = async (req, res) => {
             total,
             due,
             advance,
+            status,
             colors: {
                 [status]: statusColor
             }
@@ -106,10 +107,8 @@ const addBookingData = async (req, res) => {
         res.status(500).json({ message: 'Failed to add booking' });
     }
 };
-
 const updateBookingData = async (req, res) => {
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
-    console.log(typeof (due), typeof (advance));
 
     try {
         const BookingModel = getCurrentMonthBookingModel();
@@ -134,16 +133,16 @@ const updateBookingData = async (req, res) => {
                     cash,
                     online,
                     shift,
+                    status,
                     fee,
                     remarks,
-                    status,
                     due,
                     advance,
                     receipt,
                     TotalMoney,
-                    Payment_detail
-                },
-                ...colorUpdate
+                    Payment_detail,
+                    ...colorUpdate.$set // Ensure color update is properly merged
+                }
             },
             { new: true, upsert: true }
         );
@@ -160,6 +159,7 @@ const updateBookingData = async (req, res) => {
         res.status(500).json({ message: 'Failed to update booking' });
     }
 };
+
 const deleteBookingData = async (req, res) => {
     const { id } = req.params;
     try {
