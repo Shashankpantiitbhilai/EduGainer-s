@@ -35,42 +35,69 @@ const NotificationWrapper = ({ children }) => {
   const [error, setError] = useState("");
   const [bookingReg, setBookingReg] = useState(null);
   const { IsUserLoggedIn } = useContext(AdminContext);
-  const id = IsUserLoggedIn?._id;
 
   useEffect(() => {
-    const checkSeatAndSetInterval = async () => {
+    const checkSeatAndShowNotification = async () => {
+      if (!IsUserLoggedIn || !IsUserLoggedIn._id) {
+        console.log("User is not logged in or ID is not defined");
+        return;
+      }
+
       try {
-        const response = await getStudentLibSeat(id);
+        const response = await getStudentLibSeat(IsUserLoggedIn._id);
         console.log(response);
         if (response.booking && response.booking.reg) {
           setBookingReg(response.booking.reg);
-          const interval = setInterval(checkTimeAndShowNotification, 1000);
-          return () => clearInterval(interval);
+          checkDateAndShowNotification();
         }
       } catch (error) {
         console.error("Error checking library seat:", error);
       }
     };
 
-    const checkTimeAndShowNotification = () => {
+    const checkDateAndShowNotification = () => {
       const now = new Date();
-      const lastNotificationDate = localStorage.getItem("lastNotificationDate");
-      const currentDate = now.toDateString();
+      const currentDay = now.getDate();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
 
-      if (
-        now.getHours() >= 18 &&
-        now.getMinutes() >= 30 &&
-        (!lastNotificationDate ||
-          new Date(lastNotificationDate).toDateString() !== currentDate)
-      ) {
-     
-        setShowNotification(true);
-        localStorage.setItem("lastNotificationDate", now.toISOString());
+      const lastNotification = JSON.parse(
+        localStorage.getItem("lastNotification") || "{}"
+      );
+      const { lastSeenMonth, lastSeenYear, submitted } = lastNotification;
+
+      // Check if it's between the 28th of the current month and the 5th of the next month
+      const isNotificationPeriod =
+        currentDay >= 28 || (currentMonth !== lastSeenMonth && currentDay <= 5);
+
+      if (isNotificationPeriod) {
+        // If it's a new month or year, reset the submitted status
+        if (currentMonth !== lastSeenMonth || currentYear !== lastSeenYear) {
+          localStorage.setItem(
+            "lastNotification",
+            JSON.stringify({
+              lastSeenMonth: currentMonth,
+              lastSeenYear: currentYear,
+              submitted: false,
+            })
+          );
+          setShowNotification(true);
+        } else if (!submitted) {
+          // If it's the same month and year, but not submitted, show the notification
+          setShowNotification(true);
+        }
       }
     };
 
-    checkSeatAndSetInterval();
-  }, [id]);
+    checkSeatAndShowNotification();
+    // Set up a daily check
+    const dailyCheck = setInterval(
+      checkSeatAndShowNotification,
+      24 * 60 * 60 * 1000
+    );
+
+    return () => clearInterval(dailyCheck);
+  }, [IsUserLoggedIn]);
 
   const handleSubmit = async () => {
     if (!bookingReg) {
@@ -80,10 +107,20 @@ const NotificationWrapper = ({ children }) => {
 
     setLoading(true);
     try {
-    
-      
       await updateMonthlyStatus(bookingReg, "Confirmed");
       setShowNotification(false);
+
+      // Update localStorage to mark as submitted
+      const lastNotification = JSON.parse(
+        localStorage.getItem("lastNotification") || "{}"
+      );
+      localStorage.setItem(
+        "lastNotification",
+        JSON.stringify({
+          ...lastNotification,
+          submitted: true,
+        })
+      );
     } catch (error) {
       console.error("Error updating monthly status:", error);
       setError("Failed to update status. Please try again.");

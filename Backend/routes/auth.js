@@ -106,10 +106,11 @@ router.post("/otp-verify", async (req, res) => {
         // Find LibStudent by email
         const libStudent = await LibStudent.findOne({ email: id });
         if (libStudent) {
+         
           // Update LibStudent with userId
           libStudent.userId = newUser._id;
           await libStudent.save();
-         
+        
         }
 
         // Respond with success message and new user object
@@ -238,7 +239,7 @@ router.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
     (req, res) => {
       // Successful authentication
-      console.log("jjjjjjjjjj")
+      
      const frontendUrl =
     process.env.NODE_ENV === 'production'
         ? `${process.env.FRONTEND_PROD}`
