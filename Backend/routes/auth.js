@@ -238,7 +238,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 // Callback route after successful authentication
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
-  (req, res) => {
+  async(req, res) => {
     // Successful authentication
 
     const frontendUrl =
@@ -254,8 +254,15 @@ router.get('/google/callback',
 
       // Assuming you have a way to determine the user's role
     };
+    const libStudent = await LibStudent.findOne({ email: userInfo.username });
+    if (libStudent) {
 
-    console.log(userInfo)
+      // Update LibStudent with userId
+      libStudent.userId = newUser._id;
+      await libStudent.save();
+
+    }
+  
     // Encode and stringify user info
     const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
 

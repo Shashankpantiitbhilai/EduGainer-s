@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import { styled } from "@mui/system";
 import {
+  Box,
   Card,
   CardContent,
   Typography,
@@ -8,65 +8,49 @@ import {
   Button,
   Grid,
   CircularProgress,
+  Avatar,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  Snackbar,
+  Alert,
 } from "@mui/material";
+import { styled } from "@mui/system";
+import { Edit as EditIcon, Save as SaveIcon } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 
 import { updateUserDetails } from "../../services/utils";
 import { AdminContext } from "../../App";
 
-const RootCard = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card)(({ theme }) => ({
   maxWidth: 800,
   margin: "auto",
-  marginTop: 20,
-  padding: 20,
-  display: "flex",
-  flexDirection: "row",
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(4),
+  [theme.breakpoints.down("sm")]: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
 }));
 
-const TextFieldWrapper = styled(TextField)(({ theme }) => ({
-  width: "100%",
-  marginBottom: 10,
-}));
-
-const ButtonWrapper = styled(Button)(({ theme }) => ({
-  marginTop: 20,
-  marginRight: 10,
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: theme.spacing(20),
+  height: theme.spacing(20),
+  margin: "auto",
+  marginBottom: theme.spacing(2),
+  [theme.breakpoints.down("sm")]: {
+    width: theme.spacing(15),
+    height: theme.spacing(15),
+  },
 }));
 
 const FileInput = styled("input")({
   display: "none",
 });
 
-const ImagePreview = styled("img")({
-  width: "300px",
-  height: "300px",
-  objectFit: "cover",
-  marginBottom: 10,
-});
-
-const CircularProgressWrapper = styled(CircularProgress)({
-  margin: "auto",
-  display: "block",
-});
-
-const Details = styled(CardContent)({
-  flex: 1,
-});
-
-const ImageContainer = styled(CardContent)({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-});
-
-const UploadButton = styled(Button)({
-  marginTop: 10,
-});
-
 const Profile = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
-  const { id } = useParams(); // Assuming you're using id from the route params
+  const { id } = useParams();
   const [user, setUser] = useState({
     username: "",
     firstName: "",
@@ -79,17 +63,24 @@ const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageBase64, setImageBase64] = useState("");
-  const [error, setError] = useState(null); // To store error messages
+  const [error, setError] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetchUserDetails(id);
-  },[]);
+  }, []);
 
   const fetchUserDetails = async (id) => {
     try {
-      setUser(IsUserLoggedIn); // Ensure response.data contains the user object
+      setUser(IsUserLoggedIn);
     } catch (error) {
-      // console.error("Error fetching user data:", error);
       setError("Failed to fetch user data.");
     }
   };
@@ -127,127 +118,158 @@ const Profile = () => {
       const response = await updateUserDetails(id, updatedUser);
       setUser(response);
       setEditing(false);
-      setError(null); // Clear any previous errors
+      setError(null);
+      setSnackbar({
+        open: true,
+        message: "Profile updated successfully!",
+        severity: "success",
+      });
     } catch (error) {
-      // console.error("Error saving user data:", error);
-      setError("Failed to save user data."); // Set an error message
+      setError("Failed to save user data.");
+      setSnackbar({
+        open: true,
+        message: "Failed to update profile.",
+        severity: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   return (
     <>
       {IsUserLoggedIn && (
-        <RootCard>
-          <Details>
-            <Typography variant="h5" gutterBottom>
-              Profile
-            </Typography>
-            {error && (
-              <Typography variant="body2" color="error">
-                {error}
-              </Typography>
-            )}
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextFieldWrapper
-                  name="username"
-                  label="Email"
-                  value={user.username}
-                  variant="outlined"
-                  disabled
-                />
+        <StyledCard elevation={3}>
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4}>
+                <Box textAlign="center">
+                  <StyledAvatar src={user.photoUpload} alt={user.firstName} />
+                  <FileInput
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImage}
+                    disabled={!editing}
+                    id="photo-upload-input"
+                  />
+                  <label htmlFor="photo-upload-input">
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      component="span"
+                      disabled={!editing || loading}
+                      startIcon={<EditIcon />}
+                    >
+                      Change Photo
+                    </Button>
+                  </label>
+                </Box>
               </Grid>
-              <Grid item xs={6}>
-                <TextFieldWrapper
-                  name="firstName"
-                  label="First Name"
-                  value={user.firstName}
-                  variant="outlined"
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextFieldWrapper
-                  name="lastName"
-                  label="Last Name"
-                  value={user.lastName}
-                  variant="outlined"
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextFieldWrapper
-                  name="address"
-                  label="Address"
-                  value={user.address}
-                  variant="outlined"
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextFieldWrapper
-                  name="bio"
-                  label="Bio"
-                  value={user.bio}
-                  variant="outlined"
-                  multiline
-                  rows={3}
-                  disabled={!editing}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                {loading && <CircularProgressWrapper size={24} />}
-                {editing ? (
-                  <ButtonWrapper
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSave}
-                    disabled={loading}
-                  >
-                    Save
-                  </ButtonWrapper>
-                ) : (
-                  <ButtonWrapper
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => setEditing(true)}
-                  >
-                    Edit
-                  </ButtonWrapper>
-                )}
+              <Grid item xs={12} md={8}>
+                <Typography variant="h4" gutterBottom>
+                  {user.firstName} {user.lastName}
+                </Typography>
+                <Typography variant="body1" color="textSecondary" paragraph>
+                  {user.username}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="firstName"
+                      label="First Name"
+                      value={user.firstName}
+                      variant="outlined"
+                      disabled={!editing}
+                      onChange={handleInputChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="lastName"
+                      label="Last Name"
+                      value={user.lastName}
+                      variant="outlined"
+                      disabled={!editing}
+                      onChange={handleInputChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="address"
+                      label="Address"
+                      value={user.address}
+                      variant="outlined"
+                      disabled={!editing}
+                      onChange={handleInputChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="bio"
+                      label="Bio"
+                      value={user.bio}
+                      variant="outlined"
+                      multiline
+                      rows={3}
+                      disabled={!editing}
+                      onChange={handleInputChange}
+                    />
+                  </Grid>
+                </Grid>
+                <Box mt={3} display="flex" justifyContent="flex-end">
+                  {editing ? (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSave}
+                      disabled={loading}
+                      startIcon={
+                        loading ? <CircularProgress size={20} /> : <SaveIcon />
+                      }
+                    >
+                      Save
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => setEditing(true)}
+                      startIcon={<EditIcon />}
+                    >
+                      Edit Profile
+                    </Button>
+                  )}
+                </Box>
               </Grid>
             </Grid>
-          </Details>
-          <ImageContainer>
-            {user.photoUpload && (
-              <ImagePreview src={user.photoUpload} alt="Uploaded" />
-            )}
-            <FileInput
-              type="file"
-              accept="image/*"
-              onChange={handleImage}
-              disabled={!editing}
-              id="photo-upload-input"
-            />
-            <label htmlFor="photo-upload-input">
-              <UploadButton
-                variant="contained"
-                color="primary"
-                component="span"
-                disabled={!editing || loading}
-              >
-                Upload Photo
-              </UploadButton>
-            </label>
-          </ImageContainer>
-        </RootCard>
+          </CardContent>
+        </StyledCard>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

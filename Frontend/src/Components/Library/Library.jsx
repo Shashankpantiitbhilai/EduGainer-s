@@ -243,7 +243,7 @@ const handleCloseSnackbar = (event, reason) => {
         component="h1"
         sx={{ fontSize: { xs: "xl", sm: "2xl" }, fontWeight: "bold", mb: 4 }}
       >
-        EduGainer's Library Seating
+        EduGainer's Live Seat Tracker
       </Box>
       <Box
         sx={{

@@ -21,7 +21,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { AdminContext } from "../../App";
 import { fetchLibStudent } from "../../services/library/utils";
 import Payment from "../payment/razorpay";
-
+import CheckIcon from "@mui/icons-material/Check";
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   [theme.breakpoints.up("sm")]: {
@@ -131,7 +131,7 @@ const Fee = () => {
         setError("Student not registered");
         return;
       }
-console.log(data,"kkkkk")
+      console.log(data, "kkkkk");
       setStudentData(data.student);
       setValue("name", data.student.name);
       setValue("shift", data.student.shift);
@@ -139,7 +139,7 @@ console.log(data,"kkkkk")
       if (data.student.shift) {
         const shiftFee = shifts[data.student.shift] || 0;
         const currentMonthFee = shiftFee;
-        console.log(currentMonthFee,shiftFee,data.student.shift,"feeees")
+        console.log(currentMonthFee, shiftFee, data.student.shift, "feeees");
         const totalFee =
           currentMonthFee +
           (data.student.due || 0) -
@@ -234,6 +234,10 @@ console.log(data,"kkkkk")
         >
           Fee Payment
         </Typography>
+        <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
+          Please enter your correct reg no .Entering someone else reg no will
+          not be considered for your payment and you will be charged fine.
+        </Alert>
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
           <Controller
             name="regNo"
@@ -354,6 +358,12 @@ console.log(data,"kkkkk")
                   </Grid>
                 </Grid>
               </Box>
+              <Alert icon={<CheckIcon fontSize="bold" />} severity="info">
+                After Clicking on Pay fee ,payment portal will activate .Choose
+                any method but do not refresh the page during payment process
+                ,till it is completed. On completion and verification ,you will
+                be taken to Home page automatically.
+              </Alert>
               <Button
                 type="submit"
                 fullWidth

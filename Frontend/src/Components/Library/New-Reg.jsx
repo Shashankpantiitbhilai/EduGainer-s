@@ -30,6 +30,7 @@ import {
   ListItemText,
 } from "@mui/material";
 
+import CheckIcon from '@mui/icons-material/Check';
 import { HowToReg, CheckCircleOutline, Info } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { eligibleForNewRegistration } from "../../services/library/utils";
@@ -371,6 +372,15 @@ export default function LibraryRegistration() {
       case 3:
         return (
           <Grid container spacing={3}>
+            import * as React from 'react';
+
+
+
+    <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
+    When Clicking on Submit then payment portal will start.You are advised not to refresh the page during payment process .Once the Payment is successfull then, you will be taken yo your library subscription page automatically .
+    </Alert>
+  
+
             <Grid item xs={12} sm={6}>
               <Controller
                 name="aadhaar"
@@ -556,7 +566,7 @@ export default function LibraryRegistration() {
               Email: edugainersclasses@gmail.com
             </Typography>
             <Typography variant="body1">
-              Hours: Monday to Friday, 9:00 AM - 5:00 PM
+              Hours: Monday to Sunday, 9:00 AM - 9:00 PM
             </Typography>
             <Box mt={3}>
               <Button

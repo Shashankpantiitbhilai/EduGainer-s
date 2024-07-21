@@ -53,6 +53,7 @@ passport.use(new GoogleStrategy({
           username: profile.emails[0].value,
           strategy: 'google'
         });
+        
         await user.save();
       }
 
