@@ -1,9 +1,9 @@
-import React, { useContext,useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { AdminContext } from "../../App";
 import { Button, TextField, Container, Box, Typography } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import { loginUser } from "../../services/auth";
-import { useNavigate, Link ,useLocation} from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -50,32 +50,33 @@ function Login() {
   const location = useLocation();
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const authSuccess = params.get("auth_success");
-    const userInfo = params.get("user_info");
+   const urlParams = new URLSearchParams(window.location.search);
+    const authSuccess = urlParams.get("auth_success");
+    const userInfo = urlParams.get("user_info");
 
     if (authSuccess === "true" && userInfo) {
       try {
-        const decodedUserInfo = JSON.parse(decodeURIComponent(userInfo));
-        setIsUserLoggedIn(decodedUserInfo);
-        toast.success("Google Sign-In successful", { autoClose: 2000 });
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        const user = JSON.parse(decodeURIComponent(userInfo));
+        setIsUserLoggedIn(user); // Set login state to true
+        localStorage.setItem("user", JSON.stringify(user)); // Store user info in localStorage
+        navigate("/"); // Navigate to home page
       } catch (error) {
         console.error("Error parsing user info:", error);
-        toast.error("An error occurred during Google Sign-In", {
-          autoClose: 2000,
-        });
+        setError("Error processing user information");
       }
+    } else if (authSuccess === "false") {
+      setError("Authentication failed");
     }
-  }, [location, setIsUserLoggedIn, navigate]);
+  }, [navigate, setIsUserLoggedIn]);
+
 
   const getBackendUrl = () => {
     if (process.env.NODE_ENV === "production") {
-      return process.env.REACT_APP_BACKEND_PROD || process.env.REACT_APP_BACKEND_URL;
+      return `${process.env.REACT_APP_BACKEND_PROD}`;
     }
-    return process.env.REACT_APP_BACKEND_DEV || process.env.REACT_APP_BACKEND_URL;
+    return (
+      process.env.REACT_APP_BACKEND_DEV || process.env.REACT_APP_BACKEND_URL
+    );
   };
 
   const handleGoogleSignIn = () => {
@@ -84,11 +85,13 @@ function Login() {
 
     if (backendUrl) {
       const googleAuthUrl = `${backendUrl}/auth/google`;
-      // console.log("Google Auth URL:", googleAuthUrl);
+      
       window.location.href = googleAuthUrl;
     } else {
       console.error("Backend URL is undefined");
-      toast.error("Unable to initiate Google Sign-In. Please check the application configuration.");
+      toast.error(
+        "Unable to initiate Google Sign-In. Please check the application configuration."
+      );
     }
   };
 
@@ -114,14 +117,12 @@ function Login() {
     }
   };
 
- 
-   return (
+  return (
     <LoginContainer>
       <ToastContainer />
       <LoginForm component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <Typography variant="h4" gutterBottom>
-         Sign In
-         
+          Sign In
         </Typography>
 
         <TextField
@@ -196,7 +197,8 @@ function Login() {
         </Button>
 
         <Typography variant="body2" sx={{ mt: 2 }}>
-          Don't have an account? <Link to="/register">Register</Link>
+          Don't have an account?
+          <Link to="/register">Register</Link>
         </Typography>
       </LoginForm>
     </LoginContainer>
