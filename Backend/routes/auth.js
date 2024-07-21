@@ -229,62 +229,35 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 });
 
 
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
+// Callback route after successful authentication
+router.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
+    (req, res) => {
+        // Successful authentication
+     const frontendUrl =
+    process.env.NODE_ENV === 'production'
+        ? `${process.env.FRONTEND_PROD}`
+        : `${process.env.FRONTEND_DEV}`
+
+        // Prepare user info
+        // console.log("ncjcnd", req.user)
+        const userInfo = {
+            id: req.user._id,
+            name: req.user.username,
+            email: req.user.email,
+            // Assuming you have a way to determine the user's role
+        };
+
+        // Encode and stringify user info
+        const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
+
+        res.redirect(`${frontendUrl}/login?auth_success=true&user_info=${encodedUserInfo}`);
+    }
+);
 // Google OAuth Authentication
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] }),
-);
 
-router.get(
-  "/google/verify",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => {
-    if (!req.user.ID_No) {
-      res.redirect("/auth/google/addId");
-    } else {
-      res.redirect("/");
-    }
-  },
-);
-
-router.get("/google/addId", (req, res) => {
-  // TODO: Find a more secure url
-  res.redirect(`https://edu-gainer-s-frontend-alpha.vercel.app/register/google/${req.user._id}`);
-});
-
-router.post("/google/register", async (req, res) => {
-  const { id, ID_No } = req.body;
-  // console.log(req.user);
-
-  if (id == req.user.id) {
-    try {
-      const user = await User.findOneAndUpdate(
-        { _id: req.user.id },
-        { ID_No: ID_No },
-        { new: true },
-      );
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Serialize the updated user into the session
-      req.login(user, function (err) {
-        if (err) {
-          console.error("Error serializing user:", err);
-          return res.status(500).json({ message: "Error serializing user" });
-        }
-      });
-      res.status(200).json(user);
-    } catch (error) {
-      console.error("Error updating user:", error);
-      res.status(500).json({ message: "Error updating user" });
-    }
-  } else {
-    res.status(401).send("Unauthorized");
-  }
-});
 
 router.post("/logout", (req, res, next) => {
   req.logout(function (err) {

@@ -1,6 +1,6 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
-const GoogleStrategy = require("passport-google-oauth20");
+const dotenv = require("dotenv");
 const { User } = require("./student");
 
 // Local Strategy
@@ -14,41 +14,44 @@ passport.use(
   ),
 );
 
-// Google OAuth Strategy
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID:
-       
-//       clientSecret: 
-//       callbackURL:  // Update with your callback URL
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       // Check if the user already exists in your database
-//       try {
-//         const user = await User.findOne({ username: profile.emails[0].value });
 
-//         if (user) {
-//           // If user exists, return the user
-//           return done(null, user);
-//         }
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-//         // If user doesn't exist, create a new user in your database
-//         const newUser = new User({
-//           googleId: profile.id,
-//           username: profile.emails[0].value,
-//           name: profile.displayName,
-//           strategy: "google",
-//         });
+dotenv.config();
 
-//         await newUser.save();
-//         return done(null, newUser);
-//       } catch (error) {
-//         return done(error);
-//       }
-//     },
-//   ),
-// );
+const callbackURL =
+    process.env.NODE_ENV === 'production'
+        ? `${process.env.FRONTEND_PROD}/auth/google/callback`
+        : `${process.env.FRONTEND_DEV}/auth/google/callback`
+
+// console.log(callbackURL);
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: callbackURL
+},
+    async function (accessToken, refreshToken, profile, done) {
+        try {
+            let user = await User.findOne({ googleId: profile.id });
+
+            if (!user) {
+                // If the user is not found, create a new one
+                user = new User({
+                    googleId: profile.id,
+                    username: profile.displayName,
+                    email: profile.emails[0].value // assuming the user has a single email
+                });
+                await user.save();
+            }
+
+            return done(null, user);
+        } catch (err) {
+            return done(err);
+        }
+    }
+));
+
 
 passport.serializeUser((user, done) => {
   done(null, user);

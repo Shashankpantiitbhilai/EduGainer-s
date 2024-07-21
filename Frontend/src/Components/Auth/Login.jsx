@@ -30,12 +30,8 @@ const Divider = styled(Box)({
   display: "flex",
   alignItems: "center",
   textAlign: "center",
-  "&:before": {
-    content: '""',
-    flex: 1,
-    borderBottom: "1px solid #ccc",
-  },
-  "&:after": {
+  margin: "20px 0",
+  "&:before, &:after": {
     content: '""',
     flex: 1,
     borderBottom: "1px solid #ccc",
@@ -47,8 +43,7 @@ const Divider = styled(Box)({
 
 function Login() {
   const form = useForm();
-  const { register, control, handleSubmit, formState, setError, clearErrors } =
-    form;
+  const { register, handleSubmit, formState, setError, clearErrors } = form;
   const { errors } = formState;
   const { setIsUserLoggedIn } = useContext(AdminContext);
   const navigate = useNavigate();
@@ -56,36 +51,39 @@ function Login() {
   const onSubmit = async (data) => {
     try {
       const response = await loginUser(data.email, data.password);
-      // console.log(response);
-      if (response && response.user.role === "user") {
+      if (response && response.user) {
         setIsUserLoggedIn(response.user);
-          toast.success("Login successful", { autoClose: 2000 });
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
-      } else if (response && response.user.role === "admin") {
-        setIsUserLoggedIn(response.user);
-         toast.success("Login successful", { autoClose: 2000 });
-         setTimeout(() => {
-           navigate("/admin_home");
-         }, 1000);
+        toast.success("Login successful", { autoClose: 2000 });
+        setTimeout(() => {
+          navigate(response.user.role === "admin" ? "/admin_home" : "/");
+        }, 1000);
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });
-        // Clear the error after a short delay
         toast.error("Invalid credentials", { autoClose: 2000 });
-        // Clear the error after a short delay
         setTimeout(() => {
           clearErrors("login");
         }, 2000);
       }
     } catch (error) {
-      // console.error("Login error:", error);
+      console.error("Login error:", error);
+      toast.error("An error occurred during login", { autoClose: 2000 });
     }
+  };
+ const url =
+            process.env.NODE_ENV === "production"
+              ? process.env.REACT_APP_BACKEND_PROD
+              : process.env.REACT_APP_BACKEND_DEV;
+  const handleGoogleSignIn = () => {
+     const url =
+            process.env.NODE_ENV === "production"
+              ? process.env.REACT_APP_BACKEND_PROD
+              : process.env.REACT_APP_BACKEND_DEV;
+    window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
   };
 
   return (
     <LoginContainer>
-      <ToastContainer/>
+      <ToastContainer />
       <LoginForm component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <Typography variant="h4" gutterBottom>
           Sign In
@@ -144,7 +142,7 @@ function Login() {
           fullWidth
           sx={{ mt: 2 }}
         >
-          Submit
+          Sign In
         </Button>
 
         <Divider>
@@ -156,7 +154,7 @@ function Login() {
           color="secondary"
           fullWidth
           startIcon={<GoogleIcon />}
-          href="https://edu-gainer-s-frontend-alpha.vercel.app/auth/google"
+          onClick={handleGoogleSignIn}
           sx={{ mt: 2 }}
         >
           Sign in with Google
@@ -166,7 +164,6 @@ function Login() {
           Don't have an account? <Link to="/register">Register</Link>
         </Typography>
       </LoginForm>
-      
     </LoginContainer>
   );
 }
