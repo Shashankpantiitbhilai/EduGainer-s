@@ -31,7 +31,7 @@ router.post("/register", async (req, res) => {
     if (!redisClient.isOpen) {
       await redisClient.connect();
     }
-
+console.log(process.env.Email)
     // Check if the email already exists
     const existingUser = await User.findOne({ username: email });
     if (existingUser) {
@@ -108,7 +108,7 @@ router.post("/otp-verify", async (req, res) => {
         if (libStudent) {
 
           // Update LibStudent with userId
-          libStudent.userId = newUser._id;
+          libStudent.userId = newUser?._id;
           await libStudent.save();
 
         }
@@ -258,7 +258,7 @@ router.get('/google/callback',
     if (libStudent) {
 
       // Update LibStudent with userId
-      libStudent.userId = newUser._id;
+      libStudent.userId = userInfo.id
       await libStudent.save();
 
     }
