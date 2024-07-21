@@ -22,12 +22,13 @@ const callbackURL =
     ? `${process.env.BACKEND_PROD}/auth/google/callback`
     : `${process.env.BACKEND_DEV}/auth/google/callback`;
 
-
+// console.log(callbackURL)
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: callbackURL
 },
+
   async function (accessToken, refreshToken, profile, done) {
     try {
       // First, try to find a user with the Google ID

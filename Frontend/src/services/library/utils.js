@@ -38,11 +38,11 @@ export async function eligibleForNewRegistration(user_id) {
 }
 
 export async function fetchLibStudent(reg) {
-    console.log(reg)
+   
     try {
         // console.log(user_id)
         const response = await axiosInstance.get(`/library/fetchStudent/${reg}`);
-        console.log(response.data);// Adjust the endpoint as per your API
+        // Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object
     } catch (error) {
         // console.error("Error fetching user data:", error);
@@ -53,7 +53,7 @@ export async function fetchLibStudent(reg) {
 
 export async function getStudentLibSeat(id) {
     try {
-        console.log(id)
+     
         const response = await axiosInstance.get(`/library/getStudentLibSeat/${id}`);
         // console.log(response.data);// Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object
@@ -69,7 +69,7 @@ export async function sendFeeData(amount) {
     try {
      
         const response = await axiosInstance.post("/library/sendFeeData", { amount });
-        console.log(response.data)
+       
         // console.log(response.data);// Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object
     } catch (error) {
@@ -80,10 +80,10 @@ export async function sendFeeData(amount) {
 
 export async function updateMonthlyStatus(reg,status) {
     try {
-        console.log(reg,status)
+       
       
         const response = await axiosInstance.patch(`/library/updateMonthlyStatus/${reg}`,{status});
-        console.log(response.data)
+      
         // console.log(response.data);// Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object
     } catch (error) {

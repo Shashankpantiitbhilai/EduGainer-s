@@ -71,6 +71,27 @@ function Login() {
     }
   }, [location, setIsUserLoggedIn, navigate]);
 
+  const getBackendUrl = () => {
+    if (process.env.NODE_ENV === "production") {
+      return process.env.REACT_APP_BACKEND_PROD || process.env.REACT_APP_BACKEND_URL;
+    }
+    return process.env.REACT_APP_BACKEND_DEV || process.env.REACT_APP_BACKEND_URL;
+  };
+
+  const handleGoogleSignIn = () => {
+    const backendUrl = getBackendUrl();
+    // console.log("Backend URL:", backendUrl);
+
+    if (backendUrl) {
+      const googleAuthUrl = `${backendUrl}/auth/google`;
+      // console.log("Google Auth URL:", googleAuthUrl);
+      window.location.href = googleAuthUrl;
+    } else {
+      console.error("Backend URL is undefined");
+      toast.error("Unable to initiate Google Sign-In. Please check the application configuration.");
+    }
+  };
+
   const onSubmit = async (data) => {
     try {
       const response = await loginUser(data.email, data.password);
@@ -93,20 +114,14 @@ function Login() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    const url =
-      process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_BACKEND_PROD
-        : process.env.REACT_APP_BACKEND_DEV;
-    window.location.href = `${url}/auth/google`;
-  };
-
-  return (
+ 
+   return (
     <LoginContainer>
       <ToastContainer />
       <LoginForm component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <Typography variant="h4" gutterBottom>
-          Sign In
+         Sign In
+         
         </Typography>
 
         <TextField

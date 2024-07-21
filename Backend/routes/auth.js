@@ -244,7 +244,7 @@ router.get('/google/callback',
     process.env.NODE_ENV === 'production'
         ? `${process.env.FRONTEND_PROD}`
         : `${process.env.FRONTEND_DEV}`
-console.log(frontendUrl)
+console.log(frontendUrl,"kkkkkkk")
         // Prepare user info
         // console.log("ncjcnd", req.user)
         const userInfo = {
