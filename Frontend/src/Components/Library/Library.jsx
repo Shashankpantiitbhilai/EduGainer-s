@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import {
-  Box,
+  Box,Snackbar,
   Button,
   FormControl,
   InputLabel,
@@ -29,46 +29,73 @@ const shifts = [
   "24*7",
 ];
 
-const isOverlapping = (shift1, shift2) => {
-  const shiftRanges = {
-    "6:30 AM to 2 PM": [6.5, 14],
-    "2 PM to 9:30 PM": [14, 21.5],
-    "6:30 PM to 11 PM": [18.5, 23],
-    "9:30 PM to 6:30 AM": [21.5, 30.5],
-    "2 PM to 11 PM": [14, 23],
-    "6:30 AM to 6:30 PM": [6.5, 18.5],
-    "24*7": [0, 24],
+const checkOverlap = (currentShift, bookedShifts) => {
+  if (bookedShifts.includes("24*7")) return true;
+
+  const overlapMap = {
+    "6:30 AM to 2 PM": ["6:30 AM to 6:30 PM", "24*7", "6:30 AM to 2 PM"],
+    "2 PM to 9:30 PM": [
+      "2 PM to 11 PM",
+      "2 PM to 9:30 PM",
+      "6:30 AM to 6:30 PM",
+      "24*7",
+    ],
+    "6:30 PM to 11 PM": [
+      "2 PM to 11 PM",
+      "24*7",
+      "2 PM to 9:30 PM",
+      "9:30 PM to 6:30 AM",
+      "6:30 PM to 11 PM",
+    ],
+    "9:30 PM to 6:30 AM": ["24*7", "6:30 PM to 11 PM", "2 PM to 11 PM"],
+    "2 PM to 11 PM": [
+      "2 PM to 9:30 PM",
+      "6:30 PM to 11 PM",
+      "6:30 AM to 6:30 PM",
+      "24*7",
+      "2 PM to 11 PM",
+    ],
+    "6:30 AM to 6:30 PM": [
+      "6:30 AM to 2 PM",
+      "2 PM to 9:30 PM",
+      "2 PM to 11 PM",
+      "24*7",
+      "6:30 AM to 6:30 PM",
+    ],
+    "24*7": shifts,
   };
 
-  const [start1, end1] = shiftRanges[shift1];
-  const [start2, end2] = shiftRanges[shift2];
-
-  return (
-    (start1 < end2 && start2 < end1) || shift1 === "24*7" || shift2 === "24*7"
-  );
-};
-
-const getAvailableShifts = (bookedShift) => {
-  return shifts.filter((shift) => !isOverlapping(bookedShift, shift));
+  return bookedShifts.some((shift) => overlapMap[currentShift].includes(shift));
 };
 
 const getBackgroundColor = (status, seatStatuses, seat, selectedShift) => {
-  if (status === "Paid") return "red";
+  if (!seatStatuses[seat]) {
+    return "green"; // Default color if seat status is not available
+  }
 
-  const bookedShifts = Object.entries(seatStatuses)
-    .filter(([key, value]) => key.startsWith(seat) && value === "Paid")
-    .map(([key]) => key.split("-")[1]);
+  // Check if there's a Confirmed status in any overlapping shift
+  const hasOverlappingConfirmed = shifts.some(
+    (shift) =>
+      seatStatuses[seat][shift] === "Confirmed" &&
+      checkOverlap(selectedShift, [shift])
+  );
 
-  if (bookedShifts.includes("24*7")) return "red";
+  if (hasOverlappingConfirmed) {
+    return "yellow"; // Seat is confirmed in an overlapping shift
+  }
 
-  const availableShifts =
-    bookedShifts.length > 0 ? getAvailableShifts(bookedShifts[0]) : shifts;
+  // Get all booked (Paid) shifts for this seat
+  const bookedShifts = shifts.filter(
+    (shift) => seatStatuses[seat][shift] === "Paid"
+  );
 
-  if (availableShifts.includes(selectedShift)) return "green";
-
-  return "yellow";
+  // Check for overlapping booked shifts
+  if (checkOverlap(selectedShift, bookedShifts)) {
+    return "red"; // Seat has an overlapping booking
+  } else {
+    return "green"; // Seat can be allocated
+  }
 };
-
 const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -109,14 +136,16 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
   );
 };
 
-const Library = () => {
+const Library = () => {  const { IsUserLoggedIn } = useContext(AdminContext);
   const [selectedShift, setSelectedShift] = useState(shifts[0]);
   const [seatStatus, setSeatStatus] = useState({});
   const [userSeat, setUserSeat] = useState(null);
   const [userShift, setUserShift] = useState(null);
-  const { IsUserLoggedIn } = useContext(AdminContext);
-  const socketRef = useRef(null);
+   const [snackbarOpen, setSnackbarOpen] = useState(false);
+   const [snackbarMessage, setSnackbarMessage] = useState("");
 
+  const socketRef = useRef(null);
+  console.log(IsUserLoggedIn);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -139,32 +168,46 @@ const Library = () => {
         });
 
         socketRef.current.emit("joinSeatsRoom", roomId);
+        
+    
+       if (socketRef.current) {
+         socketRef.current.on("seatStatusUpdate", ({ id, status, seat, shift }) => {
+        
+           console.log(status, seat, shift);
+            setSnackbarMessage(
+              `Seat ${seat} status updated to ${status} for shift ${shift}`
+            );
+            setSnackbarOpen(true);
+           setSeatStatus((prevStatus) => ({
+             ...prevStatus,
+             [seat]: {
+               ...prevStatus[seat],
+               [shift]: status,
+             },
+           }));
+        
+      
+         });
+       }
+     
 
-        socketRef.current.on(
-          "seatStatusUpdate",
-          ({ id, status, seat, shift }) => {
-            console.log("Seat status update received:", {
-              id,
-              status,
-              seat,
-              shift,
+        try {
+          const response = await getSeatsData();
+          let statusMap = {};
+          shifts.forEach((shift) => {
+            const shiftData = response[shift] || [];
+            shiftData.forEach((e) => {
+              if (!statusMap[e.seat]) {
+                statusMap[e.seat] = {};
+              }
+              statusMap[e.seat][shift] = e.status || "Empty";
             });
-            setSeatStatus((prevStatus) => ({
-              ...prevStatus,
-              [`${seat}-${shift}`]: status,
-            }));
-          }
-        );
-
-        const response = await getSeatsData();
-        let statusMap = {};
-        shifts.forEach((shift) => {
-          const shiftData = response[shift] || [];
-          shiftData.forEach((e) => {
-            statusMap[`${e.seat}-${shift}`] = e.status || "Unpaid";
           });
-        });
-        setSeatStatus(statusMap);
+          setSeatStatus(statusMap);
+        } catch (error) {
+          console.error("Error fetching seat data:", error);
+        }
+        console.log(IsUserLoggedIn);
 
         const userSeatData = await getStudentLibSeat(IsUserLoggedIn?._id);
         if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
@@ -184,7 +227,12 @@ const Library = () => {
       }
     };
   }, [IsUserLoggedIn?._id, url]);
-
+const handleCloseSnackbar = (event, reason) => {
+  if (reason === "clickaway") {
+    return;
+  }
+  setSnackbarOpen(false);
+};
   const handleShiftChange = (event) => {
     setSelectedShift(event.target.value);
   };
@@ -245,12 +293,10 @@ const Library = () => {
           ))}
         </Select>
       </FormControl>
-
       <Alert severity="warning" sx={{ mt: 2, mb: 4 }}>
         <AlertTitle>Note</AlertTitle>
         In case the seat you need is not empty, kindly contact our office.
       </Alert>
-
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper
@@ -437,6 +483,17 @@ const Library = () => {
           </Paper>
         </Grid>
       </Grid>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />{" "}
+  
       <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
         <Box

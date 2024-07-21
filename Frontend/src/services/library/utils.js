@@ -53,7 +53,7 @@ export async function fetchLibStudent(reg) {
 
 export async function getStudentLibSeat(id) {
     try {
-        // console.log(id)
+        console.log(id)
         const response = await axiosInstance.get(`/library/getStudentLibSeat/${id}`);
         // console.log(response.data);// Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object

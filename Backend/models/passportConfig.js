@@ -22,7 +22,6 @@ const callbackURL =
     ? `${process.env.BACKEND_PROD}/auth/google/callback`
     : `${process.env.BACKEND_DEV}/auth/google/callback`;
 
-console.log(callbackURL, process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,

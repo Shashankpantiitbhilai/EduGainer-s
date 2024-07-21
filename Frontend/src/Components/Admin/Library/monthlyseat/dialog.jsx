@@ -186,8 +186,8 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.status || ""}
               >
                 <MenuItem value="Paid">Paid</MenuItem>
-                <MenuItem value="Empty">Empty Confirmation</MenuItem>
-                <MenuItem value="Confirmation">Paid</MenuItem>
+                <MenuItem value="Confirmed">Confirmation</MenuItem>
+                <MenuItem value="Empty">Empty</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>

@@ -248,8 +248,8 @@ console.log(frontendUrl)
         // console.log("ncjcnd", req.user)
         const userInfo = {
             id: req.user._id,
-            name: req.user.username,
-            email: req.user.emai,
+           username: req.user.username,
+           
             // Assuming you have a way to determine the user's role
         };
 

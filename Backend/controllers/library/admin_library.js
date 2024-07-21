@@ -65,13 +65,41 @@ const getBookingData = async (req, res) => {
 };
 
 const addBookingData = async (req, res) => {
-    const { reg, name, seat, date, cash, online, shift, fee, remarks, status ,total,due,advance} = req.body;
+    const { reg, name, seat, date, cash, online, shift, fee, remarks, status, total, due, advance } = req.body;
+
     try {
         const BookingModel = getCurrentMonthBookingModel();
+
+        let statusColor;
+        if (status === "Paid") {
+            statusColor = "green";
+        } else if (status === "Confirmed") {
+            statusColor = "yellow";
+        } else {
+            statusColor = "red";
+        }
+
         const newBooking = new BookingModel({
-            reg, name, seat, date, cash, online, shift, fee, remarks, status, total, due, advance
+            reg,
+            name,
+            seat,
+            date,
+            cash,
+            online,
+            shift,
+            fee,
+            remarks,
+            status,
+            total,
+            due,
+            advance,
+            colors: {
+                [status]: statusColor
+            }
         });
+
         await newBooking.save();
+
         res.status(201).json({ message: 'Booking added successfully', booking: newBooking });
     } catch (error) {
         console.error('Error adding booking:', error);
@@ -81,42 +109,57 @@ const addBookingData = async (req, res) => {
 
 const updateBookingData = async (req, res) => {
     const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
-  console.log(typeof(due),typeof(advance))
+    console.log(typeof (due), typeof (advance));
+
     try {
         const BookingModel = getCurrentMonthBookingModel();
+
+        let colorUpdate = {};
+        if (status === "Paid") {
+            colorUpdate = { $set: { [`colors.status`]: "green" } };
+        } else if (status === "Confirmed") {
+            colorUpdate = { $set: { [`colors.status`]: "yellow" } };
+        } else {
+            colorUpdate = { $set: { [`colors.status`]: "red" } };
+        }
+
         const newBooking = await BookingModel.findOneAndUpdate(
             { reg },
             {
-                reg,
-                name,
-                seat,
-                date,
-                cash,
-                online,
-                shift,
-                fee,
-                remarks,
-                status,
-                due,
-                advance,
-                receipt,
-                TotalMoney,
-                Payment_detail,
-                
+                $set: {
+                    reg,
+                    name,
+                    seat,
+                    date,
+                    cash,
+                    online,
+                    shift,
+                    fee,
+                    remarks,
+                    status,
+                    due,
+                    advance,
+                    receipt,
+                    TotalMoney,
+                    Payment_detail
+                },
+                ...colorUpdate
             },
-            { new: true }
+            { new: true, upsert: true }
         );
-   
+
+        console.log(newBooking);
+
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
         }
+
         res.status(200).json({ message: 'Booking updated successfully', booking: newBooking });
     } catch (error) {
         console.error('Error updating booking:', error);
         res.status(500).json({ message: 'Failed to update booking' });
     }
 };
-
 const deleteBookingData = async (req, res) => {
     const { id } = req.params;
     try {
@@ -155,52 +198,45 @@ const updateBookingColor = async (req, res) => {
 
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
-    const { seat, status ,shift} = req.body; // assuming these are sent in the request body
-console.log("yo",req.body)
+    const { seat, status, shift } = req.body;
+    console.log("yo", req.body);
+
     try {
         const BookingModel = getCurrentMonthBookingModel();
         const currentDate = new Date().toISOString().split('T')[0];
-        // Find the booking by reg
-        //   const booking=await BookingModel.findOne({reg})
-
-        //     if (!booking) {
-        //         return res.status(404).json({ error: 'Booking not found' });
-        //     }
 
         if (status === "Empty") {
-            // If status is empty, delete the booking
             await BookingModel.findOneAndDelete({ reg });
             return res.status(200).json({ message: 'Booking deleted successfully' });
         } else if (status === "Paid" || !status) {
-            // Update the 
-
-           
             const student = await LibStudent.findOne({ reg });
-            console.log(typeof (reg), "kkkkkkkkk")
             const updatedBooking = await BookingModel.findOneAndUpdate(
                 { reg },
-                { name: student?.name, seat, reg: reg, status: "Paid", shift, date: currentDate },
+                {
+                    name: student?.name,
+                    seat,
+                    reg: reg,
+                    status: "Paid",
+                    shift,
+                    date: currentDate,
+                    $set: { 'colors.status': 'green' }  // Set color for 'status' column to green
+                },
                 { new: true, upsert: true }
             );
             return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
-            // console.log(updatedBooking,"kkkkkkkkkkkkkk")
-           
-        }
-        else if (status === "Confirmed") {
-            
+        } else if (status === "Confirmed") {
             const updatedBooking = await BookingModel.findOneAndUpdate(
                 { reg },
-                { status: "Confirmed", date: currentDate },
+                {
+                    status: "Confirmed",
+                    date: currentDate,
+                    $set: { 'colors.status': 'yellow' }  // Set color for 'status' column to yellow
+                },
                 { new: true }
             );
             return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
         }
-    
-    
-    
-      
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Error updating status:", error);
         res.status(500).json({ error: 'Failed to update status' });
     }

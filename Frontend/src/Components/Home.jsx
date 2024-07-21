@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Typography,
@@ -9,6 +9,7 @@ import {
   Card,
  
 } from "@mui/material";
+
 import {
   ArrowForward,
   Wifi,
@@ -38,7 +39,7 @@ const StyledCard = motion(Card);
 
 function Home() {
   const navigate = useNavigate();
-  const libraryFacilities = [
+    const libraryFacilities = [
     { icon: <WatchLater />, text: "24/7 Accessibility" },
     { icon: <AcUnitIcon />, text: "Climate Control (Fans, AC, Heater)" },
     { icon: <Wifi />, text: "High-Speed WiFi" },
@@ -47,8 +48,9 @@ function Home() {
     { icon: <MenuBook />, text: "Extensive Study Materials" },
   ];
   const handleClick = async () => {
-   
-    navigate("/login");
+  
+     navigate("/library")
+    
   };
   const classesOffered = [
     { icon: <School />, text: "NEET & JEE Preparation" },
@@ -314,30 +316,9 @@ function Home() {
               textAlign: "center",
             }}
           >
-            At EduGainer, we believe in the power of 'शिक्षा आभा' - the radiance
-            of education. Join us to experience a world where knowledge meets
-            ambition, and where your dreams of acing भाग 1 - शैक्षिक आभा
-            तर्कशक्ति परीक्षण सामान्य ज्ञान एवं उत्तराखंड (50 अंक) become a
-            shining reality.
+           
           </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}
-          onClick={handleClick}
-            sx={{
-              backgroundColor: colors.secondary,
-              color: colors.white,
-              "&:hover": { backgroundColor: colors.primary },
-              fontSize: "1.2rem",
-              py: 1.5,
-              px: 4,
-              borderRadius: "50px",
-              mt: 4,
-            }}
-          >
-            Begin Your Success Story
-          </Button>
+        
         </Box>
       </Container>
       <Footer/>
