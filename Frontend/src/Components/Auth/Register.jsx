@@ -13,7 +13,7 @@ function Register() {
   const onSubmit = async (data) => {
     try {
       const response = await registerUser(data.email, data.password);
-   
+
       
       if (response && response.message === "User already exists") {
         setError("email", { type: "manual", message: "Email already exists" });
@@ -39,7 +39,7 @@ function Register() {
         justifyContent: "center",
         minHeight: "100vh",
       }}
-    >
+    ><ToastContainer/>
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}

@@ -61,9 +61,11 @@ const Dashboard = () => {
 
   const libraryContent = [
     { icon: <PersonIcon />, label: "Name", value: userData.name },
+    { icon: <BookIcon />, label: "RegNo", value: userData.reg },
     { icon: <BookIcon />, label: "Shift", value: userData.shift },
     { icon: <EmailIcon />, label: "Email", value: userData.email },
-    { icon: <PhoneIcon />, label: "Mobile", value: userData.contact1 },
+    { icon: <PhoneIcon />, label: "Primary Contact", value: userData.contact1 },
+    { icon: <PhoneIcon />, label: "Secondary Contact", value: userData.contact2 },
     { icon: <HomeIcon />, label: "Address", value: userData.address },
     {
       icon: <CreditCardIcon />,

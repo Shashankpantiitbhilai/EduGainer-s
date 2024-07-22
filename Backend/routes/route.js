@@ -108,7 +108,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
   const { order_id, payment_id, signature, formData } = req.body;
   console.log(req.body)
   console.log(formData)
-  const {reg,
+  const {
     name, email, shift, address, amount, consent,
     gender, dob, fatherName, motherName, aadhaar, contact1, contact2, examPreparation, image
   } = formData;
@@ -130,7 +130,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
         // Create new LibStudent document
         const newStudent = new LibStudent({
           userId: user_id,
-          reg,
+          
           name,
           email,
           shift,

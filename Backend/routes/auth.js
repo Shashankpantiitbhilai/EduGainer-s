@@ -51,8 +51,23 @@ console.log(process.env.Email)
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
-      subject: 'OTP Verification',
-      text: `Your OTP for registration is: ${sentOTP}`
+      subject: 'EduGainer\'s Classes: OTP Verification',
+      text: `Dear Student,
+
+Thank you for registering with EduGainer's Classes & Library, Uttarkashi.
+
+Your One-Time Password (OTP) for registration is: ${sentOTP}
+
+Please use this OTP to complete your registration process. If you didn't request this OTP, please ignore this email.
+
+For any queries, feel free to contact us:
+
+Phone: 8126857111, 9997999768
+
+Best regards,
+
+EduGainer's Team
+Uttarkashi, Uttarakhand`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -81,7 +96,7 @@ router.post("/otp-verify", async (req, res) => {
     }
 
     // Retrieve OTP from Redis
-    console.log(id)
+    
     const userDetails = await redisClient.get(id);
     if (!userDetails) {
       return res.status(400).json({ message: "Invalid OTP or user details not found" });

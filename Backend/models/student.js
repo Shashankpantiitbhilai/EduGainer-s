@@ -43,7 +43,13 @@ const userSchema = new mongoose.Schema({
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
-// Define the library student schema
+const counterSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  seq: { type: Number, default: 0 }
+});
+
+const Counter = mongoose.model('Counter', counterSchema);
+
 const libStudentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -51,9 +57,9 @@ const libStudentSchema = new mongoose.Schema({
     required: true,
   },
   name: { type: String },
-  reg: { type: String },
+  reg: { type: String, unique: true }, // Make reg field unique
   email: { type: String },
-  amount: { type: String },
+  amount: { type: Number },
   address: { type: String },
   shift: { type: String },
   image: {
@@ -75,6 +81,23 @@ const libStudentSchema = new mongoose.Schema({
   consent: { type: String, default: "Agreed" }
 });
 
+libStudentSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    try {
+      const counter = await Counter.findOneAndUpdate(
+        { name: 'studentReg' }, // Find the counter with name 'studentReg'
+        { $inc: { seq: 1 } },   // Increment the seq field by 1
+        { new: true, upsert: true } // Create the document if it doesn't exist
+      );
+      this.reg = `EDULUK${counter.seq}`; // Assign the incremented seq value to reg
+      next();
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    next();
+  }
+});
 // Define the class schema
 const classesSchema = new mongoose.Schema({
   userId: {

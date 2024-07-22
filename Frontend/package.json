@@ -29,6 +29,7 @@
     "react-hook-form": "^7.51.4",
     "react-router-dom": "^6.23.1",
     "react-scripts": "latest",
+    "react-to-pdf": "^1.0.1",
     "react-toastify": "^10.0.5",
     "reactstrap": "^9.2.2",
     "schema-utils": "^3.0.0",

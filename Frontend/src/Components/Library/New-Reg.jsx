@@ -372,14 +372,11 @@ export default function LibraryRegistration() {
       case 3:
         return (
           <Grid container spacing={3}>
-            import * as React from 'react';
+       
 
 
 
-    <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
-    When Clicking on Submit then payment portal will start.You are advised not to refresh the page during payment process .Once the Payment is successfull then, you will be taken yo your library subscription page automatically .
-    </Alert>
-  
+   
 
             <Grid item xs={12} sm={6}>
               <Controller
@@ -508,6 +505,13 @@ export default function LibraryRegistration() {
             <Grid item xs={12}>
               <Typography variant="h6">Payment Details</Typography>
             </Grid>
+            <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
+              When Clicking on Submit then payment portal will start.You are
+              advised not to refresh the page during payment process .Once the
+              Payment is successfull then, you will be taken yo your library
+              subscription page automatically .
+            </Alert>
+
             <Grid item xs={12}>
               <Typography variant="body1">Registration Fee: ₹100</Typography>
             </Grid>
