@@ -53,25 +53,11 @@ router.post("/register", async (req, res) => {
       subject: 'EduGainer\'s Classes: OTP Verification',
       text: `Dear Student,
 
-Your One-Time Password (OTP) for registration is: ${sentOTP}
+Your  (OTP) for registration is: ${sentOTP}
 
-Please use this OTP to complete your registration process. If you didn't request this OTP, please ignore this email.
 
-For any queries, feel free to contact us:
 
-Phone: 8126857111, 9997999768
-
-Best regards,
-
-EduGainer's Team
-Uttarkashi, Uttarakhand`,
-      html: `<p>Dear Student,</p>
-         <p>Your One-Time Password (OTP) for registration is: <strong>${sentOTP}</strong></p>
-         <p>Please use this OTP to complete your registration process. If you didn't request this OTP, please ignore this email.</p>
-         <p>For any queries, feel free to contact us:</p>
-         <p>Phone: 8126857111, 9997999768</p>
-         <p>Best regards,</p>
-         <p>EduGainer's Team<br>Uttarkashi, Uttarakhand</p>`
+`
     };
 
 
@@ -248,7 +234,7 @@ router.post("/login", passport.authenticate("local"), async (req, res) => {
 
   // Find LibStudent by email
   const libStudent = await LibStudent.findOne({ email: emailRegex });
- 
+
   if (libStudent) {
 
     // Update LibStudent with userId
@@ -296,7 +282,7 @@ router.get('/google/callback',
     const emailRegex = new RegExp(`^\\s*${userInfo.username}\\s*$`, 'i');
 
     const libStudent = await LibStudent.findOne({ email: emailRegex });
-  
+
     if (libStudent) {
 
       // Update LibStudent with userId

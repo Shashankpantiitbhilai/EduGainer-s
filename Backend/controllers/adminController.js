@@ -38,7 +38,7 @@ const fetchAllUsers = async (req, res) => {
 
 const deleteLibStudentById = async (req, res) => {
     const { id } = req.params;// Assuming shift is sent in the request body
-    console.log(req.params, "reached controller");
+   
     try {
         // Query database to find admins based on the shift
 
@@ -55,7 +55,7 @@ const deleteLibStudentById = async (req, res) => {
 
 const addLibStudent = async (req, res) => {
    // Assuming shift is sent in the request body
-    console.log( req.body, "reached controller of edit");
+
     try {
         // Query database to find admins based on the shift
         const data = {
@@ -64,10 +64,10 @@ const addLibStudent = async (req, res) => {
 }
         const addedStudent = await LibStudent.create(data);
 
-console.log(data)
+
         // console.log(addedstudent);
         // Example response structure
-        console.log(addedStudent)
+      
         res.status(200).json(addedStudent);
     } catch (error) {
         console.error("Error searching LibStudents by shift:", error);
@@ -78,7 +78,7 @@ console.log(data)
 
 const editLibStudentById = async (req, res) => {
     const id = req.body._id// Assuming shift is sent in the request body
-    console.log(id, req.body, "reached controller of edit");
+    // console.log(id, req.body, "reached controller of edit");
     try {
         // Query database to find admins based on the shift
 
@@ -96,14 +96,13 @@ const editLibStudentById = async (req, res) => {
 
 const uploadResource = async (req, res) => {
     const { name, tags } = req.body;
-    console.log(req.body)
-    console.log(req.file)
+ 
     const filePath = req.file.path;
 
     try {
         // Upload file to Cloudinary
         const result = await uploadToCloudinary(filePath, 'Library_Resources'); // Specify the folder name in Cloudinary
-        console.log(result);
+      
         const newResource = new Resource({
             name,
             tags, // Assuming tags are sent as a comma-separated string
@@ -131,7 +130,7 @@ const uploadResource = async (req, res) => {
 const fetchLibResources = async (req, res) => {
 
     const Name = req.body.data;
-    console.log(Name);
+
     try {
         let resources = [];
     
@@ -170,7 +169,7 @@ const editLibResource = async (req, res) => {
 
     const { id
     } = req.params;
-    console.log(id);
+  
     const Name = req.body.name;
     // console.log(req.body)
     try {
@@ -179,7 +178,7 @@ const editLibResource = async (req, res) => {
 
 
         // Save the new resource to the database
-        console.log(resources)
+       
 
         // Send the Cloudinary URL in the response
         res.json(resources);
@@ -196,7 +195,7 @@ const deleteLibResource = async (req, res) => {
 
     const { id
     } = req.params;
-    console.log(id);
+ 
 
     try {
 
@@ -204,7 +203,7 @@ const deleteLibResource = async (req, res) => {
 
 
         // Save the new resource to the database
-        console.log(resources)
+        
 
         // Send the Cloudinary URL in the response
         res.json(resources);

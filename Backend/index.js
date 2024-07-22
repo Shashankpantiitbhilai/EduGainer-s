@@ -26,10 +26,6 @@ const origin = process.env.NODE_ENV === 'production'
 
 
 
-const currentDate = new Date();
-
-const formattedDate = currentDate.toISOString().split('T')[0];
-console.log(formattedDate)
 // // Create the server
 const server = http.createServer(app);
 const io = socketIO(server, {

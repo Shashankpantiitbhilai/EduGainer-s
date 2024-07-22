@@ -79,10 +79,9 @@ const SuccessPage = () => {
           right: 0,
           bottom: 0,
           backgroundImage: `url(${backgroundChat})`,
-          backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           backgroundSize: "50%",
-          opacity: 0.1,
+          opacity: 0.9,
           zIndex: -1,
         },
       }}
@@ -90,6 +89,7 @@ const SuccessPage = () => {
       <Typography variant="h6" gutterBottom align="center">
         EduGainer's Classes & Library
       </Typography>
+
       <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
         <CheckCircleOutlineIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
         <Typography variant="h4" component="h1" gutterBottom>

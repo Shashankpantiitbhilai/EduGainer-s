@@ -25,7 +25,12 @@ const getSeatInfo = async (req, res) => {
 const getStudentInfo = async (req, res) => {
     const { reg } = req.params;
     try {
-        const student = await LibStudent.findOne({ reg: reg }).select('-_id -__v');
+        const data = await LibStudent.findOne({ reg: reg }).select('-_id -__v').lean();
+        const BookingModel = getCurrentMonthBookingModel();
+        const bookings = await BookingModel.findOne({ reg })
+            .select(' seat shift ').lean();
+        const student={...data,...bookings}
+     
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -147,7 +152,7 @@ const updateBookingData = async (req, res) => {
             { new: true, upsert: true }
         );
 
-        console.log(newBooking);
+       
 
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -199,7 +204,7 @@ const updateBookingColor = async (req, res) => {
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
     const { seat, status, shift } = req.body;
-    console.log("yo", req.body);
+  
 
     try {
         const BookingModel = getCurrentMonthBookingModel();
