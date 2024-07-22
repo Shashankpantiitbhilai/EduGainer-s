@@ -78,7 +78,7 @@ const SuccessPage = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `url(${backgroundChat})`,
+        
           backgroundPosition: "center",
           backgroundSize: "50%",
           opacity: 0.9,

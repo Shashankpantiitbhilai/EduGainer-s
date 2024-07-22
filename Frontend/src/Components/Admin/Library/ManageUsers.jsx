@@ -3,6 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import {
   TextField,
   Box,
+  Typography,
   Button,
   IconButton,
   Dialog,
@@ -13,8 +14,17 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Avatar,
+  CircularProgress,
 } from "@mui/material";
-import { Search, FileDownload, Edit, Save, Delete, Add } from "@mui/icons-material";
+import {
+  Search,
+  FileDownload,
+  Edit,
+  Save,
+  Delete,
+  Add,
+} from "@mui/icons-material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -26,19 +36,30 @@ import {
 import ConfirmationDialog from "./monthlyseat/confirm";
 import ExcelJS from "exceljs";
 
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB in bytes
+
+const shifts = [
+  "6:30 AM to 2 PM",
+  "2 PM to 9:30 PM",
+  "6:30 PM to 11 PM",
+  "9:30 PM to 6:30 AM",
+  "2 PM to 11 PM",
+  "6:30 AM to 6:30 PM",
+  "24*7",
+];
+
 export default function EnhancedStudentGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [editModeId, setEditModeId] = useState(null);
+  const [savingChanges, setSavingChanges] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [studentToEdit, setStudentToEdit] = useState(null);
   const [studentToDelete, setStudentToDelete] = useState(null);
-  const [cellDialogOpen, setCellDialogOpen] = useState(false);
-  const [cellDialogContent, setCellDialogContent] = useState({
-    title: "",
-    content: "",
-  });
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [cellDialogOpen, setCellDialogOpen] = useState(false);
+  const [cellContent, setCellContent] = useState({ field: "", value: "" });
   const [newStudent, setNewStudent] = useState({
     name: "",
     reg: "",
@@ -56,38 +77,51 @@ export default function EnhancedStudentGrid() {
     examPreparation: "",
     consent: "Agreed",
   });
+  const [imageBase64, setImageBase64] = useState("");
+  const [fileError, setFileError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const defaultData = await fetchLibSudents();
         setStudents(defaultData);
       } catch (error) {
         toast.error("Error fetching student data");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
+  const handleCellClick = (params) => {
+    setCellContent({ field: params.field, value: params.value });
+    setCellDialogOpen(true);
+  };
+
   const handleEdit = async (id, data) => {
-    setLoading(true);
+    setSavingChanges(true);
     try {
-      await editLibStudentById(id, data);
+      await editLibStudentById(id, { ...data, image: imageBase64 });
       const updatedStudents = students.map((student) =>
-        student._id === id ? { ...student, ...data } : student
+        student._id === id
+          ? { ...student, ...data, image: { url: imageBase64 } }
+          : student
       );
       setStudents(updatedStudents);
       toast.success("Student updated successfully");
+      setEditDialogOpen(false);
     } catch (error) {
       toast.error("Failed to update student");
     } finally {
-      setLoading(false);
-      setEditModeId(null);
+      setSavingChanges(false);
     }
   };
 
   const handleDelete = async () => {
+    setSavingChanges(true);
     try {
       await deleteLibStudent(studentToDelete);
       setStudents(
@@ -99,119 +133,103 @@ export default function EnhancedStudentGrid() {
     } finally {
       setDeleteDialogOpen(false);
       setStudentToDelete(null);
+      setSavingChanges(false);
     }
   };
 
-  const handleCellClick = (params) => {
-    if (params.field !== "actions" && editModeId === null) {
-      setCellDialogContent({
-        title: params.colDef.headerName,
-        content: params.value,
+  const handleAddStudent = async () => {
+    setSavingChanges(true);
+    try {
+      const addedStudent = await addStudentData({
+        ...newStudent,
+        image: imageBase64,
       });
-      setCellDialogOpen(true);
+      setStudents((prevStudents) => [...prevStudents, addedStudent]);
+      toast.success("Student added successfully");
+      setAddDialogOpen(false);
+      setNewStudent({
+        name: "",
+        reg: "",
+        email: "",
+        amount: "",
+        address: "",
+        shift: "",
+        gender: "",
+        dob: "",
+        fatherName: "",
+        motherName: "",
+        contact1: "",
+        contact2: "",
+        aadhaar: "",
+        examPreparation: "",
+        consent: "Agreed",
+      });
+      setImageBase64("");
+    } catch (error) {
+      toast.error("Failed to add student");
+    } finally {
+      setSavingChanges(false);
     }
   };
- const handleAddStudent = async () => {
-   try {
-     const addedStudent = await addStudentData(newStudent);
-     // Assuming addStudentData returns the newly added student with an _id
-     setStudents((prevStudents) => [...prevStudents, addedStudent]);
-     toast.success("Student added successfully");
-     setAddDialogOpen(false);
-     setNewStudent({
-       name: "",
-       reg: "",
-       email: "",
-       amount: "",
-       address: "",
-       shift: "",
-       gender: "",
-       dob: "",
-       fatherName: "",
-       motherName: "",
-       contact1: "",
-       contact2: "",
-       aadhaar: "",
-       examPreparation: "",
-       consent: "Agreed",
-     });
 
-     // Fetch the updated list of students to ensure we have the correct _id
-     const updatedStudents = await fetchLibSudents();
-     setStudents(updatedStudents);
-   } catch (error) {
-     toast.error("Failed to add student");
-     console.error("Error adding student:", error);
-   }
- };
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > MAX_FILE_SIZE) {
+      setFileError("File size should not exceed 3 MB");
+      return;
+    }
+    setFileError("");
+    setFileToBase64(file);
+  };
+
+  const setFileToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImageBase64(reader.result);
+    };
+  };
+
   const columns = [
-    { field: "reg", headerName: "Reg", width: 30, editable: true },
-    { field: "Mode", headerName: "Mode", width: 30, editable: true },
-    { field: "amount", headerName: "Amount", width: 30, editable: true },
+    { field: "reg", headerName: "Reg", width: 80, editable: true },
+    { field: "Mode", headerName: "Mode", width: 80, editable: true },
+    { field: "amount", headerName: "Amount", width: 80, editable: true },
     { field: "name", headerName: "Name", width: 150, editable: true },
     { field: "email", headerName: "Email", width: 150, editable: true },
-    { field: "address", headerName: "Address", width: 100, editable: true },
+    { field: "address", headerName: "Address", width: 150, editable: true },
     { field: "shift", headerName: "Shift", width: 150, editable: true },
-    { field: "contact1", headerName: "ContactNo1", width: 150, editable: true },
-    { field: "contact2", headerName: "ContactNo2", width: 150, editable: true },
+    { field: "contact1", headerName: "ContactNo1", width: 120, editable: true },
+    { field: "contact2", headerName: "ContactNo2", width: 120, editable: true },
     {
       field: "image",
       headerName: "Image",
       width: 80,
-      editable: true,
       renderCell: (params) =>
         params.value && params.value.url ? (
-          <img
-            src={params.value.url}
-            alt="User"
-            style={{ width: 40, height: 40, borderRadius: "50%" }}
-          />
+          <Avatar src={params.value.url} alt="User" />
         ) : null,
     },
-    { field: "gender", headerName: "Gender", width: 50 },
-    {
-      field: "dob",
-      editable: true,
-      headerName: "Date of Birth",
-      width: 80,
-    },
-    {
-      field: "fatherName",
-      editable: true,
-      headerName: "Father's Name",
-      width: 100,
-    },
-    {
-      field: "motherName",
-      editable: true,
-      headerName: "Mother's Name",
-      width: 100,
-    },
-    { field: "aadhaar", editable: true, headerName: "Aadhaar", width: 150 },
-    {
-      field: "examPreparation",
-      editable: true,
-      headerName: "Exam Preparation",
-      width: 100,
-    },
-    { field: "consent", editable: true, headerName: "Consent", width: 150 },
+    { field: "gender", headerName: "Gender", width: 80 },
+    { field: "dob", headerName: "Date of Birth", width: 120 },
+    { field: "fatherName", headerName: "Father's Name", width: 150 },
+    { field: "motherName", headerName: "Mother's Name", width: 150 },
+    { field: "aadhaar", headerName: "Aadhaar", width: 150 },
+    { field: "examPreparation", headerName: "Exam Preparation", width: 150 },
+    { field: "consent", headerName: "Consent", width: 100 },
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 120,
       renderCell: (params) => (
         <Box>
           <IconButton
             onClick={() => {
-              if (editModeId === params.row._id) {
-                handleEdit(params.row._id, params.row);
-              } else {
-                setEditModeId(params.row._id);
-              }
+              setStudentToEdit(params.row);
+              setEditDialogOpen(true);
             }}
             color="primary"
           >
-            {editModeId === params.row._id ? <Save /> : <Edit />}
+            <Edit />
           </IconButton>
           <IconButton
             onClick={() => {
@@ -225,24 +243,64 @@ export default function EnhancedStudentGrid() {
         </Box>
       ),
     },
-  ];
+  ].map((column) => ({
+    ...column,
+    renderCell: (params) => (
+      <div onClick={() => handleCellClick(params)}>
+        {column.renderCell ? column.renderCell(params) : params.value}
+      </div>
+    ),
+  }));
+
+  const renderCellDialog = () => (
+    <Dialog
+      open={cellDialogOpen && cellContent.field !== "actions"}
+      onClose={() => setCellDialogOpen(false)}
+      maxWidth="md"
+      fullWidth
+    >
+      <DialogTitle>{cellContent.field}</DialogTitle>
+      <DialogContent>
+        {cellContent.field === "image" &&
+        cellContent.value &&
+        cellContent.value.url ? (
+          <Box display="flex" justifyContent="center" my={2}>
+            <img
+              src={cellContent.value.url}
+              alt="Student"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "400px",
+                objectFit: "contain",
+              }}
+            />
+          </Box>
+        ) : (
+          <Typography>
+            {cellContent.value instanceof Object
+              ? JSON.stringify(cellContent.value, null, 2)
+              : cellContent.value}
+          </Typography>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setCellDialogOpen(false)}>Close</Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Students");
 
-    // Add headers
     worksheet.addRow(columns.map((col) => col.headerName));
 
-    // Add data
     students.forEach((student) => {
       worksheet.addRow(columns.map((col) => student[col.field]));
     });
 
-    // Generate blob
     const blob = await workbook.xlsx.writeBuffer();
 
-    // Create download link
     const url = window.URL.createObjectURL(new Blob([blob]));
     const link = document.createElement("a");
     link.href = url;
@@ -259,6 +317,250 @@ export default function EnhancedStudentGrid() {
         value.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
+  const renderDialog = (isEdit) => {
+    const dialogTitle = isEdit ? "Edit Student" : "Add New Student";
+    const handleSubmit = isEdit
+      ? () => handleEdit(studentToEdit._id, studentToEdit)
+      : handleAddStudent;
+    const student = isEdit ? studentToEdit : newStudent;
+    const setStudent = isEdit ? setStudentToEdit : setNewStudent;
+
+    return (
+      <Dialog
+        open={isEdit ? editDialogOpen : addDialogOpen}
+        onClose={() =>
+          isEdit ? setEditDialogOpen(false) : setAddDialogOpen(false)
+        }
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{dialogTitle}</DialogTitle>
+        <DialogContent>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: 2,
+            }}
+          >
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Name"
+              type="text"
+              fullWidth
+              value={student?.name}
+              onChange={(e) => setStudent({ ...student, name: e.target.value })}
+            />
+            <TextField
+              margin="dense"
+              label="Reg"
+              type="text"
+              fullWidth
+              value={student?.reg}
+              onChange={(e) => setStudent({ ...student, reg: e.target.value })}
+            />
+            <TextField
+              margin="dense"
+              label="Email"
+              type="email"
+              fullWidth
+              value={student?.email}
+              onChange={(e) =>
+                setStudent({ ...student, email: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Amount"
+              type="number"
+              fullWidth
+              value={student?.amount}
+              onChange={(e) =>
+                setStudent({ ...student, amount: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Address"
+              type="text"
+              fullWidth
+              value={student?.address}
+              onChange={(e) =>
+                setStudent({ ...student, address: e.target.value })
+              }
+            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Shift</InputLabel>
+              <Select
+                value={student?.shift}
+                onChange={(e) =>
+                  setStudent({ ...student, shift: e.target.value })
+                }
+              >
+                {shifts.map((shift) => (
+                  <MenuItem key={shift} value={shift}>
+                    {shift}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Gender</InputLabel>
+              <Select
+                value={student?.gender}
+                onChange={(e) =>
+                  setStudent({ ...student, gender: e.target.value })
+                }
+              >
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              margin="dense"
+              label="Date of Birth"
+              type="date"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              value={student?.dob}
+              onChange={(e) => setStudent({ ...student, dob: e.target.value })}
+            />
+            <TextField
+              margin="dense"
+              label="Father's Name"
+              type="text"
+              fullWidth
+              value={student?.fatherName}
+              onChange={(e) =>
+                setStudent({ ...student, fatherName: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Mother's Name"
+              type="text"
+              fullWidth
+              value={student?.motherName}
+              onChange={(e) =>
+                setStudent({ ...student, motherName: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Contact No. 1"
+              type="tel"
+              fullWidth
+              value={student?.contact1}
+              onChange={(e) =>
+                setStudent({ ...student, contact1: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Contact No. 2"
+              type="tel"
+              fullWidth
+              value={student?.contact2}
+              onChange={(e) =>
+                setStudent({ ...student, contact2: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Aadhaar"
+              type="text"
+              fullWidth
+              value={student?.aadhaar}
+              onChange={(e) =>
+                setStudent({ ...student, aadhaar: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Exam Preparation"
+              type="text"
+              fullWidth
+              value={student?.examPreparation}
+              onChange={(e) =>
+                setStudent({ ...student, examPreparation: e.target.value })
+              }
+            />
+          </Box>
+          <Box mt={2}>
+            <input
+              accept="image/*"
+              id="image-upload"
+              type="file"
+              onChange={handleImage}
+              style={{ display: "none" }}
+            />
+            <label htmlFor="image-upload">
+              <Button variant="contained" component="span">
+                Upload Image
+              </Button>
+            </label>
+            {fileError && <p style={{ color: "red" }}>{fileError}</p>}
+            {imageBase64 && (
+              <Avatar
+                src={imageBase64}
+                alt="Uploaded Photo"
+                style={{ marginTop: 10 }}
+              />
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              if (isEdit) {
+                setEditDialogOpen(false);
+                setStudentToEdit(null);
+              } else {
+                setAddDialogOpen(false);
+                setNewStudent({
+                  name: "",
+                  reg: "",
+                  email: "",
+                  amount: "",
+                  address: "",
+                  shift: "",
+                  gender: "",
+                  dob: "",
+                  fatherName: "",
+                  motherName: "",
+                  contact1: "",
+                  contact2: "",
+                  aadhaar: "",
+                  examPreparation: "",
+                  consent: "Agreed",
+                });
+              }
+              setImageBase64("");
+              setFileError("");
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            color="primary"
+            disabled={savingChanges}
+          >
+            {savingChanges ? (
+              <CircularProgress size={24} />
+            ) : isEdit ? (
+              "Save"
+            ) : (
+              "Add"
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
 
   return (
     <Box sx={{ height: "80vh", width: "100%", p: 2 }}>
@@ -306,18 +608,16 @@ export default function EnhancedStudentGrid() {
         rowsPerPageOptions={[10, 25, 50]}
         loading={loading}
         getRowId={(row) => row._id}
-        onCellClick={handleCellClick}
+        disableSelectionOnClick
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "1px solid #ddd",
-          },
+          "& .MuiDataGrid-root": { border: "1px solid #ddd" },
           "& .MuiDataGrid-cell": {
             borderRight: "1px solid #ddd",
             borderBottom: "1px solid #ddd",
-            maxHeight: "40px!important",
-            minHeight: "40px!important",
+            padding: "0 16px",
             display: "flex",
             alignItems: "center",
+            cursor: "pointer",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "orange",
@@ -333,14 +633,15 @@ export default function EnhancedStudentGrid() {
             fontWeight: "bold",
           },
           "& .MuiDataGrid-row": {
-            maxHeight: "40px!important",
-            minHeight: "40px!important",
+            "&:nth-of-type(odd)": {
+              backgroundColor: "#f5f5f5",
+            },
+            "&:hover": {
+              backgroundColor: "#e0e0e0",
+            },
           },
           "& .MuiDataGrid-cell:focus": {
             outline: "none",
-          },
-          "& .MuiDataGrid-cell:hover": {
-            backgroundColor: "green",
           },
         }}
       />
@@ -349,198 +650,9 @@ export default function EnhancedStudentGrid() {
         handleClose={() => setDeleteDialogOpen(false)}
         handleConfirm={handleDelete}
       />
-      <Dialog open={cellDialogOpen} onClose={() => setCellDialogOpen(false)}>
-        <DialogTitle>{cellDialogContent.title}</DialogTitle>
-        <DialogContent>
-          {cellDialogContent.title === "Image" ? (
-            <img
-              src={cellDialogContent.content?.url}
-              alt="User"
-              style={{
-                width: "100%",
-                maxHeight: "300px",
-                objectFit: "contain",
-              }}
-            />
-          ) : (
-            <p>{cellDialogContent.content}</p>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCellDialogOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
-        <DialogTitle>Add New Student</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            type="text"
-            fullWidth
-            value={newStudent.name}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, name: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Reg"
-            type="text"
-            fullWidth
-            value={newStudent.reg}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, reg: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Email"
-            type="email"
-            fullWidth
-            value={newStudent.email}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, email: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Amount"
-            type="number"
-            fullWidth
-            value={newStudent.amount}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, amount: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Address"
-            type="text"
-            fullWidth
-            value={newStudent.address}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, address: e.target.value })
-            }
-          />
-        
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Gender</InputLabel>
-            <Select
-              value={newStudent.gender}
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, gender: e.target.value })
-              }
-            >
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
-              <MenuItem value="Other">Other</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            margin="dense"
-            label="Date of Birth"
-            type="date"
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-            value={newStudent.dob}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, dob: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Father's Name"
-            type="text"
-            fullWidth
-            value={newStudent.fatherName}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, fatherName: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Mother's Name"
-            type="text"
-            fullWidth
-            value={newStudent.motherName}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, motherName: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Contact No. 1"
-            type="tel"
-            fullWidth
-            value={newStudent.contact1}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, contact1: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Contact No. 2"
-            type="tel"
-            fullWidth
-            value={newStudent.contact2}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, contact2: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Aadhaar"
-            type="text"
-            fullWidth
-            value={newStudent.aadhaar}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, aadhaar: e.target.value })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Exam Preparation"
-            type="text"
-            fullWidth
-            value={newStudent.examPreparation}
-            onChange={(e) =>
-              setNewStudent({ ...newStudent, examPreparation: e.target.value })
-            }
-          />
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Shift</InputLabel>
-            <Select
-              value={newStudent.shift}
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, shift: e.target.value })
-              }
-            >
-              {shifts.map((shift) => (
-                <MenuItem key={shift} value={shift}>
-                  {shift}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddStudent}>Add</Button>
-        </DialogActions>
-      </Dialog>
+      {renderDialog(true)} {/* Edit dialog */}
+      {renderDialog(false)} {/* Add dialog */}
+      {renderCellDialog()} {/* Cell content dialog */}
     </Box>
   );
 }
-
-// Add this constant at the top of your file, outside of the component
-const shifts = [
-  "6:30 AM to 2 PM",
-  "2 PM to 9:30 PM",
-  "6:30 PM to 11 PM",
-  "9:30 PM to 6:30 AM",
-  "2 PM to 11 PM",
-  "6:30 AM to 6:30 PM",
-  "24*7",
-];
