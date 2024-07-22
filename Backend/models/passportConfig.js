@@ -33,10 +33,11 @@ passport.use(new GoogleStrategy({
     try {
       // First, try to find a user with the Google ID
       let user = await User.findOne({ googleId: profile.id });
-
+   
       // If not found by Google ID, try to find by email
       if (!user) {
         user = await User.findOne({ username: profile.emails[0].value });
+      
       }
 
       if (user) {
@@ -44,16 +45,18 @@ passport.use(new GoogleStrategy({
         if (!user.googleId) {
           user.googleId = profile.id;
           user.strategy = 'google';
+         
           await user.save();
         }
       } else {
+      
         // If user doesn't exist, create a new one
         user = new User({
           googleId: profile.id,
           username: profile.emails[0].value,
           strategy: 'google'
         });
-        
+     
         await user.save();
       }
 

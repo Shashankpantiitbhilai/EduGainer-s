@@ -45,12 +45,12 @@ function Login() {
   const form = useForm();
   const { register, handleSubmit, formState, setError, clearErrors } = form;
   const { errors } = formState;
-  const { setIsUserLoggedIn } = useContext(AdminContext);
+  const { setIsUserLoggedIn, IsUserLoggedIn } = useContext(AdminContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-   const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(window.location.search);
     const authSuccess = urlParams.get("auth_success");
     const userInfo = urlParams.get("user_info");
 
@@ -58,8 +58,14 @@ function Login() {
       try {
         const user = JSON.parse(decodeURIComponent(userInfo));
         setIsUserLoggedIn(user); // Set login state to true
-        localStorage.setItem("user", JSON.stringify(user)); // Store user info in localStorage
-        navigate("/"); // Navigate to home page
+
+        if (IsUserLoggedIn?.role === "admin") {
+          navigate("/admin_home");
+        } else {
+          navigate("/");
+        }
+        // Store user info in localStorage
+        // Navigate to home page
       } catch (error) {
         console.error("Error parsing user info:", error);
         setError("Error processing user information");
@@ -68,7 +74,6 @@ function Login() {
       setError("Authentication failed");
     }
   }, [navigate, setIsUserLoggedIn]);
-
 
   const getBackendUrl = () => {
     if (process.env.NODE_ENV === "production") {
@@ -85,7 +90,7 @@ function Login() {
 
     if (backendUrl) {
       const googleAuthUrl = `${backendUrl}/auth/google`;
-      
+
       window.location.href = googleAuthUrl;
     } else {
       console.error("Backend URL is undefined");
@@ -101,11 +106,10 @@ function Login() {
       if (response && response.user) {
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
-        
-        if (response.user.role === "admin")
-          navigate("/admin_home");
+
+        if (response.user.role === "admin") navigate("/admin_home");
         else {
-          navigate("/")
+          navigate("/");
         }
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });

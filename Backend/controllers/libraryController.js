@@ -11,7 +11,7 @@ const getCurrentMonthBookings = async (req, res) => {
         const currentMonth = new Date().getMonth() + 1;
 
         const Booking = getModelForMonth(currentMonth);
-        console.log(Booking)
+    
         const bookings = await Booking.find({}, 'seat status shift');
         const bookingsByShift = bookings.reduce((acc, booking) => {
             const { seat, status, shift } = booking;
@@ -45,19 +45,19 @@ const getStudentLibSeat = async (req, res) => {
     const { id } = req.params;
     try {
         const currentMonth = new Date().getMonth() + 1;
-console.log(id)
+
         const Booking = getModelForMonth(currentMonth);
 
         const student = await LibStudent.findOne({ userId: id });
         if (!student) {
             return res.status(404).json({ error: 'Student not found in LibStudent collection' });
         }
-        console.log(student)
+       
         const findBooking = await Booking.findOne({ reg: student.reg });
         if (!findBooking) {
             return res.status(404).json({ error: 'Booking not found for this student' });
         }
-        console.log(findBooking)
+       
 
         res.status(200).json({
             message: 'Student found monthly sheet successfully',
@@ -77,7 +77,7 @@ const getLibStudentData = async (req, res) => {
 
         // Try to find the student in the Booking collection
         const bookingData = await Booking.findOne({ reg }).select('name shift due advance');
-        console.log(bookingData)
+     
         if (bookingData) {
             // If student is found in Booking, respond with their details
             res.status(200).json({
@@ -116,7 +116,7 @@ const getLibStudentData = async (req, res) => {
 
 const verifyLibfeePayment = async (req, res) => {
     const { order_id, payment_id, signature, formData } = req.body;
-    console.log(req.body)
+   
     const { user_id } = req.params;
     const { name, shift, reg, fee, advancePaymentPeriod } = formData;
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
@@ -131,7 +131,7 @@ const verifyLibfeePayment = async (req, res) => {
             if (!user) {
                 return res.status(404).json({ success: false, error: 'User not found' });
             }
-console.log(typeof(fee))
+
             const currentDate = new Date().toISOString().split('T')[0];
             const updatedBooking = await Booking.findOneAndUpdate(
                 { reg },
@@ -150,7 +150,7 @@ console.log(typeof(fee))
                 },
                 { new: true, upsert: true }
             );
-            console.log(updatedBooking)
+       
             res.status(200).json({ success: true, message: 'Payment verified successfully', booking: updatedBooking });
         } catch (error) {
             console.error("Error updating student record:", error);
@@ -228,7 +228,6 @@ const updateNotificationStatus = async (req, res) => {
     try {
         const BookingModel = getCurrentMonthBookingModel();
       
-       console.log(reg)
        
         const updatedBooking = await BookingModel.findOneAndUpdate(
             { reg },
@@ -236,7 +235,7 @@ const updateNotificationStatus = async (req, res) => {
             {new:true}
            
         );
-        console.log(updatedBooking)
+      
         // Find the booking by reg
         //   const booking=await BookingModel.findOne({reg})
 

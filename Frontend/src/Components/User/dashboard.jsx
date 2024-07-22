@@ -23,6 +23,7 @@ import {
   CreditCard as CreditCardIcon,
   Assignment as AssignmentIcon,
   School as SchoolIcon,
+  ErrorOutline as ErrorOutlineIcon,
 } from "@mui/icons-material";
 
 import { fetchUserDataById } from "../../services/utils";
@@ -30,12 +31,19 @@ import { fetchUserDataById } from "../../services/utils";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [tabValue, setTabValue] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchUserDataById(id);
-      setUserData(data);
+      try {
+        const data = await fetchUserDataById(id);
+        setUserData(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, [id]);
@@ -44,7 +52,7 @@ const Dashboard = () => {
     setTabValue(newValue);
   };
 
-  if (!userData) {
+  if (isLoading) {
     return (
       <Box
         sx={{
@@ -59,13 +67,39 @@ const Dashboard = () => {
     );
   }
 
+  if (!userData) {
+    return (
+      <Box sx={{ maxWidth: 800, margin: "auto", mt: 4 }}>
+        <Card elevation={3}>
+          <CardContent>
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <ErrorOutlineIcon
+                sx={{ fontSize: 60, color: "error.main", mb: 2 }}
+              />
+              <Typography variant="h5" gutterBottom>
+                No Active Subscription
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                There is no active library subscription for this user.
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
+
   const libraryContent = [
     { icon: <PersonIcon />, label: "Name", value: userData.name },
     { icon: <BookIcon />, label: "RegNo", value: userData.reg },
     { icon: <BookIcon />, label: "Shift", value: userData.shift },
     { icon: <EmailIcon />, label: "Email", value: userData.email },
     { icon: <PhoneIcon />, label: "Primary Contact", value: userData.contact1 },
-    { icon: <PhoneIcon />, label: "Secondary Contact", value: userData.contact2 },
+    {
+      icon: <PhoneIcon />,
+      label: "Secondary Contact",
+      value: userData.contact2,
+    },
     { icon: <HomeIcon />, label: "Address", value: userData.address },
     {
       icon: <CreditCardIcon />,
@@ -92,7 +126,7 @@ const Dashboard = () => {
 
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
             <Avatar
-              src={userData.image.url}
+              src={userData?.image?.url}
               alt={userData.name}
               sx={{ width: 80, height: 80, mr: 2 }}
             />

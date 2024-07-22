@@ -31,7 +31,7 @@ router.post("/register", async (req, res) => {
     if (!redisClient.isOpen) {
       await redisClient.connect();
     }
-console.log(process.env.Email)
+
     // Check if the email already exists
     const existingUser = await User.findOne({ username: email });
     if (existingUser) {
@@ -260,7 +260,7 @@ router.get('/google/callback',
       process.env.NODE_ENV === 'production'
         ? `${process.env.FRONTEND_PROD}`
         : `${process.env.FRONTEND_DEV}`
-    console.log(frontendUrl, "kkkkkkk")
+  
     // Prepare user info
     // console.log("ncjcnd", req.user)
     const userInfo = {
@@ -269,7 +269,10 @@ router.get('/google/callback',
 
       // Assuming you have a way to determine the user's role
     };
-    const libStudent = await LibStudent.findOne({ email: userInfo.username });
+    const emailRegex = new RegExp(`^${userInfo.username}$`, 'i');
+   
+    const libStudent = await LibStudent.findOne({ email: emailRegex });
+   
     if (libStudent) {
 
       // Update LibStudent with userId

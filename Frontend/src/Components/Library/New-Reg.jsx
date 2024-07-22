@@ -67,7 +67,7 @@ export default function LibraryRegistration() {
   const { initializePayment } = Payment({
     formData,
     imageBase64,
-    amount: 1,
+    amount: 100,
     userId: id,
     setLoading,
     status: "newRegistration",
@@ -492,7 +492,7 @@ export default function LibraryRegistration() {
                     color="primary"
                   />
                 }
-                label="I agree to the privacy policy, terms of conditions, and agree to abide by the rules and regulations of the library."
+                label="I agree to the privacy policy, terms of conditions, and agree to abide by the rules and regulations of the EduGainer's library."
               />
             </Grid>
           </Grid>
