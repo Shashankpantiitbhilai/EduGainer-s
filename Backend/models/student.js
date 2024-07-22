@@ -83,11 +83,11 @@ const libStudentSchema = new mongoose.Schema({
 });
 
 libStudentSchema.pre('save', async function (next) {
-  if (this.isNew) {
+  if (this.isNew && this.Mode === 'Online') {
     try {
       const counter = await Counter.findOneAndUpdate(
         { name: 'studentReg' }, // Find the counter with name 'studentReg'
-        { $inc: { seq: 1 } },   // Increment the seq field by 1
+        { $inc: { seq: 1 } }, // Increment the seq field by 1
         { new: true, upsert: true } // Create the document if it doesn't exist
       );
       this.reg = `EDULUK${counter.seq}`; // Assign the incremented seq value to reg

@@ -13,7 +13,7 @@ const getSeatInfo = async (req, res) => {
         const BookingModel = getCurrentMonthBookingModel();
         const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Empty" } })
             .select('name seat shift image reg');
-
+console.log(bookings)
 
         res.status(200).json(bookings);
     } catch (error) {
