@@ -53,17 +53,21 @@ const deleteLibStudentById = async (req, res) => {
     }
 };
 
-const addLibStudentById = async (req, res) => {
-    const id = req.body._id// Assuming shift is sent in the request body
-    console.log(id, req.body, "reached controller of edit");
+const addLibStudent = async (req, res) => {
+   // Assuming shift is sent in the request body
+    console.log( req.body, "reached controller of edit");
     try {
         // Query database to find admins based on the shift
+        const data = {
+            ...req.body,
+            Mode:"Offline"
+}
+        const addedStudent = await LibStudent.create(data);
 
-        const addedStudent = await LibStudent.create(id, req.body);
-
-
+console.log(data)
         // console.log(addedstudent);
         // Example response structure
+        console.log(addedStudent)
         res.status(200).json(addedStudent);
     } catch (error) {
         console.error("Error searching LibStudents by shift:", error);
@@ -236,7 +240,7 @@ const fetchAllSiteUsers = async (req, res) => {
 
 // Export controller functions
 module.exports = {
-  
+  addLibStudent,
     deleteLibStudentById,
     editLibStudentById,
     uploadResource,

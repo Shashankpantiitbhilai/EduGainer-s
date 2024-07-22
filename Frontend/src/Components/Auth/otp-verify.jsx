@@ -11,7 +11,7 @@ function OTPVerify() {
   const {
     register,
     handleSubmit,
-    setError,
+  
     formState: { errors },
   } = useForm();
   const [error, setErrorMsg] = useState("");

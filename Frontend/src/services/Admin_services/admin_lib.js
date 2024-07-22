@@ -158,3 +158,4 @@ export async function getStudentInfo(reg) {
         throw error; // Propagate the error to handle it in the calling component
     }
 }
+

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 function Register() {
   const { control, handleSubmit, setError, formState } = useForm();
   const { errors } = formState;
@@ -14,17 +15,20 @@ function Register() {
     try {
       const response = await registerUser(data.email, data.password);
 
-      
       if (response && response.message === "User already exists") {
         setError("email", { type: "manual", message: "Email already exists" });
       } else if (response && response.message === "OTP sent successfully") {
-        toast.success("OTP sent successfully ,check your entered email Id")
-        navigate(`/otp-verify/${response.email}`);
+        toast.success("OTP sent successfully, check your entered email ID");
+        setTimeout(() => {
+          navigate(`/otp-verify/${response.email}`);
+        }, 3000);
+        // Adding a delay to allow the user to see the notification
       } else {
         navigate("/");
       }
     } catch (error) {
-      // console.error("Registration error:", error);
+      toast.error("An error occurred during registration.");
+      console.error("Registration error:", error);
     }
   };
 
@@ -39,7 +43,7 @@ function Register() {
         justifyContent: "center",
         minHeight: "100vh",
       }}
-    ><ToastContainer/>
+    >
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -49,6 +53,7 @@ function Register() {
         }}
         noValidate
       >
+        <ToastContainer />
         <Typography component="h1" variant="h5" align="center" gutterBottom>
           Register
         </Typography>

@@ -9,14 +9,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { Search, FileDownload, Edit, Save, Delete } from "@mui/icons-material";
+import { Search, FileDownload, Edit, Save, Delete, Add } from "@mui/icons-material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   fetchLibSudents,
   deleteLibStudent,
   editLibStudentById,
+  addStudentData,
 } from "../../../services/Admin_services/adminUtils";
 import ConfirmationDialog from "./monthlyseat/confirm";
 import ExcelJS from "exceljs";
@@ -32,6 +37,24 @@ export default function EnhancedStudentGrid() {
   const [cellDialogContent, setCellDialogContent] = useState({
     title: "",
     content: "",
+  });
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newStudent, setNewStudent] = useState({
+    name: "",
+    reg: "",
+    email: "",
+    amount: "",
+    address: "",
+    shift: "",
+    gender: "",
+    dob: "",
+    fatherName: "",
+    motherName: "",
+    contact1: "",
+    contact2: "",
+    aadhaar: "",
+    examPreparation: "",
+    consent: "Agreed",
   });
 
   useEffect(() => {
@@ -88,9 +111,42 @@ export default function EnhancedStudentGrid() {
       setCellDialogOpen(true);
     }
   };
+ const handleAddStudent = async () => {
+   try {
+     const addedStudent = await addStudentData(newStudent);
+     // Assuming addStudentData returns the newly added student with an _id
+     setStudents((prevStudents) => [...prevStudents, addedStudent]);
+     toast.success("Student added successfully");
+     setAddDialogOpen(false);
+     setNewStudent({
+       name: "",
+       reg: "",
+       email: "",
+       amount: "",
+       address: "",
+       shift: "",
+       gender: "",
+       dob: "",
+       fatherName: "",
+       motherName: "",
+       contact1: "",
+       contact2: "",
+       aadhaar: "",
+       examPreparation: "",
+       consent: "Agreed",
+     });
 
+     // Fetch the updated list of students to ensure we have the correct _id
+     const updatedStudents = await fetchLibSudents();
+     setStudents(updatedStudents);
+   } catch (error) {
+     toast.error("Failed to add student");
+     console.error("Error adding student:", error);
+   }
+ };
   const columns = [
     { field: "reg", headerName: "Reg", width: 30, editable: true },
+    { field: "Mode", headerName: "Mode", width: 30, editable: true },
     { field: "amount", headerName: "Amount", width: 30, editable: true },
     { field: "name", headerName: "Name", width: 150, editable: true },
     { field: "email", headerName: "Email", width: 150, editable: true },
@@ -223,21 +279,31 @@ export default function EnhancedStudentGrid() {
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{ endAdornment: <Search /> }}
         />
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<FileDownload />}
-          onClick={exportToExcel}
-        >
-          Export to Excel
-        </Button>
+        <Box>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<FileDownload />}
+            onClick={exportToExcel}
+            sx={{ mr: 2 }}
+          >
+            Export to Excel
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<Add />}
+            onClick={() => setAddDialogOpen(true)}
+          >
+            Add Student
+          </Button>
+        </Box>
       </Box>
       <DataGrid
         rows={filteredStudents}
         columns={columns}
         pageSize={30}
         rowsPerPageOptions={[10, 25, 50]}
-       
         loading={loading}
         getRowId={(row) => row._id}
         onCellClick={handleCellClick}
@@ -304,6 +370,177 @@ export default function EnhancedStudentGrid() {
           <Button onClick={() => setCellDialogOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
+      <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
+        <DialogTitle>Add New Student</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Name"
+            type="text"
+            fullWidth
+            value={newStudent.name}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, name: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Reg"
+            type="text"
+            fullWidth
+            value={newStudent.reg}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, reg: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Email"
+            type="email"
+            fullWidth
+            value={newStudent.email}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, email: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Amount"
+            type="number"
+            fullWidth
+            value={newStudent.amount}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, amount: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Address"
+            type="text"
+            fullWidth
+            value={newStudent.address}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, address: e.target.value })
+            }
+          />
+        
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Gender</InputLabel>
+            <Select
+              value={newStudent.gender}
+              onChange={(e) =>
+                setNewStudent({ ...newStudent, gender: e.target.value })
+              }
+            >
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            margin="dense"
+            label="Date of Birth"
+            type="date"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            value={newStudent.dob}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, dob: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Father's Name"
+            type="text"
+            fullWidth
+            value={newStudent.fatherName}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, fatherName: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Mother's Name"
+            type="text"
+            fullWidth
+            value={newStudent.motherName}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, motherName: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Contact No. 1"
+            type="tel"
+            fullWidth
+            value={newStudent.contact1}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, contact1: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Contact No. 2"
+            type="tel"
+            fullWidth
+            value={newStudent.contact2}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, contact2: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Aadhaar"
+            type="text"
+            fullWidth
+            value={newStudent.aadhaar}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, aadhaar: e.target.value })
+            }
+          />
+          <TextField
+            margin="dense"
+            label="Exam Preparation"
+            type="text"
+            fullWidth
+            value={newStudent.examPreparation}
+            onChange={(e) =>
+              setNewStudent({ ...newStudent, examPreparation: e.target.value })
+            }
+          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Shift</InputLabel>
+            <Select
+              value={newStudent.shift}
+              onChange={(e) =>
+                setNewStudent({ ...newStudent, shift: e.target.value })
+              }
+            >
+              {shifts.map((shift) => (
+                <MenuItem key={shift} value={shift}>
+                  {shift}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleAddStudent}>Add</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
+
+// Add this constant at the top of your file, outside of the component
+const shifts = [
+  "6:30 AM to 2 PM",
+  "2 PM to 9:30 PM",
+  "6:30 PM to 11 PM",
+  "9:30 PM to 6:30 AM",
+  "2 PM to 11 PM",
+  "6:30 AM to 6:30 PM",
+  "24*7",
+];

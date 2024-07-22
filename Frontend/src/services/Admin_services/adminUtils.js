@@ -77,7 +77,17 @@ export const fetchLibResources = async (data) => {
         throw error;
     }
 };
+export async function addStudentData(data) {
+    try {
+        console.log(data,"kkkkkk")
+        const response = await axiosInstance.post("/admin/addStudentData", data);
 
+        return response.data;
+    } catch (error) {
+        // console.error("Error adding legend:", error);
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
 export const editLibResources = async (id, data) => {
     // console.log(data);
     try {

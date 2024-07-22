@@ -13,7 +13,7 @@ router.post('/fetchLibResource', adminController.fetchLibResources);
 router.delete('/deleteLibStudent/:id', adminController.deleteLibStudentById);
 
 router.patch('/editLibStudent/:id', adminController.editLibStudentById);
-
+router.post('/addStudentData', adminController.addLibStudent);
 router.post('/uploadResource', upload.single('file'), adminController.uploadResource);
 
 router.patch('/editLibResource/:id', adminController.editLibResource);

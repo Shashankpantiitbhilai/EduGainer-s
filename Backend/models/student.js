@@ -54,7 +54,7 @@ const libStudentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Reference to the User model
-    required: true,
+  
   },
   name: { type: String },
   reg: { type: String, unique: true }, // Make reg field unique
@@ -75,6 +75,7 @@ const libStudentSchema = new mongoose.Schema({
   fatherName: { type: String },
   motherName: { type: String },
   contact1: { type: String },
+  Mode: { type: String },
   contact2: { type: String },
   aadhaar: { type: String },
   examPreparation: { type: String },

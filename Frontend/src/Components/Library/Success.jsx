@@ -9,25 +9,21 @@ import {
   Button,
   Grid,
   Avatar,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Chip,
   CircularProgress,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DownloadIcon from "@mui/icons-material/Download";
 import { fetchUserDataById } from "../../services/utils";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import generatePDF from "react-to-pdf";
+import backgroundChat from "../../images/backgroundChat.jpg";
 
 const SuccessPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [expanded, setExpanded] = useState("panel1");
   const pdfRef = useRef();
 
   useEffect(() => {
@@ -35,7 +31,7 @@ const SuccessPage = () => {
       try {
         const data = await fetchUserDataById(id);
         setUserData(data);
-        toast.success("🎉 Registration successful! .", {
+        toast.success("🎉 Registration successful!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -50,10 +46,6 @@ const SuccessPage = () => {
     };
     getUserData();
   }, [id]);
-
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
-  };
 
   const handleDownloadPDF = () => {
     generatePDF(pdfRef, {
@@ -76,7 +68,28 @@ const SuccessPage = () => {
   }
 
   const PDFContent = () => (
-    <Box>
+    <Box
+      sx={{
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${backgroundChat})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "50%",
+          opacity: 0.1,
+          zIndex: -1,
+        },
+      }}
+    >
+      <Typography variant="h6" gutterBottom align="center">
+        EduGainer's Classes & Library
+      </Typography>
       <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
         <CheckCircleOutlineIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
         <Typography variant="h4" component="h1" gutterBottom>

@@ -47,14 +47,11 @@ router.post("/register", async (req, res) => {
     // Store the object in Redis with a TTL (Time-To-Live)
     await redisClient.set(email, userDetails, 'EX', 30000);
     // console.log(userDetails)
-    // Send email with OTP
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
       subject: 'EduGainer\'s Classes: OTP Verification',
       text: `Dear Student,
-
-Thank you for registering with EduGainer's Classes & Library, Uttarkashi.
 
 Your One-Time Password (OTP) for registration is: ${sentOTP}
 
@@ -67,8 +64,16 @@ Phone: 8126857111, 9997999768
 Best regards,
 
 EduGainer's Team
-Uttarkashi, Uttarakhand`
+Uttarkashi, Uttarakhand`,
+      html: `<p>Dear Student,</p>
+         <p>Your One-Time Password (OTP) for registration is: <strong>${sentOTP}</strong></p>
+         <p>Please use this OTP to complete your registration process. If you didn't request this OTP, please ignore this email.</p>
+         <p>For any queries, feel free to contact us:</p>
+         <p>Phone: 8126857111, 9997999768</p>
+         <p>Best regards,</p>
+         <p>EduGainer's Team<br>Uttarkashi, Uttarakhand</p>`
     };
+
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -96,7 +101,7 @@ router.post("/otp-verify", async (req, res) => {
     }
 
     // Retrieve OTP from Redis
-    
+
     const userDetails = await redisClient.get(id);
     if (!userDetails) {
       return res.status(400).json({ message: "Invalid OTP or user details not found" });
@@ -117,9 +122,11 @@ router.post("/otp-verify", async (req, res) => {
           console.error(err);
           return res.status(500).json({ message: "Internal Server Error" });
         }
+        const emailRegex = new RegExp(`^\\s*${id}\\s*$`, 'i');
+
 
         // Find LibStudent by email
-        const libStudent = await LibStudent.findOne({ email: id });
+        const libStudent = await LibStudent.findOne({ email: emailRegex });
         if (libStudent) {
 
           // Update LibStudent with userId
@@ -182,7 +189,7 @@ router.post('/reset-password/:id/:token', async (req, res) => {
 });
 
 router.post("/forgot-password", (req, res) => {
-let { email } = req.body;
+  let { email } = req.body;
   email = email.toLowerCase();
   User.findOne({ username: email })
 
@@ -229,9 +236,26 @@ router.get("/fetchAuth", function (req, res) {
 });
 
 // Local Authentication
-router.post("/login", passport.authenticate("local"), (req, res) => {
+router.post("/login", passport.authenticate("local"), async (req, res) => {
+
+
+
 
   const { email, password } = req.body;
+
+  const emailRegex = new RegExp(`^\\s*${email}\\s*$`, 'i');
+
+
+  // Find LibStudent by email
+  const libStudent = await LibStudent.findOne({ email: emailRegex });
+ 
+  if (libStudent) {
+
+    // Update LibStudent with userId
+    libStudent.userId = req.user._id;
+    await libStudent.save();
+
+  }
   // console.log(req.body);
   if (email == process.env.ADMIN_EMAIL && password == process.env.ADMIN_PASSWORD) {
 
@@ -253,14 +277,14 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 // Callback route after successful authentication
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login?auth_success=false' }),
-  async(req, res) => {
+  async (req, res) => {
     // Successful authentication
 
     const frontendUrl =
       process.env.NODE_ENV === 'production'
         ? `${process.env.FRONTEND_PROD}`
         : `${process.env.FRONTEND_DEV}`
-  
+
     // Prepare user info
     // console.log("ncjcnd", req.user)
     const userInfo = {
@@ -269,10 +293,10 @@ router.get('/google/callback',
 
       // Assuming you have a way to determine the user's role
     };
-    const emailRegex = new RegExp(`^${userInfo.username}$`, 'i');
-   
+    const emailRegex = new RegExp(`^\\s*${userInfo.username}\\s*$`, 'i');
+
     const libStudent = await LibStudent.findOne({ email: emailRegex });
-   
+  
     if (libStudent) {
 
       // Update LibStudent with userId
@@ -280,7 +304,7 @@ router.get('/google/callback',
       await libStudent.save();
 
     }
-  
+
     // Encode and stringify user info
     const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
 

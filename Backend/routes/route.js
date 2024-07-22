@@ -142,6 +142,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
           fatherName,
           motherName,
           aadhaar,
+          Mode:"Online",
           contact1,
           contact2,
           examPreparation,
