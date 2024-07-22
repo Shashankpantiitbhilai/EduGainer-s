@@ -35,7 +35,7 @@ const SuccessPage = () => {
       try {
         const data = await fetchUserDataById(id);
         setUserData(data);
-        toast.success("🎉 Registration successful! We will contact you soon.", {
+        toast.success("🎉 Registration successful! .", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
