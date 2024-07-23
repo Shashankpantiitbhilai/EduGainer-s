@@ -48,48 +48,54 @@ const NotificationWrapper = ({ children }) => {
         console.log(response);
         if (response.booking && response.booking.reg) {
           setBookingReg(response.booking.reg);
-          checkTimeAndShowNotification();
+          checkDateAndShowNotification();
         }
       } catch (error) {
         console.error("Error checking library seat:", error);
       }
     };
 
-    const checkTimeAndShowNotification = () => {
+    const checkDateAndShowNotification = () => {
       const now = new Date();
-      const currentDate = now.toDateString();
+      const currentDay = now.getDate();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
       const lastNotification = JSON.parse(
         localStorage.getItem("lastNotification") || "{}"
       );
-      const { lastSeenDate, submitted } = lastNotification;
+      const {
+        lastSeenMonth,
+        lastSeenYear,
+        lastSubmittedMonth,
+        lastSubmittedYear,
+      } = lastNotification;
 
-      // Check if it's a new day or if the notification hasn't been shown today
-      if (currentDate !== lastSeenDate || !submitted) {
-        const targetTime = new Date(now);
-        targetTime.setHours(9, 55, 0, 0);
+      // Check if it's between the 28th of the current month and the 5th of the next month
+      const isNotificationPeriod =
+        currentDay >= 28 || (currentMonth !== lastSeenMonth && currentDay <= 5);
 
-        if (now >= targetTime || !lastSeenDate) {
+      if (isNotificationPeriod) {
+        // Check if we're in a new period compared to the last submission
+        const isNewPeriod =
+          currentYear > lastSubmittedYear ||
+          (currentYear === lastSubmittedYear &&
+            currentMonth > lastSubmittedMonth) ||
+          (currentYear === lastSubmittedYear &&
+            currentMonth === lastSubmittedMonth &&
+            currentDay >= 28);
+
+        if (isNewPeriod || !lastSubmittedMonth) {
           setShowNotification(true);
           localStorage.setItem(
             "lastNotification",
             JSON.stringify({
-              lastSeenDate: currentDate,
-              submitted: false,
+              lastSeenMonth: currentMonth,
+              lastSeenYear: currentYear,
+              lastSubmittedMonth,
+              lastSubmittedYear,
             })
           );
-        } else {
-          // Schedule the notification for 9:55 AM
-          const timeUntilTarget = targetTime.getTime() - now.getTime();
-          setTimeout(() => {
-            setShowNotification(true);
-            localStorage.setItem(
-              "lastNotification",
-              JSON.stringify({
-                lastSeenDate: currentDate,
-                submitted: false,
-              })
-            );
-          }, timeUntilTarget);
         }
       }
     };
@@ -115,7 +121,8 @@ const NotificationWrapper = ({ children }) => {
       await updateMonthlyStatus(bookingReg, status);
       setShowNotification(false);
 
-      // Update localStorage to mark as submitted
+      // Update localStorage to mark as submitted for this period
+      const now = new Date();
       const lastNotification = JSON.parse(
         localStorage.getItem("lastNotification") || "{}"
       );
@@ -123,7 +130,8 @@ const NotificationWrapper = ({ children }) => {
         "lastNotification",
         JSON.stringify({
           ...lastNotification,
-          submitted: true,
+          lastSubmittedMonth: now.getMonth(),
+          lastSubmittedYear: now.getFullYear(),
         })
       );
     } catch (error) {
@@ -161,7 +169,7 @@ const NotificationWrapper = ({ children }) => {
         <DialogActions>
           <Box position="relative">
             <Button
-              onClick={() => handleSubmit("discontinue")}
+              onClick={() => handleSubmit("NotContinue")}
               color="secondary"
               variant="outlined"
               disabled={loading}
