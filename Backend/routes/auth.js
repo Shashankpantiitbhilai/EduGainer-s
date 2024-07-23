@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-
+const jwt=require("jsonwebtoken")
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator')
@@ -144,28 +144,18 @@ router.post('/reset-password/:id/:token', async (req, res) => {
     // Verify the token
     const decoded = jwt.verify(token, "jwt_secret_key");
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // console.log("New hashed password:", hashedPassword);
-
-    // Retrieve the user before updating the password
-    const userBeforeUpdate = await User.findById(id);
-    // console.log("User before update:", userBeforeUpdate);
-
-    // Update the user's password in the database
-    const updatedUser = await User.findByIdAndUpdate(id, { password: hashedPassword });
-
-    // console.log("Updated user:", updatedUser);
-
-    if (updatedUser) {
-      // Send a success response if the user was updated
-      res.json({ success: true, message: "Password reset successfully" });
-    } else {
-      // If the user was not found, send an error response
-      res.status(404).json({ success: false, message: "User not found" });
+    // Retrieve the user
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
+
+    // Use Passport-Local Mongoose's setPassword method
+    await user.setPassword(password);
+    await user.save();
+
+    res.json({ success: true, message: "Password reset successfully" });
   } catch (error) {
-    // Handle errors
     if (error.name === "JsonWebTokenError") {
       res.status(400).json({ success: false, message: "Error with token" });
     } else {
@@ -173,7 +163,6 @@ router.post('/reset-password/:id/:token', async (req, res) => {
     }
   }
 });
-
 router.post("/forgot-password", (req, res) => {
   let { email } = req.body;
   email = email.toLowerCase();
@@ -191,11 +180,16 @@ router.post("/forgot-password", (req, res) => {
         ? process.env.FRONTEND_PROD
         : process.env.FRONTEND_DEV
       var mailOptions = {
-        from: 'shashankpant94115@gmail.com',
+        from: process.env.EMAIL,
         to: email,
         subject: 'Reset Password Link',
-        text: `${url}/${user._id}/${token}`
+        html: `
+          <p>Dear Student,</p>
+          <p>Click the following link to reset your password:</p>
+          <a href="${url}/reset-password/${user._id}/${token}">Reset Password Link</a>
+        `
       };
+
 
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
