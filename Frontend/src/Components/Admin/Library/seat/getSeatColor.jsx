@@ -70,6 +70,10 @@ export const getSeatColor = (seatNumber, seatStatus, selectedShift) => {
   if (hasOverlappingConfirmed) {
     return "yellow"; // Seat is confirmed in an overlapping shift
   }
+  if (seatStatus[seatNumber][selectedShift] === "discontinue")
+  {
+    return "grey";
+  }
 
   // Get all booked (Paid) shifts for this seat
   const bookedShifts = shifts.filter(

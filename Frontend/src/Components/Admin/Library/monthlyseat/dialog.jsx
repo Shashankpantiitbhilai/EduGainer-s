@@ -187,7 +187,7 @@ const BookingDialog = ({
               >
                 <MenuItem value="Paid">Paid</MenuItem>
                 <MenuItem value="Confirmed">Confirmation</MenuItem>
-                <MenuItem value="Empty">Empty</MenuItem>
+                <MenuItem value="discontinue">Discontinue</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>

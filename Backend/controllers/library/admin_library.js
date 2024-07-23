@@ -13,7 +13,7 @@ const getSeatInfo = async (req, res) => {
         const BookingModel = getCurrentMonthBookingModel();
         const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Empty" } })
             .select('name seat shift image reg');
-console.log(bookings)
+
 
         res.status(200).json(bookings);
     } catch (error) {
@@ -25,7 +25,7 @@ console.log(bookings)
 const getStudentInfo = async (req, res) => {
     const { reg } = req.params;
     try {
-        const data = await LibStudent.findOne({ reg: reg }).select('-_id -__v').lean();
+        const data = await LibStudent.findOne({ reg: reg }).select('-_id -__v -userId').lean();
         const BookingModel = getCurrentMonthBookingModel();
         const bookings = await BookingModel.findOne({ reg })
             .select(' seat shift ').lean();
@@ -123,8 +123,8 @@ const updateBookingData = async (req, res) => {
             colorUpdate = { $set: { [`colors.status`]: "green" } };
         } else if (status === "Confirmed") {
             colorUpdate = { $set: { [`colors.status`]: "yellow" } };
-        } else {
-            colorUpdate = { $set: { [`colors.status`]: "red" } };
+        } else if (status === "discontinue") {
+            colorUpdate = { $set: { [`colors.status`]: "grey" } };
         }
 
         const newBooking = await BookingModel.findOneAndUpdate(
@@ -236,6 +236,17 @@ const updateSeatStatus = async (req, res) => {
                     status: "Confirmed",
                     date: currentDate,
                     $set: { 'colors.status': 'yellow' }  // Set color for 'status' column to yellow
+                },
+                { new: true }
+            )
+        }
+            else if (status === "discontinue") {
+            const updatedBooking = await BookingModel.findOneAndUpdate(
+                { reg },
+                {
+                    status: "discontinue",
+                    date: currentDate,
+                    $set: { 'colors.status': 'grey' }  // Set color for 'status' column to yellow
                 },
                 { new: true }
             );

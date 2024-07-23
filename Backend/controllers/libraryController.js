@@ -45,7 +45,7 @@ const getStudentLibSeat = async (req, res) => {
     const { id } = req.params;
     try {
         const currentMonth = new Date().getMonth() + 1;
-console.log(id,req.user._id)
+
         const Booking = getModelForMonth(currentMonth);
 
         const student = await LibStudent.findOne({ userId: id });
@@ -224,21 +224,29 @@ const sendFeeData = async (req, res) => {
 // };
 const updateNotificationStatus = async (req, res) => {
     const { reg } = req.params;
-
+    const { status } = req.body;
     try {
         const BookingModel = getCurrentMonthBookingModel();
-      
+        let colorUpdate = {};
+        const currentDate = new Date().toISOString().split('T')[0];
+     if (status === "Confirmed") {
+            colorUpdate = { $set: { [`colors.status`]: "yellow" } };
+        } else if(status==="discontinue"){
+            colorUpdate = { $set: { [`colors.status`]: "grey" } };
+        }
        
         const updatedBooking = await BookingModel.findOneAndUpdate(
             { reg },
             {
-                status: "Confirmed",
-                $set: { 'colors.status': 'yellow' }
+                status,
+                ...colorUpdate,
+                date:currentDate
+               
             },
             {new:true}
            
         );
-      
+   
         // Find the booking by reg
         //   const booking=await BookingModel.findOne({reg})
 

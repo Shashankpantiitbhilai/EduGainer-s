@@ -48,43 +48,48 @@ const NotificationWrapper = ({ children }) => {
         console.log(response);
         if (response.booking && response.booking.reg) {
           setBookingReg(response.booking.reg);
-          checkDateAndShowNotification();
+          checkTimeAndShowNotification();
         }
       } catch (error) {
         console.error("Error checking library seat:", error);
       }
     };
 
-    const checkDateAndShowNotification = () => {
+    const checkTimeAndShowNotification = () => {
       const now = new Date();
-      const currentDay = now.getDate();
-      const currentMonth = now.getMonth();
-      const currentYear = now.getFullYear();
-
+      const currentDate = now.toDateString();
       const lastNotification = JSON.parse(
         localStorage.getItem("lastNotification") || "{}"
       );
-      const { lastSeenMonth, lastSeenYear, submitted } = lastNotification;
+      const { lastSeenDate, submitted } = lastNotification;
 
-      // Check if it's between the 28th of the current month and the 5th of the next month
-      const isNotificationPeriod =
-        currentDay >= 28 || (currentMonth !== lastSeenMonth && currentDay <= 5);
+      // Check if it's a new day or if the notification hasn't been shown today
+      if (currentDate !== lastSeenDate || !submitted) {
+        const targetTime = new Date(now);
+        targetTime.setHours(9, 55, 0, 0);
 
-      if (isNotificationPeriod) {
-        // If it's a new month or year, reset the submitted status
-        if (currentMonth !== lastSeenMonth || currentYear !== lastSeenYear) {
+        if (now >= targetTime || !lastSeenDate) {
+          setShowNotification(true);
           localStorage.setItem(
             "lastNotification",
             JSON.stringify({
-              lastSeenMonth: currentMonth,
-              lastSeenYear: currentYear,
+              lastSeenDate: currentDate,
               submitted: false,
             })
           );
-          setShowNotification(true);
-        } else if (!submitted) {
-          // If it's the same month and year, but not submitted, show the notification
-          setShowNotification(true);
+        } else {
+          // Schedule the notification for 9:55 AM
+          const timeUntilTarget = targetTime.getTime() - now.getTime();
+          setTimeout(() => {
+            setShowNotification(true);
+            localStorage.setItem(
+              "lastNotification",
+              JSON.stringify({
+                lastSeenDate: currentDate,
+                submitted: false,
+              })
+            );
+          }, timeUntilTarget);
         }
       }
     };
@@ -99,7 +104,7 @@ const NotificationWrapper = ({ children }) => {
     return () => clearInterval(dailyCheck);
   }, [IsUserLoggedIn]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (status) => {
     if (!bookingReg) {
       setError("No active booking found.");
       return;
@@ -107,7 +112,7 @@ const NotificationWrapper = ({ children }) => {
 
     setLoading(true);
     try {
-      await updateMonthlyStatus(bookingReg, "Confirmed");
+      await updateMonthlyStatus(bookingReg, status);
       setShowNotification(false);
 
       // Update localStorage to mark as submitted
@@ -154,17 +159,24 @@ const NotificationWrapper = ({ children }) => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Cancel
-          </Button>
           <Box position="relative">
             <Button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit("discontinue")}
+              color="secondary"
+              variant="outlined"
+              disabled={loading}
+            >
+              No
+            </Button>
+          </Box>
+          <Box position="relative" ml={1}>
+            <Button
+              onClick={() => handleSubmit("Confirmed")}
               color="primary"
               variant="contained"
               disabled={loading}
             >
-              {loading ? "Submitting..." : "Continue Subscription"}
+              Yes
             </Button>
             {loading && (
               <CircularProgress
