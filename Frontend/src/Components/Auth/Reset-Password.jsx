@@ -1,12 +1,20 @@
 import React from "react";
-import { Container, Form, FormGroup, Label, Button } from "reactstrap"; // Assuming you're using Reactstrap
-import { useForm } from "react-hook-form";
-import { Link, useNavigate, useParams } from "react-router-dom"; // Import Link for routing
+import { useForm, Controller } from "react-hook-form";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import {
+  Container,
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+} from "@mui/material";
 import { resetPassword } from "../../services/auth";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function ResetPassword() {
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm();
@@ -16,64 +24,84 @@ function ResetPassword() {
   const onSubmit = async (data) => {
     try {
       const response = await resetPassword(data.password, id, token);
+      console.log(response)
       if (response && response.success) {
-        navigate("/login");
+        toast.success("Password reset successfully")
+        setTimeout(() => navigate("/login"), 3000 )
+       
       } else {
-        // console.error("Error resetting password:", response.message);
+        // Handle error
+        toast.error(" Some error occurred!! Try Again");
       }
     } catch (error) {
-      // console.error("Error resetting password:", error);
+      // Handle error
     }
   };
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center login-container"
-      style={{ height: "100vh" }}
-    >
-      <Form
-        onSubmit={handleSubmit(onSubmit)}
-        className="login-form"
-        style={{ width: "30%" }}
-        noValidate
+    <Container maxWidth="sm">
+    <ToastContainer/>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+        }}
       >
-        <FormGroup className="text-center mt-3">
-          <h2>Reset Password</h2>
-        </FormGroup>
-
-        <FormGroup className="mb-3">
-          <Label for="password">New Password</Label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            {...register("password", {
-              required: "Password is required",
-              minLength: {
-                value: 8,
-                message: "Password must be at least 8 characters",
-              },
-              maxLength: {
-                value: 16,
-                message: "Password must not exceed 16 characters",
-              },
-            })}
-            placeholder="Enter password"
-            className="form-control" // Apply 'is-invalid' class if there's an error
-          />
-          <div className="error">{errors.password?.message}</div>
-        </FormGroup>
-
-        <FormGroup className="text-center">
-          <Button
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: "100%" }}
+        <Paper elevation={3} sx={{ padding: 4, width: "100%" }}>
+          <Typography component="h1" variant="h5" align="center" gutterBottom>
+            Reset Password
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            sx={{ mt: 1 }}
           >
-            Submit
-          </Button>
-        </FormGroup>
-      </Form>
+            <Controller
+              name="password"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters",
+                },
+                maxLength: {
+                  value: 16,
+                  message: "Password must not exceed 16 characters",
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="New Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                />
+              )}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Submit
+            </Button>
+          </Box>
+        </Paper>
+      </Box>
     </Container>
   );
 }

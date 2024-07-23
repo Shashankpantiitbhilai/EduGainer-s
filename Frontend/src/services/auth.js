@@ -107,7 +107,7 @@ export async function forgotPassword(email) {
 export async function resetPassword(password, id, token) {
   try {
     const response = await axiosInstance.post(`/auth/reset-password/${id}/${token}`, { password });
-    // console.log(response);
+    console.log(response);
     if (response.data.success) {
       // console.log("Password reset successfully!");
       return { success: true, message: "Password reset successfully" };
