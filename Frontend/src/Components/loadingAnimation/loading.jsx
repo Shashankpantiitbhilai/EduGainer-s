@@ -87,7 +87,7 @@ const LoadingAnimation = () => {
         EduGainer's
       </Typography>
       <Typography variant="h6" color="#166534" fontWeight="medium" mb={4}>
-        Empowering Education
+        Curiosity,Dedication ,Persevarance
       </Typography>
       <Box width="100%" maxWidth={300} position="relative" mb={2}>
         <LinearProgress
