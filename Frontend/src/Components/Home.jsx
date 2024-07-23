@@ -82,7 +82,7 @@ function Home() {
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
             }}
           >
-            Ignite Your Potential with EduGainer
+            Ignite Your Potential with EduGainer's
           </Typography>
           <Typography
             variant="h2"
@@ -127,7 +127,7 @@ function Home() {
             fontSize: { xs: "2.5rem", md: "3.5rem" },
           }}
         >
-          EduGainer's 24/7 Learning Oasis
+          EduGainer's's 24/7 Learning Oasis
         </Typography>
         <Typography
           variant="body1"
@@ -213,7 +213,7 @@ function Home() {
               margin: "0 auto",
             }}
           >
-            At EduGainer, we don't just prepare you for exams; we sculpt future
+            At EduGainer's, we don't just prepare you for exams; we sculpt future
             leaders. Dive into our meticulously crafted courses designed to
             transform your aspirations into achievements.
           </Typography>
@@ -254,7 +254,7 @@ function Home() {
         </Container>
       </Box>
 
-      {/* EduGainer's Approach Section */}
+      {/* EduGainer's's Approach Section */}
       <Container maxWidth="lg" sx={{ py: 12 }}>
         <Typography
           variant="h2"
@@ -266,7 +266,7 @@ function Home() {
             fontSize: { xs: "2.5rem", md: "3.5rem" },
           }}
         >
-          The EduGainer Edge: Where Dreams Take Flight
+          The EduGainer's Edge: Where Dreams Take Flight
         </Typography>
         <Box
           sx={{
@@ -287,7 +287,7 @@ function Home() {
               textAlign: "center",
             }}
           >
-            Embark on a transformative journey with EduGainer, where every class
+            Embark on a transformative journey with EduGainer's, where every class
             is a stepping stone to greatness. Our dynamic approach blends
             cutting-edge pedagogy with personalized mentoring, creating an
             electrifying learning environment that ignites your potential.

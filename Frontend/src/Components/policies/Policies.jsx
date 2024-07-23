@@ -27,12 +27,12 @@ const Policies = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h3" gutterBottom align="center" color="primary">
-        Edugainer Policies
+       EduGainer's Policies
       </Typography>
 
       <PolicySection
         title="Terms and Conditions"
-        content="This privacy policy applies to all Users who access the Edugainer Platform and are therefore required to read and understand the Policy before submitting any Personal Information. By submitting Personal Information, you are consenting to the use and processing of such information in accordance with this Policy. Edugainer does not sell, transfer or rent your personal information to third parties for their marketing purposes without your explicit consent. We view protection of your privacy as a very important principle and store and process your personal information on secure servers located in India."
+        content="This privacy policy applies to all Users who access theEduGainer's Platform and are therefore required to read and understand the Policy before submitting any Personal Information. By submitting Personal Information, you are consenting to the use and processing of such information in accordance with this Policy.EduGainer's does not sell, transfer or rent your personal information to third parties for their marketing purposes without your explicit consent. We view protection of your privacy as a very important principle and store and process your personal information on secure servers located in India."
       />
 
       <PolicySection
@@ -71,7 +71,7 @@ const Policies = () => {
                   underline="hover"
                   color="inherit"
                 >
-                  edugainersclasses@gmail.com
+                 edugainersclasses@gmail.com
                 </Link>
               }
             />
