@@ -127,7 +127,7 @@ function Home() {
             fontSize: { xs: "2.5rem", md: "3.5rem" },
           }}
         >
-          EduGainer's's 24/7 Learning Oasis
+          EduGainer's 24/7 Learning Oasis
         </Typography>
         <Typography
           variant="body1"
