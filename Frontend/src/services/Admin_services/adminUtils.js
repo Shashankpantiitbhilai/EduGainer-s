@@ -38,7 +38,7 @@ export async function deleteLibStudent(id) {
 }
 
 export async function editLibStudentById(id, data) {
-    console.log(id, data);
+    
     try {
         const response = await axiosInstance.patch(`/admin/editLibStudent/${id}`, data);
         // console.log(response.data);

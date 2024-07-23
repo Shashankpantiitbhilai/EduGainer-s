@@ -53,8 +53,7 @@ const LoadingAnimation = () => {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      minHeight="100vh"
-      bgcolor="#fde047" // Tailwind yellow-300 equivalent
+      minHeight="100vh" // Tailwind yellow-300 equivalent
     >
       <Box position="relative" mb={4}>
         <SubjectIcon
@@ -85,7 +84,7 @@ const LoadingAnimation = () => {
         fontWeight="bold"
         mb={2}
       >
-        Edugainer
+        EduGainer's
       </Typography>
       <Typography variant="h6" color="#166534" fontWeight="medium" mb={4}>
         Empowering Education

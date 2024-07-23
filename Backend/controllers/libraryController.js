@@ -45,7 +45,7 @@ const getStudentLibSeat = async (req, res) => {
     const { id } = req.params;
     try {
         const currentMonth = new Date().getMonth() + 1;
-
+console.log(id,req.user._id)
         const Booking = getModelForMonth(currentMonth);
 
         const student = await LibStudent.findOne({ userId: id });
@@ -231,7 +231,10 @@ const updateNotificationStatus = async (req, res) => {
        
         const updatedBooking = await BookingModel.findOneAndUpdate(
             { reg },
-            { status: "Confirmed" },
+            {
+                status: "Confirmed",
+                $set: { 'colors.status': 'yellow' }
+            },
             {new:true}
            
         );

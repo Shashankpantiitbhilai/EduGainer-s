@@ -59,6 +59,7 @@ export default function EnhancedStudentGrid() {
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [cellDialogOpen, setCellDialogOpen] = useState(false);
+  const [defaultImage, setdefaultImage] = useState("");
   const [cellContent, setCellContent] = useState({ field: "", value: "" });
   const [newStudent, setNewStudent] = useState({
     name: "",
@@ -102,20 +103,47 @@ export default function EnhancedStudentGrid() {
   };
 
   const handleEdit = async (id, data) => {
+    
+   
     setSavingChanges(true);
     try {
-      await editLibStudentById(id, { ...data, image: imageBase64 });
-      const updatedStudents = students.map((student) =>
-        student._id === id
-          ? { ...student, ...data, image: { url: imageBase64 } }
-          : student
-      );
-      setStudents(updatedStudents);
-      toast.success("Student updated successfully");
+      const originalStudent = students.find((student) => student._id === id);
+      const changedFields = {};
+
+      // Compare each field and only include changed ones
+      Object.keys(data).forEach((key) => {
+        if (data[key] !== originalStudent[key]) {
+          changedFields[key] = data[key];
+        }
+      });
+
+      // Only include the image if it has changed
+      if (imageBase64 && imageBase64 !== originalStudent.image?.url) {
+        changedFields.image = imageBase64;
+      }
+
+      // Only send the API request if there are changes
+      if (Object.keys(changedFields).length > 0) {
+        await editLibStudentById(id, changedFields);
+        const updatedStudents = students.map((student) =>
+          student._id === id
+            ? {
+                ...student,
+                ...changedFields,
+                image: { url: imageBase64 || student.image?.url },
+              }
+            : student
+        );
+        setStudents(updatedStudents);
+        toast.success("Student updated successfully");
+      } else {
+        toast.info("No changes detected");
+      }
       setEditDialogOpen(false);
     } catch (error) {
       toast.error("Failed to update student");
     } finally {
+     
       setSavingChanges(false);
     }
   };
@@ -320,6 +348,7 @@ export default function EnhancedStudentGrid() {
 
   const renderDialog = (isEdit) => {
     const dialogTitle = isEdit ? "Edit Student" : "Add New Student";
+
     const handleSubmit = isEdit
       ? () => handleEdit(studentToEdit._id, studentToEdit)
       : handleAddStudent;
@@ -503,13 +532,11 @@ export default function EnhancedStudentGrid() {
               </Button>
             </label>
             {fileError && <p style={{ color: "red" }}>{fileError}</p>}
-            {imageBase64 && (
-              <Avatar
-                src={imageBase64}
-                alt="Uploaded Photo"
-                style={{ marginTop: 10 }}
-              />
-            )}
+            <Avatar
+              src={studentToEdit?.image?.url}
+              alt="Uploaded Photo"
+              style={{ marginTop: 10 }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>

@@ -6,11 +6,11 @@ const { uploadToCloudinary } = require("../cloudinary")
 const fs = require('fs');
 const path = require('path');
 const fetchAllChats = async (req, res) => {
-    const { id }=req.params// Assuming shift is sent in the request body
+    const { id } = req.params// Assuming shift is sent in the request body
     try {
         // Query database to find admins based on the shift
-       
-       const chats = await Message.find({ user: id });
+
+        const chats = await Message.find({ user: id });
         // console.log(chats)
         // Example response structure
         res.status(200).json(chats);
@@ -24,8 +24,8 @@ const fetchAllUsers = async (req, res) => {
     // Assuming shift is sent in the request body
     try {
         // Query database to find admins based on the shift
-       
-       const LibStudents = await LibStudent.find({})
+
+        const LibStudents = await LibStudent.find({})
 
         // console.log(LibStudents)
         // Example response structure
@@ -38,7 +38,7 @@ const fetchAllUsers = async (req, res) => {
 
 const deleteLibStudentById = async (req, res) => {
     const { id } = req.params;// Assuming shift is sent in the request body
-   
+
     try {
         // Query database to find admins based on the shift
 
@@ -54,29 +54,29 @@ const deleteLibStudentById = async (req, res) => {
 };
 
 const addLibStudent = async (req, res) => {
-   // Assuming shift is sent in the request body
+    // Assuming shift is sent in the request body
     const { image } = req.body;
 
     try {
         // Query database to find admins based on the shift
         const data = {
             ...req.body,
-            Mode:"Offline"
-}
+            Mode: "Offline"
+        }
         const addedStudent = await LibStudent.create(data);
-
+        const imagedata = {}
         if (image) {
             const results = await uploadToCloudinary(image, "Library_Students");
 
-            // Update the student record with image data
-            addedStudent.image.publicId = results.publicId;
-            addedStudent.image.url = results.url;
+            imagedata.publicId = results.publicId;
+            imagedata.url = results.url;
+            addedStudent.image = imagedata
         }
-        await  addedStudent.save();
-        console.log( addedStudent);
+        await addedStudent.save();
+
         // console.log(addedstudent);
         // Example response structure
-      
+
         res.status(200).json(addedStudent);
     } catch (error) {
         console.error("Error searching LibStudents by shift:", error);
@@ -86,23 +86,25 @@ const addLibStudent = async (req, res) => {
 
 
 const editLibStudentById = async (req, res) => {
-    const id = req.body._id// Assuming shift is sent in the request body
-    // console.log(id, req.body, "reached controller of edit");
+    const { id
+    } = req.params// Assuming shift is sent in the request body
+
     try {
         // Query database to find admins based on the shift
         const { image } = req.body;
-      
-console.log(id)
-        const updatedstudent = await LibStudent.findByIdAndUpdate(id, { ...req.body, image: {} }, { new: true }).exec();
+
+        const imagedata = {};
+        const updatedstudent = await LibStudent.findByIdAndUpdate(id, { ...req.body }, { new: true }).exec();
         if (image) {
             const results = await uploadToCloudinary(image, "Library_Students");
 
             // Update the student record with image data
-           updatedstudent.image.publicId = results.publicId;
-           updatedstudent.image.url = results.url;
+            imagedata.publicId = results.publicId;
+            imagedata.url = results.url;
+            updatedstudent.image = imagedata;
         }
         await updatedstudent.save();
-        console.log(updatedstudent);
+
         // Example response structure
         res.status(200).json(updatedstudent);
     } catch (error) {
@@ -114,13 +116,13 @@ console.log(id)
 
 const uploadResource = async (req, res) => {
     const { name, tags } = req.body;
- 
+
     const filePath = req.file.path;
 
     try {
         // Upload file to Cloudinary
         const result = await uploadToCloudinary(filePath, 'Library_Resources'); // Specify the folder name in Cloudinary
-      
+
         const newResource = new Resource({
             name,
             tags, // Assuming tags are sent as a comma-separated string
@@ -151,7 +153,7 @@ const fetchLibResources = async (req, res) => {
 
     try {
         let resources = [];
-    
+
         if (!Name)
             resources = await Resource.find({});
 
@@ -187,7 +189,7 @@ const editLibResource = async (req, res) => {
 
     const { id
     } = req.params;
-  
+
     const Name = req.body.name;
     // console.log(req.body)
     try {
@@ -196,7 +198,7 @@ const editLibResource = async (req, res) => {
 
 
         // Save the new resource to the database
-       
+
 
         // Send the Cloudinary URL in the response
         res.json(resources);
@@ -213,7 +215,7 @@ const deleteLibResource = async (req, res) => {
 
     const { id
     } = req.params;
- 
+
 
     try {
 
@@ -221,7 +223,7 @@ const deleteLibResource = async (req, res) => {
 
 
         // Save the new resource to the database
-        
+
 
         // Send the Cloudinary URL in the response
         res.json(resources);
@@ -257,7 +259,7 @@ const fetchAllSiteUsers = async (req, res) => {
 
 // Export controller functions
 module.exports = {
-  addLibStudent,
+    addLibStudent,
     deleteLibStudentById,
     editLibStudentById,
     uploadResource,

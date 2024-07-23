@@ -68,7 +68,7 @@ const checkOverlap = (currentShift, bookedShifts) => {
   return bookedShifts.some((shift) => overlapMap[currentShift].includes(shift));
 };
 
-const getBackgroundColor = (status, seatStatuses, seat, selectedShift) => {
+const getBackgroundColor = ( seatStatuses, seat, selectedShift,userSeat,userShift) => {
   if (!seatStatuses[seat]) {
     return "green"; // Default color if seat status is not available
   }
@@ -83,7 +83,11 @@ const getBackgroundColor = (status, seatStatuses, seat, selectedShift) => {
   if (hasOverlappingConfirmed) {
     return "yellow"; // Seat is confirmed in an overlapping shift
   }
-
+  
+  if (seat == userSeat && selectedShift===userShift)
+  {
+    return "purple";
+  }
   // Get all booked (Paid) shifts for this seat
   const bookedShifts = shifts.filter(
     (shift) => seatStatuses[seat][shift] === "Paid"
@@ -113,17 +117,21 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
             p: 0,
             fontSize: isMobile ? "0.7rem" : "0.875rem",
             backgroundColor: getBackgroundColor(
-              seatStatus[`${seat}-${selectedShift}`],
+             
               seatStatus,
               seat,
-              selectedShift
+              selectedShift,
+              userSeat,
+              userShift
             ),
             "&:hover": {
               backgroundColor: getBackgroundColor(
-                seatStatus[`${seat}-${selectedShift}`],
+             
                 seatStatus,
                 seat,
-                selectedShift
+                selectedShift,
+                userSeat,
+                userShift
               ),
               opacity: 0.8,
             },
@@ -144,7 +152,7 @@ const Library = () => {  const { IsUserLoggedIn } = useContext(AdminContext);
    const [snackbarOpen, setSnackbarOpen] = useState(false);
    const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const socketRef = useRef(null);
+  const socketRef = useRef(null)
   console.log(IsUserLoggedIn);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -493,7 +501,6 @@ const handleCloseSnackbar = (event, reason) => {
         onClose={handleCloseSnackbar}
         message={snackbarMessage}
       />{" "}
-  
       <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
         <Box
@@ -504,6 +511,10 @@ const handleCloseSnackbar = (event, reason) => {
             gap: 2,
           }}
         >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: 16, height: 16, bgcolor: "purple", mr: 2 }}></Box>
+            <Box>Your Seat</Box>
+          </Box>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Box sx={{ width: 16, height: 16, bgcolor: "red", mr: 2 }}></Box>
             <Box>Booked</Box>
