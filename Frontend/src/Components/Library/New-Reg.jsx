@@ -67,7 +67,7 @@ export default function LibraryRegistration() {
   const { initializePayment } = Payment({
     formData,
     imageBase64,
-    amount: 100,
+    amount: 105,
     userId: id,
     setLoading,
     status: "newRegistration",
@@ -513,7 +513,7 @@ export default function LibraryRegistration() {
             </Alert>
 
             <Grid item xs={12}>
-              <Typography variant="body1">Registration Fee: ₹100</Typography>
+              <Typography variant="body1">Registration Fee: ₹105</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body2">
