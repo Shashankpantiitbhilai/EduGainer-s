@@ -9,7 +9,7 @@ const getCurrentMonthBookingModel = () => {
 const getSeatInfo = async (req, res) => {
     const { seat } = req.params;
     try {
-      
+
         const BookingModel = getCurrentMonthBookingModel();
         const bookings = await BookingModel.find({ seat: seat, status: { $ne: "Empty" } })
             .select('name seat shift image reg');
@@ -29,8 +29,8 @@ const getStudentInfo = async (req, res) => {
         const BookingModel = getCurrentMonthBookingModel();
         const bookings = await BookingModel.findOne({ reg })
             .select(' seat shift ').lean();
-        const student={...data,...bookings}
-     
+        const student = { ...data, ...bookings }
+
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
@@ -43,7 +43,7 @@ const getStudentInfo = async (req, res) => {
 
 const getBookingData = async (req, res) => {
     const { month } = req.params;
-    
+
 
 
     try {
@@ -53,15 +53,15 @@ const getBookingData = async (req, res) => {
         if (month && month.toLowerCase() !== 'all') {
             // If a specific month is selected, use the corresponding model
             BookingModel = getModelForMonth(month);
-        
+
         } else {
             // If no month is selected or "all" is selected, use the current month's model
             BookingModel = getCurrentMonthBookingModel();
-          
+
         }
 
         const bookings = await BookingModel.find({});
-       
+
         res.status(200).json(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -126,6 +126,7 @@ const updateBookingData = async (req, res) => {
         } else if (status === "discontinue") {
             colorUpdate = { $set: { [`colors.status`]: "grey" } };
         }
+        const updatedStudent = await LibStudent.findOneAndUpdate({ reg }, { name, shift }, { new: true })
 
         const newBooking = await BookingModel.findOneAndUpdate(
             { reg },
@@ -152,7 +153,7 @@ const updateBookingData = async (req, res) => {
             { new: true, upsert: true }
         );
 
-       
+
 
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -204,7 +205,7 @@ const updateBookingColor = async (req, res) => {
 const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
     const { seat, status, shift } = req.body;
-  
+
 
     try {
         const BookingModel = getCurrentMonthBookingModel();
@@ -215,6 +216,8 @@ const updateSeatStatus = async (req, res) => {
             return res.status(200).json({ message: 'Booking deleted successfully' });
         } else if (status === "Paid" || !status) {
             const student = await LibStudent.findOne({ reg });
+            const updateStudent = await LibStudent.findOneAndUpdate({ reg }, { shift }, { new: true })
+
             const updatedBooking = await BookingModel.findOneAndUpdate(
                 { reg },
                 {
@@ -240,7 +243,7 @@ const updateSeatStatus = async (req, res) => {
                 { new: true }
             )
         }
-            else if (status === "discontinue") {
+        else if (status === "discontinue") {
             const updatedBooking = await BookingModel.findOneAndUpdate(
                 { reg },
                 {

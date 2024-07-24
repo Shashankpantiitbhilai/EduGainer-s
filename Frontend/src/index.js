@@ -7,7 +7,6 @@ import App from "./App";
 // import AddUser from "./AddUser";
 import reportWebVitals from "./reportWebVitals";
 
-import Footer from "./Components/footer";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

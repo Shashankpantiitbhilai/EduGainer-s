@@ -15,6 +15,7 @@ import {
 import { Send as SendIcon, Announcement, Person } from "@mui/icons-material";
 import io from "socket.io-client";
 import theme from "../../theme";
+
 import { AdminContext } from "../../App";
 import {
   fetchChatMessages,
@@ -201,7 +202,7 @@ const Chat = () => {
               </Typography>
               <Avatar
                 alt="Admin"
-                src="https://material-ui.com/static/images/avatar/1.jpg"
+                src="../../images/logo.jpg"
                 sx={{ width: 100, height: 100, mx: "auto", mb: 2 }}
               />
               <List>
