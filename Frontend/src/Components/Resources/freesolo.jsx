@@ -12,7 +12,7 @@ export default function FreeSolo({ resources, onSearchChange }) {
         options={resources.map((option) => option.name)}
         onInputChange={(event, value) => onSearchChange(value)}
         renderInput={(params) => (
-          <TextField {...params} label="Search for resources" />
+          <TextField {...params} label="Search for resources by name" />
         )}
       />
     </Stack>

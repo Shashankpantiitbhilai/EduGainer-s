@@ -30,14 +30,13 @@ router.put('/profile/:id', async (req, res) => {
     const id = req.params.id;
     const updatedUserData = req.body;
     let imageUrl;
-    console.log(updatedUserData.firstName, id)
+   
     if (updatedUserData.image) {
       const results = await uploadToCloudinary(updatedUserData.image, "Library_Students");
       imageUrl = results.url;
       delete updatedUserData.image; // Remove the image from the updatedUserData object
     }
-    console.log(updatedUserData)
-    console.log(imageUrl);
+  
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { ...updatedUserData, ...(imageUrl && { photoUpload: imageUrl }) }, // Add the imageUrl if it exists

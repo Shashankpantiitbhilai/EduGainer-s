@@ -268,7 +268,55 @@ const App = () => {
               />
               <Autocomplete
                 multiple
-                options={["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]}
+                options = {[
+  "Science",
+  "Maths",
+  "Literature",
+  "History",
+  "Civics",
+  "Geography",
+  "English",
+  "Sanskrit",
+  "General Studies",
+  "Arts",
+  "Commerce",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Hindi",
+  "Computer Science",
+  "Economics",
+  "Psychology",
+  "Sociology",
+  "Philosophy",
+  "Political Science",
+  "Environmental Science",
+  "Statistics",
+  "Foreign Languages",
+  "Physical Education",
+  "Music",
+  "Drama",
+  "Visual Arts",
+  "Home Science",
+  "Accounting",
+  "Business Studies",
+  "Engineering Graphics",
+  "Biotechnology",
+  "Geology",
+  "Astronomy",
+  "Anthropology",
+  "Linguistics",
+  "Media Studies",
+  "Information Technology",
+  "Artificial Intelligence",
+  "Robotics",
+  "Nutrition and Dietetics",
+  "Agriculture",
+  "Animal Husbandry",
+  "Horticulture",
+  "Archaeology"
+]}
+               
                 value={newResource.tags}
                 onChange={(event, newValue) =>
                   setNewResource({ ...newResource, tags: newValue })

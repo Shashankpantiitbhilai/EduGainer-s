@@ -49,7 +49,7 @@ export async function sendIdCard(id) {
 
 export async function updateUserDetails(id, data) {
   try {
-    // console.log(id, data);
+  
     const response = await axiosInstance.put(`/profile/${id}`, data);
     // console.log(response);
     return response.data; // Assuming the API returns JSON data representing the user object
