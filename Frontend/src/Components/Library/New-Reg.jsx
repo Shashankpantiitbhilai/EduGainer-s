@@ -28,6 +28,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import CheckIcon from '@mui/icons-material/Check';
@@ -38,9 +40,9 @@ import Payment from "../payment/razorpay";
 
 const steps = [
   "Benefits",
-  "Personal Information",
-  "Contact Details",
-  "Additional Information",
+  "Personal Info",
+  "Contact",
+  "Additional Info",
   "Payment",
 ];
 
@@ -63,6 +65,9 @@ export default function LibraryRegistration() {
   const [isEligible, setIsEligible] = useState(null);
   const [consentGiven, setConsentGiven] = useState(false);
   const [fileError, setFileError] = useState("");
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { initializePayment } = Payment({
     formData,
@@ -106,11 +111,8 @@ export default function LibraryRegistration() {
   };
 
   const handleImage = (e) => {
-   
     const file = e.target.files[0];
-     console.log(file.size, "size", MAX_FILE_SIZE);
     if (file && file.size > MAX_FILE_SIZE) {
-      console.log("size large")
       setFileError("File size should not exceed 3 MB");
       return;
     }
@@ -124,7 +126,6 @@ export default function LibraryRegistration() {
   };
 
   const onSubmit = async () => {
-   
     if (activeStep === steps.length - 1) {
       await initializePayment();
     } else {
@@ -146,19 +147,21 @@ export default function LibraryRegistration() {
     switch (step) {
       case 0:
         return (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>
                 Benefits of Online Library Registration
               </Typography>
               <List>
-                {[
-                  "Guaranteed Seats and Priority Access",
-                  "Secure Your Spot in Advance",
-                  "Priority Processing",
-                  "Reserve Your Preferred Time Slot",
-                  "Complete Registration from Anywhere",
-                  "Be Among the First",
+                 {[
+                "Get Instant Registration Number",
+                "Download Your Information Card Immediately",
+                "Guaranteed Seats and Priority Access",
+                "Secure Your Spot in Advance",
+                "Priority Processing",
+                "Reserve Your Preferred Time Slot",
+                "Complete Registration from Anywhere",
+                "Be Among the First",
                 ].map((benefit, index) => (
                   <ListItem key={index}>
                     <ListItemIcon>
@@ -175,10 +178,10 @@ export default function LibraryRegistration() {
             </Grid>
           </Grid>
         );
-         case 1:
+      case 1:
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
               <Controller
                 name="name"
                 control={control}
@@ -195,7 +198,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="gender"
                 control={control}
@@ -218,7 +221,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="dob"
                 control={control}
@@ -239,7 +242,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="fatherName"
                 control={control}
@@ -256,7 +259,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="motherName"
                 control={control}
@@ -275,11 +278,10 @@ export default function LibraryRegistration() {
             </Grid>
           </Grid>
         );
-
       case 2:
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
               <Controller
                 name="contact1"
                 control={control}
@@ -302,7 +304,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="contact2"
                 control={control}
@@ -371,14 +373,8 @@ export default function LibraryRegistration() {
         );
       case 3:
         return (
-          <Grid container spacing={3}>
-       
-
-
-
-   
-
-            <Grid item xs={12} sm={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
               <Controller
                 name="aadhaar"
                 control={control}
@@ -387,7 +383,8 @@ export default function LibraryRegistration() {
                   required: "Aadhaar or ID No is required",
                   pattern: {
                     value: /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/,
-                    message: "Please enter a valid Aadhaar number (e.g., 2234 5678 9012)",
+                    message:
+                      "Please enter a valid Aadhaar number (e.g., 2234 5678 9012)",
                   },
                 }}
                 render={({ field }) => (
@@ -401,7 +398,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="examPreparation"
                 control={control}
@@ -418,7 +415,7 @@ export default function LibraryRegistration() {
                 )}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <Controller
                 name="shift"
                 control={control}
@@ -450,7 +447,6 @@ export default function LibraryRegistration() {
                 defaultValue=""
                 rules={{
                   required: "Photo is required",
-                 
                 }}
                 render={({ field }) => (
                   <Box>
@@ -480,7 +476,9 @@ export default function LibraryRegistration() {
                   </Box>
                 )}
               />
-              {imageBase64 && <Avatar src={imageBase64} alt="Uploaded Photo" />}
+              {imageBase64 && (
+                <Avatar src={imageBase64} alt="Uploaded Photo" sx={{ mt: 2 }} />
+              )}
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel
@@ -497,21 +495,20 @@ export default function LibraryRegistration() {
             </Grid>
           </Grid>
         );
-    
-
       case 4:
         return (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <Typography variant="h6">Payment Details</Typography>
             </Grid>
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
-              When Clicking on Submit then payment portal will start.You are
-              advised not to refresh the page during payment process .Once the
-              Payment is successfull then, you will be taken yo your library
-              subscription page automatically .
-            </Alert>
-
+            <Grid item xs={12}>
+              <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
+                When clicking on Submit, the payment portal will start. You are
+                advised not to refresh the page during the payment process. Once
+                the payment is successful, you will be automatically taken to
+                your library subscription page.
+              </Alert>
+            </Grid>
             <Grid item xs={12}>
               <Typography variant="body1">Registration Fee: ₹105</Typography>
             </Grid>
@@ -529,7 +526,7 @@ export default function LibraryRegistration() {
 
   if (isEligible === null) {
     return (
-      <Container component="main" maxWidth="sm" sx={{ my: 10 }}>
+      <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
         <Card>
           <CardContent>
             <Box display="flex" justifyContent="center" alignItems="center">
@@ -543,7 +540,7 @@ export default function LibraryRegistration() {
 
   if (isEligible === false) {
     return (
-      <Container component="main" maxWidth="md" sx={{ my: 10 }}>
+      <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
         <Card elevation={3}>
           <CardContent>
             <Alert
@@ -577,6 +574,7 @@ export default function LibraryRegistration() {
                 variant="contained"
                 color="primary"
                 onClick={() => navigate("/")}
+                fullWidth
               >
                 Return to HomePage
               </Button>
@@ -588,12 +586,16 @@ export default function LibraryRegistration() {
   }
 
   return (
-    <Container component="main" maxWidth="md" sx={{ my: 10 }}>
-      <Paper elevation={6} sx={{ p: 4 }}>
-        <Typography component="h1" variant="h5" align="center">
+    <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
+      <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
+        <Typography component="h1" variant="h5" align="center" gutterBottom>
           <HowToReg fontSize="large" /> Library Registration
         </Typography>
-        <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+        <Stepper
+          activeStep={activeStep}
+          sx={{ pt: 3, pb: 5 }}
+          orientation={isMobile ? "vertical" : "horizontal"}
+        >
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
@@ -602,9 +604,20 @@ export default function LibraryRegistration() {
         </Stepper>
         <form onSubmit={handleSubmit(handleStepSubmit)}>
           {getStepContent(activeStep)}
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mt: 3,
+              flexDirection: isMobile ? "column" : "row",
+            }}
+          >
             {activeStep !== 0 && (
-              <Button onClick={handleBack} sx={{ mr: 1 }}>
+              <Button
+                onClick={handleBack}
+                sx={{ mr: 1, mb: isMobile ? 2 : 0 }}
+                fullWidth={isMobile}
+              >
                 Back
               </Button>
             )}
@@ -614,14 +627,16 @@ export default function LibraryRegistration() {
                 variant="contained"
                 onClick={onSubmit}
                 disabled={loading || !consentGiven}
+                fullWidth={isMobile}
               >
-                Submit and Pay ₹100
+                Submit and Pay ₹105
               </Button>
             ) : (
               <Button
                 type="submit"
                 variant="contained"
                 disabled={activeStep === 3 && !consentGiven}
+                fullWidth={isMobile}
               >
                 Next
               </Button>
