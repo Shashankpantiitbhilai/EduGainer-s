@@ -9,7 +9,7 @@ export const columnOrder = [
     "fee",
     "due",
     "advance",
-     "TotalMoney",
+    
     
     "status",
     "remarks",

@@ -188,6 +188,8 @@ const bookingSchema = new mongoose.Schema({
 bookingSchema.pre('save', async function (next) {
   try {
     // Ensure advance and due are numbers
+    console.log(this.advance, this.due, this.fee);
+    const fee = this.fee;
     const advance = isNaN(this.advance) ? 0 : this.advance;
     const due = isNaN(this.due) ? 0 : this.due;
     this.TotalMoney = advance - due;

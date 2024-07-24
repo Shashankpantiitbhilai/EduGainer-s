@@ -145,7 +145,7 @@ const updateBookingData = async (req, res) => {
                     due,
                     advance,
                     receipt,
-                    TotalMoney,
+                    
                     Payment_detail,
                     ...colorUpdate.$set // Ensure color update is properly merged
                 }
@@ -153,7 +153,7 @@ const updateBookingData = async (req, res) => {
             { new: true, upsert: true }
         );
 
-
+        await newBooking.save();
 
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
