@@ -170,6 +170,8 @@ const bookingSchema = new mongoose.Schema({
   seat: { type: String },
   date: { type: String },
   cash: { type: Number, default: 0 },
+  contact1: { type: String },
+   contact2: { type: String },
   TotalMoney: {
     type: Number,
     default: 0

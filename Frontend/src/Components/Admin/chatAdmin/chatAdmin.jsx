@@ -12,12 +12,12 @@ import {
   Fab,
   Badge,
 } from "@mui/material";
-import {ThemeProvider} from "@mui/material";
+import { ThemeProvider } from "@mui/material";
 import theme from "../../../theme";
 import { Send as SendIcon } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import io from "socket.io-client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { AdminContext } from "../../../App";
 import {
@@ -39,7 +39,7 @@ const ChatSection = styled(Paper)(({ theme }) => ({
   borderRadius: theme.spacing(2),
   overflow: "hidden",
 }));
-console.log(theme.palette.primary.main)
+
 const Sidebar = styled(Grid)(({ theme }) => ({
   borderRight: "1px solid #e0e0e0",
   backgroundColor: "green",
@@ -77,6 +77,7 @@ const MessageItem = styled(motion.div)(({ theme, align }) => ({
   whiteSpace: "pre-wrap",
   padding: theme.spacing(1),
   wordWrap: "break-word",
+  overflowWrap: "break-word",
 }));
 
 const HeaderMessage = styled(Typography)(({ theme }) => ({
@@ -88,7 +89,7 @@ const HeaderMessage = styled(Typography)(({ theme }) => ({
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
+    backgroundColor: "orange",
     color: "#44b700",
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
     "&::after": {
@@ -115,6 +116,24 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
+const SidebarItem = styled(ListItem)(({ theme, selected }) => ({
+  "&:hover": {
+    backgroundColor: "orange",
+  },
+  backgroundColor: selected ? "orange" : "transparent",
+  color: selected ?"orange" : "inherit",
+  transition: "background-color 0.3s ease",
+}));
+
+const UnreadBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    right: -3,
+    top: 13,
+    border: `2px solid ${theme.palette.background.paper}`,
+    padding: "0 4px",
+  },
+}));
+
 const AdminChat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
@@ -124,10 +143,9 @@ const AdminChat = () => {
   const socketRef = useRef();
   const messageEndRef = useRef(null);
 
-  const [userRoomId, setUserRoomId] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("");
-
   const [announcementMessages, setAnnouncementMessages] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -139,6 +157,11 @@ const AdminChat = () => {
 
         if (usersData) {
           setUsers(usersData);
+          const initialUnreadCounts = {};
+          usersData.forEach((user) => {
+            initialUnreadCounts[user._id] = 0;
+          });
+          setUnreadCounts(initialUnreadCounts);
         }
 
         if (adminData) {
@@ -157,10 +180,9 @@ const AdminChat = () => {
           });
 
           const admin_id = admin._id;
-          const user_id = IsUserLoggedIn._id;
           socketRef.current = socket;
 
-          socket.on("receiveMessage", (message, roomId) => {
+          socket.on("receiveMessage", (message, roomId,sender) => {
             if (roomId === admin_id) {
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
@@ -168,6 +190,13 @@ const AdminChat = () => {
               ]);
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
+              console.log(adminRoomId,"kkkkkkkkk",roomId,admin_id);
+              if (roomId !== selectedRoom && sender!==admin_id) {
+                setUnreadCounts((prev) => ({
+                  ...prev,
+                  [roomId]: (prev[roomId] || 0) + 1,
+                }));
+              }
             }
             playBeep();
           });
@@ -192,22 +221,28 @@ const AdminChat = () => {
     try {
       setSelectedRoom(id);
       const response = await fetchAllChats(id);
-      const roomId = id;
       if (id === adminRoomId) {
         setAnnouncementMessages(response);
       } else {
         setMessages(response);
       }
 
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [id]: 0,
+      }));
+
       if (socketRef.current) {
-        socketRef.current.emit("joinRoom", roomId);
+        socketRef.current.emit("joinRoom", id);
       }
     } catch (error) {
       console.error("Error fetching chat messages:", error);
     }
   };
 
-  const sendMessage = async (id) => {
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+
     const messageData = {
       messages: [
         {
@@ -216,13 +251,13 @@ const AdminChat = () => {
           content: input,
         },
       ],
-      user: id,
+      user: selectedRoom,
       timestamp: new Date(),
     };
 
     try {
       if (socketRef.current) {
-        socketRef.current.emit("sendMessage", messageData, selectedRoom);
+        socketRef.current.emit("sendMessage", messageData, selectedRoom,adminRoomId);
       }
       setInput("");
       await postChatMessages(messageData);
@@ -260,45 +295,53 @@ const AdminChat = () => {
           </Grid>
           <Grid item xs={12} sm={8} container direction="column">
             <MessageArea>
-              {(adminRoomId === selectedRoom
-                ? announcementMessages
-                : messages
-              ).map((msg, index) => (
-                <MessageItem
-                  key={index}
-                  align={
-                    msg.messages[0].sender === IsUserLoggedIn._id
-                      ? "right"
-                      : "left"
-                  }
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <ListItemText
-                        primary={msg.messages[0].content}
-                        align={
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                      />
+              <AnimatePresence>
+                {(adminRoomId === selectedRoom
+                  ? announcementMessages
+                  : messages
+                ).map((msg, index) => (
+                  <MessageItem
+                    key={index}
+                    align={
+                      msg.messages[0].sender === IsUserLoggedIn._id
+                        ? "right"
+                        : "left"
+                    }
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <ListItemText
+                          primary={msg.messages[0].content}
+                          primaryTypographyProps={{
+                            style: { wordBreak: "break-word" },
+                          }}
+                          align={
+                            msg.messages[0].sender === IsUserLoggedIn._id
+                              ? "right"
+                              : "left"
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <ListItemText
+                          secondary={new Date(
+                            msg.timestamp
+                          ).toLocaleTimeString()}
+                          align={
+                            msg.messages[0].sender === IsUserLoggedIn._id
+                              ? "right"
+                              : "left"
+                          }
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                      <ListItemText
-                        secondary={new Date(msg.timestamp).toLocaleTimeString()}
-                        align={
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                      />
-                    </Grid>
-                  </Grid>
-                </MessageItem>
-              ))}
+                  </MessageItem>
+                ))}
+              </AnimatePresence>
               <div ref={messageEndRef} />
             </MessageArea>
             <Divider />
@@ -312,7 +355,7 @@ const AdminChat = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
-                      sendMessage(selectedRoom);
+                      sendMessage();
                     }
                   }}
                 />
@@ -321,7 +364,7 @@ const AdminChat = () => {
                 <Fab
                   color="primary"
                   aria-label="send"
-                  onClick={() => sendMessage(selectedRoom)}
+                  onClick={sendMessage}
                   disabled={!input.trim()}
                 >
                   <SendIcon />
@@ -331,17 +374,23 @@ const AdminChat = () => {
           </Grid>
           <Sidebar item xs={12} sm={4}>
             <List>
-              <ListItem button onClick={() => handleClick(adminRoomId)}>
+              <SidebarItem
+                button
+                onClick={() => handleClick(adminRoomId)}
+                selected={selectedRoom === adminRoomId}
+              >
                 <ListItemText primary="Announcement Room" />
-              </ListItem>
+              </SidebarItem>
               <Divider />
               {users.map(
                 (user) =>
                   IsUserLoggedIn._id !== user._id && (
-                    <ListItem
+                    <SidebarItem
                       button
                       key={user._id}
+                    
                       onClick={() => handleClick(user._id)}
+                      selected={selectedRoom === user._id}
                     >
                       <StyledBadge
                         overlap="circular"
@@ -357,13 +406,17 @@ const AdminChat = () => {
                         primary={user.username}
                         style={{ marginLeft: "10px" }}
                       />
-                    </ListItem>
+                      <UnreadBadge
+                        badgeContent={unreadCounts[user._id]}
+                        color="error"
+                      />
+                    </SidebarItem>
                   )
               )}
             </List>
           </Sidebar>
         </Grid>
-      </ChatSection>{" "}
+      </ChatSection>
     </ThemeProvider>
   );
 };

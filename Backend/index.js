@@ -131,14 +131,14 @@ io.on('connection', (socket) => {
       socket.emit('updateSeatStatusError', { error: 'Failed to update seat status' });
     }
   });
-  socket.on('sendMessage', (messageData, roomId) => {
+  socket.on('sendMessage', (messageData, roomId,sender) => {
 
     console.log("messagedata", messageData);
     const { messages, user } = messageData;
     console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
 
     // Broadcast the message to all clients in the room
-    io.to(roomId).emit('receiveMessage', messageData, roomId);
+    io.to(roomId).emit('receiveMessage', messageData, roomId,sender);
   });
 
   socket.on('disconnect', () => {

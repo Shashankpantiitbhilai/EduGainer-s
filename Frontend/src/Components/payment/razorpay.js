@@ -56,9 +56,9 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
         key,
         amount: order.amount,
         currency: "INR",
-        name: "Library Management",
+        name: "EduGainer's Library",
         description: "Library Registration Fee",
-        image: "https://example.com/logo.png",
+        image: "https://res.cloudinary.com/dlxbl2ero/image/upload/v1721800478/Library_Resources/sjnicynl3rfkomnfc884.jpg",
         order_id: order.id,
         prefill: {
           name: formData.name,
@@ -83,7 +83,7 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
           }
           // console.log(baseURL, callbackUrl);
           // try {
-          try{
+          try {
             let verificationResponse;
             if (status === "newRegistration") {
               // console.log("jjjj")
@@ -92,7 +92,7 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
                 order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
                 signature: razorpay_signature,
-formData:formDataWithImage
+                formData: formDataWithImage
 
                 //for fee no image is sent
               });

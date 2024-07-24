@@ -381,11 +381,7 @@ export default function LibraryRegistration() {
                 defaultValue={formData.aadhaar || ""}
                 rules={{
                   required: "Aadhaar or ID No is required",
-                  pattern: {
-                    value: /^[2-9]{1}[0-9]{3}\s[0-9]{4}\s[0-9]{4}$/,
-                    message:
-                      "Please enter a valid Aadhaar number (e.g., 2234 5678 9012)",
-                  },
+                
                 }}
                 render={({ field }) => (
                   <TextField

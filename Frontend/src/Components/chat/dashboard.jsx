@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import {
   Box,
   Grid,
@@ -11,6 +11,7 @@ import {
   Avatar,
   IconButton,
   Paper,
+  Badge,
 } from "@mui/material";
 import { Send as SendIcon, Announcement, Person } from "@mui/icons-material";
 import io from "socket.io-client";
@@ -24,8 +25,6 @@ import {
 } from "../../services/chat/utils";
 import { fetchAllChats } from "../../services/Admin_services/adminUtils";
 
-
-
 const Chat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
@@ -37,6 +36,10 @@ const Chat = () => {
   const [selectedRoom, setSelectedRoom] = useState("");
   const [error, setError] = useState("");
   const messagesEndRef = useRef(null);
+  const [unreadCounts, setUnreadCounts] = useState({
+    announcements: 0,
+    admin: 0,
+  });
 
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
@@ -67,14 +70,26 @@ const Chat = () => {
 
           socketRef.current = socket;
 
-          socket.on("receiveMessage", (message, roomId) => {
+          socket.on("receiveMessage", (message, roomId, sender) => {
             if (roomId === admin_id) {
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
                 message,
               ]);
+              if (userRoomId !== sender) {
+                setUnreadCounts((prev) => ({
+                  ...prev,
+                  announcements: prev.announcements + 1,
+                }));
+              }
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
+              if (userRoomId!==sender) {
+                setUnreadCounts((prev) => ({
+                  ...prev,
+                  admin: prev.admin + 1,
+                }));
+              }
             }
             playBeep();
             scrollToBottom();
@@ -120,7 +135,12 @@ const Chat = () => {
       try {
         await postChatMessages(messageData);
         if (socketRef.current) {
-          socketRef.current.emit("sendMessage", messageData, selectedRoom);
+          socketRef.current.emit(
+            "sendMessage",
+            messageData,
+            selectedRoom,
+            userRoomId
+          );
         }
 
         setInput("");
@@ -159,8 +179,10 @@ const Chat = () => {
 
       if (id === adminRoomId) {
         setAnnouncementMessages(response);
+        setUnreadCounts((prev) => ({ ...prev, announcements: 0 }));
       } else {
         setMessages(response);
+        setUnreadCounts((prev) => ({ ...prev, admin: 0 }));
       }
       setSelectedRoom(id);
       if (socketRef.current) {
@@ -178,7 +200,6 @@ const Chat = () => {
         sx={{
           flexGrow: 1,
           height: "100vh",
-       
         }}
       >
         <Grid container spacing={2} sx={{ height: "100%" }}>
@@ -213,12 +234,20 @@ const Chat = () => {
                     mb: 1,
                     backgroundColor:
                       selectedRoom === adminRoomId
-                        ? "secondary.main"
+                        ? "warning.main"
                         : "transparent",
                     borderRadius: 1,
+                    "&:hover": {
+                      backgroundColor: "warning.light",
+                    },
                   }}
                 >
-                  <Announcement sx={{ mr: 1, color: "white" }} />
+                  <Badge
+                    badgeContent={unreadCounts.announcements}
+                    color="error"
+                  >
+                    <Announcement sx={{ mr: 1, color: "white" }} />
+                  </Badge>
                   <ListItemText
                     primary="Announcements"
                     sx={{ color: "white" }}
@@ -230,12 +259,17 @@ const Chat = () => {
                   sx={{
                     backgroundColor:
                       selectedRoom === userRoomId
-                        ? "secondary.main"
+                        ? "warning.main"
                         : "transparent",
                     borderRadius: 1,
+                    "&:hover": {
+                      backgroundColor: "warning.light",
+                    },
                   }}
                 >
-                  <Person sx={{ mr: 1, color: "white" }} />
+                  <Badge badgeContent={unreadCounts.admin} color="error">
+                    <Person sx={{ mr: 1, color: "white" }} />
+                  </Badge>
                   <ListItemText primary="Admin" sx={{ color: "white" }} />
                 </ListItem>
               </List>
@@ -261,9 +295,6 @@ const Chat = () => {
                           : "flex-start",
                       mb: 2,
                     }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
                   >
                     <Paper
                       elevation={1}
@@ -277,7 +308,13 @@ const Chat = () => {
                         maxWidth: "70%",
                       }}
                     >
-                      <Typography variant="body1">
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          wordBreak: "break-word",
+                          overflowWrap: "break-word",
+                        }}
+                      >
                         {msg.messages[0].content}
                       </Typography>
                       <Typography
@@ -313,7 +350,7 @@ const Chat = () => {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => {
                           if (e.key === "Enter") {
-                            sendMessage(selectedRoom);
+                            sendMessage();
                           }
                         }}
                       />
