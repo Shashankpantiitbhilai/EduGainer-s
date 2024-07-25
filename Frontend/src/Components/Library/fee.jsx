@@ -33,7 +33,7 @@ const shifts = {
   "6:30 AM to 2 PM": 550,
   "2 PM to 9:30 PM": 550,
   "6:30 AM to 6:30 PM": 850,
-  "24*7": 1100,
+  "24*7":1100,
   "6:30 AM to 11 PM": 350,
   "2 PM to 11 PM": 750,
   "9:30 PM to 6:30 AM": 550,
@@ -74,7 +74,9 @@ const Fee = () => {
   const [error, setError] = useState("");
   const [shouldInitiatePayment, setShouldInitiatePayment] = useState(false);
   const [availableDeals, setAvailableDeals] = useState([]);
-
+  const [isInactive, setIsInactive] = useState(false);
+  const [info, setInfo] = useState("");
+    const [message, setmessage] = useState("");
   const {
     control,
     handleSubmit,
@@ -125,30 +127,41 @@ const Fee = () => {
   const autoGenerateFee = async () => {
     setLoading(true);
     setError("");
+    setIsInactive(false);
+    setInfo("")
     try {
       const data = await fetchLibStudent(regNo);
       if (!data || !data.student) {
         setError("Student not registered");
         return;
       }
-      console.log(data, "kkkkk");
+console.log(data,"ppp")
+    
       setStudentData(data.student);
+      setmessage(data.message)
       setValue("name", data.student.name);
       setValue("shift", data.student.shift);
 
       if (data.student.shift) {
         const shiftFee = shifts[data.student.shift] || 0;
         const currentMonthFee = shiftFee;
-        console.log(currentMonthFee, shiftFee, data.student.shift, "feeees");
-        const totalFee =
+        let totalFee =
           currentMonthFee +
           (data.student.due || 0) -
           (data.student.advance || 0);
+        console.log(data.message)
+        if (data.message === "Student is not active for 3 months straight") {
+            setInfo(
+              "You are being charged Rs.50 registration fees for the gap of 90+ days without being active"
+            );
+           
+        totalFee += 50;
+          }
+
         setCalculatedFee(totalFee);
         setAdvancePaymentPeriod("Current Month");
         setSelectedDeal("current");
 
-        // Filter deals based on the student's shift fee
         const filteredDeals = deals.filter((deal) => deal.fee === shiftFee);
         setAvailableDeals(filteredDeals);
       }
@@ -180,8 +193,13 @@ const Fee = () => {
       }
     } else {
       const deal = deals.find((d) => d.id === selectedValue);
-      const totalFee =
+  let  totalFee =
         deal.totalFee + (studentData.due || 0) - (studentData.advance || 0);
+       if (message === "Student is not active for 3 months straight") {
+        
+
+         totalFee += 50;
+       }
       setCalculatedFee(totalFee);
       updateAdvancePaymentPeriod(deal.months);
     }
@@ -235,8 +253,8 @@ const Fee = () => {
           Fee Payment
         </Typography>
         <Alert icon={<CheckIcon fontSize="inherit" />} severity="info">
-          Please enter your correct reg no .Entering someone else reg no will
-          not be considered for your payment and you will be charged fine.
+          Please enter your correct reg no. Entering someone else's reg no will
+          not be considered for your payment and you will be charged a fine.
         </Alert>
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
           <Controller
@@ -272,114 +290,127 @@ const Fee = () => {
               {error}
             </Alert>
           )}
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                margin="normal"
-                fullWidth
-                id="name"
-                label="Name"
-                disabled
-              />
-            )}
-          />
-          <Controller
-            name="shift"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                margin="normal"
-                fullWidth
-                id="shift"
-                label="Shift"
-                disabled
-              />
-            )}
-          />
-          {studentData && (
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="deal-select-label">
-                Select Deal or Current Month
-              </InputLabel>
-              <Select
-                labelId="deal-select-label"
-                id="deal-select"
-                value={selectedDeal}
-                label="Select Deal or Current Month"
-                onChange={handleDealSelect}
-              >
-                <MenuItem value="current">Current Month</MenuItem>
-                {availableDeals.map((deal) => (
-                  <MenuItem key={deal.id} value={deal.id}>
-                    ₹{deal.totalFee.toFixed(2)} for {deal.months} months -
-                    Discount: {deal.discount}%
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-          {selectedDeal && (
+          {!isInactive && studentData && (
             <>
-              <Box mt={2}>
-                <Typography variant="body1" sx={{ fontWeight: "bold", mb: 1 }}>
-                  Fee Details:
-                </Typography>
-                <Typography variant="body1">
-                  Advance Payment Period: {advancePaymentPeriod}
-                </Typography>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="body2" color="textSecondary">
-                      Due Fee:
-                    </Typography>
-                    <Typography variant="h6" color="error">
-                      ₹{studentData?.due || 0}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="body2" color="textSecondary">
-                      Advance Fee:
-                    </Typography>
-                    <Typography variant="h6" color="primary">
-                      ₹{studentData?.advance || 0}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="body2" color="textSecondary">
-                      Net Fee:
-                    </Typography>
-                    <Typography variant="h6" color="success.main">
-                      ₹{calculatedFee.toFixed(2)}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-              <Alert icon={<CheckIcon fontSize="bold" />} severity="info">
-                After Clicking on Pay fee ,payment portal will activate .Choose
-                any method but do not refresh the page during payment process
-                ,till it is completed. On completion and verification ,you will
-                be taken to Home page automatically.
-              </Alert>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3 }}
-                disabled={loading}
-              >
-                {loading ? (
-                  <CircularProgress size={24} />
-                ) : calculatedFee > 0 ? (
-                  `Pay Now: ₹${calculatedFee.toFixed(2)}`
-                ) : (
-                  "No fee to be paid"
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="normal"
+                    fullWidth
+                    id="name"
+                    label="Name"
+                    disabled
+                  />
                 )}
-              </Button>
+              />
+              <Controller
+                name="shift"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="normal"
+                    fullWidth
+                    id="shift"
+                    label="Shift"
+                    disabled
+                  />
+                )}
+              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel id="deal-select-label">
+                  Select Deal or Current Month
+                </InputLabel>
+                <Select
+                  labelId="deal-select-label"
+                  id="deal-select"
+                  value={selectedDeal}
+                  label="Select Deal or Current Month"
+                  onChange={handleDealSelect}
+                >
+                  <MenuItem value="current">Current Month</MenuItem>
+                  {availableDeals.map((deal) => (
+                    <MenuItem key={deal.id} value={deal.id}>
+                      ₹{deal.totalFee.toFixed(2)} for {deal.months} months -
+                      Discount: {deal.discount}%
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {selectedDeal && (
+                <>
+                  <Box mt={2}>
+                    <Typography
+                      variant="body1"
+                      sx={{ fontWeight: "bold", mb: 1 }}
+                    >
+                      Fee Details:
+                    </Typography>
+                    <Typography variant="body1">
+                      Advance Payment Period: {advancePaymentPeriod}
+                    </Typography>
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                      <Grid item xs={12} sm={4}>
+                        <Typography variant="body2" color="textSecondary">
+                          Due Fee:
+                        </Typography>
+                        <Typography variant="h6" color="error">
+                          ₹{studentData?.due || 0}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Typography variant="body2" color="textSecondary">
+                          Advance Fee:
+                        </Typography>
+                        <Typography variant="h6" color="primary">
+                          ₹{studentData?.advance || 0}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Typography variant="body2" color="textSecondary">
+                          Net Fee:
+                        </Typography>
+                        <Typography variant="h6" color="success.main">
+                          ₹{calculatedFee.toFixed(2)}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                  <Alert icon={<CheckIcon fontSize="bold" />} severity="info">
+                    After clicking on Pay fee, the payment portal will activate.
+                    Choose any method but do not refresh the page during the
+                    payment process until it is completed. On completion and
+                    verification, you will be taken to the Home page
+                    automatically.
+                  </Alert>
+
+                  {info && <Alert
+                    icon={<CheckIcon fontSize="inherit" />}
+                    severity="warning"
+                  >
+                    {info}
+                  </Alert>}
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 3 }}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <CircularProgress size={24} />
+                    ) : calculatedFee > 0 ? (
+                      `Pay Now: ₹${calculatedFee.toFixed(2)}`
+                    ) : (
+                      "No fee to be paid"
+                    )}
+                  </Button>
+                </>
+              )}
             </>
           )}
         </Box>

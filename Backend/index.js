@@ -104,11 +104,11 @@ io.on('connection', (socket) => {
 
   // Handle joinRoom event
   socket.on('joinRoom', (roomId) => {
-    console.log(`User ${socket.id} joining room ${roomId}`);
+   
     socket.join(roomId);
   });
   socket.on("joinSeatsRoom", (roomId) => {
-    console.log(roomId, "joined room");
+   
     socket.join(roomId);
 })
 
@@ -116,14 +116,11 @@ io.on('connection', (socket) => {
   // Handle sendMessage event
   socket.on('updateSeatStatus', async (data) => {
     const { id, status, seat ,shift} = data;
-    console.log(data)
-    console.log(`Updating seat ${id} status to ${status}`);
+   
+  
 
     try {
-      // Here you would typically update the seat status in your database
-      // For example: await updateSeatInDatabase(id, status);
-
-      // Broadcast the updated seat status to all connected clients
+   
       io.emit('seatStatusUpdate', { id, status,seat,shift });
     } catch (error) {
       console.error('Error updating seat status:', error);
@@ -133,10 +130,9 @@ io.on('connection', (socket) => {
   });
   socket.on('sendMessage', (messageData, roomId,sender) => {
 
-    console.log("messagedata", messageData);
+  
     const { messages, user } = messageData;
-    console.log(`Message received in room ${messages[0].receiver}: ${messages[0].content}`);
-
+   
     // Broadcast the message to all clients in the room
     io.to(roomId).emit('receiveMessage', messageData, roomId,sender);
   });

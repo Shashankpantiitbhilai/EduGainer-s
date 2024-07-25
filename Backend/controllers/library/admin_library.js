@@ -44,8 +44,6 @@ const getStudentInfo = async (req, res) => {
 const getBookingData = async (req, res) => {
     const { month } = req.params;
 
-
-
     try {
         let BookingModel;
         const year = new Date().getFullYear(); // Use the current year
@@ -53,16 +51,22 @@ const getBookingData = async (req, res) => {
         if (month && month.toLowerCase() !== 'all') {
             // If a specific month is selected, use the corresponding model
             BookingModel = getModelForMonth(month);
-
         } else {
             // If no month is selected or "all" is selected, use the current month's model
             BookingModel = getCurrentMonthBookingModel();
-
         }
 
         const bookings = await BookingModel.find({});
 
-        res.status(200).json(bookings);
+        // Fetch fine amounts for each booking
+        const bookingsWithRegFee = await Promise.all(bookings.map(async (booking) => {
+            const student = await LibStudent.findOne({ reg: booking.reg });
+            const regFee = student ? student.amount : 0;
+          
+            return { ...booking.toObject(), regFee };
+        }));
+
+        res.status(200).json(bookingsWithRegFee);
     } catch (error) {
         console.error('Error fetching bookings:', error);
         res.status(500).json({ message: 'Failed to fetch bookings' });
@@ -145,7 +149,7 @@ const updateBookingData = async (req, res) => {
                     due,
                     advance,
                     receipt,
-                    
+
                     Payment_detail,
                     ...colorUpdate.$set // Ensure color update is properly merged
                 }
@@ -206,12 +210,13 @@ const updateSeatStatus = async (req, res) => {
     const { reg } = req.params;
     const { seat, status, shift } = req.body;
 
-
     try {
         const BookingModel = getCurrentMonthBookingModel();
         const currentDate = new Date().toISOString().split('T')[0];
 
         if (status === "Empty") {
+           
+          
             await BookingModel.findOneAndDelete({ reg });
             return res.status(200).json({ message: 'Booking deleted successfully' });
         } else if (status === "Paid" || !status) {

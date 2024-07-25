@@ -59,7 +59,7 @@ function Login() {
         const user = JSON.parse(decodeURIComponent(userInfo));
         setIsUserLoggedIn(user); // Set login state to true
 
-        if (IsUserLoggedIn?.role === "admin") {
+        if (user.role === "admin") {
           navigate("/admin_home");
         } else {
           navigate("/");

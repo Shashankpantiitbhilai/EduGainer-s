@@ -84,7 +84,7 @@ const Chat = () => {
               }
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
-              if (userRoomId!==sender) {
+              if (userRoomId !== sender) {
                 setUnreadCounts((prev) => ({
                   ...prev,
                   admin: prev.admin + 1,

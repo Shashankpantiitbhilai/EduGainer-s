@@ -151,20 +151,7 @@ const BookingDialog = ({
                 <FormHelperText>{errors.shift?.message}</FormHelperText>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                {...register("fee", {
-                  required: "Fee is required",
-                  valueAsNumber: true,
-                })}
-                label="Fee"
-                type="number"
-                fullWidth
-                error={!!errors.fee}
-                helperText={errors.fee?.message}
-                defaultValue={defaultValues?.fee || 0}
-              />
-            </Grid>
+          
             <Grid item xs={12}>
               <TextField
                 {...register("remarks")}

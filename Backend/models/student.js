@@ -59,7 +59,7 @@ const libStudentSchema = new mongoose.Schema({
   name: { type: String },
   reg: { type: String, unique: true }, // Make reg field unique
   email: { type: String },
-  amount: { type: Number },
+  amount: { type: Number ,default:0},
   address: { type: String },
   shift: { type: String },
   image: {
@@ -69,13 +69,18 @@ const libStudentSchema = new mongoose.Schema({
   Payment_detail: {
     razorpay_order_id: { type: String },
     razorpay_payment_id: { type: String },
+  }, lastfeedate: {
+    type: String
   },
   gender: { type: String },
   dob: { type: String },
   fatherName: { type: String },
   motherName: { type: String },
   contact1: { type: String },
-  Mode: { type: String },
+  Mode: {
+    type: String,
+    default: "offline"
+  },
   contact2: { type: String },
   aadhaar: { type: String },
   examPreparation: { type: String },
@@ -130,6 +135,7 @@ const classesSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+ 
   image: {
     publicId: {
       type: String,
@@ -171,10 +177,18 @@ const bookingSchema = new mongoose.Schema({
   date: { type: String },
   cash: { type: Number, default: 0 },
   contact1: { type: String },
-   contact2: { type: String },
+  contact2: { type: String },
+  website: {
+    type: Number,
+    default: 0
+   },
   TotalMoney: {
     type: Number,
     default: 0
+  },
+  regFee: {
+    type: Number,
+    default:0.
   },
   online: { type: Number, default: 0 },
   shift: { type: String, default: '' },
@@ -191,10 +205,11 @@ bookingSchema.pre('save', async function (next) {
   try {
     // Ensure advance and due are numbers
     console.log(this.advance, this.due, this.fee);
-    const fee = this.fee;
-    const advance = isNaN(this.advance) ? 0 : this.advance;
-    const due = isNaN(this.due) ? 0 : this.due;
-    this.TotalMoney = advance - due;
+    const website = this.website;
+    const online = this.online;
+    const cash = this.cash;
+ 
+    this.TotalMoney = website+cash+online;
 
     // Verify if the reg field corresponds to a LibStudent reg
     const libStudent = await mongoose.model('LibStudent').findOne({ reg: this.reg });

@@ -242,6 +242,7 @@ export default function EnhancedStudentGrid() {
     { field: "fatherName", headerName: "Father's Name", width: 150 },
     { field: "motherName", headerName: "Mother's Name", width: 150 },
     { field: "aadhaar", headerName: "Aadhaar", width: 150 },
+    { field: "lastfeedate", headerName: "LastPaymentDate", width: 80, editable: true },
     { field: "examPreparation", headerName: "Exam Preparation", width: 150 },
     { field: "consent", headerName: "Consent", width: 100 },
     {
@@ -355,6 +356,7 @@ export default function EnhancedStudentGrid() {
     const student = isEdit ? studentToEdit : newStudent;
     const setStudent = isEdit ? setStudentToEdit : setNewStudent;
 
+   
     return (
       <Dialog
         open={isEdit ? editDialogOpen : addDialogOpen}
@@ -448,6 +450,18 @@ export default function EnhancedStudentGrid() {
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Mode</InputLabel>
+              <Select
+                value={student?.Mode}
+                onChange={(e) =>
+                  setStudent({ ...student, Mode: e.target.value })
+                }
+              >
+                <MenuItem value="Offline">Offline</MenuItem>
+                <MenuItem value="Online">Online</MenuItem>
+              </Select>
+            </FormControl>
             <TextField
               margin="dense"
               label="Date of Birth"
@@ -465,6 +479,17 @@ export default function EnhancedStudentGrid() {
               value={student?.fatherName}
               onChange={(e) =>
                 setStudent({ ...student, fatherName: e.target.value })
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Last Payment Date"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              value={student?.lastfeedate}
+              onChange={(e) =>
+                setStudent({ ...student, lastfeedate: e.target.value })
               }
             />
             <TextField
@@ -555,6 +580,7 @@ export default function EnhancedStudentGrid() {
                   address: "",
                   shift: "",
                   gender: "",
+                  mode: "",
                   dob: "",
                   fatherName: "",
                   motherName: "",
@@ -587,7 +613,7 @@ export default function EnhancedStudentGrid() {
         </DialogActions>
       </Dialog>
     );
-  };
+  }
 
   return (
     <Box sx={{ height: "80vh", width: "100%", p: 2 }}>

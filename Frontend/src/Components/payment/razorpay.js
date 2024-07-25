@@ -74,7 +74,7 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
             response;
-          // console.log(formDataWithImage)
+          console.log(formDataWithImage)
           let callbackUrl;
           if (status === "newRegistration")
             callbackUrl = `${baseURL}/payment-verification/${userId}`;

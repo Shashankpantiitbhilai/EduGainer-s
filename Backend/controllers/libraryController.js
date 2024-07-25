@@ -68,16 +68,66 @@ const getStudentLibSeat = async (req, res) => {
         res.status(500).json({ error: 'Failed to update status' });
     }
 };
+
 const getLibStudentData = async (req, res) => {
     const { reg } = req.params;
     try {
-        const currentMonth = new Date().getMonth() + 1;
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
 
         const Booking = getModelForMonth(currentMonth);
 
-        // Try to find the student in the Booking collection
+        // Find the student in the LibStudent collection
+        const student = await LibStudent.findOne({ reg });
+
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found in LibStudent collection' });
+        }
+
+        // Function to convert Date to YYYY-MM-DD string
+        const formatDate = (date) => {
+            return date.toISOString().split('T')[0];
+        };
+
+        // Function to subtract months from a date
+        const subtractMonths = (date, months) => {
+            const newDate = new Date(date);
+            newDate.setMonth(newDate.getMonth() - months);
+            return newDate;
+        };
+
+        // Check if the student has been inactive for 3 months
+        let lastFeeDate, threeMonthsAgo;
+        try {
+            lastFeeDate = student.lastfeedate ? new Date(student.lastfeedate) : null;
+            if (lastFeeDate) {
+                lastFeeDate = formatDate(lastFeeDate);
+            }
+            threeMonthsAgo = formatDate(subtractMonths(currentDate, 3));
+        } catch (dateError) {
+            console.error("Error processing dates:", dateError);
+            return res.status(500).json({ error: 'Error processing date information' });
+        }
         const bookingData = await Booking.findOne({ reg }).select('name shift due advance');
-     
+      
+        if (lastFeeDate && lastFeeDate < threeMonthsAgo) {
+         
+            return res.status(200).json({
+                message: 'Student is not active for 3 months straight',
+                student: {
+                    name: student.name,
+                    shift: student.shift,
+                    due: bookingData.due,
+                    advance: bookingData.advance,
+                    isActive: false
+                }
+            });
+        }
+else{
+            
+}
+        // Try to find the student in the Booking collection
+    
         if (bookingData) {
             // If student is found in Booking, respond with their details
             res.status(200).json({
@@ -87,16 +137,11 @@ const getLibStudentData = async (req, res) => {
                     shift: bookingData.shift,
                     due: bookingData.due,
                     advance: bookingData.advance,
+                    isActive: true
                 },
             });
         } else {
-            // If student is not found in Booking, find them in LibStudent
-            const student = await LibStudent.findOne({ reg }).select('name shift');
-
-            if (!student) {
-                return res.status(404).json({ error: 'Student not found in LibStudent collection' });
-            }
-
+            // If student is not found in Booking, use data from LibStudent
             res.status(200).json({
                 message: 'Student sent successfully',
                 student: {
@@ -104,6 +149,7 @@ const getLibStudentData = async (req, res) => {
                     shift: student.shift,
                     due: 0,
                     advance: 0,
+                    isActive: true
                 },
             });
         }
@@ -112,8 +158,6 @@ const getLibStudentData = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch data' });
     }
 };
-
-
 const verifyLibfeePayment = async (req, res) => {
     const { order_id, payment_id, signature, formData } = req.body;
    
@@ -131,15 +175,20 @@ const verifyLibfeePayment = async (req, res) => {
             if (!user) {
                 return res.status(404).json({ success: false, error: 'User not found' });
             }
+           
 
+          
             const currentDate = new Date().toISOString().split('T')[0];
+            const updatedLib = await LibStudent.findOneAndUpdate({ reg }, { lastfeedate: currentDate })
+          
             const updatedBooking = await Booking.findOneAndUpdate(
                 { reg },
                 {
                     reg,
                     name,
                     shift,
-                    Online: fee,
+                    website:fee,
+                   
                     date: currentDate,
                     fee,
 
@@ -150,7 +199,7 @@ const verifyLibfeePayment = async (req, res) => {
                 },
                 { new: true, upsert: true }
             );
-       
+      await  updatedBooking.save()
             res.status(200).json({ success: true, message: 'Payment verified successfully', booking: updatedBooking });
         } catch (error) {
             console.error("Error updating student record:", error);

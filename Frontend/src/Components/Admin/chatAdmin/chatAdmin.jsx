@@ -121,7 +121,7 @@ const SidebarItem = styled(ListItem)(({ theme, selected }) => ({
     backgroundColor: "orange",
   },
   backgroundColor: selected ? "orange" : "transparent",
-  color: selected ?"orange" : "inherit",
+  color: selected ? "orange" : "inherit",
   transition: "background-color 0.3s ease",
 }));
 
@@ -182,7 +182,7 @@ const AdminChat = () => {
           const admin_id = admin._id;
           socketRef.current = socket;
 
-          socket.on("receiveMessage", (message, roomId,sender) => {
+          socket.on("receiveMessage", (message, roomId, sender) => {
             if (roomId === admin_id) {
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
@@ -190,8 +190,8 @@ const AdminChat = () => {
               ]);
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
-              console.log(adminRoomId,"kkkkkkkkk",roomId,admin_id);
-              if (roomId !== selectedRoom && sender!==admin_id) {
+              console.log(adminRoomId, "kkkkkkkkk", roomId, admin_id);
+              if (roomId !== selectedRoom && sender !== admin_id) {
                 setUnreadCounts((prev) => ({
                   ...prev,
                   [roomId]: (prev[roomId] || 0) + 1,
@@ -257,7 +257,12 @@ const AdminChat = () => {
 
     try {
       if (socketRef.current) {
-        socketRef.current.emit("sendMessage", messageData, selectedRoom,adminRoomId);
+        socketRef.current.emit(
+          "sendMessage",
+          messageData,
+          selectedRoom,
+          adminRoomId
+        );
       }
       setInput("");
       await postChatMessages(messageData);
@@ -388,7 +393,6 @@ const AdminChat = () => {
                     <SidebarItem
                       button
                       key={user._id}
-                    
                       onClick={() => handleClick(user._id)}
                       selected={selectedRoom === user._id}
                     >

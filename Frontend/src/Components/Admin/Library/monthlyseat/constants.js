@@ -3,10 +3,13 @@ export const columnOrder = [
     "name",
     "seat",
     "date",
+    "regFee",
+    "website",
     "cash",
     "online",
+    "TotalMoney",
     "shift",
-    "fee",
+   
     "due",
     "advance",
 

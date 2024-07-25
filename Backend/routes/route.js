@@ -123,13 +123,13 @@ router.post('/payment-verification/:user_id', async (req, res) => {
     // Verify the payment signature
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
     console.log(isSignatureValid, "Payment verification result");
-
+    const currentDate = new Date().toISOString().split('T')[0];
     if (isSignatureValid) {
       try {
         // Create new LibStudent document
         const newStudent = new LibStudent({
           userId: user_id,
-          
+          lastfeedate:currentDate,
           name,
           email,
           shift,
@@ -138,6 +138,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
           consent,
           gender,
           dob,
+        
           fatherName,
           motherName,
           aadhaar,
@@ -163,6 +164,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
 
         // Save the student document
         await newStudent.save();
+      
 
         console.log(newStudent, "Newly created student");
         res.status(200).json({ success: true, message: 'Payment verified and student record created successfully' });
