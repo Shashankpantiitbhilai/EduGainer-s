@@ -59,14 +59,9 @@ const getBookingData = async (req, res) => {
         const bookings = await BookingModel.find({});
 
         // Fetch fine amounts for each booking
-        const bookingsWithRegFee = await Promise.all(bookings.map(async (booking) => {
-            const student = await LibStudent.findOne({ reg: booking.reg });
-            const regFee = student ? student.amount : 0;
-          
-            return { ...booking.toObject(), regFee };
-        }));
+    
 
-        res.status(200).json(bookingsWithRegFee);
+        res.status(200).json(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
         res.status(500).json({ message: 'Failed to fetch bookings' });
@@ -130,7 +125,7 @@ const updateBookingData = async (req, res) => {
         } else if (status === "discontinue") {
             colorUpdate = { $set: { [`colors.status`]: "grey" } };
         }
-        const updatedStudent = await LibStudent.findOneAndUpdate({ reg }, { name, shift }, { new: true })
+        const updatedStudent = await LibStudent.findOneAndUpdate({ reg }, { name, shift,lastfeedate:date }, { new: true })
 
         const newBooking = await BookingModel.findOneAndUpdate(
             { reg },

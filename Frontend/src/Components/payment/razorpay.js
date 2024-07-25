@@ -6,15 +6,11 @@ import { toast } from 'react-toastify';
 import { sendFeeData } from "../../services/library/utils";
 
 const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) => {
-
   const navigate = useNavigate();
-  const baseURL =
-    process.env.NODE_ENV === "production"
-      ? process.env.REACT_APP_BACKEND_PROD
-      : process.env.REACT_APP_BACKEND_DEV;
-
-  // console.log(baseURL, process.env.REACT_APP_BACKEND_DEV);
-  // console.log(status)
+  const baseURL = process.env.NODE_ENV === "production"
+    ? process.env.REACT_APP_BACKEND_PROD
+    : process.env.REACT_APP_BACKEND_DEV;
+console.log(status,"jhju")
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -24,34 +20,24 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
       document.body.removeChild(script);
     };
   }, []);
-  // console.log(formData);
+
   const initializePayment = async () => {
     setLoading(true);
-    // console.log(formData, "jjjjj");
     const formDataWithImage = {
       ...formData,
-
-
       amount,
       image: imageBase64
-
     };
-
-
-    // console.log(amount);
 
     try {
       let result;
       if (status === "newRegistration") {
-
         result = await sendFormData(amount);
-      }
-      else {
-
-        result = await sendFeeData(amount);
+      } else {
+        result = await sendFeeData(amount, status);
       }
       const { key, order } = result;
-      // console.log(result);
+
       const options = {
         key,
         amount: order.amount,
@@ -72,50 +58,40 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
           color: "#3399cc",
         },
         handler: async (response) => {
-          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-            response;
-          console.log(formDataWithImage)
-          let callbackUrl;
-          if (status === "newRegistration")
-            callbackUrl = `${baseURL}/payment-verification/${userId}`;
-          else {
-            callbackUrl = `${baseURL}/library/verify-payment/${userId}`;
-          }
-          // console.log(baseURL, callbackUrl);
-          // try {
+          const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = response;
+          let callbackUrl = status === "newRegistration"
+            ? `${baseURL}/payment-verification/${userId}`
+            : `${baseURL}/library/verify-payment/${userId}`;
+
           try {
             let verificationResponse;
             if (status === "newRegistration") {
-              // console.log("jjjj")
               verificationResponse = await axios.post(callbackUrl, {
-
                 order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
                 signature: razorpay_signature,
                 formData: formDataWithImage
-
-                //for fee no image is sent
               });
-            }
-            else {
+            } else {
               verificationResponse = await axios.post(callbackUrl, {
-
                 order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
                 signature: razorpay_signature,
-                formData: formDataWithImage
-                //for fee no image is sent
+                formData: formDataWithImage,
+                status
               });
-
             }
-
+            console.log("status");
             if (verificationResponse.data.success) {
               if (status === "newRegistration") {
-                // toast.success("Registration successful!");
-                navigate(`/success/${userId}`);
+                
+                toast.success("Registration successful! Please contact the office to get your seat and shift."); navigate(`/success/${userId}`);
+              } else if (status === "Reregistration") {
+                toast.success("Re-registration successful! Please contact the office to get your shift and seat.");
+                setTimeout(()=>navigate('/'),3000)
               } else {
-                // toast.success("Fee paid successfully!");
-                navigate(`/`)
+                toast.success("Fee paid successfully!");
+                navigate(`/success/${userId}`);
               }
             } else {
               throw new Error("Payment verification failed");

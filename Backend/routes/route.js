@@ -2,6 +2,11 @@ const express = require("express");
 const { LibStudent, User } = require("../models/student");
 const { uploadToCloudinary } = require("../cloudinary");
 const { createOrder, verifyPaymentSignature } = require("./payment");
+const { getModelForMonth } = require('../models/student'); // Assume the function is defined in utils/modelUtils.js
+const getCurrentMonthBookingModel = () => {
+  const now = new Date();
+  return getModelForMonth(now.getMonth() + 1);
+};
 
 const router = express.Router();
 const path = require('path');
@@ -103,33 +108,34 @@ router.get("/Lib_student/:user_id", async (req, res) => {
 
 
 
+
 router.post('/payment-verification/:user_id', async (req, res) => {
   const { order_id, payment_id, signature, formData } = req.body;
-  console.log(req.body)
-  console.log(formData)
+ 
   const {
     name, email, shift, address, amount, consent,
     gender, dob, fatherName, motherName, aadhaar, contact1, contact2, examPreparation, image
   } = formData;
   const { user_id } = req.params;
+  const currentMonth = new Date().getMonth() + 1;
 
-  console.log(req.body, "Request body");
+  const Booking = getModelForMonth(currentMonth);
 
   try {
     // Generate Razorpay order first
     const order = await createOrder(amount);
-    console.log(order, "Created order");
 
     // Verify the payment signature
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
     console.log(isSignatureValid, "Payment verification result");
     const currentDate = new Date().toISOString().split('T')[0];
+
     if (isSignatureValid) {
       try {
         // Create new LibStudent document
         const newStudent = new LibStudent({
           userId: user_id,
-          lastfeedate:currentDate,
+          lastfeedate: currentDate,
           name,
           email,
           shift,
@@ -138,11 +144,10 @@ router.post('/payment-verification/:user_id', async (req, res) => {
           consent,
           gender,
           dob,
-        
           fatherName,
           motherName,
           aadhaar,
-          Mode:"Online",
+          Mode: "Online",
           contact1,
           contact2,
           examPreparation,
@@ -156,7 +161,6 @@ router.post('/payment-verification/:user_id', async (req, res) => {
         // Upload image if it exists
         if (image) {
           const results = await uploadToCloudinary(image, "Library_Students");
-
           // Update the student record with image data
           newStudent.image.publicId = results.publicId;
           newStudent.image.url = results.url;
@@ -164,12 +168,36 @@ router.post('/payment-verification/:user_id', async (req, res) => {
 
         // Save the student document
         await newStudent.save();
-      
 
-        console.log(newStudent, "Newly created student");
-        res.status(200).json({ success: true, message: 'Payment verified and student record created successfully' });
+        // Now that the student is saved, we can access the generated reg number
+        const reg = newStudent.reg;
+
+        // Create or update the Booking record with the same reg number
+        const bookingData = {
+          userId: newStudent._id, // Reference to the LibStudent document
+          reg: reg, // Use the same reg number
+          name,
+          shift,
+          date: currentDate,
+          regFee: amount,
+          // Add other relevant fields from the formData or LibStudent model as needed
+        };
+
+        const booking = await Booking.findOneAndUpdate(
+          { reg: reg },
+          bookingData,
+          { new: true, upsert: true }
+        );
+
+     
+
+        res.status(200).json({
+          success: true,
+          message: 'Payment verified, student and booking records created successfully',
+          studentReg: reg
+        });
       } catch (error) {
-        console.error("Error creating student record:", error);
+        console.error("Error creating student and booking records:", error);
         res.status(500).json({ success: false, error: 'Internal server error' });
       }
     } else {
@@ -181,7 +209,6 @@ router.post('/payment-verification/:user_id', async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
-
 
 
 router.get('/Lib_student/sendIdCard/:id', async (req, res) => {

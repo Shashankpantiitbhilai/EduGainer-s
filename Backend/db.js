@@ -1,18 +1,20 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv")
-dotenv.config()
+const dotenv = require("dotenv");
+dotenv.config();
+const setupChangeStream = require('./models/changeStreamSetup');
 
 const connectDB = async () => {
-
   try {
     const ConnectDB = `${process.env.MONGODB_URI}`;
     await mongoose.connect(ConnectDB);
     console.log("MongoDB Connected");
+    await setupChangeStream();
+    console.log("Change streams set up successfully");
+    // Note: CSV imports are handled separately and can be called as needed
   } catch (error) {
     console.error("MongoDB Connection Error:", error);
   }
-}
-// connectDB()
+};
 
 const closeDB = () => {
   mongoose.connection.close()
@@ -23,8 +25,5 @@ const closeDB = () => {
       console.error('Error while closing MongoDB connection:', err);
     });
 };
-
-// Call the connectDB function to establish the MongoDB connection
-
 
 module.exports = { connectDB, closeDB };

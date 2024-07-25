@@ -84,9 +84,29 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.name || ""}
               />
             </Grid>
+             <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("website")}
+                label="Website"
+                fullWidth
+                error={!!errors.website}
+                helperText={errors.website?.message}
+                defaultValue={defaultValues?.website || ""}
+              />
+            </Grid>
+             <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("regFee")}
+                label="RegFee"
+                fullWidth
+                error={!!errors.regFee}
+                helperText={errors.regFee?.message}
+                defaultValue={defaultValues?.regFee || ""}
+              />
+            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                {...register("seat", { required: "Seat is required" })}
+                {...register("seat")}
                 label="Seat"
                 fullWidth
                 error={!!errors.seat}

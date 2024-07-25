@@ -22,6 +22,7 @@ import { AdminContext } from "../../App";
 import { fetchLibStudent } from "../../services/library/utils";
 import Payment from "../payment/razorpay";
 import CheckIcon from "@mui/icons-material/Check";
+
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   [theme.breakpoints.up("sm")]: {
@@ -33,7 +34,7 @@ const shifts = {
   "6:30 AM to 2 PM": 550,
   "2 PM to 9:30 PM": 550,
   "6:30 AM to 6:30 PM": 850,
-  "24*7":1100,
+  "24*7": 1100,
   "6:30 AM to 11 PM": 350,
   "2 PM to 11 PM": 750,
   "9:30 PM to 6:30 AM": 550,
@@ -76,7 +77,9 @@ const Fee = () => {
   const [availableDeals, setAvailableDeals] = useState([]);
   const [isInactive, setIsInactive] = useState(false);
   const [info, setInfo] = useState("");
-    const [message, setmessage] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+
   const {
     control,
     handleSubmit,
@@ -100,7 +103,7 @@ const Fee = () => {
     amount: calculatedFee,
     userId: id,
     setLoading,
-    status: "fee-payment",
+    status
   });
 
   useEffect(() => {
@@ -128,35 +131,44 @@ const Fee = () => {
     setLoading(true);
     setError("");
     setIsInactive(false);
-    setInfo("")
+    setInfo("");
+    setStatus("");
+    setCalculatedFee(0);
+    setAvailableDeals([]);
+    setSelectedDeal("");
+
     try {
       const data = await fetchLibStudent(regNo);
       if (!data || !data.student) {
         setError("Student not registered");
         return;
       }
-console.log(data,"ppp")
-    
-      setStudentData(data.student);
-      setmessage(data.message)
-      setValue("name", data.student.name);
-      setValue("shift", data.student.shift);
 
-      if (data.student.shift) {
+      setStudentData(data.student);
+      setMessage(data.message);
+      setValue("name", data.student.name);
+console.log(data.student.shift)
+      if (data.message === "Student is not active for 3 months straight") {
+        setInfo(
+          "You are being charged Rs.50 registration fees for the gap of 90+ days without being active"
+        );
+        setStatus("Reregistration");
+        setCalculatedFee(50);
+        setValue("shift", "");
+        setAdvancePaymentPeriod("Reregistration Fee");
+        setSelectedDeal("reregistration");
+      } else if (data.student?.shift==="NULL") {
+        setError("No shift allocated. Please contact the office.");
+        setValue("shift", "");
+      } else {
+        setStatus("fee-payment");
+        setValue("shift", data.student.shift);
         const shiftFee = shifts[data.student.shift] || 0;
         const currentMonthFee = shiftFee;
         let totalFee =
           currentMonthFee +
           (data.student.due || 0) -
           (data.student.advance || 0);
-        console.log(data.message)
-        if (data.message === "Student is not active for 3 months straight") {
-            setInfo(
-              "You are being charged Rs.50 registration fees for the gap of 90+ days without being active"
-            );
-           
-        totalFee += 50;
-          }
 
         setCalculatedFee(totalFee);
         setAdvancePaymentPeriod("Current Month");
@@ -183,7 +195,10 @@ console.log(data,"ppp")
     const selectedValue = event.target.value;
     setSelectedDeal(selectedValue);
 
-    if (selectedValue === "current") {
+    if (status === "Reregistration") {
+      setCalculatedFee(1);
+      setAdvancePaymentPeriod("Reregistration Fee");
+    } else if (selectedValue === "current") {
       if (studentData && studentData.shift) {
         const currentMonthFee = shifts[studentData.shift] || 0;
         const totalFee =
@@ -193,13 +208,8 @@ console.log(data,"ppp")
       }
     } else {
       const deal = deals.find((d) => d.id === selectedValue);
-  let  totalFee =
+      let totalFee =
         deal.totalFee + (studentData.due || 0) - (studentData.advance || 0);
-       if (message === "Student is not active for 3 months straight") {
-        
-
-         totalFee += 50;
-       }
       setCalculatedFee(totalFee);
       updateAdvancePaymentPeriod(deal.months);
     }
@@ -222,7 +232,7 @@ console.log(data,"ppp")
   };
 
   const onSubmit = async (data) => {
-    if (!selectedDeal) {
+    if (!selectedDeal && status !== "Reregistration") {
       toast.error("Please select a deal or generate the current month's fee");
       return;
     }
@@ -230,7 +240,7 @@ console.log(data,"ppp")
     const newFormData = {
       reg: data.regNo,
       fee: calculatedFee,
-      shift: data.shift,
+      shift: status === "Reregistration" ? "Reregistration" : data.shift,
       name: data.name,
       advancePaymentPeriod,
     };
@@ -290,6 +300,11 @@ console.log(data,"ppp")
               {error}
             </Alert>
           )}
+          {info && (
+            <Alert severity="info" sx={{ mt: 2, mb: 2 }}>
+              {info}
+            </Alert>
+          )}
           {!isInactive && studentData && (
             <>
               <Controller
@@ -306,42 +321,24 @@ console.log(data,"ppp")
                   />
                 )}
               />
-              <Controller
-                name="shift"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    margin="normal"
-                    fullWidth
-                    id="shift"
-                    label="Shift"
-                    disabled
-                  />
-                )}
-              />
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="deal-select-label">
-                  Select Deal or Current Month
-                </InputLabel>
-                <Select
-                  labelId="deal-select-label"
-                  id="deal-select"
-                  value={selectedDeal}
-                  label="Select Deal or Current Month"
-                  onChange={handleDealSelect}
-                >
-                  <MenuItem value="current">Current Month</MenuItem>
-                  {availableDeals.map((deal) => (
-                    <MenuItem key={deal.id} value={deal.id}>
-                      ₹{deal.totalFee.toFixed(2)} for {deal.months} months -
-                      Discount: {deal.discount}%
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              {selectedDeal && (
-                <>
+              {status !== "Reregistration" && (
+                <Controller
+                  name="shift"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      margin="normal"
+                      fullWidth
+                      id="shift"
+                      label="Shift"
+                      disabled
+                    />
+                  )}
+                />
+              )}
+              {(selectedDeal || status === "Reregistration") && (
+                <StyledPaper>
                   <Box mt={2}>
                     <Typography
                       variant="body1"
@@ -352,34 +349,50 @@ console.log(data,"ppp")
                     <Typography variant="body1">
                       Advance Payment Period: {advancePaymentPeriod}
                     </Typography>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                      <Grid item xs={12} sm={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          Due Fee:
-                        </Typography>
-                        <Typography variant="h6" color="error">
-                          ₹{studentData?.due || 0}
-                        </Typography>
+                    {status !== "Reregistration" && (
+                      <Grid container spacing={2} sx={{ mt: 1 }}>
+                        <Grid item xs={12} sm={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            Due Fee:
+                          </Typography>
+                          <Typography variant="h6" color="error">
+                            ₹{studentData?.due || 0}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            Advance Fee:
+                          </Typography>
+                          <Typography variant="h6" color="primary">
+                            ₹{studentData?.advance || 0}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                          <Typography variant="body2" color="textSecondary">
+                            Net Fee:
+                          </Typography>
+                          <Typography variant="h6" color="success.main">
+                            ₹{calculatedFee.toFixed(2)}
+                          </Typography>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          Advance Fee:
-                        </Typography>
-                        <Typography variant="h6" color="primary">
-                          ₹{studentData?.advance || 0}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <Typography variant="body2" color="textSecondary">
-                          Net Fee:
-                        </Typography>
-                        <Typography variant="h6" color="success.main">
-                          ₹{calculatedFee.toFixed(2)}
-                        </Typography>
-                      </Grid>
-                    </Grid>
+                    )}
+                    {status === "Reregistration" && (
+                      <Typography
+                        variant="h6"
+                        color="success.main"
+                        sx={{ mt: 2 }}
+                      >
+                        Reregistration Fee: ₹{calculatedFee.toFixed(2)}
+                      </Typography>
+                    )}
                   </Box>
-                  <Alert icon={<CheckIcon fontSize="bold" />} severity="info">
+
+                  <Alert
+                    icon={<CheckIcon fontSize="bold" />}
+                    severity="info"
+                    sx={{ mt: 2 }}
+                  >
                     After clicking on Pay fee, the payment portal will activate.
                     Choose any method but do not refresh the page during the
                     payment process until it is completed. On completion and
@@ -387,29 +400,54 @@ console.log(data,"ppp")
                     automatically.
                   </Alert>
 
-                  {info && <Alert
-                    icon={<CheckIcon fontSize="inherit" />}
-                    severity="warning"
+                  {info && (
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="warning"
+                      sx={{ mt: 2 }}
+                    >
+                      {info}
+                    </Alert>
+                  )}
+
+                  {calculatedFee > 0 && (
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      color="primary"
+                      sx={{ mt: 3 }}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        `Pay Now: ₹${calculatedFee.toFixed(2)}`
+                      )}
+                    </Button>
+                  )}
+                </StyledPaper>
+              )}
+
+              {status !== "Reregistration" && availableDeals.length > 0 && (
+                <FormControl fullWidth sx={{ mt: 3 }}>
+                  <InputLabel id="deal-select-label">Select Deal</InputLabel>
+                  <Select
+                    labelId="deal-select-label"
+                    id="deal-select"
+                    value={selectedDeal}
+                    label="Select Deal"
+                    onChange={handleDealSelect}
                   >
-                    {info}
-                  </Alert>}
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    sx={{ mt: 3 }}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <CircularProgress size={24} />
-                    ) : calculatedFee > 0 ? (
-                      `Pay Now: ₹${calculatedFee.toFixed(2)}`
-                    ) : (
-                      "No fee to be paid"
-                    )}
-                  </Button>
-                </>
+                    <MenuItem value="current">Current Month</MenuItem>
+                    {availableDeals.map((deal) => (
+                      <MenuItem key={deal.id} value={deal.id}>
+                        {deal.months} Months - ₹{deal.totalFee} (Save{" "}
+                        {deal.discount}%)
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               )}
             </>
           )}

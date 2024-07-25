@@ -69,7 +69,9 @@ const libStudentSchema = new mongoose.Schema({
   Payment_detail: {
     razorpay_order_id: { type: String },
     razorpay_payment_id: { type: String },
-  }, lastfeedate: {
+  },
+  
+  lastfeedate: {
     type: String
   },
   gender: { type: String },
@@ -176,8 +178,7 @@ const bookingSchema = new mongoose.Schema({
   seat: { type: String },
   date: { type: String },
   cash: { type: Number, default: 0 },
-  contact1: { type: String },
-  contact2: { type: String },
+ 
   website: {
     type: Number,
     default: 0
@@ -188,7 +189,7 @@ const bookingSchema = new mongoose.Schema({
   },
   regFee: {
     type: Number,
-    default:0.
+    default:0
   },
   online: { type: Number, default: 0 },
   shift: { type: String, default: '' },

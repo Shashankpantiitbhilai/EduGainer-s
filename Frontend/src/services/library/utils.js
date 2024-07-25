@@ -65,10 +65,10 @@ export async function getStudentLibSeat(id) {
 
 
 
-export async function sendFeeData(amount) {
+export async function sendFeeData(amount,status) {
     try {
      
-        const response = await axiosInstance.post("/library/sendFeeData", { amount });
+        const response = await axiosInstance.post("/library/sendFeeData", { amount, status });
        
         // console.log(response.data);// Adjust the endpoint as per your API
         return response.data; // Assuming the API returns JSON data representing the user object

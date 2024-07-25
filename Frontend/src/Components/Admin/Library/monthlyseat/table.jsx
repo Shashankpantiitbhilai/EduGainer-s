@@ -77,7 +77,7 @@ const StudentManagementTable = () => {
     setLoading(true);
     try {
       const bookings = await getBookingData(month);
-      console.log(bookings,"kkkkk");
+     
       setData(bookings);
     } catch (error) {
       // toast.error("Error fetching booking data.");
