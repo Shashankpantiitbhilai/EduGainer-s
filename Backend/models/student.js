@@ -193,7 +193,7 @@ const bookingSchema = new mongoose.Schema({
   },
   online: { type: Number, default: 0 },
   shift: { type: String, default: '' },
-  fee: { type: Number, default: 0 },
+ 
   remarks: { type: String, default: '' },
   Payment_detail: {
     razorpay_order_id: { type: String },

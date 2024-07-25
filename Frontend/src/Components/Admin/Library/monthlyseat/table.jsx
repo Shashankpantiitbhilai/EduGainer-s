@@ -140,7 +140,7 @@ const StudentManagementTable = () => {
   };
 
   const handleEditBooking = async (formData) => {
-
+console.log(formData,"kkkkkk")
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);

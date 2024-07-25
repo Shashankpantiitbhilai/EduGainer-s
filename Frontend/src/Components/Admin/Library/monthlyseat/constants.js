@@ -9,7 +9,7 @@ export const columnOrder = [
     "online",
     "TotalMoney",
     "shift",
-   
+   "receipt",
     "due",
     "advance",
 

@@ -69,8 +69,8 @@ const getBookingData = async (req, res) => {
 };
 
 const addBookingData = async (req, res) => {
-    const { reg, name, seat, date, cash, online, shift, fee, remarks, status, total, due, advance } = req.body;
-
+    const { reg, name, receipt,website,regFee,seat, date, cash, online, shift,  remarks, status,TotalMoney, due, advance } = req.body;
+    console.log(req.body);
     try {
         const BookingModel = getCurrentMonthBookingModel();
 
@@ -91,13 +91,16 @@ const addBookingData = async (req, res) => {
             cash,
             online,
             shift,
-            fee,
+          
             remarks,
             status,
-            total,
+           TotalMoney,
             due,
             advance,
-            status,
+           
+            website,
+            regFee,
+            receipt,
             colors: {
                 [status]: statusColor
             }
@@ -112,7 +115,7 @@ const addBookingData = async (req, res) => {
     }
 };
 const updateBookingData = async (req, res) => {
-    const { reg, name, seat, date, cash, online, shift, fee, remarks, status, due, advance, receipt, TotalMoney, Payment_detail } = req.body;
+    const { reg, name, seat, date, cash, online, shift,  remarks, status, due, advance, receipt, TotalMoney ,website,regFee} = req.body;
 
     try {
         const BookingModel = getCurrentMonthBookingModel();
@@ -131,21 +134,7 @@ const updateBookingData = async (req, res) => {
             { reg },
             {
                 $set: {
-                    reg,
-                    name,
-                    seat,
-                    date,
-                    cash,
-                    online,
-                    shift,
-                    status,
-                    fee,
-                    remarks,
-                    due,
-                    advance,
-                    receipt,
-
-                    Payment_detail,
+                    reg, name, seat, date, cash, online, shift, remarks, status, due, advance, receipt, TotalMoney, website, regFee,
                     ...colorUpdate.$set // Ensure color update is properly merged
                 }
             },
