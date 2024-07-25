@@ -112,7 +112,7 @@ const StudentManagementTable = () => {
   const handleAddBooking = async (formData) => {
     try {
       await addBooking(formData);
-      console.log(formData);
+      
       setOpenAddDialog(false);
       setupdation(!updation);
       toast.success("Booking added successfully!");
@@ -140,7 +140,7 @@ const StudentManagementTable = () => {
   };
 
   const handleEditBooking = async (formData) => {
-console.log(formData,"kkkkkk")
+
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);

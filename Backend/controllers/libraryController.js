@@ -110,7 +110,7 @@ const getLibStudentData = async (req, res) => {
         }
 
         const bookingData = await Booking.findOne({ reg }).select('name shift due advance');
-        console.log(lastFeeDate, threeMonthsAgo)
+       
         if (lastFeeDate && lastFeeDate <= threeMonthsAgo) {
 
             return res.status(200).json({
@@ -162,7 +162,7 @@ const verifyLibfeePayment = async (req, res) => {
     const { order_id, payment_id, signature, formData, status } = req.body;
     const { user_id } = req.params;
     const { name, shift, reg, fee, advancePaymentPeriod } = formData;
-    console.log(status, "statushs",formData)
+    // console.log(status, "statushs",formData)
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
 
     if (!isSignatureValid) {
@@ -175,7 +175,7 @@ const verifyLibfeePayment = async (req, res) => {
         const currentDate = new Date().toISOString().split('T')[0];
 
         if (status === 'Reregistration') {
-            console.log("klk")
+    
             const student = await Booking.findOneAndUpdate(
                 { reg },
                 { regFee: fee, name, shift: "NULL", remarks: "Reregistration fee 50 Rs" },
@@ -186,7 +186,7 @@ const verifyLibfeePayment = async (req, res) => {
                 { lastfeedate: currentDate },
                 { new: true }
             );
-            console.log(student,student.regFee, "kkkkkkkkkk")
+           
         } else {
             const user = await LibStudent.findOne({ userId: user_id });
             if (!user) {

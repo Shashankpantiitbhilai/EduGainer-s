@@ -126,8 +126,8 @@ const ManageSeats = () => {
   useEffect(() => {
     if (socket) {
       socket.on("seatStatusUpdate", ({ id, status, seat, shift }) => {
-        console.log("recievd i n socketssssssssss");
-        console.log(status,seat,shift)
+      
+    
         setSeatStatus((prevStatus) => ({
           ...prevStatus,
           [seat]: {
@@ -153,7 +153,7 @@ const ManageSeats = () => {
           shiftData.forEach((e, key) => {
             if (!statusMap[e.seat]) {
               if(e.seat=="19")
-              console.log(e.seat,"seatttttttttttt")
+              // console.log(e.seat,"seatttttttttttt")
               statusMap[e.seat] = {};
             }
           
@@ -161,7 +161,7 @@ const ManageSeats = () => {
           });
         }
       });
-       console.log(statusMap,"kkkkkkk")
+      //  console.log(statusMap,"kkkkkkk")
     
       setSeatStatus(statusMap);
     } catch (error) {
@@ -202,7 +202,7 @@ const ManageSeats = () => {
    try {
     
      const currentSeatStatus = seatStatus[selectedSeat];
-console.log(currentSeatStatus)
+// console.log(currentSeatStatus)
      // Check for overlapping Paid or Confirmed shifts
      if (currentSeatStatus) {
        const overlappingShifts = Object.keys(currentSeatStatus).filter(
@@ -224,7 +224,7 @@ console.log(currentSeatStatus)
          return;
        }
      }
-       console.log("submit")
+      //  console.log("submit")
        const response = await updateSeatStatus(
          reg,
          "Paid",
@@ -238,7 +238,7 @@ console.log(currentSeatStatus)
          seat: selectedSeat,
          shift: selectedShift,
        });
-       console.log(response, "kkkkkkkkk")
+    
   
        setSnackbarMessage(
          `Seat ${selectedSeat} marked as Paid for ${selectedShift}`

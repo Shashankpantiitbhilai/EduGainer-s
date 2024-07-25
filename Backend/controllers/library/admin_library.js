@@ -70,7 +70,7 @@ const getBookingData = async (req, res) => {
 
 const addBookingData = async (req, res) => {
     const { reg, name, receipt,website,regFee,seat, date, cash, online, shift,  remarks, status,TotalMoney, due, advance } = req.body;
-    console.log(req.body);
+    
     try {
         const BookingModel = getCurrentMonthBookingModel();
 

@@ -63,7 +63,7 @@ const addLibStudent = async (req, res) => {
             ...req.body,
             
         }
-        console.log(req.body)
+       
         const addedStudent = await LibStudent.create(data);
         const imagedata = {}
         if (image) {
@@ -89,7 +89,7 @@ const addLibStudent = async (req, res) => {
 const editLibStudentById = async (req, res) => {
     const { id
     } = req.params// Assuming shift is sent in the request body
-console.log(req.body)
+
     try {
         // Query database to find admins based on the shift
         const { image } = req.body;
