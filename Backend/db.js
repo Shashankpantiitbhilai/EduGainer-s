@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
-const setupChangeStream = require('./models/changeStreamSetup');
+const setupChangeStream = require('./models/changeStreamsetup');
 
 const connectDB = async () => {
   try {
