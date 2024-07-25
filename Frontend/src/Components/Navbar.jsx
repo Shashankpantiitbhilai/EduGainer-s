@@ -72,11 +72,11 @@ function Navbar() {
     }
   };
 
+  const isAdmin = IsUserLoggedIn?.role === "admin";
   const pages = IsUserLoggedIn
-    ? IsUserLoggedIn?.role === "admin"
+    ? isAdmin
       ? [
           { name: "Library", link: "/admin_library" },
-
           { name: "AdminChat", link: "/admin/chat" },
           { name: "Policies", link: "/Policies" },
         ]
@@ -88,7 +88,8 @@ function Navbar() {
           { name: "Policies", link: "/Policies" },
         ]
     : [];
-  const homeURL = IsUserLoggedIn?.role === "user" ? "/" : "/admin_home";
+
+  const homeURL = isAdmin ? "/admin_home" : "/";
   const settings = [
     {
       name: "Profile",
@@ -100,6 +101,8 @@ function Navbar() {
     },
     { name: "Logout", link: "/logout", action: handleLogout },
   ];
+
+  
 
   return (
     <AppBar position="static" sx={{ backgroundColor: colors.primary }}>
@@ -118,8 +121,7 @@ function Navbar() {
           <Typography
             variant="h6"
             noWrap
-            component={Link}
-            to={homeURL}
+          
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -185,7 +187,7 @@ function Navbar() {
             variant="h5"
             noWrap
             component={Link}
-            to="/"
+            to={homeURL}
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
