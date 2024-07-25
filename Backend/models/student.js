@@ -209,8 +209,8 @@ bookingSchema.pre('save', async function (next) {
     const website = this.website;
     const online = this.online;
     const cash = this.cash;
- 
-    this.TotalMoney = website+cash+online;
+    const regFee = this.regFee;
+    this.TotalMoney = website+cash+online+regFee;
 
     // Verify if the reg field corresponds to a LibStudent reg
     const libStudent = await mongoose.model('LibStudent').findOne({ reg: this.reg });
