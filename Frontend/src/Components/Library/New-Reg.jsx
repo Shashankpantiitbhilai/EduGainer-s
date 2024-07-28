@@ -32,7 +32,7 @@ import {
   useTheme,
 } from "@mui/material";
 
-import CheckIcon from '@mui/icons-material/Check';
+import CheckIcon from "@mui/icons-material/Check";
 import { HowToReg, CheckCircleOutline, Info } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { eligibleForNewRegistration } from "../../services/library/utils";
@@ -153,15 +153,15 @@ export default function LibraryRegistration() {
                 Benefits of Online Library Registration
               </Typography>
               <List>
-                 {[
-                "Get Instant Registration Number",
-                "Download Your Information Card Immediately",
-                "Guaranteed Seats and Priority Access",
-                "Secure Your Spot in Advance",
-                "Priority Processing",
-                "Reserve Your Preferred Time Slot",
-                "Complete Registration from Anywhere",
-                "Be Among the First",
+                {[
+                  "Get Instant Registration Number",
+                  "Download Your Information Card Immediately",
+                  "Guaranteed Seats and Priority Access",
+                  "Secure Your Spot in Advance",
+                  "Priority Processing",
+                  "Reserve Your Preferred Time Slot",
+                  "Complete Registration from Anywhere",
+                  "Be Among the First",
                 ].map((benefit, index) => (
                   <ListItem key={index}>
                     <ListItemIcon>
@@ -381,7 +381,6 @@ export default function LibraryRegistration() {
                 defaultValue={formData.aadhaar || ""}
                 rules={{
                   required: "Aadhaar or ID No is required",
-                
                 }}
                 render={({ field }) => (
                   <TextField

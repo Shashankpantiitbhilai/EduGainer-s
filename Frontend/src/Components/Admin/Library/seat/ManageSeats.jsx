@@ -147,12 +147,13 @@ const ManageSeats = () => {
     try {
       let statusMap = {};
       const response = await getSeatsData();
+      console.log(response,"lllll")
       shifts.forEach((shift) => {
         const shiftData = response[shift];
         if (shiftData) {
           shiftData.forEach((e, key) => {
             if (!statusMap[e.seat]) {
-              if(e.seat=="19")
+            
               // console.log(e.seat,"seatttttttttttt")
               statusMap[e.seat] = {};
             }
@@ -161,7 +162,7 @@ const ManageSeats = () => {
           });
         }
       });
-      //  console.log(statusMap,"kkkkkkk")
+       console.log(statusMap,"kkkkkkk")
     
       setSeatStatus(statusMap);
     } catch (error) {
