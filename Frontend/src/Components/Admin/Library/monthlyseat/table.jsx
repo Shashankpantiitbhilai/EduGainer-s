@@ -77,8 +77,12 @@ const StudentManagementTable = () => {
     setLoading(true);
     try {
       const bookings = await getBookingData(month);
-     console.log(bookings,"kkkkkkkkk")
-      setData(bookings);
+       const flattenedBookings = bookings.map((booking) => ({
+         ...booking,
+         razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
+         razorpay_payment_id: booking.Payment_detail?.razorpay_payment_id || "",
+       }));
+      setData(flattenedBookings);
     } catch (error) {
       // toast.error("Error fetching booking data.");
     } finally {
@@ -112,7 +116,7 @@ const StudentManagementTable = () => {
   const handleAddBooking = async (formData) => {
     try {
       await addBooking(formData);
-      
+
       setOpenAddDialog(false);
       setupdation(!updation);
       toast.success("Booking added successfully!");
@@ -140,7 +144,6 @@ const StudentManagementTable = () => {
   };
 
   const handleEditBooking = async (formData) => {
-
     try {
       await updateBooking(formData);
       setOpenEditDialog(false);

@@ -154,7 +154,7 @@ const ManageSeats = () => {
           shiftData.forEach((e, key) => {
             if (!statusMap[e.seat]) {
             
-              // console.log(e.seat,"seatttttttttttt")
+           
               statusMap[e.seat] = {};
             }
           

@@ -144,7 +144,10 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
   );
 };
 
-const Library = () => {  const { IsUserLoggedIn } = useContext(AdminContext);
+const Library = () => { 
+  
+  const { IsUserLoggedIn} = useContext(AdminContext);
+
   const [selectedShift, setSelectedShift] = useState(shifts[0]);
   const [seatStatus, setSeatStatus] = useState({});
   const [userSeat, setUserSeat] = useState(null);
@@ -153,9 +156,10 @@ const Library = () => {  const { IsUserLoggedIn } = useContext(AdminContext);
    const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const socketRef = useRef(null)
-  console.log(IsUserLoggedIn);
+ 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+const id=IsUserLoggedIn._id
 
   const url =
     process.env.NODE_ENV === "production"
@@ -181,7 +185,7 @@ const Library = () => {  const { IsUserLoggedIn } = useContext(AdminContext);
        if (socketRef.current) {
          socketRef.current.on("seatStatusUpdate", ({ id, status, seat, shift }) => {
         
-           console.log(status, seat, shift);
+          
             setSnackbarMessage(
               `Seat ${seat} status updated to ${status} for shift ${shift}`
             );
@@ -215,9 +219,9 @@ const Library = () => {  const { IsUserLoggedIn } = useContext(AdminContext);
         } catch (error) {
           console.error("Error fetching seat data:", error);
         }
-        console.log(IsUserLoggedIn);
+        
 
-        const userSeatData = await getStudentLibSeat(IsUserLoggedIn?._id);
+        const userSeatData = await getStudentLibSeat(id);
         if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
           setUserSeat(userSeatData.booking.seat);
           setUserShift(userSeatData.booking.shift);

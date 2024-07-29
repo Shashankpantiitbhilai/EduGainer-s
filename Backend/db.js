@@ -8,7 +8,7 @@ const connectDB = async () => {
     const ConnectDB = `${process.env.MONGODB_URI}`;
     await mongoose.connect(ConnectDB);
     console.log("MongoDB Connected")
-    console.log("Change streams set up successfully");
+ 
     // Note: CSV imports are handled separately and can be called as needed
   } catch (error) {
     console.error("MongoDB Connection Error:", error);

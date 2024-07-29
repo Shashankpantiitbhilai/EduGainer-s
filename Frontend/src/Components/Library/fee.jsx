@@ -31,10 +31,10 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 const shifts = {
-  "6:30 AM to 2 PM": 550,
+  "6:30 AM to 2 PM": 1,
   "2 PM to 9:30 PM": 550,
-  "6:30 AM to 6:30 PM": 850,
-  "24*7": 1100,
+  "6:30 AM to 6:30 PM": 1,
+  "24*7": 1,
   "6:30 AM to 11 PM": 350,
   "2 PM to 11 PM": 750,
   "9:30 PM to 6:30 AM": 550,
@@ -103,7 +103,7 @@ const Fee = () => {
     amount: calculatedFee,
     userId: id,
     setLoading,
-    status
+    status,
   });
 
   useEffect(() => {
@@ -143,11 +143,11 @@ const Fee = () => {
         setError("Student not registered");
         return;
       }
-
+      console.log(data.student, "kkkkkk");
       setStudentData(data.student);
       setMessage(data.message);
       setValue("name", data.student.name);
-console.log(data.student.shift)
+
       if (data.message === "Student is not active for 3 months straight") {
         setInfo(
           "You are being charged Rs.50 registration fees for the gap of 90+ days without being active"
@@ -157,7 +157,7 @@ console.log(data.student.shift)
         setValue("shift", "");
         setAdvancePaymentPeriod("Reregistration Fee");
         setSelectedDeal("reregistration");
-      } else if (data.student?.shift==="NULL") {
+      } else if (data.student?.shift === "NULL") {
         setError("No shift allocated. Please contact the office.");
         setValue("shift", "");
       } else {
@@ -243,6 +243,7 @@ console.log(data.student.shift)
       shift: status === "Reregistration" ? "Reregistration" : data.shift,
       name: data.name,
       advancePaymentPeriod,
+      email: studentData.email,
     };
 
     setFormData(newFormData);

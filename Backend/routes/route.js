@@ -69,7 +69,7 @@ router.post("/Lib-new-reg", async (req, res) => {
   try{
  const order= await createOrder(amount)
     // console.log(user);
-console.log(order,amount)
+
     res.status(200).json({
       success: true,
       order,
@@ -90,7 +90,7 @@ console.log(order,amount)
 
 router.get("/Lib_student/:user_id", async (req, res) => {
   const { user_id } = req.params;
-  console.log(user_id, req.params,"hi")
+
 
   try {
     const user = await LibStudent.findOne({ userId: user_id });
@@ -98,7 +98,7 @@ router.get("/Lib_student/:user_id", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    console.log(user,"users");
+   
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -111,7 +111,7 @@ router.get("/Lib_student/:user_id", async (req, res) => {
 
 router.post('/payment-verification/:user_id', async (req, res) => {
   const { order_id, payment_id, signature, formData } = req.body;
- 
+
   const {
     name, email, shift, address, amount, consent,
     gender, dob, fatherName, motherName, aadhaar, contact1, contact2, examPreparation, image
@@ -127,7 +127,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
 
     // Verify the payment signature
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
-    console.log(isSignatureValid, "Payment verification result");
+   
     const currentDate = new Date().toISOString().split('T')[0];
 
     if (isSignatureValid) {
@@ -294,7 +294,7 @@ router.get('/Lib_student/sendIdCard/:id', async (req, res) => {
       try {
         await sendEmailWithAttachment(email, subject, text, attachments);
         emailSent = true;
-        console.log('Email sent successfully');
+        
         res.send('Email sent successfully');
       } catch (error) {
         console.error('Failed to send email:', error);

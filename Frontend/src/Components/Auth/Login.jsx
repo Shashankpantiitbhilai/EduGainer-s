@@ -53,7 +53,7 @@ function Login() {
     const urlParams = new URLSearchParams(window.location.search);
     const authSuccess = urlParams.get("auth_success");
     const userInfo = urlParams.get("user_info");
-
+console.log(userInfo,"kkkkkk")
     if (authSuccess === "true" && userInfo) {
       try {
         const user = JSON.parse(decodeURIComponent(userInfo));

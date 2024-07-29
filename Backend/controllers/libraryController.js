@@ -1,6 +1,7 @@
 const { LibStudent } = require('../models/student');
 const { createOrder, verifyPaymentSignature } = require("../routes/payment");
 const { getModelForMonth } = require('../models/student'); // Assume the function is defined in utils/modelUtils.js
+const { ConsoleMessage } = require('puppeteer');
 const getCurrentMonthBookingModel = () => {
     const now = new Date();
     return getModelForMonth(now.getMonth() + 1);
@@ -47,7 +48,7 @@ const getStudentLibSeat = async (req, res) => {
         const currentMonth = new Date().getMonth() + 1;
 
         const Booking = getModelForMonth(currentMonth);
-
+    
         const student = await LibStudent.findOne({ userId: id });
         if (!student) {
             return res.status(404).json({ error: 'Student not found in LibStudent collection' });
@@ -117,6 +118,7 @@ const getLibStudentData = async (req, res) => {
                 message: 'Student is not active for 3 months straight',
                 student: {
                     name: student?.name,
+                    email: student?.email,
                     shift: student?.shift,
                     due: bookingData?.due,
                     advance: bookingData?.advance,
@@ -135,6 +137,7 @@ const getLibStudentData = async (req, res) => {
                 student: {
                     name: bookingData.name,
                     shift: bookingData.shift,
+                    email: student?.email,
                     due: bookingData.due,
                     advance: bookingData.advance,
                     isActive: true
@@ -147,6 +150,7 @@ const getLibStudentData = async (req, res) => {
                 student: {
                     name: student.name,
                     shift: student.shift,
+                    email: student?.email,
                     due: 0,
                     advance: 0,
                     isActive: true

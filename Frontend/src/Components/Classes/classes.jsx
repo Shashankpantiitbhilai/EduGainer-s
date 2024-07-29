@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
 import {
   Container,
   Typography,
@@ -8,11 +8,12 @@ import {
   CircularProgress,
   Grid,
 } from "@mui/material";
-
+import { AdminContext } from "../../App";
 function EdugainerClasses() {
   const [comingSoonText, setComingSoonText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
+  const { IsUserLoggedIn } = useContext(AdminContext);
+  console.log(IsUserLoggedIn,"ppppppppp")
   useEffect(() => {
     const text = "Coming Soon";
     let index = 0;

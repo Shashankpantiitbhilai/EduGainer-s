@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 export async function fetchCredentials() {
   try {
     const response = await axiosInstance.get("/auth/fetchAuth");
-    // console.log(response.data)
+   
     return response.data;
   } catch (error) {
     // console.error("Error fetching credentials:", error);

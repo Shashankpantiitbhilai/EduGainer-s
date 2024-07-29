@@ -9,12 +9,11 @@ export const columnOrder = [
     "online",
     "TotalMoney",
     "shift",
-   "receipt",
+    "receipt",
     "due",
     "advance",
-
-
     "status",
     "remarks",
-
+    "razorpay_order_id",
+    "razorpay_payment_id"
 ];

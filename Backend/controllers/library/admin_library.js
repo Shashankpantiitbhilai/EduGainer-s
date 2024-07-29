@@ -1,3 +1,4 @@
+const { ConsoleMessage } = require('puppeteer');
 const { LibStudent, getModelForMonth } = require('../../models/student');
 
 // Helper function to get the current month's Booking model
@@ -59,7 +60,7 @@ const getBookingData = async (req, res) => {
         const bookings = await BookingModel.find({});
 
         // Fetch fine amounts for each booking
-    
+ 
 
         res.status(200).json(bookings);
     } catch (error) {

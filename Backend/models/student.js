@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["local", "google"],
     required: true,
-  }, googleId: {
+  },
+  googleId: {
     type: String,
   
   },

@@ -86,7 +86,15 @@ export default function EnhancedStudentGrid() {
       setLoading(true);
       try {
         const defaultData = await fetchLibSudents();
-        setStudents(defaultData);
+          const flattenedBookings = defaultData.map((booking) => ({
+            ...booking,
+            razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
+            razorpay_payment_id:
+              booking.Payment_detail?.razorpay_payment_id || "",
+          }));
+        
+        setStudents(flattenedBookings);
+        console.log(flattenedBookings,"nnnnnnnnnnnn")
       } catch (error) {
         toast.error("Error fetching student data");
       } finally {
@@ -128,10 +136,10 @@ export default function EnhancedStudentGrid() {
         const updatedStudents = students.map((student) =>
           student._id === id
             ? {
-                ...student,
-                ...changedFields,
-                image: { url: imageBase64 || student.image?.url },
-              }
+              ...student,
+              ...changedFields,
+              image: { url: imageBase64 || student.image?.url },
+            }
             : student
         );
         setStudents(updatedStudents);
@@ -242,45 +250,72 @@ export default function EnhancedStudentGrid() {
     { field: "fatherName", headerName: "Father's Name", width: 150 },
     { field: "motherName", headerName: "Mother's Name", width: 150 },
     { field: "aadhaar", headerName: "Aadhaar", width: 150 },
-    { field: "lastfeedate", headerName: "LastPaymentDate", width: 80, editable: true },
+    {
+      field: "lastfeedate",
+      headerName: "LastPaymentDate",
+      width: 80,
+      editable: true,
+    },
     { field: "examPreparation", headerName: "Exam Preparation", width: 150 },
     { field: "consent", headerName: "Consent", width: 100 },
+ 
+    {
+      field: "razorpay_order_id",
+      headerName: "Razorpay Order ID",
+      width: 200,
+     
+    },
+    {
+      field: "razorpay_payment_id",
+      headerName: "Razorpay Payment ID",
+      width: 200,
+    
+    },
     {
       field: "actions",
       headerName: "Actions",
       width: 120,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            onClick={() => {
-              setStudentToEdit(params.row);
-              setEditDialogOpen(true);
-            }}
-            color="primary"
-          >
-            <Edit />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              setDeleteDialogOpen(true);
-              setStudentToDelete(params.row._id);
-            }}
-            color="error"
-          >
-            <Delete />
-          </IconButton>
-        </Box>
-      ),
+      renderCell: (params) => {
+        if (!params || !params.row) {
+          return null;
+        }
+        return (
+          <Box>
+            <IconButton
+              onClick={() => {
+                setStudentToEdit(params.row);
+                setEditDialogOpen(true);
+              }}
+              color="primary"
+            >
+              <Edit />
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                setDeleteDialogOpen(true);
+                setStudentToDelete(params.row._id);
+              }}
+              color="error"
+            >
+              <Delete />
+            </IconButton>
+          </Box>
+        );
+      },
     },
   ].map((column) => ({
     ...column,
-    renderCell: (params) => (
-      <div onClick={() => handleCellClick(params)}>
-        {column.renderCell ? column.renderCell(params) : params.value}
-      </div>
-    ),
+    renderCell: (params) => {
+      if (!params) {
+        return null;
+      }
+      return (
+        <div onClick={() => handleCellClick(params)}>
+          {column.renderCell ? column.renderCell(params) : params.value}
+        </div>
+      );
+    },
   }));
-
   const renderCellDialog = () => (
     <Dialog
       open={cellDialogOpen && cellContent.field !== "actions"}

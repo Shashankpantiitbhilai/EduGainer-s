@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+
 import {
   Alert,
   AlertTitle,
@@ -37,7 +38,7 @@ import { HowToReg, CheckCircleOutline, Info } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { eligibleForNewRegistration } from "../../services/library/utils";
 import Payment from "../payment/razorpay";
-
+import { CircularProgress } from "@mui/material";
 const steps = [
   "Benefits",
   "Personal Info",
@@ -53,6 +54,7 @@ export default function LibraryRegistration() {
   const id = IsUserLoggedIn?._id;
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({});
+  const [submit, setsubmit] = useState("");
   const {
     control,
     handleSubmit,
@@ -72,7 +74,7 @@ export default function LibraryRegistration() {
   const { initializePayment } = Payment({
     formData,
     imageBase64,
-    amount: 105,
+    amount: 1,
     userId: id,
     setLoading,
     status: "newRegistration",
@@ -127,6 +129,7 @@ export default function LibraryRegistration() {
 
   const onSubmit = async () => {
     if (activeStep === steps.length - 1) {
+      setsubmit("Payment")
       await initializePayment();
     } else {
       handleNext();
@@ -580,8 +583,10 @@ export default function LibraryRegistration() {
     );
   }
 
-  return (
-    <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
+
+    if (submit === "Payment") { return<CircularProgress /> }
+  else {
+   return <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
       <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
         <Typography component="h1" variant="h5" align="center" gutterBottom>
           <HowToReg fontSize="large" /> Library Registration
@@ -640,5 +645,6 @@ export default function LibraryRegistration() {
         </form>
       </Paper>
     </Container>
-  );
+  }
+  
 }

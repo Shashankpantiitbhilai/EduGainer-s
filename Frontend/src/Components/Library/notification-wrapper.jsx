@@ -75,7 +75,11 @@ const NotificationWrapper = ({ children }) => {
       const isNotificationPeriod =
         currentDay >= 28 || (currentMonth !== lastSeenMonth && currentDay <= 5);
 
-      if (isNotificationPeriod) {
+      // Ensure the notification is sent only once during the period
+      const isAlreadyNotified =
+        lastSeenMonth === currentMonth && lastSeenYear === currentYear;
+
+      if (isNotificationPeriod && !isAlreadyNotified) {
         // Check if we're in a new period compared to the last submission
         const isNewPeriod =
           currentYear > lastSubmittedYear ||

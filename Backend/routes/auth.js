@@ -206,8 +206,7 @@ router.post("/forgot-password", (req, res) => {
     });
 });
 router.get("/fetchAuth", function (req, res) {
-  // console.log(req.session)
-  // console.log("fetch",req.user)
+
   if (req.isAuthenticated()) {
     res.json(req.user);
   } else {
@@ -268,11 +267,11 @@ router.get('/google/callback',
     // Prepare user info
     // console.log("ncjcnd", req.user)
     const userInfo = {
-      id: req.user._id,
-      username: req.user.username,
+     ...req.user._doc,
 
       // Assuming you have a way to determine the user's role
     };
+  
     const emailRegex = new RegExp(`^\\s*${userInfo.username}\\s*$`, 'i');
 
     const libStudent = await LibStudent.findOne({ email: emailRegex });

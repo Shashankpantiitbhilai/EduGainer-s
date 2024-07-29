@@ -33,7 +33,7 @@ function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const navigate = useNavigate();
-
+console.log(IsUserLoggedIn,"llllll")
   useEffect(() => {
     if (IsUserLoggedIn && IsUserLoggedIn.username) {
       const userInitials = IsUserLoggedIn.username
