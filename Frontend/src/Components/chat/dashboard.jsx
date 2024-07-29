@@ -71,12 +71,15 @@ const Chat = () => {
           socketRef.current = socket;
 
           socket.on("receiveMessage", (message, roomId, sender) => {
+         
             if (roomId === admin_id) {
               setAnnouncementMessages((prevMessages) => [
                 ...prevMessages,
                 message,
               ]);
-              if (userRoomId !== sender) {
+            
+              if (user_id !== sender) {
+                
                 setUnreadCounts((prev) => ({
                   ...prev,
                   announcements: prev.announcements + 1,
@@ -84,7 +87,8 @@ const Chat = () => {
               }
             } else {
               setMessages((prevMessages) => [...prevMessages, message]);
-              if (userRoomId !== sender) {
+              if (user_id !== sender) {
+               
                 setUnreadCounts((prev) => ({
                   ...prev,
                   admin: prev.admin + 1,

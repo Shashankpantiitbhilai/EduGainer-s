@@ -41,7 +41,7 @@ const StyledCard = motion(Card);
 function Home() {
   const navigate = useNavigate();
   const { IsUserLoggedIn } = useContext(AdminContext)
-  console.log(IsUserLoggedIn,"llllllll")
+  
     const libraryFacilities = [
     { icon: <WatchLater />, text: "24/7 Accessibility" },
     { icon: <AcUnitIcon />, text: "Climate Control (Fans, AC, Heater)" },

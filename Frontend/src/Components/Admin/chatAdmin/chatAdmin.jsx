@@ -11,10 +11,14 @@ import {
   Avatar,
   Fab,
   Badge,
+  useMediaQuery,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material";
 import theme from "../../../theme";
-import { Send as SendIcon } from "@mui/icons-material";
+import {
+  Send as SendIcon,
+  ArrowBack as ArrowBackIcon,
+} from "@mui/icons-material";
 import { styled } from "@mui/system";
 import io from "socket.io-client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -146,7 +150,9 @@ const AdminChat = () => {
   const [selectedRoom, setSelectedRoom] = useState("");
   const [announcementMessages, setAnnouncementMessages] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
-
+  const [showSidebar, setShowSidebar] = useState(true);
+ const [sender, setsender] = useState(true);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -183,21 +189,25 @@ const AdminChat = () => {
           socketRef.current = socket;
 
           socket.on("receiveMessage", (message, roomId, sender) => {
-            if (roomId === admin_id) {
-              setAnnouncementMessages((prevMessages) => [
-                ...prevMessages,
-                message,
-              ]);
-            } else {
-              setMessages((prevMessages) => [...prevMessages, message]);
-              console.log(adminRoomId, "kkkkkkkkk", roomId, admin_id);
-              if (roomId !== selectedRoom && sender !== admin_id) {
-                setUnreadCounts((prev) => ({
-                  ...prev,
-                  [roomId]: (prev[roomId] || 0) + 1,
-                }));
+           
+            if (sender === selectedRoom) {
+              if (roomId === admin_id) {
+                setAnnouncementMessages((prevMessages) => [
+                  ...prevMessages,
+                  message,
+                ]);
+              } else {
+                setMessages((prevMessages) => [...prevMessages, message]);
+             
+               
               }
             }
+             if (roomId !== selectedRoom && sender !== admin_id) {
+               setUnreadCounts((prev) => ({
+                 ...prev,
+                 [roomId]: (prev[roomId] || 0) + 1,
+               }));
+             }
             playBeep();
           });
         }
@@ -217,28 +227,7 @@ const AdminChat = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleClick = async (id) => {
-    try {
-      setSelectedRoom(id);
-      const response = await fetchAllChats(id);
-      if (id === adminRoomId) {
-        setAnnouncementMessages(response);
-      } else {
-        setMessages(response);
-      }
-
-      setUnreadCounts((prev) => ({
-        ...prev,
-        [id]: 0,
-      }));
-
-      if (socketRef.current) {
-        socketRef.current.emit("joinRoom", id);
-      }
-    } catch (error) {
-      console.error("Error fetching chat messages:", error);
-    }
-  };
+ 
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -266,6 +255,11 @@ const AdminChat = () => {
       }
       setInput("");
       await postChatMessages(messageData);
+        if (selectedRoom === adminRoomId ) {
+          setAnnouncementMessages((prevMessages) => [...prevMessages, messageData]);
+        } else {
+          setMessages((prevMessages) => [...prevMessages, messageData]);
+        }
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -291,6 +285,39 @@ const AdminChat = () => {
     }, 300);
   };
 
+  const handleClick = async (id) => {
+    try {
+      setSelectedRoom(id);
+      const response = await fetchAllChats(id);
+      if (id === adminRoomId) {
+        setAnnouncementMessages(response);
+      } else {
+        setMessages(response);
+      }
+
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [id]: 0,
+      }));
+
+      if (socketRef.current) {
+        socketRef.current.emit("joinRoom", id);
+      }
+
+      if (isMobile) {
+        setShowSidebar(false);
+      }
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+    }
+  };
+
+  const getSelectedUserName = () => {
+    if (selectedRoom === adminRoomId) return "Announcement Room";
+    const selectedUser = users.find((user) => user._id === selectedRoom);
+    return selectedUser ? selectedUser.username : "";
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <ChatSection>
@@ -298,127 +325,168 @@ const AdminChat = () => {
           <Grid item xs={12}>
             <HeaderMessage variant="h5">Admin Query Portal</HeaderMessage>
           </Grid>
-          <Grid item xs={12} sm={8} container direction="column">
-            <MessageArea>
-              <AnimatePresence>
-                {(adminRoomId === selectedRoom
-                  ? announcementMessages
-                  : messages
-                ).map((msg, index) => (
-                  <MessageItem
-                    key={index}
-                    align={
-                      msg.messages[0].sender === IsUserLoggedIn._id
-                        ? "right"
-                        : "left"
-                    }
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <ListItemText
-                          primary={msg.messages[0].content}
-                          primaryTypographyProps={{
-                            style: { wordBreak: "break-word" },
-                          }}
-                          align={
-                            msg.messages[0].sender === IsUserLoggedIn._id
-                              ? "right"
-                              : "left"
-                          }
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <ListItemText
-                          secondary={new Date(
-                            msg.timestamp
-                          ).toLocaleTimeString()}
-                          align={
-                            msg.messages[0].sender === IsUserLoggedIn._id
-                              ? "right"
-                              : "left"
-                          }
-                        />
-                      </Grid>
-                    </Grid>
-                  </MessageItem>
-                ))}
-              </AnimatePresence>
-              <div ref={messageEndRef} />
-            </MessageArea>
-            <Divider />
-            <InputArea container>
-              <Grid item xs={11}>
-                <TextField
-                  id="outlined-basic-email"
-                  label="Type Something"
-                  fullWidth
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      sendMessage();
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid item xs={1} align="right">
-                <Fab
-                  color="primary"
-                  aria-label="send"
-                  onClick={sendMessage}
-                  disabled={!input.trim()}
+          {(!isMobile || (isMobile && showSidebar)) && (
+            <Sidebar
+              item
+              xs={12}
+              sm={4}
+              style={{ maxHeight: "70vh", overflowY: "auto" }}
+            >
+              <List>
+                <SidebarItem
+                  button
+                  onClick={() => handleClick(adminRoomId)}
+                  selected={selectedRoom === adminRoomId}
                 >
-                  <SendIcon />
-                </Fab>
-              </Grid>
-            </InputArea>
-          </Grid>
-          <Sidebar item xs={12} sm={4}>
-            <List>
-              <SidebarItem
-                button
-                onClick={() => handleClick(adminRoomId)}
-                selected={selectedRoom === adminRoomId}
-              >
-                <ListItemText primary="Announcement Room" />
-              </SidebarItem>
-              <Divider />
-              {users.map(
-                (user) =>
-                  IsUserLoggedIn._id !== user._id && (
-                    <SidebarItem
-                      button
-                      key={user._id}
-                      onClick={() => handleClick(user._id)}
-                      selected={selectedRoom === user._id}
-                    >
-                      <StyledBadge
-                        overlap="circular"
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
-                        }}
-                        variant="dot"
+                  <ListItemText primary="Announcement Room" />
+                </SidebarItem>
+                <Divider />
+                {users.map(
+                  (user) =>
+                    IsUserLoggedIn._id !== user._id && (
+                      <SidebarItem
+                        button
+                        key={user._id}
+                        onClick={() => handleClick(user._id)}
+                        selected={selectedRoom === user._id}
                       >
-                        <Avatar alt={user.name} src={user.avatarUrl} />
-                      </StyledBadge>
-                      <ListItemText
-                        primary={user.username}
-                        style={{ marginLeft: "10px" }}
-                      />
-                      <UnreadBadge
-                        badgeContent={unreadCounts[user._id]}
-                        color="error"
-                      />
-                    </SidebarItem>
-                  )
+                        <StyledBadge
+                          overlap="circular"
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                          }}
+                          variant="dot"
+                        >
+                          <Avatar alt={user.firstName} src={user.avatarUrl} />
+                        </StyledBadge>
+                        <ListItemText
+                          primary={user.username}
+                          style={{ marginLeft: "10px" }}
+                        />
+                        <UnreadBadge
+                          badgeContent={unreadCounts[user._id]}
+                          color="error"
+                        />
+                      </SidebarItem>
+                    )
+                )}
+              </List>
+            </Sidebar>
+          )}
+          {(!isMobile || (isMobile && !showSidebar)) && (
+            <Grid item xs={12} sm={8} container direction="column">
+              {isMobile && (
+                <Grid item xs={12}>
+                  <Fab
+                    color="primary"
+                    aria-label="back"
+                    onClick={() => setShowSidebar(true)}
+                    style={{ margin: "10px" }}
+                  >
+                    <ArrowBackIcon />
+                  </Fab>
+                  <Typography
+                    variant="h6"
+                    style={{ display: "inline-block", marginLeft: "10px" }}
+                  >
+                    {getSelectedUserName()}
+                  </Typography>
+                </Grid>
               )}
-            </List>
-          </Sidebar>
+
+             
+                <MessageArea>
+                 
+                  <AnimatePresence>
+                    {(adminRoomId === selectedRoom
+                      ? announcementMessages
+                      : messages
+                    ).map((msg, index) => (
+                      <MessageItem
+                        key={index}
+                        sx={{
+                          p: 1,
+                          backgroundColor:
+                            msg.messages[0].sender === IsUserLoggedIn._id
+                              ? "secondary.light"
+                              : "primary.light",
+                          borderRadius: 2,
+                          maxWidth: "70%",
+                        }}
+                        align={
+                          msg.messages[0].sender === IsUserLoggedIn._id
+                            ? "right"
+                            : "left"
+                        }
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Grid container>
+                          <Grid item xs={12}>
+                            <ListItemText
+                              primary={msg.messages[0].content}
+                              primaryTypographyProps={{
+                                style: { wordBreak: "break-word" },
+                              }}
+                              align={
+                                msg.messages[0].sender === IsUserLoggedIn._id
+                                  ? "right"
+                                  : "left"
+                              }
+                            />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <ListItemText
+                              secondary={new Date(
+                                msg.timestamp
+                              ).toLocaleTimeString()}
+                              align={
+                                msg.messages[0].sender === IsUserLoggedIn._id
+                                  ? "right"
+                                  : "left"
+                              }
+                            />
+                          </Grid>
+                        </Grid>
+                      </MessageItem>
+                    ))}
+                  </AnimatePresence>
+                  <div ref={messageEndRef} />
+                </MessageArea>
+              
+
+              <Divider />
+              <InputArea container>
+                <Grid item xs={11}>
+                  <TextField
+                    id="outlined-basic-email"
+                    label="Type Something"
+                    fullWidth
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        sendMessage();
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={1} align="right">
+                  <Fab
+                    color="primary"
+                    aria-label="send"
+                    onClick={sendMessage}
+                    disabled={!input.trim()}
+                  >
+                    <SendIcon />
+                  </Fab>
+                </Grid>
+              </InputArea>
+            </Grid>
+          )}
         </Grid>
       </ChatSection>
     </ThemeProvider>
