@@ -173,7 +173,7 @@ const NotificationWrapper = ({ children }) => {
         <DialogActions>
           <Box position="relative">
             <Button
-              onClick={() => handleSubmit("NotContinue")}
+              onClick={() => handleSubmit("discontinue")}
               color="secondary"
               variant="outlined"
               disabled={loading}

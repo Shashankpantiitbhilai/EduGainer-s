@@ -129,7 +129,7 @@ export default function LibraryRegistration() {
 
   const onSubmit = async () => {
     if (activeStep === steps.length - 1) {
-      setsubmit("Payment")
+      setsubmit("Payment");
       await initializePayment();
     } else {
       handleNext();
@@ -211,9 +211,9 @@ export default function LibraryRegistration() {
                   <FormControl fullWidth error={!!errors.gender}>
                     <InputLabel>Gender</InputLabel>
                     <Select {...field} label="Gender">
-                      <MenuItem value="male">Male</MenuItem>
-                      <MenuItem value="female">Female</MenuItem>
-                      <MenuItem value="other">Other</MenuItem>
+                      <MenuItem value="Male">Male</MenuItem>
+                      <MenuItem value="Female">Female</MenuItem>
+                      <MenuItem value="Other">Other</MenuItem>
                     </Select>
                     {errors.gender && (
                       <Typography color="error" variant="caption">
@@ -583,68 +583,69 @@ export default function LibraryRegistration() {
     );
   }
 
-
-    if (submit === "Payment") { return<CircularProgress /> }
-  else {
-   return <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
-      <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
-        <Typography component="h1" variant="h5" align="center" gutterBottom>
-          <HowToReg fontSize="large" /> Library Registration
-        </Typography>
-        <Stepper
-          activeStep={activeStep}
-          sx={{ pt: 3, pb: 5 }}
-          orientation={isMobile ? "vertical" : "horizontal"}
-        >
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <form onSubmit={handleSubmit(handleStepSubmit)}>
-          {getStepContent(activeStep)}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              mt: 3,
-              flexDirection: isMobile ? "column" : "row",
-            }}
+  if (submit === "Payment") {
+    return <CircularProgress />;
+  } else {
+    return (
+      <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
+        <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
+          <Typography component="h1" variant="h5" align="center" gutterBottom>
+            <HowToReg fontSize="large" /> Library Registration
+          </Typography>
+          <Stepper
+            activeStep={activeStep}
+            sx={{ pt: 3, pb: 5 }}
+            orientation={isMobile ? "vertical" : "horizontal"}
           >
-            {activeStep !== 0 && (
-              <Button
-                onClick={handleBack}
-                sx={{ mr: 1, mb: isMobile ? 2 : 0 }}
-                fullWidth={isMobile}
-              >
-                Back
-              </Button>
-            )}
-            {activeStep === steps.length - 1 ? (
-              <Button
-                type="button"
-                variant="contained"
-                onClick={onSubmit}
-                disabled={loading || !consentGiven}
-                fullWidth={isMobile}
-              >
-                Submit and Pay ₹105
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={activeStep === 3 && !consentGiven}
-                fullWidth={isMobile}
-              >
-                Next
-              </Button>
-            )}
-          </Box>
-        </form>
-      </Paper>
-    </Container>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <form onSubmit={handleSubmit(handleStepSubmit)}>
+            {getStepContent(activeStep)}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mt: 3,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
+              {activeStep !== 0 && (
+                <Button
+                  onClick={handleBack}
+                  sx={{ mr: 1, mb: isMobile ? 2 : 0 }}
+                  fullWidth={isMobile}
+                >
+                  Back
+                </Button>
+              )}
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={onSubmit}
+                  disabled={loading || !consentGiven}
+                  fullWidth={isMobile}
+                >
+                  Submit and Pay ₹105
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={activeStep === 3 && !consentGiven}
+                  fullWidth={isMobile}
+                >
+                  Next
+                </Button>
+              )}
+            </Box>
+          </form>
+        </Paper>
+      </Container>
+    );
   }
-  
 }
