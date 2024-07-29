@@ -82,7 +82,7 @@ console.log(callbackUrl,"kkkkk",status)
                 status
               });
             }
-        
+        console.log(verificationResponse.data)
             if (verificationResponse.data.success) {
               if (status === "newRegistration") {
                 

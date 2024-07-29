@@ -277,9 +277,9 @@ router.get('/google/callback',
     const libStudent = await LibStudent.findOne({ email: emailRegex });
 
     if (libStudent) {
-
+console.log(libStudent)
       // Update LibStudent with userId
-      libStudent.userId = userInfo.id
+      libStudent.userId = userInfo._id
       await libStudent.save();
 
     }

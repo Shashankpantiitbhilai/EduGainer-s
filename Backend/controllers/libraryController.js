@@ -166,7 +166,7 @@ const verifyLibfeePayment = async (req, res) => {
     const { order_id, payment_id, signature, formData, status } = req.body;
     const { user_id } = req.params;
     const { name, shift, reg, fee, advancePaymentPeriod } = formData;
-    // console.log(status, "statushs",formData)
+    console.log(status, "statushs",formData)
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
 
     if (!isSignatureValid) {
@@ -193,6 +193,7 @@ const verifyLibfeePayment = async (req, res) => {
            
         } else {
             const user = await LibStudent.findOne({ userId: user_id });
+            console.log(user)
             if (!user) {
                 return res.status(404).json({ success: false, error: 'User not found' });
             }
