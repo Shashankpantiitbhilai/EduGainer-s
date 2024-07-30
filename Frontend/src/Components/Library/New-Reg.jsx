@@ -383,13 +383,18 @@ export default function LibraryRegistration() {
                 control={control}
                 defaultValue={formData.aadhaar || ""}
                 rules={{
-                  required: "Aadhaar or ID No is required",
+                  required: "Aadhaar   No is required",
+                  pattern: {
+                    value: /^[2-9][0-9]{3}\s[0-9]{4}\s[0-9]{4}$/,
+                    message:
+                      "Invalid Aadhaar number format. Must start with 2 and be in the format: 2xxx xxxx xxxx",
+                  },
                 }}
                 render={({ field }) => (
                   <TextField
                     {...field}
                     fullWidth
-                    label="Aadhaar or Any ID No"
+                    label="Aadhaar Number"
                     error={!!errors.aadhaar}
                     helperText={errors.aadhaar?.message}
                   />
@@ -444,7 +449,7 @@ export default function LibraryRegistration() {
                 control={control}
                 defaultValue=""
                 rules={{
-                  required: "Photo is required",
+                  required: "Adhaar Card Front Photo is required",
                 }}
                 render={({ field }) => (
                   <Box>
@@ -460,7 +465,7 @@ export default function LibraryRegistration() {
                     />
                     <label htmlFor="image-upload">
                       <Button variant="contained" component="span">
-                        Upload Photo
+                        Upload Aadhaar Card front Side Photo
                       </Button>
                     </label>
                     {errors.image && (
