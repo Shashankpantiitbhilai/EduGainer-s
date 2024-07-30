@@ -35,7 +35,7 @@ const shifts = {
   "2 PM to 9:30 PM": 550,
   "6:30 AM to 6:30 PM": 850,
   "24*7": 1100,
-  "6:30 AM to 11 PM": 350,
+  "6:30 PM to 11 PM": 350,
   "2 PM to 11 PM": 750,
   "9:30 PM to 6:30 AM": 550,
 };
@@ -143,7 +143,7 @@ const Fee = () => {
         setError("Student not registered");
         return;
       }
-      console.log(data.student, "kkkkkk");
+     
       setStudentData(data.student);
       setMessage(data.message);
       setValue("name", data.student.name);

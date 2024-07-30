@@ -151,7 +151,7 @@ const AdminChat = () => {
   const [announcementMessages, setAnnouncementMessages] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
   const [showSidebar, setShowSidebar] = useState(true);
- const [sender, setsender] = useState(true);
+ 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   useEffect(() => {
     const fetchInitialData = async () => {
