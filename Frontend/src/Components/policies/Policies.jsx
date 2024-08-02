@@ -32,7 +32,7 @@ const Policies = () => {
 
       <PolicySection
         title="Terms and Conditions"
-        content="This privacy policy applies to all Users who access theEduGainer's Platform and are therefore required to read and understand the Policy before submitting any Personal Information. By submitting Personal Information, you are consenting to the use and processing of such information in accordance with this Policy.EduGainer's does not sell, transfer or rent your personal information to third parties for their marketing purposes without your explicit consent. We view protection of your privacy as a very important principle and store and process your personal information on secure servers located in India."
+        content="This privacy policy applies to all Users who access the EduGainer's Platform and are therefore required to read and understand the Policy before submitting any Personal Information. By submitting Personal Information, you are consenting to the use and processing of such information in accordance with this Policy.EduGainer's does not sell, transfer or rent your personal information to third parties for their marketing purposes without your explicit consent. We view protection of your privacy as a very important principle and store and process your personal information on secure servers located in India."
       />
 
       <PolicySection
@@ -47,7 +47,7 @@ const Policies = () => {
 
       <PolicySection
         title="No Shipping and No Refund Policy"
-        content="Edugainer provides digital services and does not offer physical products, therefore we do not provide shipping services. All purchases made on our platform are final and non-refundable. We encourage users to carefully review the service details before making a purchase."
+        content="Edugainer's provides digital services and does not offer physical products, therefore we do not provide shipping services. All purchases made on our platform are final and non-refundable. We encourage users to carefully review the service details before making a purchase."
       />
 
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
@@ -88,7 +88,7 @@ const Policies = () => {
             </ListItemIcon>
             <ListItemText
               primary="Address"
-              secondary="Edugainer, Uttarkashi, Uttarakhand, India"
+              secondary="EduGainer's Classes & Library, Uttarkashi, Uttarakhand, India"
             />
           </ListItem>
         </List>

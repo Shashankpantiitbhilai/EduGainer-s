@@ -47,20 +47,27 @@ const steps = [
   "Payment",
 ];
 
-const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB in bytes
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 3 MB in bytes
 
 export default function LibraryRegistration() {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn?._id;
   const [activeStep, setActiveStep] = useState(0);
-  const [formData, setFormData] = useState({});
+
   const [submit, setsubmit] = useState("");
+  const [formData, setFormData] = useState({
+    email: IsUserLoggedIn?.username || "", // Initialize email in formData
+  });
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      email: IsUserLoggedIn?.username || "", // Set default value for email
+    },
+  });
   const [imageBase64, setImageBase64] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -74,7 +81,7 @@ export default function LibraryRegistration() {
   const { initializePayment } = Payment({
     formData,
     imageBase64,
-    amount: 105,
+    amount: 1,
     userId: id,
     setLoading,
     status: "newRegistration",
@@ -115,7 +122,7 @@ export default function LibraryRegistration() {
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (file && file.size > MAX_FILE_SIZE) {
-      setFileError("File size should not exceed 3 MB");
+      setFileError("File size should not exceed 2 MB");
       return;
     }
     setFileError("");
@@ -131,6 +138,7 @@ export default function LibraryRegistration() {
     if (activeStep === steps.length - 1) {
       setsubmit("Payment");
       await initializePayment();
+      // console.log("pppppppppppppppppppp");
     } else {
       handleNext();
     }
@@ -331,27 +339,23 @@ export default function LibraryRegistration() {
               />
             </Grid>
             <Grid item xs={12}>
-              <Controller
-                name="email"
-                control={control}
-                defaultValue={formData.email || ""}
-                rules={{
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: "Invalid email address",
-                  },
-                }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Email Address"
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
-                  />
-                )}
-              />
+             <Controller
+  name="email"
+  control={control}
+  defaultValue={IsUserLoggedIn?.username || ""}
+  render={({ field }) => (
+    <TextField
+      {...field}
+      fullWidth
+      label="Email Address"
+      disabled
+      InputProps={{
+        readOnly: true,
+      }}
+      value={IsUserLoggedIn?.username || ""}
+    />
+  )}
+/>
             </Grid>
             <Grid item xs={12}>
               <Controller

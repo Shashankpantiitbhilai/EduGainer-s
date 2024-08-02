@@ -143,7 +143,7 @@ const Fee = () => {
         setError("Student not registered");
         return;
       }
-     
+
       setStudentData(data.student);
       setMessage(data.message);
       setValue("name", data.student.name);

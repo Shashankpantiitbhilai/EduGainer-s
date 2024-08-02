@@ -82,6 +82,7 @@ const StudentManagementTable = () => {
          razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
          razorpay_payment_id: booking.Payment_detail?.razorpay_payment_id || "",
        }));
+      console.log(flattenedBookings,"kkkkkkk")
       setData(flattenedBookings);
     } catch (error) {
       // toast.error("Error fetching booking data.");

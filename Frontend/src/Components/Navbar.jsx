@@ -121,7 +121,8 @@ function Navbar() {
           <Typography
             variant="h6"
             noWrap
-          
+            component={Link}
+            to={IsUserLoggedIn?.role==="admin"?"/admin_home" :"/"}
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },

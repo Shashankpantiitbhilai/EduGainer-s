@@ -51,8 +51,12 @@ function Home() {
     { icon: <MenuBook />, text: "Extensive Study Materials" },
   ];
   const handleClick = async () => {
-  
-     navigate("/library")
+    if (IsUserLoggedIn?.role === "admin") {
+      navigate("/admin_Library");
+    }
+    else {
+      navigate("/library")
+    }
     
   };
   const classesOffered = [

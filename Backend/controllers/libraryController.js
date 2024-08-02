@@ -22,7 +22,7 @@ const getCurrentMonthBookings = async (req, res) => {
             acc[shift].push({ seat, status });
             return acc;
         }, {});
-// console.log(bookingsByShift)
+// console.log(bookingsByShift,"KKKKKK")
         res.status(200).json(bookingsByShift);
     } catch (error) {
         console.error('Error fetching bookings:', error);

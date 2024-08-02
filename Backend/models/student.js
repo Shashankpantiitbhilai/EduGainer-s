@@ -175,7 +175,7 @@ const bookingSchema = new mongoose.Schema({
   receipt: { type: String },
   advance: { type: Number, default: 0 },
 
-  name: { type: String, default: '' },
+  name: { type: String},
   seat: { type: String },
   date: { type: String },
   cash: { type: Number, default: 0 },

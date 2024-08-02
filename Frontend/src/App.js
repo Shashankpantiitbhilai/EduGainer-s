@@ -21,7 +21,7 @@ function App() {
         fetchCredentials().then((User) => {
             if (User) {
                 setIsUserLoggedIn(User);
-                console.log(User,IsUserLoggedIn,"kkk")
+              
             }
             setIsLoading(false);
         });
