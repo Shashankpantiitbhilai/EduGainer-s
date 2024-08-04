@@ -81,7 +81,7 @@ export default function LibraryRegistration() {
   const { initializePayment } = Payment({
     formData,
     imageBase64,
-    amount: 1,
+    amount: 105,
     userId: id,
     setLoading,
     status: "newRegistration",

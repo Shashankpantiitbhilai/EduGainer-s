@@ -86,15 +86,15 @@ export default function EnhancedStudentGrid() {
       setLoading(true);
       try {
         const defaultData = await fetchLibSudents();
-          const flattenedBookings = defaultData.map((booking) => ({
-            ...booking,
-            razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
-            razorpay_payment_id:
-              booking.Payment_detail?.razorpay_payment_id || "",
-          }));
-        
+        const flattenedBookings = defaultData.map((booking) => ({
+          ...booking,
+          razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
+          razorpay_payment_id:
+            booking.Payment_detail?.razorpay_payment_id || "",
+        }));
+
         setStudents(flattenedBookings);
-        console.log(flattenedBookings,"nnnnnnnnnnnn")
+        console.log(flattenedBookings, "nnnnnnnnnnnn");
       } catch (error) {
         toast.error("Error fetching student data");
       } finally {
@@ -111,8 +111,6 @@ export default function EnhancedStudentGrid() {
   };
 
   const handleEdit = async (id, data) => {
-    
-   
     setSavingChanges(true);
     try {
       const originalStudent = students.find((student) => student._id === id);
@@ -136,10 +134,10 @@ export default function EnhancedStudentGrid() {
         const updatedStudents = students.map((student) =>
           student._id === id
             ? {
-              ...student,
-              ...changedFields,
-              image: { url: imageBase64 || student.image?.url },
-            }
+                ...student,
+                ...changedFields,
+                image: { url: imageBase64 || student.image?.url },
+              }
             : student
         );
         setStudents(updatedStudents);
@@ -151,7 +149,6 @@ export default function EnhancedStudentGrid() {
     } catch (error) {
       toast.error("Failed to update student");
     } finally {
-     
       setSavingChanges(false);
     }
   };
@@ -258,18 +255,16 @@ export default function EnhancedStudentGrid() {
     },
     { field: "examPreparation", headerName: "Exam Preparation", width: 150 },
     { field: "consent", headerName: "Consent", width: 100 },
- 
+
     {
       field: "razorpay_order_id",
       headerName: "Razorpay Order ID",
       width: 200,
-     
     },
     {
       field: "razorpay_payment_id",
       headerName: "Razorpay Payment ID",
       width: 200,
-    
     },
     {
       field: "actions",
@@ -391,7 +386,6 @@ export default function EnhancedStudentGrid() {
     const student = isEdit ? studentToEdit : newStudent;
     const setStudent = isEdit ? setStudentToEdit : setNewStudent;
 
-   
     return (
       <Dialog
         open={isEdit ? editDialogOpen : addDialogOpen}
@@ -588,7 +582,7 @@ export default function EnhancedStudentGrid() {
             />
             <label htmlFor="image-upload">
               <Button variant="contained" component="span">
-                Upload Image
+                Upload Aadhaar Card front Image
               </Button>
             </label>
             {fileError && <p style={{ color: "red" }}>{fileError}</p>}
@@ -648,7 +642,7 @@ export default function EnhancedStudentGrid() {
         </DialogActions>
       </Dialog>
     );
-  }
+  };
 
   return (
     <Box sx={{ height: "80vh", width: "100%", p: 2 }}>

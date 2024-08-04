@@ -147,7 +147,7 @@ const ManageSeats = () => {
     try {
       let statusMap = {};
       const response = await getSeatsData();
-      console.log(response,"lllll")
+   
       shifts.forEach((shift) => {
         const shiftData = response[shift];
         if (shiftData) {
