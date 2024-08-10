@@ -45,7 +45,7 @@ function Login() {
   const form = useForm();
   const { register, handleSubmit, formState, setError, clearErrors } = form;
   const { errors } = formState;
-  const { setIsUserLoggedIn, IsUserLoggedIn } = useContext(AdminContext);
+  const { setIsUserLoggedIn } = useContext(AdminContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -53,19 +53,22 @@ function Login() {
     const urlParams = new URLSearchParams(window.location.search);
     const authSuccess = urlParams.get("auth_success");
     const userInfo = urlParams.get("user_info");
-console.log(userInfo,"kkkkkk")
+
     if (authSuccess === "true" && userInfo) {
       try {
         const user = JSON.parse(decodeURIComponent(userInfo));
         setIsUserLoggedIn(user); // Set login state to true
-
+        if (user.status === "blocked") {
+          toast.error("You have been blocked by the administrator.", {
+            autoClose: 3000,
+          });
+          return;
+        }
         if (user.role === "admin") {
           navigate("/admin_home");
         } else {
           navigate("/");
         }
-        // Store user info in localStorage
-        // Navigate to home page
       } catch (error) {
         console.error("Error parsing user info:", error);
         setError("Error processing user information");
@@ -73,7 +76,7 @@ console.log(userInfo,"kkkkkk")
     } else if (authSuccess === "false") {
       setError("Authentication failed");
     }
-  }, [navigate, setIsUserLoggedIn]);
+  }, [navigate, setIsUserLoggedIn, setError]);
 
   const getBackendUrl = () => {
     if (process.env.NODE_ENV === "production") {
@@ -86,7 +89,6 @@ console.log(userInfo,"kkkkkk")
 
   const handleGoogleSignIn = () => {
     const backendUrl = getBackendUrl();
-    // console.log("Backend URL:", backendUrl);
 
     if (backendUrl) {
       const googleAuthUrl = `${backendUrl}/auth/google`;
@@ -103,7 +105,16 @@ console.log(userInfo,"kkkkkk")
   const onSubmit = async (data) => {
     try {
       const response = await loginUser(data.email, data.password);
+
       if (response && response.user) {
+        // Check if the user is blocked
+        if (response.user.status === "blocked") {
+          toast.error("You have been blocked by the administrator.", {
+            autoClose: 3000,
+          });
+          return;
+        }
+
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
 

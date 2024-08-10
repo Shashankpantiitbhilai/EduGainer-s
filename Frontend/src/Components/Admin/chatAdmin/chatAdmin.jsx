@@ -14,7 +14,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material";
-import theme from "../../../theme";
+import {darkTheme} from "../../../theme";
 import {
   Send as SendIcon,
   ArrowBack as ArrowBackIcon,
@@ -152,7 +152,7 @@ const AdminChat = () => {
   const [unreadCounts, setUnreadCounts] = useState({});
   const [showSidebar, setShowSidebar] = useState(true);
  
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(darkTheme.breakpoints.down("sm"));
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -319,7 +319,7 @@ const AdminChat = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={darkTheme}>
       <ChatSection>
         <Grid container component={ChatSection}>
           <Grid item xs={12}>
@@ -395,68 +395,65 @@ const AdminChat = () => {
                 </Grid>
               )}
 
-             
-                <MessageArea>
-                 
-                  <AnimatePresence>
-                    {(adminRoomId === selectedRoom
-                      ? announcementMessages
-                      : messages
-                    ).map((msg, index) => (
-                      <MessageItem
-                        key={index}
-                        sx={{
-                          p: 1,
-                          backgroundColor:
-                            msg.messages[0].sender === IsUserLoggedIn._id
-                              ? "secondary.light"
-                              : "primary.light",
-                          borderRadius: 2,
-                          maxWidth: "70%",
-                        }}
-                        align={
+              <MessageArea>
+                <AnimatePresence>
+                  {(adminRoomId === selectedRoom
+                    ? announcementMessages
+                    : messages
+                  ).map((msg, index) => (
+                    <MessageItem
+                      key={index}
+                      sx={{
+                        p: 1,
+                        backgroundColor:
                           msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "right"
-                            : "left"
-                        }
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <ListItemText
-                              primary={msg.messages[0].content}
-                              primaryTypographyProps={{
-                                style: { wordBreak: "break-word" },
-                              }}
-                              align={
-                                msg.messages[0].sender === IsUserLoggedIn._id
-                                  ? "right"
-                                  : "left"
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12}>
-                            <ListItemText
-                              secondary={new Date(
-                                msg.timestamp
-                              ).toLocaleTimeString()}
-                              align={
-                                msg.messages[0].sender === IsUserLoggedIn._id
-                                  ? "right"
-                                  : "left"
-                              }
-                            />
-                          </Grid>
+                            ? "secondary.light"
+                            : "primary.light",
+                        borderRadius: 2,
+                        maxWidth: "70%",
+                      }}
+                      align={
+                        msg.messages[0].sender === IsUserLoggedIn._id
+                          ? "right"
+                          : "left"
+                      }
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <ListItemText
+                            primary={msg.messages[0].content}
+                            primaryTypographyProps={{
+                              style: { wordBreak: "break-word" },
+                            }}
+                            align={
+                              msg.messages[0].sender === IsUserLoggedIn._id
+                                ? "right"
+                                : "left"
+                            }
+                          />
                         </Grid>
-                      </MessageItem>
-                    ))}
-                  </AnimatePresence>
-                  <div ref={messageEndRef} />
-                </MessageArea>
-              
+                        <Grid item xs={12}>
+                          <ListItemText
+                            secondary={new Date(
+                              msg.timestamp
+                            ).toLocaleTimeString()}
+                            align={
+                              msg.messages[0].sender === IsUserLoggedIn._id
+                                ? "right"
+                                : "left"
+                            }
+                          />
+                        </Grid>
+                      </Grid>
+                    </MessageItem>
+                  ))}
+                </AnimatePresence>
+                <div ref={messageEndRef} />
+              </MessageArea>
 
               <Divider />
               <InputArea container>

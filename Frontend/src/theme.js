@@ -1,24 +1,62 @@
-// src/theme.js
-import { createTheme } from "@mui/material/styles";
+// theme.js
+import { createTheme } from '@mui/material/styles';
 
-const theme = createTheme({
+// Define a common color palette
+const commonColors = {
+    primary: '#4caf50', // Green
+    secondary: '#ff9800', // Orange
+    warning: '#ffeb3b', // Yellow
+    error: '#f44336', // Red
+};
+
+const lightTheme = createTheme({
     palette: {
+        mode: 'light',
         primary: {
-            main: "#2ecc71",
+            main: commonColors.primary,
         },
         secondary: {
-            main: "#f1c40f",
+            main: commonColors.secondary,
         },
-        text: {
-            primary: "#2c3e50",
+        warning: {
+            main: commonColors.warning,
+        },
+        error: {
+            main: commonColors.error,
         },
         background: {
-            default: "#ecf0f1",
+            default: '#fafafa', // Light background
         },
-        white: {
-            main: "#ffffff",
+        text: {
+            primary: '#000000', // Dark text on light background
+            secondary: '#555555', // Slightly lighter text
         },
     },
 });
 
-export default theme;
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        primary: {
+            main: commonColors.primary,
+        },
+        secondary: {
+            main: commonColors.secondary,
+        },
+        warning: {
+            main: commonColors.warning,
+        },
+        error: {
+            main: commonColors.error,
+        },
+        background: {
+            default: '#303030', // Dark background
+        },
+        text: {
+            primary: '#ffffff', // Light text on dark background
+            secondary: '#bbbbbb', // Slightly darker text
+        },
+    },
+});
+
+export { lightTheme, darkTheme };

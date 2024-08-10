@@ -47,6 +47,7 @@ export async function sendIdCard(id) {
   }
 }
 
+
 export async function updateUserDetails(id, data) {
   try {
   

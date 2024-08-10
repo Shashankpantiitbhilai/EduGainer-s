@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const trafficRoutes = require('./routes/traffic');
 const routes_auth = require("./routes/auth");
 const routes_general = require("./routes/route");
 const routes_admin = require("./routes/admin");
@@ -83,7 +84,7 @@ else {
 }
 app.use(myPassport.initialize());
 app.use(myPassport.session());
-
+app.use("/traffic", trafficRoutes);
 app.use("/", routes_general);
 app.use("/auth", routes_auth);
 app.use("/admin", routes_admin);

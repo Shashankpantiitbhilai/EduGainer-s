@@ -5,6 +5,23 @@ const { Resource } = require('../models/Admin')
 const { uploadToCloudinary } = require("../cloudinary")
 const fs = require('fs');
 const path = require('path');
+
+const editUserById = async (req, res) => {
+    const { id } = req.params// Assuming shift is sent in the request body
+    console.log(id,req.body.data)
+    try {
+        // Query database to find admins based on the shift
+
+        const user = await User.findByIdAndUpdate({ _id:id },{...req.body.data},{new:true});
+        // console.log(chats)
+        // Example response structure
+        console.log(user)
+        res.status(200).json(user);
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
 const fetchAllChats = async (req, res) => {
     const { id } = req.params// Assuming shift is sent in the request body
     try {
@@ -269,6 +286,7 @@ module.exports = {
     deleteLibResource,
     fetchAllUsers,
     fetchAllChats,
-    fetchAllSiteUsers
+    fetchAllSiteUsers,
+    editUserById
     // Add other controller functions as needed
 };

@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
     default: "user", // Default role if not specified
     required: true,
   },
+  status: {
+    type: String,
+    default:"active",
+  }
 });
 
 userSchema.plugin(passportLocalMongoose);

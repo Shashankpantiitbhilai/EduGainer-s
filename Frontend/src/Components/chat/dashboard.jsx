@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { Send as SendIcon, Announcement, Person } from "@mui/icons-material";
 import io from "socket.io-client";
-import theme from "../../theme";
+import {lightTheme} from "../../theme";
 
 import { AdminContext } from "../../App";
 import {
@@ -199,7 +199,7 @@ const Chat = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={lightTheme}>
       <Box
         sx={{
           flexGrow: 1,

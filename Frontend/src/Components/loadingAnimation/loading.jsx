@@ -4,117 +4,128 @@ import {
   Typography,
   LinearProgress,
   CircularProgress,
+  Fade,
 } from "@mui/material";
-import ScienceIcon from "@mui/icons-material/Science";
-import PsychologyAltIcon from "@mui/icons-material/PsychologyAlt";
-import BiotechIcon from "@mui/icons-material/Biotech";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#2ecc71", // Green
+      dark: "darkgreen", // Dark Green
+    },
+    secondary: {
+      main: "#e67e22", // Orange
+    },
+    background: {
+      default: "#ffffff",
+    },
+  },
+});
+
 const LoadingAnimation = () => {
-  const [currentSubject, setCurrentSubject] = useState("physics");
   const [loadingProgress, setLoadingProgress] = useState(0);
-
-  const subjects = {
-    physics: { icon: ScienceIcon },
-    chemistry: { icon: BiotechIcon },
-    math: { icon:PsychologyAltIcon },
-  };
-
-  const SubjectIcon = subjects[currentSubject].icon;
+  const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0);
+  const tagline = ["Curiosity", "Dedication", "Perseverance"];
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev < 100) {
-          return prev + 1;
-        } else {
-          clearInterval(progressTimer);
-          return 100;
-        }
-      });
+      setLoadingProgress((prev) => (prev < 100 ? prev + 1 : 0));
     }, 50);
 
-    const subjectTimer = setInterval(() => {
-      setCurrentSubject((prevSubject) => {
-        const subjectKeys = Object.keys(subjects);
-        const nextSubjectIndex =
-          (subjectKeys.indexOf(prevSubject) + 1) % subjectKeys.length;
-        return subjectKeys[nextSubjectIndex];
-      });
-    }, 3000); // Change subject every 3 seconds
+    const taglineTimer = setInterval(() => {
+      setCurrentTaglineIndex((prev) => (prev + 1) % tagline.length);
+    }, 3000);
 
     return () => {
       clearInterval(progressTimer);
-      clearInterval(subjectTimer);
+      clearInterval(taglineTimer);
     };
   }, []);
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="100vh" // Tailwind yellow-300 equivalent
-    >
-      <Box position="relative" mb={4}>
-        <SubjectIcon
-          sx={{
-            color: "#166534",
-            width: 96,
-            height: 96,
-            animation: "bounce 1s infinite",
-          }}
-        />
-        <CircularProgress
-          size={80}
-          thickness={4}
-          sx={{
-            color: "#166534",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            marginTop: -5,
-            marginLeft: -5,
-          }}
-        />
-      </Box>
-      <Typography
-        variant="h3"
-        component="h1"
-        color="#166534"
-        fontWeight="bold"
-        mb={2}
+    <ThemeProvider theme={theme}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="100vh"
+        sx={{ backgroundColor: "background.default" }}
       >
-        EduGainer's
-      </Typography>
-      <Typography variant="h6" color="#166534" fontWeight="medium" mb={4}>
-        Curiosity  Dedication  Perseverance
-      </Typography>
-      <Box width="100%" maxWidth={300} position="relative" mb={2}>
-        <LinearProgress
-          variant="determinate"
-          value={loadingProgress}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "rgba(22, 101, 52, 0.2)",
-            "& .MuiLinearProgress-bar": {
-              borderRadius: 4,
-              backgroundColor: "#166534",
-            },
-          }}
-        />
-        <Typography
-          variant="body2"
-          color="#166534"
-          position="absolute"
-          top="-24px"
-          left="50%"
-          style={{ transform: "translateX(-50%)" }}
-        >
-          {`${Math.round(loadingProgress)}%`}
-        </Typography>
+        <Box position="relative" mb={4}>
+          <Typography
+            variant="h1"
+            component="h1"
+            sx={{
+              color: "primary.dark",
+              fontWeight: "bold",
+              fontSize: "4rem",
+              textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
+              mb: 2,
+            }}
+          >
+            EduGainer
+          </Typography>
+          <CircularProgress
+            size={150}
+            thickness={5}
+            variant="determinate"
+            value={loadingProgress}
+            sx={{
+              color: "primary.main",
+              position: "absolute",
+              top: "100%",
+              left: "50%",
+              marginTop: "20px",
+              marginLeft: "-75px",
+            }}
+          />
+        </Box>
+        <Box height="60px" mb={4}>
+          <Fade in={true} timeout={1000}>
+            <Typography
+              variant="h4"
+              sx={{
+                color: "secondary.main",
+                fontWeight: "medium",
+                textAlign: "center",
+              }}
+            >
+              {tagline[currentTaglineIndex]}
+            </Typography>
+          </Fade>
+        </Box>
+        <Box width="100%" maxWidth={400} position="relative" mb={2}>
+          <LinearProgress
+            variant="determinate"
+            value={loadingProgress}
+            sx={{
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: "primary.light",
+              "& .MuiLinearProgress-bar": {
+                borderRadius: 5,
+                backgroundColor: "secondary.main",
+              },
+            }}
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              color: "primary.dark",
+              position: "absolute",
+              top: "-30px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              fontWeight: "bold",
+            }}
+          >
+            {`${Math.round(loadingProgress)}%`}
+          </Typography>
+        </Box>
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 };
 

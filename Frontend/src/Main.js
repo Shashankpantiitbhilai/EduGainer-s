@@ -16,7 +16,7 @@ import ProtectedAdmin from "./Protected_admin.js";
 import Navbar from "./Components/Navbar.jsx";
 import Dashboard from "./Components/User/dashboard.jsx";
 import Profile from "./Components/User/Profile.jsx";
-import AdminDashboard from "./Components/Admin/ADMIN_HOME.jsx";
+import AdminHome from "./Components/Admin/ADMIN_HOME.jsx";
 import AdminLibrary from "./Components/Admin/Library/Admin_Library.jsx";
 import ManageUsers from "./Components/Admin/Library/ManageUsers.jsx"
 import ManageResources from "./Components/Admin/Library/Resources.jsx";
@@ -30,7 +30,9 @@ import AdminChat from "./Components/Admin/chatAdmin/chatAdmin.jsx";
 import ManageBooking from "./Components/Admin/Library/monthlyseat/table.jsx";
 import Policies from "./Components/policies/Policies.jsx";
 import StudentManagementTable from "./Components/Admin/Library/seat/ManageSeats.jsx";
-import  Fee from "./Components/Library/fee.jsx"
+import Fee from "./Components/Library/fee.jsx"
+import AdminDashboard from "./Components/Admin/adminDashboard.jsx";
+import StationaryHome from "./Components/Stationary/home.jsx";
 // import FeePaymentSuccess from "./Components/Library/fee-pay-success.jsx"
 const Main = () => {
     const location = useLocation();
@@ -41,7 +43,7 @@ const Main = () => {
         <>
             {!shouldHideNavbar && <Navbar />}
             <Routes>
-                <Route path="/admin_home" element={<AdminDashboard />} />
+                <Route path="/admin_home" element={<AdminHome />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
 
@@ -144,6 +146,14 @@ const Main = () => {
                     }
                 />
                 <Route
+                    path="/admin_dashboard"
+                    element={
+                        <ProtectedUser>
+                            <AdminDashboard />
+                        </ProtectedUser>
+                    }
+                />
+                <Route
                     path="/profile/:id"
                     element={
                         <ProtectedUser>
@@ -189,6 +199,14 @@ const Main = () => {
                         <ProtectedAdmin>
                             <StudentManagementTable/>
                         </ProtectedAdmin>
+                    }
+                />
+                <Route
+                    path="/stationary/home"
+                    element={
+                        <ProtectedUser>
+                            <StationaryHome />
+                        </ProtectedUser>
                     }
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />

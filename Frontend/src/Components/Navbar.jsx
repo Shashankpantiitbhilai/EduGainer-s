@@ -78,18 +78,26 @@ function Navbar() {
       ? [
           { name: "Library", link: "/admin_library" },
           { name: "AdminChat", link: "/admin/chat" },
+          { name: "MeriStationary", link: "/stationary/home" },
           { name: "Policies", link: "/Policies" },
         ]
       : [
           { name: "Library", link: "/library" },
           { name: "Classes", link: "/classes" },
           { name: "Resources", link: "/resources" },
+          { name: "MeriStationary", link: "/stationary/home" },
           { name: "Query", link: "/chat/home" },
           { name: "Policies", link: "/Policies" },
         ]
     : [];
-
+const id=IsUserLoggedIn?._id;
   const homeURL = isAdmin ? "/admin_home" : "/";
+  const dashboadUrl = isAdmin
+    ? "/admin_dashboard"
+    : `/dashboard/${id}`
+
+
+    
   const settings = [
     {
       name: "Profile",
@@ -97,7 +105,7 @@ function Navbar() {
     },
     {
       name: "Dashboard",
-      link: `/dashboard/${IsUserLoggedIn ? IsUserLoggedIn._id : ""}`,
+      link: `${dashboadUrl}`,
     },
     { name: "Logout", link: "/logout", action: handleLogout },
   ];
