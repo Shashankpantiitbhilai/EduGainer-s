@@ -8,21 +8,12 @@ import {
   Card,
   CardMedia,
   CardContent,
+  useTheme,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
-// Define colors
-const colors = {
-  primary: "#4CAF50",
-  secondary: "#FF9800",
-  text: "#333333",
-  background: "#F0F8FF",
-  white: "#FFFFFF",
-  accent: "#FFEB3B",
-};
 
 // Create a motion-enabled Card component
 const StyledCard = motion(Card);
@@ -63,6 +54,7 @@ const products = [
 
 // Enhanced VideoAnimation component
 const VideoAnimation = () => {
+  const theme = useTheme();
   const videoFiles = ["stationary.mp4"];
   const [currentVideo, setCurrentVideo] = useState(0);
 
@@ -100,7 +92,7 @@ const VideoAnimation = () => {
             left: 0,
             width: "100%",
             height: "100%",
-            
+            objectFit: "cover",
           }}
         />
       </AnimatePresence>
@@ -125,7 +117,7 @@ const VideoAnimation = () => {
           <Typography
             variant="h2"
             sx={{
-              color: colors.white,
+              color: theme.palette.common.white,
               textAlign: "center",
               fontWeight: "bold",
               textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
@@ -142,6 +134,8 @@ const VideoAnimation = () => {
 
 // Enhanced Home component
 function Home() {
+  const theme = useTheme();
+
   const handleWhatsAppClick = () => {
     window.open(
       "https://api.whatsapp.com/qr/2C3KLXY6PXWRF1?autoload=1&app_absent=0",
@@ -150,15 +144,15 @@ function Home() {
   };
 
   return (
-    <Box sx={{ backgroundColor: colors.background }}>
+    <Box sx={{ backgroundColor: theme.palette.background.default }}>
       <VideoAnimation />
 
       <Box
         sx={{
-          backgroundColor: colors.primary,
-          color: colors.white,
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
           py: { xs: 4, sm: 6 },
-          borderBottom: `8px solid ${colors.secondary}`,
+          borderBottom: `8px solid ${theme.palette.secondary.main}`,
         }}
       >
         <Container maxWidth="lg">
@@ -205,9 +199,9 @@ function Home() {
                 size="large"
                 startIcon={<WhatsAppIcon />}
                 sx={{
-                  backgroundColor: colors.secondary,
-                  color: colors.white,
-                  "&:hover": { backgroundColor: colors.accent },
+                  backgroundColor: theme.palette.secondary.main,
+                  color: theme.palette.secondary.contrastText,
+                  "&:hover": { backgroundColor: theme.palette.secondary.dark },
                   fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
                   py: 1.5,
                   px: 4,
@@ -230,7 +224,7 @@ function Home() {
           <Typography
             variant="h5"
             sx={{
-              color: colors.text,
+              color: theme.palette.text.primary,
               fontWeight: "bold",
               textAlign: "center",
               fontSize: { xs: "1.2rem", sm: "1.5rem", md: "2rem" },
@@ -243,7 +237,7 @@ function Home() {
           <Typography
             variant="h6"
             sx={{
-              color: colors.primary,
+              color: theme.palette.primary.main,
               fontWeight: "bold",
               textAlign: "center",
               fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" },
@@ -264,7 +258,7 @@ function Home() {
           <Typography
             variant="h2"
             sx={{
-              color: colors.primary,
+              color: theme.palette.primary.main,
               fontWeight: "bold",
               mb: 4,
               textAlign: "center",
@@ -289,7 +283,7 @@ function Home() {
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    backgroundColor: colors.white,
+                    backgroundColor: theme.palette.background.paper,
                     boxShadow: 3,
                     borderRadius: "15px",
                     overflow: "hidden",
@@ -309,7 +303,7 @@ function Home() {
                     <Typography
                       variant="h6"
                       sx={{
-                        color: colors.text,
+                        color: theme.palette.text.primary,
                         fontWeight: "bold",
                         textAlign: "center",
                       }}
@@ -326,11 +320,11 @@ function Home() {
 
       <Box
         sx={{
-          backgroundColor: colors.primary,
-          color: colors.white,
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
           py: 8,
-          borderTop: `8px solid ${colors.secondary}`,
-          borderBottom: `8px solid ${colors.secondary}`,
+          borderTop: `8px solid ${theme.palette.secondary.main}`,
+          borderBottom: `8px solid ${theme.palette.secondary.main}`,
         }}
       >
         <Container maxWidth="lg">
@@ -370,7 +364,7 @@ function Home() {
             <Typography
               variant="h6"
               sx={{
-                color: colors.accent,
+                color: theme.palette.secondary.light,
                 fontWeight: "bold",
                 textAlign: "center",
                 fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" },
@@ -383,7 +377,10 @@ function Home() {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 8 }}>
-        <Box sx={{ textAlign: "center", mb: 4 }}>
+       
+
+
+              <Box sx={{ textAlign: "center", mb: 4 }}>
           <motion.div
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -391,7 +388,7 @@ function Home() {
           >
             <Typography
               variant="h5"
-              sx={{ color: colors.primary, fontWeight: "bold", mb: 2 }}
+              sx={{ color: theme.palette.primary.main, fontWeight: "bold", mb: 2 }}
             >
               Get in Touch
             </Typography>
@@ -404,17 +401,29 @@ function Home() {
             </Typography>
           </motion.div>
         </Box>
-      </Container>
 
-      <Box sx={{ backgroundColor: colors.primary, color: colors.white, py: 4 }}>
-        <Container maxWidth="lg">
-          <Typography variant="body2" align="center">
-            &copy; {new Date().getFullYear()} MeriStationary by EduGainer's. All
-            rights reserved.
-          </Typography>
-        </Container>
-      </Box>
-    </Box>
+        <Box
+          sx={{
+            backgroundColor: theme.palette.background.paper,
+            py: 4,
+            borderTop: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Container maxWidth="lg">
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme.palette.text.secondary,
+                textAlign: "center",
+                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
+              }}
+            >
+              &copy; {new Date().getFullYear()} MeriStationary. All rights reserved.
+            </Typography>
+      </Container></Box></Container></Box>
+       
+     
+  
   );
 }
 
