@@ -60,8 +60,8 @@ const getBookingData = async (req, res) => {
         const bookings = await BookingModel.find({});
 
         // Fetch fine amounts for each booking
- 
-// console.log(bookings)
+
+        // console.log(bookings)
         res.status(200).json(bookings);
     } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -70,79 +70,100 @@ const getBookingData = async (req, res) => {
 };
 
 const addBookingData = async (req, res) => {
-    const { reg, name, receipt,website,regFee,seat, date, cash, online, shift,  remarks, status,TotalMoney, due, advance } = req.body;
-    
     try {
         const BookingModel = getCurrentMonthBookingModel();
 
-        let statusColor;
-        if (status === "Paid") {
-            statusColor = "green";
-        } else if (status === "Confirmed") {
-            statusColor = "yellow";
+        // Remove _id and __v if they exist in req.body (to prevent conflicts)
+        delete req.body._id;
+        delete req.body.__v;
+
+        // Determine the color for the status and nextMonthStatus based on req.body
+        const colors = {};
+
+        if (req.body.status === "Paid") {
+            colors.status = "green";
+        } else if (req.body.status === "Confirmed") {
+            colors.status = "yellow";
         } else {
-            statusColor = "red";
+            colors.status = "red";
         }
 
+        if (req.body.nextMonthStatus === "discontinue") {
+            colors.nextMonthStatus = "grey";
+        } else if (req.body.nextMonthStatus === "Confirmed") {
+            colors.nextMonthStatus = "yellow";
+        }
+
+        // Create a new booking document using req.body and add the colors object
         const newBooking = new BookingModel({
-            reg,
-            name,
-            seat,
-            date,
-            cash,
-            online,
-            shift,
-          
-            remarks,
-            status,
-           TotalMoney,
-            due,
-            advance,
-           
-            website,
-            regFee,
-            receipt,
-            colors: {
-                [status]: statusColor
-            }
+            ...req.body, // Spread all fields from req.body
+            colors       // Add the colors object
         });
 
+        // Save the new booking to the database
         await newBooking.save();
 
+        // Send success response
         res.status(201).json({ message: 'Booking added successfully', booking: newBooking });
     } catch (error) {
         console.error('Error adding booking:', error);
         res.status(500).json({ message: 'Failed to add booking' });
     }
 };
-const updateBookingData = async (req, res) => {
-    const { reg, name, seat, date, cash, online, shift,  remarks, status, due, advance, receipt, TotalMoney ,website,regFee} = req.body;
 
+
+const updateBookingData = async (req, res) => {
     try {
         const BookingModel = getCurrentMonthBookingModel();
+        const { reg, status, nextMonthStatus } = req.body;
 
+        console.log(req.body);
+
+        // Remove _id and __v from req.body if they exist
+        delete req.body._id;
+        delete req.body.__v;
+
+        // Initialize color updates
         let colorUpdate = {};
-        if (status === "Paid") {
-            colorUpdate = { $set: { [`colors.status`]: "green" } };
-        } else if (status === "Confirmed") {
-            colorUpdate = { $set: { [`colors.status`]: "yellow" } };
-        } else if (status === "discontinue") {
-            colorUpdate = { $set: { [`colors.status`]: "grey" } };
-        }
-        const updatedStudent = await LibStudent.findOneAndUpdate({ reg }, { name, shift,lastfeedate:date }, { new: true })
 
+        // Determine the color based on the status
+        if (status === "Paid") {
+            colorUpdate['status'] = "green";
+        } else if (status === "Confirmed") {
+            colorUpdate['status'] = "yellow";
+        } else if (status === "discontinue") {
+            colorUpdate['status'] = "grey";
+        }
+
+        // Determine the color based on the nextMonthStatus
+        if (nextMonthStatus === "discontinue") {
+            colorUpdate['nextMonthStatus'] = "grey";
+        } else if (nextMonthStatus === "Confirmed") {
+            colorUpdate['nextMonthStatus'] = "yellow";
+        }
+
+        // If any color updates were determined, set them in the req.body
+        if (Object.keys(colorUpdate).length > 0) {
+            req.body.colors = { ...req.body.colors, ...colorUpdate };
+        }
+
+        // Update the student record
+        const updatedStudent = await LibStudent.findOneAndUpdate(
+            { reg },
+            { ...req.body, lastfeedate: req.body.date },
+            { new: true }
+        );
+
+        // Update the booking record
         const newBooking = await BookingModel.findOneAndUpdate(
             { reg },
-            {
-                $set: {
-                    reg, name, seat, date, cash, online, shift, remarks, status, due, advance, receipt, TotalMoney, website, regFee,
-                    ...colorUpdate.$set // Ensure color update is properly merged
-                }
-            },
+            { ...req.body },  // Spread all fields from req.body
             { new: true, upsert: true }
         );
 
         await newBooking.save();
+
+        console.log(newBooking);
 
         if (!newBooking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -154,6 +175,7 @@ const updateBookingData = async (req, res) => {
         res.status(500).json({ message: 'Failed to update booking' });
     }
 };
+
 
 const deleteBookingData = async (req, res) => {
     const { id } = req.params;
@@ -200,8 +222,8 @@ const updateSeatStatus = async (req, res) => {
         const currentDate = new Date().toISOString().split('T')[0];
 
         if (status === "Empty") {
-           
-          
+
+
             await BookingModel.findOneAndDelete({ reg });
             return res.status(200).json({ message: 'Booking deleted successfully' });
         } else if (status === "Paid" || !status) {

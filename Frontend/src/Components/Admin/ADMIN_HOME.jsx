@@ -24,15 +24,6 @@ import {
 import { AdminContext } from "../../App";
 import { logoutUser } from "../../services/auth";
 
-const colors = {
-  primary: "#006400", // Dark Green
-  secondary: "#FFA500", // Orange
-  text: "#333333",
-  background: "#F0F8FF", // Light Sky Blue
-  white: "#FFFFFF",
-  accent: "#4CAF50", // Light Green
-};
-
 function ADMIN_HOME() {
   const navigate = useNavigate();
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
@@ -55,8 +46,6 @@ function ADMIN_HOME() {
 
   const adminTools = [
     { title: "Manage Library", icon: <LibraryIcon />, link: "/admin_library" },
-    
-  
     { title: "Admin Chat", icon: <ChatIcon />, link: "/admin/chat" },
   ];
 
@@ -64,7 +53,6 @@ function ADMIN_HOME() {
     <Box
       sx={{
         flexGrow: 1,
-        backgroundColor: colors.background,
         minHeight: "100vh",
       }}
     >
@@ -73,8 +61,7 @@ function ADMIN_HOME() {
           <Box
             sx={{
               p: 3,
-              backgroundColor: colors.white,
-              borderBottom: `4px solid ${colors.primary}`,
+              borderBottom: "4px solid",
             }}
           >
             <Box
@@ -87,19 +74,13 @@ function ADMIN_HOME() {
                   sx={{
                     width: 60,
                     height: 60,
-                    bgcolor: colors.primary,
                     mr: 2,
                   }}
                 >
                   A
                 </Avatar>
                 <Box>
-                  <Typography
-                    variant="h4"
-                    component="h1"
-                    fontWeight="bold"
-                    color={colors.primary}
-                  >
+                  <Typography variant="h4" component="h1" fontWeight="bold">
                     Welcome, Admin
                   </Typography>
                   <Typography variant="subtitle1" color="text.secondary">
@@ -128,7 +109,6 @@ function ADMIN_HOME() {
               variant="h5"
               component="div"
               gutterBottom
-              color={colors.text}
               sx={{ mb: 4, textAlign: "center" }}
             >
               Manage EduGainer's Resources and Services
@@ -156,21 +136,15 @@ function ADMIN_HOME() {
                       sx={{
                         flexGrow: 1,
                         textAlign: "center",
-                        backgroundColor: colors.white,
                       }}
                     >
                       {React.cloneElement(tool.icon, {
                         style: {
                           fontSize: 60,
-                          color: colors.primary,
                           marginBottom: "16px",
                         },
                       })}
-                      <Typography
-                        variant="h6"
-                        component="div"
-                        color={colors.text}
-                      >
+                      <Typography variant="h6" component="div">
                         {tool.title}
                       </Typography>
                     </CardContent>
@@ -180,11 +154,6 @@ function ADMIN_HOME() {
                         component={Link}
                         to={tool.link}
                         sx={{
-                          backgroundColor: colors.primary,
-                          color: colors.white,
-                          "&:hover": {
-                            backgroundColor: colors.accent,
-                          },
                           borderRadius: "20px",
                           px: 4,
                         }}

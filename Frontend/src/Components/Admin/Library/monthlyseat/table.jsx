@@ -34,6 +34,7 @@ import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ExcelJS from "exceljs";
+
 const months = [
   { display: "January", value: "1" },
   { display: "February", value: "2" },
@@ -64,11 +65,13 @@ const StudentManagementTable = () => {
   const [updation, setupdation] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState("");
+
   useEffect(() => {
     const d = new Date();
-    const currentMonth = d.getMonth() + 1; // Months are zero-indexed in JavaScript Date
+    const currentMonth = d.getMonth() + 1;
     setSelectedMonth(currentMonth.toString());
   }, []);
+
   useEffect(() => {
     fetchBookingData(selectedMonth);
   }, [selectedMonth, updation]);
@@ -77,12 +80,11 @@ const StudentManagementTable = () => {
     setLoading(true);
     try {
       const bookings = await getBookingData(month);
-       const flattenedBookings = bookings.map((booking) => ({
-         ...booking,
-         razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
-         razorpay_payment_id: booking.Payment_detail?.razorpay_payment_id || "",
-       }));
-      console.log(flattenedBookings,"kkkkkkk")
+      const flattenedBookings = bookings.map((booking) => ({
+        ...booking,
+        razorpay_order_id: booking.Payment_detail?.razorpay_order_id || "",
+        razorpay_payment_id: booking.Payment_detail?.razorpay_payment_id || "",
+      }));
       setData(flattenedBookings);
     } catch (error) {
       // toast.error("Error fetching booking data.");
@@ -117,12 +119,10 @@ const StudentManagementTable = () => {
   const handleAddBooking = async (formData) => {
     try {
       await addBooking(formData);
-
       setOpenAddDialog(false);
       setupdation(!updation);
       toast.success("Booking added successfully!");
     } catch (error) {
-      // console.error("Error adding new booking:", error);
       toast.error("Error adding new booking.");
     }
   };
@@ -139,7 +139,6 @@ const StudentManagementTable = () => {
       setupdation(!updation);
       toast.success("Booking deleted successfully!");
     } catch (error) {
-      // console.error("Error deleting booking:", error);
       toast.error("Error deleting booking.");
     }
   };
@@ -151,7 +150,6 @@ const StudentManagementTable = () => {
       setupdation(!updation);
       toast.success("Booking updated successfully!");
     } catch (error) {
-      // console.error("Error updating booking:", error);
       toast.error("Error updating booking.");
     }
   };
@@ -191,18 +189,14 @@ const StudentManagementTable = () => {
   };
 
   const handleExport = async () => {
-    // Create a new workbook and worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Bookings");
 
-    // Add headers
     worksheet.addRow(columnOrder);
 
-    // Add data and apply colors
     data.forEach((item, rowIndex) => {
       const row = worksheet.addRow(columnOrder.map((key) => item[key]));
 
-      // Apply colors to cells based on item.colors
       if (item.colors) {
         Object.entries(item.colors).forEach(([key, color]) => {
           const colIndex = columnOrder.indexOf(key);
@@ -218,7 +212,6 @@ const StudentManagementTable = () => {
       }
     });
 
-    // Auto-fit columns
     worksheet.columns.forEach((column, index) => {
       let maxLength = columnOrder[index].length;
       column.eachCell({ includeEmpty: true }, (cell) => {
@@ -230,7 +223,6 @@ const StudentManagementTable = () => {
       column.width = maxLength < 10 ? 10 : maxLength + 2;
     });
 
-    // Generate Excel file
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -243,6 +235,7 @@ const StudentManagementTable = () => {
 
     toast.success("Booking Data exported successfully ");
   };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       {loading ? (
@@ -273,7 +266,6 @@ const StudentManagementTable = () => {
                     <Select
                       labelId="month-select-label"
                       id="month-select"
-                      // default={}
                       value={
                         months.find((month) => month.value === selectedMonth)
                           ?.display || ""
@@ -310,8 +302,8 @@ const StudentManagementTable = () => {
                   Export to Excel
                 </Button>
               </Box>
-              <TableContainer>
-                <Table sx={{ border: "1px solid #ddd" }}>
+              <TableContainer sx={{ maxHeight: 600 }}>
+                <Table stickyHeader sx={{ border: "1px solid #ddd" }}>
                   <TableHead>
                     <TableRow>
                       <TableCell
@@ -320,7 +312,10 @@ const StudentManagementTable = () => {
                           backgroundColor: "orange",
                           color: "white",
                           fontWeight: "bold",
-                          height: "40px", // Reduced height for header
+                          height: "40px",
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 1,
                         }}
                       ></TableCell>
                       {columnOrder.map((key) => (
@@ -330,7 +325,10 @@ const StudentManagementTable = () => {
                             backgroundColor: "orange",
                             color: "white",
                             fontWeight: "bold",
-                            height: "40px", // Reduced height for header
+                            height: "40px",
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1,
                           }}
                         >
                           <TableSortLabel
@@ -365,7 +363,10 @@ const StudentManagementTable = () => {
                           backgroundColor: "orange",
                           color: "white",
                           fontWeight: "bold",
-                          height: "40px", // Reduced height for header
+                          height: "40px",
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 1,
                         }}
                       >
                         Actions
@@ -386,7 +387,7 @@ const StudentManagementTable = () => {
                       .map((item) => (
                         <TableRow
                           key={item._id}
-                          sx={{ height: "40px" }} // Reduced height for each row
+                          sx={{ height: "40px" }}
                         >
                           <TableCell padding="checkbox">
                             <Checkbox
@@ -395,8 +396,8 @@ const StudentManagementTable = () => {
                                 setSelectedRows((prevSelectedRows) =>
                                   prevSelectedRows.includes(item._id)
                                     ? prevSelectedRows.filter(
-                                        (rowId) => rowId !== item._id
-                                      )
+                                      (rowId) => rowId !== item._id
+                                    )
                                     : [...prevSelectedRows, item._id]
                                 )
                               }
@@ -412,7 +413,7 @@ const StudentManagementTable = () => {
                                     ? item.colors[key]
                                     : "inherit",
                                 cursor: "pointer",
-                                height: "40px", // Reduced height for each cell
+                                height: "40px",
                               }}
                             >
                               {item[key]}
@@ -421,13 +422,13 @@ const StudentManagementTable = () => {
                           <TableCell>
                             <IconButton
                               onClick={() => handleDeleteBooking(item._id)}
-                              size="small" // Reduced size for icons
+                              size="small"
                             >
                               <Delete color="error" fontSize="small" />
                             </IconButton>
                             <IconButton
                               onClick={() => handleOpenEditDialog(item)}
-                              size="small" // Reduced size for icons
+                              size="small"
                             >
                               <Edit color="primary" fontSize="small" />
                             </IconButton>
@@ -473,6 +474,6 @@ const StudentManagementTable = () => {
       )}
     </Box>
   );
-};
+}
 
 export default StudentManagementTable;

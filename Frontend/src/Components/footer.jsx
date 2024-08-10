@@ -32,7 +32,7 @@ function Footer() {
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
             <Typography variant="h6" sx={footerStyles.heading}>
-              EduGainer's Classes
+              EduGainer's Classes and Library
             </Typography>
             <Typography variant="body2">
               <LocationOn sx={footerStyles.icon} />
@@ -73,7 +73,7 @@ function Footer() {
           <Typography variant="body2" align="center">
             {"Copyright © "}
             <Link color="inherit" href="/" sx={footerStyles.link}>
-              EduGainer's Library & Classes
+              EduGainer's Classes and Library
             </Link>{" "}
             {new Date().getFullYear()}. All rights reserved.
           </Typography>

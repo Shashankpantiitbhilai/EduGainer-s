@@ -1,13 +1,6 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Typography,
-  Button,
-  Container,
-  Box,
-  Grid,
-  Card,
-} from "@mui/material";
+import { Typography, Button, Container, Box, Grid, Card } from "@mui/material";
 
 import {
   ArrowForward,

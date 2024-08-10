@@ -143,7 +143,10 @@ const VideoAnimation = () => {
 // Enhanced Home component
 function Home() {
   const handleWhatsAppClick = () => {
-    window.open("https://chat.whatsapp.com/your-group-link", "_blank");
+    window.open(
+      "https://api.whatsapp.com/qr/2C3KLXY6PXWRF1?autoload=1&app_absent=0",
+      "_blank"
+    );
   };
 
   return (

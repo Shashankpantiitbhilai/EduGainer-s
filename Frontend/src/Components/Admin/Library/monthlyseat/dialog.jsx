@@ -48,7 +48,6 @@ const BookingDialog = ({
   }, [open, defaultValues, setValue]);
 
   const onSubmit = (data) => {
-   
     handleSubmitForm(data);
     reset();
     handleClose();
@@ -84,7 +83,7 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.name || ""}
               />
             </Grid>
-             <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 {...register("website")}
                 label="Website"
@@ -94,7 +93,7 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.website || ""}
               />
             </Grid>
-             <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 {...register("regFee")}
                 label="RegFee"
@@ -137,7 +136,7 @@ const BookingDialog = ({
                 fullWidth
                 error={!!errors.cash}
                 helperText={errors.cash?.message}
-                defaultValue={defaultValues?.cash ||0}
+                defaultValue={defaultValues?.cash || 0}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -171,7 +170,7 @@ const BookingDialog = ({
                 <FormHelperText>{errors.shift?.message}</FormHelperText>
               </FormControl>
             </Grid>
-          
+
             <Grid item xs={12}>
               <TextField
                 {...register("remarks")}
@@ -193,7 +192,21 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.status || ""}
               >
                 <MenuItem value="Paid">Paid</MenuItem>
-                <MenuItem value="Confirmed">Confirmation</MenuItem>
+                <MenuItem value="Confirmed">Confirmed</MenuItem>
+                <MenuItem value="discontinue">Discontinue</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                {...register("nextMonthStatus")}
+                label="nextMonthStatus"
+                fullWidth
+                select
+                error={!!errors.nextMonthStatus}
+                helperText={errors.nextMonthStatus?.message}
+                defaultValue={defaultValues?.nextMonthStatus || ""}
+              >
+                <MenuItem value="Confirmed">Confirmed</MenuItem>
                 <MenuItem value="discontinue">Discontinue</MenuItem>
               </TextField>
             </Grid>
@@ -244,6 +257,7 @@ const BookingDialog = ({
                 defaultValue={defaultValues?.TotalMoney || 0}
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 {...register("Payment_detail.razorpay_order_id")}
@@ -264,7 +278,6 @@ const BookingDialog = ({
                 }
               />
             </Grid>
-         
           </Grid>
         </DialogContent>
         <DialogActions>

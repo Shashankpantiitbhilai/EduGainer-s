@@ -205,6 +205,9 @@ const bookingSchema = new mongoose.Schema({
     razorpay_payment_id: { type: String, required: false },
   },
   status: { type: String, default: '' },
+  nextMonthStatus:{
+    type: String,
+  },
   colors: { type: Map, of: String, default: {} }
 });
 bookingSchema.pre('save', async function (next) {

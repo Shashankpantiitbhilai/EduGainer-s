@@ -59,7 +59,7 @@ const getStudentLibSeat = async (req, res) => {
             return res.status(404).json({ error: 'Booking not found for this student' });
         }
 
-
+console.log(findBooking)
         res.status(200).json({
             message: 'Student found monthly sheet successfully',
             booking: findBooking,
@@ -296,15 +296,15 @@ const updateNotificationStatus = async (req, res) => {
         let colorUpdate = {};
         const currentDate = new Date().toISOString().split('T')[0];
         if (status === "Confirmed") {
-            colorUpdate = { $set: { [`colors.status`]: "yellow" } };
+            colorUpdate = { $set: { [`colors.nextMonthStatus`]: "yellow" } };
         } else if (status === "discontinue") {
-            colorUpdate = { $set: { [`colors.status`]: "grey" } };
+            colorUpdate = { $set: { [`colors.nextMonthStatus`]: "grey" } };
         }
 
         const updatedBooking = await BookingModel.findOneAndUpdate(
             { reg },
             {
-                status,
+                nextMonthStatus:status,
                 ...colorUpdate,
                 date: currentDate
 
@@ -313,12 +313,7 @@ const updateNotificationStatus = async (req, res) => {
 
         );
 
-        // Find the booking by reg
-        //   const booking=await BookingModel.findOne({reg})
-
-        //     if (!booking) {
-        //         return res.status(404).json({ error: 'Booking not found' });
-        //     }
+      
 
 
         return res.status(200).json({ message: 'Booking updated successfully', booking: updatedBooking });
