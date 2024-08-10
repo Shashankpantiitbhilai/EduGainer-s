@@ -137,10 +137,7 @@ function Home() {
   const theme = useTheme();
 
   const handleWhatsAppClick = () => {
-    window.open(
-      "https://api.whatsapp.com/qr/2C3KLXY6PXWRF1?autoload=1&app_absent=0",
-      "_blank"
-    );
+    window.open("https://wa.me/qr/2C3KLXY6PXWRF1", "_blank");
   };
 
   return (
@@ -418,7 +415,7 @@ function Home() {
                 fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
               }}
             >
-              &copy; {new Date().getFullYear()} MeriStationary. All rights reserved.
+              &copy; {new Date().getFullYear()}EduGainer's Classes and Library. All rights reserved.
             </Typography>
       </Container></Box></Container></Box>
        

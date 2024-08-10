@@ -21,7 +21,7 @@ import logoImage from "../images/logo.jpg";
 const colors = {
   primary: "#006400", // Dark Green
   secondary: "#FFA500", // Orange
-  text: "#333333",
+  text: "orange",
   background: "#F0F8FF", // Light Sky Blue
   white: "#FFFFFF",
   accent: "#4CAF50", // Light Green

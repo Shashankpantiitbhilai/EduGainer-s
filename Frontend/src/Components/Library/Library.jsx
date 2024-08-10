@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import {
-  Box,Snackbar,
+  Box,
+  Snackbar,
   Button,
   FormControl,
   InputLabel,
@@ -12,6 +13,10 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
+  Card,
+  CardContent,
+  Typography,
+  Slide,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
@@ -68,7 +73,7 @@ const checkOverlap = (currentShift, bookedShifts) => {
   return bookedShifts.some((shift) => overlapMap[currentShift].includes(shift));
 };
 
-const getBackgroundColor = ( seatStatuses, seat, selectedShift,userSeat,userShift) => {
+const getBackgroundColor = (seatStatuses, seat, selectedShift, userSeat, userShift) => {
   if (!seatStatuses[seat]) {
     return "green"; // Default color if seat status is not available
   }
@@ -84,10 +89,10 @@ const getBackgroundColor = ( seatStatuses, seat, selectedShift,userSeat,userShif
     return "yellow"; // Seat is confirmed in an overlapping shift
   }
   
-  if (seat == userSeat && selectedShift===userShift)
-  {
+  if (seat == userSeat && selectedShift === userShift) {
     return "purple";
   }
+  
   // Get all booked (Paid) shifts for this seat
   const bookedShifts = shifts.filter(
     (shift) => seatStatuses[seat][shift] === "Paid"
@@ -100,6 +105,7 @@ const getBackgroundColor = ( seatStatuses, seat, selectedShift,userSeat,userShif
     return "green"; // Seat can be allocated
   }
 };
+
 const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -117,7 +123,6 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
             p: 0,
             fontSize: isMobile ? "0.7rem" : "0.875rem",
             backgroundColor: getBackgroundColor(
-             
               seatStatus,
               seat,
               selectedShift,
@@ -126,7 +131,6 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
             ),
             "&:hover": {
               backgroundColor: getBackgroundColor(
-             
                 seatStatus,
                 seat,
                 selectedShift,
@@ -144,23 +148,39 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
   );
 };
 
-const Library = () => { 
-  
-  const { IsUserLoggedIn} = useContext(AdminContext);
+const SubscriptionCard = ({ months, discount }) => (
+  <Card sx={{ minWidth: 200, m: 1 }}>
+    <CardContent>
+      <Typography variant="h5" component="div">
+        {months} Months
+      </Typography>
+      <Typography sx={{ mb: 1.5 }} color="text.secondary">
+        {discount}% off
+      </Typography>
+      <Typography variant="body2">
+        Subscribe now and save!
+      </Typography>
+    </CardContent>
+  </Card>
+);
+
+const Library = () => {
+  const { IsUserLoggedIn } = useContext(AdminContext);
 
   const [selectedShift, setSelectedShift] = useState(shifts[0]);
   const [seatStatus, setSeatStatus] = useState({});
   const [userSeat, setUserSeat] = useState(null);
   const [userShift, setUserShift] = useState(null);
-   const [snackbarOpen, setSnackbarOpen] = useState(false);
-   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [showDiscount, setShowDiscount] = useState(false);
 
-  const socketRef = useRef(null)
- 
+  const socketRef = useRef(null);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-const id=IsUserLoggedIn._id
-     console.log(IsUserLoggedIn, "pppppppppppppp");
+  const id = IsUserLoggedIn._id;
+
   const url =
     process.env.NODE_ENV === "production"
       ? process.env.REACT_APP_BACKEND_PROD
@@ -180,28 +200,25 @@ const id=IsUserLoggedIn._id
         });
 
         socketRef.current.emit("joinSeatsRoom", roomId);
-        
-    
-       if (socketRef.current) {
-         socketRef.current.on("seatStatusUpdate", ({ id, status, seat, shift }) => {
-        
-          
-            setSnackbarMessage(
-              `Seat ${seat} status updated to ${status} for shift ${shift}`
-            );
-            setSnackbarOpen(true);
-           setSeatStatus((prevStatus) => ({
-             ...prevStatus,
-             [seat]: {
-               ...prevStatus[seat],
-               [shift]: status,
-             },
-           }));
-        
-      
-         });
-       }
-     
+
+        if (socketRef.current) {
+          socketRef.current.on(
+            "seatStatusUpdate",
+            ({ id, status, seat, shift }) => {
+              setSnackbarMessage(
+                `Seat ${seat} status updated to ${status} for shift ${shift}`
+              );
+              setSnackbarOpen(true);
+              setSeatStatus((prevStatus) => ({
+                ...prevStatus,
+                [seat]: {
+                  ...prevStatus[seat],
+                  [shift]: status,
+                },
+              }));
+            }
+          );
+        }
 
         try {
           const response = await getSeatsData();
@@ -219,7 +236,6 @@ const id=IsUserLoggedIn._id
         } catch (error) {
           console.error("Error fetching seat data:", error);
         }
-        
 
         const userSeatData = await getStudentLibSeat(id);
         if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
@@ -239,14 +255,20 @@ const id=IsUserLoggedIn._id
       }
     };
   }, [IsUserLoggedIn?._id, url]);
-const handleCloseSnackbar = (event, reason) => {
-  if (reason === "clickaway") {
-    return;
-  }
-  setSnackbarOpen(false);
-};
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
   const handleShiftChange = (event) => {
     setSelectedShift(event.target.value);
+  };
+
+  const toggleDiscountCards = () => {
+    setShowDiscount(!showDiscount);
   };
 
   return (
@@ -272,9 +294,16 @@ const handleCloseSnackbar = (event, reason) => {
           variant="contained"
           color="primary"
           size={isMobile ? "medium" : "large"}
-          sx={{ minWidth: 150, fontSize: { xs: "1rem", sm: "1.1rem" } }}
+          sx={{
+            minWidth: 150,
+            fontSize: { xs: "1rem", sm: "1.1rem" },
+            transition: "transform 0.3s",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
         >
-          Register
+          Register Now
         </Button>
         <Button
           component={Link}
@@ -282,11 +311,51 @@ const handleCloseSnackbar = (event, reason) => {
           variant="contained"
           color="secondary"
           size={isMobile ? "medium" : "large"}
-          sx={{ minWidth: 150, fontSize: { xs: "1rem", sm: "1.1rem" } }}
+          sx={{
+            minWidth: 150,
+            fontSize: { xs: "1rem", sm: "1.1rem" },
+            transition: "transform 0.3s",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
         >
           Pay Fee
         </Button>
+        <Button
+          onClick={toggleDiscountCards}
+          variant="outlined"
+          color="info"
+          size={isMobile ? "medium" : "large"}
+          sx={{
+            minWidth: 150,
+            fontSize: { xs: "1rem", sm: "1.1rem" },
+            transition: "transform 0.3s",
+            "&:hover": {
+              transform: "scale(1.05)",
+            },
+          }}
+        >
+          {showDiscount ? "Hide Offers" : "View Offers"}
+        </Button>
       </Box>
+
+      <Slide direction="up" in={showDiscount} mountOnEnter unmountOnExit>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            mb: 4,
+          }}
+        >
+          <SubscriptionCard months={3} discount={3} />
+          <SubscriptionCard months={6} discount={6} />
+          <SubscriptionCard months={9} discount={9} />
+          <SubscriptionCard months={12} discount={12} />
+        </Box>
+      </Slide>
+
       <FormControl
         sx={{ mb: 4, minWidth: 200, width: { xs: "100%", sm: "auto" } }}
       >
@@ -305,10 +374,13 @@ const handleCloseSnackbar = (event, reason) => {
           ))}
         </Select>
       </FormControl>
+
       <Alert severity="warning" sx={{ mt: 2, mb: 4 }}>
         <AlertTitle>Note</AlertTitle>
         In case the seat you need is not empty, kindly contact our office.
+        Register early to secure your preferred seat!
       </Alert>
+
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper
@@ -495,6 +567,7 @@ const handleCloseSnackbar = (event, reason) => {
           </Paper>
         </Grid>
       </Grid>
+
       <Snackbar
         anchorOrigin={{
           vertical: "top",
@@ -504,7 +577,8 @@ const handleCloseSnackbar = (event, reason) => {
         autoHideDuration={4000}
         onClose={handleCloseSnackbar}
         message={snackbarMessage}
-      />{" "}
+      />
+
       <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
         <Box
