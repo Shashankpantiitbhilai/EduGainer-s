@@ -50,7 +50,7 @@ function Footer() {
                 href="mailto:edugainersclasses@gmail.com"
                 sx={{ color: "orange", textDecoration: "none" }}
               >
-                edugainersclasses@gmail.com
+              
                 <Email sx={footerStyles.icon} /> edugainerclasses@gmail.com
               </Link>
             </Typography>
