@@ -45,9 +45,14 @@ function Footer() {
             <Typography variant="h6" sx={footerStyles.heading}>
               Contact Us
             </Typography>
-            <Typography variant="body2">
-              <Email sx={footerStyles.icon} />
-              edugainerclasses@gmail.com
+            <Typography variant="body1" sx={{ color: "orange" }}>
+              <Link
+                href="mailto:edugainersclasses@gmail.com"
+                sx={{ color: "orange", textDecoration: "none" }}
+              >
+                edugainersclasses@gmail.com
+                <Email sx={footerStyles.icon} /> edugainerclasses@gmail.com
+              </Link>
             </Typography>
             <Typography variant="body2">
               <Phone sx={footerStyles.icon} />
