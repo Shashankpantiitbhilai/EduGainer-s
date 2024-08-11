@@ -187,7 +187,7 @@ function Home() {
       </Container>
 
       {/* Classes Offered Section */}
-      <Box
+      {/* <Box
         sx={{
           backgroundColor: colors.primary,
           color: colors.white,
@@ -221,8 +221,8 @@ function Home() {
             At EduGainer's, we don't just prepare you for exams; we sculpt
             future leaders. Dive into our meticulously crafted courses designed
             to transform your aspirations into achievements.
-          </Typography>
-          <Grid container spacing={4}>
+          </Typography> */}
+          {/* <Grid container spacing={4}>
             {classesOffered.map((course, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <StyledCard
@@ -255,12 +255,12 @@ function Home() {
                 </StyledCard>
               </Grid>
             ))}
-          </Grid>
-        </Container>
-      </Box>
+          </Grid> */}
+        {/* </Container>
+      </Box> */}
 
       {/* EduGainer's Approach Section */}
-      <Container maxWidth="lg" sx={{ py: 12 }}>
+      {/* <Container maxWidth="lg" sx={{ py: 12 }}>
         <Typography
           variant="h2"
           sx={{
@@ -441,7 +441,7 @@ function Home() {
       </Box>
 
       {/* EduGainer's Classes Section */}
-      <Container maxWidth="lg" sx={{ py: 12 }}>
+      {/* <Container maxWidth="lg" sx={{ py: 12 }}>
         <Typography
           variant="h2"
           sx={{
@@ -560,7 +560,7 @@ function Home() {
       </Container>
 
       {/* MeriStaionary by EduGainer's Section */}
-      <Box
+      {/* <Box
         sx={{ backgroundColor: colors.primary, color: colors.white, py: 12 }}
       >
         <Container maxWidth="lg">
@@ -680,7 +680,7 @@ function Home() {
             </Grid>
           </Grid>
         </Container>
-      </Box>
+      </Box> */} */} */}
 
       <Footer />
     </Box>

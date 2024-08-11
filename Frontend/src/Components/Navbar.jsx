@@ -78,14 +78,14 @@ function Navbar() {
       ? [
           { name: "Library", link: "/admin_library" },
           { name: "AdminChat", link: "/admin/chat" },
-          { name: "MeriStationary", link: "/stationary/home" },
+          // { name: "MeriStationary", link: "/stationary/home" },
           { name: "Policies", link: "/Policies" },
         ]
       : [
           { name: "Library", link: "/library" },
-          { name: "Classes", link: "/classes" },
+          // { name: "Classes", link: "/classes" },
           { name: "Resources", link: "/resources" },
-          { name: "MeriStationary", link: "/stationary/home" },
+          // { name: "MeriStationary", link: "/stationary/home" },
           { name: "Query", link: "/chat/home" },
           { name: "Policies", link: "/Policies" },
         ]
