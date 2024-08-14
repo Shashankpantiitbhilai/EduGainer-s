@@ -226,7 +226,7 @@ export default function EnhancedStudentGrid() {
   const columns = [
     { field: "reg", headerName: "Reg", width: 80, editable: true },
     { field: "Mode", headerName: "Mode", width: 80, editable: true },
-    { field: "amount", headerName: "Amount", width: 80, editable: true },
+    { field: "amount", headerName: "regFee", width: 80, editable: true },
     { field: "name", headerName: "Name", width: 150, editable: true },
     { field: "email", headerName: "Email", width: 150, editable: true },
     { field: "address", headerName: "Address", width: 150, editable: true },
