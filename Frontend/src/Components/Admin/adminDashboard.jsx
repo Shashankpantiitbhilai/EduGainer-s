@@ -18,9 +18,6 @@ import {
   TextField,
   IconButton,
   InputAdornment,
-  CssBaseline,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material";
 import {
   Backup,
@@ -54,37 +51,42 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
-import {
-  fetchAllSiteUsers,
- 
-} from "../../services/Admin_services/adminUtils";
+import { fetchAllSiteUsers } from "../../services/Admin_services/adminUtils";
 import { editUserById } from "../../services/adminDashboard/utils";
-// Sample data for charts (unchanged)
+// Enhanced sample data for charts
 const trafficData = [
-  { name: "Jan", value: 4000 },
-  { name: "Feb", value: 3000 },
-  { name: "Mar", value: 5000 },
-  { name: "Apr", value: 4500 },
-  { name: "May", value: 6000 },
-  { name: "Jun", value: 5500 },
+  { name: "Jan", pageViews: 4000, uniqueVisitors: 2400, avgTimeOnSite: 120 },
+  { name: "Feb", pageViews: 3000, uniqueVisitors: 1800, avgTimeOnSite: 100 },
+  { name: "Mar", pageViews: 5000, uniqueVisitors: 3000, avgTimeOnSite: 150 },
+  { name: "Apr", pageViews: 4500, uniqueVisitors: 2700, avgTimeOnSite: 130 },
+  { name: "May", pageViews: 6000, uniqueVisitors: 3600, avgTimeOnSite: 160 },
+  { name: "Jun", pageViews: 5500, uniqueVisitors: 3300, avgTimeOnSite: 140 },
 ];
 
 const viewerData = [
-  { name: "Mon", desktop: 4000, mobile: 2400 },
-  { name: "Tue", desktop: 3000, mobile: 1398 },
-  { name: "Wed", desktop: 2000, mobile: 9800 },
-  { name: "Thu", desktop: 2780, mobile: 3908 },
-  { name: "Fri", desktop: 1890, mobile: 4800 },
-  { name: "Sat", desktop: 2390, mobile: 3800 },
-  { name: "Sun", desktop: 3490, mobile: 4300 },
+  { name: "Mon", desktop: 4000, mobile: 2400, tablet: 1000 },
+  { name: "Tue", desktop: 3000, mobile: 1398, tablet: 800 },
+  { name: "Wed", desktop: 2000, mobile: 9800, tablet: 1200 },
+  { name: "Thu", desktop: 2780, mobile: 3908, tablet: 1500 },
+  { name: "Fri", desktop: 1890, mobile: 4800, tablet: 1100 },
+  { name: "Sat", desktop: 2390, mobile: 3800, tablet: 900 },
+  { name: "Sun", desktop: 3490, mobile: 4300, tablet: 1300 },
 ];
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+const geographicData = [
+  { name: "North America", value: 35 },
+  { name: "Europe", value: 30 },
+  { name: "Asia", value: 25 },
+  { name: "South America", value: 5 },
+  { name: "Africa", value: 3 },
+  { name: "Oceania", value: 2 },
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 const AdminDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("traffic");
@@ -236,28 +238,42 @@ const AdminDashboard = () => {
     </Box>
   );
 
-  const renderChart = () => {
-    switch (selectedOption) {
-      case "traffic":
-        return (
+  const renderTrafficStats = () => (
+    <Box>
+      <Typography variant="h6" gutterBottom>Website Traffic</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trafficData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" />
               <Tooltip />
               <Legend />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-              />
+              <Line yAxisId="left" type="monotone" dataKey="pageViews" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line yAxisId="left" type="monotone" dataKey="uniqueVisitors" stroke="#82ca9d" />
+              <Line yAxisId="right" type="monotone" dataKey="avgTimeOnSite" stroke="#ffc658" />
             </LineChart>
           </ResponsiveContainer>
-        );
-      case "viewers":
-        return (
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Typography variant="subtitle1">Key Metrics</Typography>
+            <Typography>Total Page Views: {trafficData.reduce((sum, item) => sum + item.pageViews, 0)}</Typography>
+            <Typography>Avg. Unique Visitors: {Math.round(trafficData.reduce((sum, item) => sum + item.uniqueVisitors, 0) / trafficData.length)}</Typography>
+            <Typography>Avg. Time on Site: {Math.round(trafficData.reduce((sum, item) => sum + item.avgTimeOnSite, 0) / trafficData.length)} seconds</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+
+  const renderViewerStats = () => (
+    <Box>
+      <Typography variant="h6" gutterBottom>Viewer Statistics</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={viewerData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -267,9 +283,44 @@ const AdminDashboard = () => {
               <Legend />
               <Bar dataKey="desktop" fill="#8884d8" />
               <Bar dataKey="mobile" fill="#82ca9d" />
+              <Bar dataKey="tablet" fill="#ffc658" />
             </BarChart>
           </ResponsiveContainer>
-        );
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Typography variant="subtitle1">Device Usage</Typography>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={geographicData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {geographicData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <Typography variant="subtitle2" align="center">Geographic Distribution</Typography>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+
+  const renderChart = () => {
+    switch (selectedOption) {
+      case "traffic":
+        return renderTrafficStats();
+      case "viewers":
+        return renderViewerStats();
       case "userManagement":
         return (
           <Box>
@@ -401,7 +452,13 @@ const AdminDashboard = () => {
                 </ListItemIcon>
                 <ListItemText primary="Content Management" />
               </ListItem>
-              <ListItem
+              
+    
+    
+
+
+
+                <ListItem
                 button
                 onClick={() => setSelectedOption("performanceAnalytics")}
               >

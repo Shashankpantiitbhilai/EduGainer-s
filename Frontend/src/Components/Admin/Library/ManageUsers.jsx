@@ -433,7 +433,7 @@ export default function EnhancedStudentGrid() {
             />
             <TextField
               margin="dense"
-              label="Amount"
+              label="regFee"
               type="number"
               fullWidth
               value={student?.amount}
