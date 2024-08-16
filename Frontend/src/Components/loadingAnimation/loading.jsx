@@ -65,7 +65,7 @@ const LoadingAnimation = () => {
               mb: 2,
             }}
           >
-            EduGainer
+            EduGainer's
           </Typography>
           <CircularProgress
             size={150}
