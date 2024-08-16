@@ -51,7 +51,7 @@ function Footer() {
                 sx={{ color: "orange", textDecoration: "none" }}
               >
               
-                <Email sx={footerStyles.icon} /> edugainerclasses@gmail.com
+                <Email sx={footerStyles.icon} /> edugainersclasses@gmail.com
               </Link>
             </Typography>
             <Typography variant="body2">
