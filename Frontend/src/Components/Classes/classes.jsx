@@ -16,6 +16,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import Footer from "../footer";
 import {
   School as SchoolIcon,
   Event as EventIcon,
@@ -66,7 +67,7 @@ function EdugainerClasses() {
     },
   ];
 
-  return (
+  return (<>
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Fade in={true} timeout={1000}>
         <Paper
@@ -368,7 +369,8 @@ function EdugainerClasses() {
           </Box>
         </Paper>
       </Fade>
-    </Container>
+      
+    </Container><Footer/></>
   );
 }
 
