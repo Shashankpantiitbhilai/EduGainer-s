@@ -1,4 +1,3 @@
-// App.js
 import "./App.css";
 import React, { useEffect, useState, createContext } from "react";
 import { BrowserRouter } from "react-router-dom";
@@ -11,6 +10,7 @@ import { lightTheme, darkTheme } from "./theme";
 import NotificationWrapper from "../src/Components/Library/notification-wrapper.jsx"; // Import the NotificationWrapper
 import FloatingButton from "./floatingButton.js";
 
+// Create contexts
 const AdminContext = createContext();
 const LoadingContext = createContext();
 
@@ -33,6 +33,22 @@ function App() {
         if (savedTheme) {
             setIsDarkMode(savedTheme === 'dark');
         }
+
+        // Disable right-click
+        document.addEventListener('contextmenu', (event) => event.preventDefault());
+
+        // Disable common keyboard shortcuts
+        const handleKeyDown = (event) => {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I')) {
+                event.preventDefault();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('contextmenu', (event) => event.preventDefault());
+            document.removeEventListener('keydown', handleKeyDown);
+        };
     }, []);
 
     const handleThemeToggle = () => {
@@ -54,15 +70,14 @@ function App() {
             <AdminContext.Provider value={{ IsUserLoggedIn, setIsUserLoggedIn }}>
                 <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
                     <BrowserRouter>
-
-
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>
                                 <Main />
                             </NotificationWrapper>
                         ) : (
                             <Main />
-                        )} <FloatingButton isDarkMode={isDarkMode} onClick={handleThemeToggle} />
+                        )}
+                        <FloatingButton isDarkMode={isDarkMode} onClick={handleThemeToggle} />
                     </BrowserRouter>
                 </LoadingContext.Provider>
             </AdminContext.Provider>
