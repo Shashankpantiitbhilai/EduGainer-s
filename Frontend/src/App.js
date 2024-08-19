@@ -35,15 +35,15 @@ function App() {
         }
 
         // Disable right-click
-        document.addEventListener('contextmenu', (event) => event.preventDefault());
+        // document.addEventListener('contextmenu', (event) => event.preventDefault());
 
-        // Disable common keyboard shortcuts
+        // // Disable common keyboard shortcuts
         const handleKeyDown = (event) => {
             if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I')) {
                 event.preventDefault();
             }
         };
-        document.addEventListener('keydown', handleKeyDown);
+        // document.addEventListener('keydown', handleKeyDown);
 
         return () => {
             document.removeEventListener('contextmenu', (event) => event.preventDefault());
