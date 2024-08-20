@@ -132,9 +132,10 @@ function Home() {
           sx={{
             position: "relative",
             width: "100%",
-            maxWidth: "50%", // 50% width on larger screens
-            paddingTop: "35%", // Adjust the aspect ratio to make the height smaller
-            height: 0,
+          
+            maxWidth: "80%", // 50% width on larger screens
+            paddingTop: "50%", // Adjust the aspect ratio to make the height smaller
+
             overflow: "hidden",
             borderRadius: "12px",
             boxShadow: 3,
