@@ -124,23 +124,38 @@ function Home() {
         sx={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
-          mt: 6,
-          px: { xs: 2, md: 0 }, // Add padding on smaller screens
+          py: 4,
+          px: { xs: 2, md: 4 },
         }}
       >
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6859.271406693189!2d78.42992424145729!3d30.72864022085043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3908ed08d3bdd33f%3A0xc82a9e75e23749e4!2sEduGainer&#39;s%20Classes%20%26%20Library!5e0!3m2!1sen!2sin!4v1724170083231!5m2!1sen!2sin"
-          width="50%" // Make the map responsive
-          height="450"
-          style={{
-            border: 0,
-            borderRadius: "12px", // Optional: Add border-radius for a smoother look
+        <Box
+          sx={{
+            position: "relative",
+            width: "100%",
+            maxWidth: "50%", // 50% width on larger screens
+            paddingTop: "35%", // Adjust the aspect ratio to make the height smaller
+            height: 0,
+            overflow: "hidden",
+            borderRadius: "12px",
+            boxShadow: 3,
           }}
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
+        >
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6859.271406693189!2d78.42992424145729!3d30.72864022085043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3908ed08d3bdd33f%3A0xc82a9e75e23749e4!2sEduGainer&#39;s%20Classes%20%26%20Library!5e0!3m2!1sen!2sin!4v1724170083231!5m2!1sen!2sin"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              border: 0,
+              borderRadius: "12px",
+            }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </Box>
       </Box>
 
       {/* Library Facilities Section */}

@@ -179,7 +179,7 @@ const Library = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const id = IsUserLoggedIn._id;
+  const id = IsUserLoggedIn?._id;
 
   const url =
     process.env.NODE_ENV === "production"
@@ -194,8 +194,8 @@ const Library = () => {
 
         socketRef.current = io(url, {
           query: {
-            sender: IsUserLoggedIn._id,
-            admin: adminData._id,
+            sender: IsUserLoggedIn?._id,
+            admin: adminData?._id,
           },
         });
 
@@ -236,17 +236,18 @@ const Library = () => {
         } catch (error) {
           console.error("Error fetching seat data:", error);
         }
-
-        const userSeatData = await getStudentLibSeat(id);
-        if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
-          setUserSeat(userSeatData.booking.seat);
-          setUserShift(userSeatData.booking.shift);
+        if (IsUserLoggedIn) {
+          const userSeatData = await getStudentLibSeat(id);
+          if (userSeatData?.booking?.seat && userSeatData?.booking?.shift) {
+            setUserSeat(userSeatData.booking.seat);
+            setUserShift(userSeatData.booking.shift);
+          }
         }
       } catch (error) {
-        console.error("Error initializing data:", error);
-      }
-    };
-
+          console.error("Error initializing data:", error);
+        }
+      };
+    
     initializeData();
 
     return () => {

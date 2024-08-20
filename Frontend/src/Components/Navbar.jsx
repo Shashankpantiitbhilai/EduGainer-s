@@ -89,7 +89,14 @@ function Navbar() {
           { name: "Query", link: "/chat/home" },
           { name: "Policies", link: "/Policies" },
         ]
-    : [];
+    : [
+        { name: "Library", link: "/library" },
+        { name: "Classes", link: "/classes" },
+        { name: "Resources", link: "/resources" },
+        { name: "MeriStationary", link: "/stationary/home" },
+        { name: "Query", link: "/chat/home" },
+        { name: "Policies", link: "/Policies" },
+      ];
 const id=IsUserLoggedIn?._id;
   const homeURL = isAdmin ? "/admin_home" : "/";
   const dashboadUrl = isAdmin

@@ -242,52 +242,7 @@ const sendFeeData = async (req, res) => {
     }
 };
 
-// const feePayment = async (req, res) => {
-//     try {
-//         const { reg, month, fee, amount, seat, shift, DueOrAdvance } = req.body;
-//         const id = req.user._id;
 
-//         const student = await LibStudent.findOne({ userId: id });
-//         if (!student) {
-//             return res.status(404).json({ error: "Student not found" });
-//         }
-
-//         const currentMonth = new Date().getMonth() + 1;
-
-//         const Booking = getModelForMonth(currentMonth);
-
-//         const order = await createOrder(amount);
-//         const currentDate = new Date();
-
-//         const updatedBooking = await Booking.findOneAndUpdate(
-//             { reg: student.reg },
-//             {
-//                 reg,
-//                 name: student.name,
-//                 shift,
-//                 amount,
-//                 online: amount,
-//                 date: currentDate,
-//                 DueOrAdvance
-//             },
-//             { new: true,upsert:true }
-//         );
-
-//         if (!updatedBooking) {
-//             return res.status(404).json({ error: "Booking not found" });
-//         }
-
-//         res.status(200).json({
-//             success: true,
-//             order,
-//             user: updatedBooking,
-//             key: process.env.KEY_ID_RZRPAY
-//         });
-//     } catch (error) {
-//         console.error("Error creating user or processing payment:", error);
-//         res.status(500).json({ error: "A server error occurred with this request" });
-//     }
-// };
 const updateNotificationStatus = async (req, res) => {
     const { reg } = req.params;
     const { status } = req.body;

@@ -92,17 +92,16 @@ const Main = () => {
                 <Route
                     path="/library"
                     element={
-                        <ProtectedUser>
+                       
                             <Library />
-                        </ProtectedUser>
                     }
                 />
                 <Route
                     path="/classes"
                     element={
-                        <ProtectedUser>
+                       
                             <EdugainerClasses />
-                        </ProtectedUser>
+                      
                     }
                 />
                 <Route
@@ -204,9 +203,9 @@ const Main = () => {
                 <Route
                     path="/stationary/home"
                     element={
-                        <ProtectedUser>
+                        
                             <StationaryHome />
-                        </ProtectedUser>
+                       
                     }
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />
