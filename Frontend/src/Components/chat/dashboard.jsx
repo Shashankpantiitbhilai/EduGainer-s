@@ -106,7 +106,7 @@ const Chat = () => {
                 }));
               }
             }
-           
+
             scrollToBottom();
           });
 
@@ -169,7 +169,6 @@ const Chat = () => {
     }
   };
 
- 
   const handleRoomClick = async (id) => {
     try {
       const response = await fetchAllChats(id);
@@ -281,7 +280,7 @@ const Chat = () => {
                 </List>{" "}
                 <Typography
                   variant="body2"
-                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                  sx={{ color: "white", mb: 2,mt:7, textAlign: "center" }}
                 >
                   End-to-end encrypted.
                   <br /> Query your queries with our experts and get solutions
@@ -312,6 +311,29 @@ const Chat = () => {
                   sx={{ color: "white", mb: 2, textAlign: "center" }}
                 >
                   Edugainer Query Portal
+                  {!IsUserLoggedIn && (
+                    <Box
+                      sx={{
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        p: 4,
+                        backgroundColor: "background.default",
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{ color: "error.main", textAlign: "center" }}
+                      >
+                        Please{" "}
+                        <Link to="/login" style={{ color: "error.main" }}>
+                          log in
+                        </Link>{" "}
+                        to continue.
+                      </Typography>
+                    </Box>
+                  )}
                 </Typography>
                 <Avatar
                   alt="Admin"
@@ -369,7 +391,7 @@ const Chat = () => {
                 </List>{" "}
                 <Typography
                   variant="body2"
-                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                  sx={{ color: "white", mb: 2, mt: 7, textAlign: "center" }}
                 >
                   End-to-end encrypted.
                   <br /> Query your queries with our experts and get solutions
