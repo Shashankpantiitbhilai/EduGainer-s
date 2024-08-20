@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Button,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -105,7 +106,7 @@ const Chat = () => {
                 }));
               }
             }
-
+           
             scrollToBottom();
           });
 
@@ -141,7 +142,7 @@ const Chat = () => {
         messages: [
           {
             sender: IsUserLoggedIn._id,
-            receiver: selectedRoom,
+            receiver: adminRoomId,
             content: input,
           },
         ],
@@ -168,9 +169,12 @@ const Chat = () => {
     }
   };
 
+ 
   const handleRoomClick = async (id) => {
     try {
       const response = await fetchAllChats(id);
+      const roomId = id;
+
       if (id === adminRoomId) {
         setAnnouncementMessages(response);
         setUnreadCounts((prev) => ({ ...prev, announcements: 0 }));
@@ -180,7 +184,7 @@ const Chat = () => {
       }
       setSelectedRoom(id);
       if (socketRef.current) {
-        socketRef.current.emit("joinRoom", id);
+        socketRef.current.emit("joinRoom", roomId);
       }
       scrollToBottom();
       setShowChatDialog(true);
@@ -195,7 +199,12 @@ const Chat = () => {
 
   return (
     <ThemeProvider theme={lightTheme}>
-      <Box sx={{ flexGrow: 1, height: "100vh" }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          height: "100vh",
+        }}
+      >
         <Grid container spacing={2} sx={{ height: "100%" }}>
           {!isMobile && (
             <Grid item xs={12} sm={3}>
@@ -221,14 +230,6 @@ const Chat = () => {
                   src="../../images/logo.jpg"
                   sx={{ width: 100, height: 100, mx: "auto", mb: 2 }}
                 />
-                <Box sx={{ mb: 4, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ color: "white", mb: 1 }}>
-                    💬 Chat with our experts and resolve your doubts instantly!
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "white" }}>
-                    🔒 End-to-end encrypted chats for your privacy and security.
-                  </Typography>
-                </Box>
                 <List>
                   <ListItem
                     button
@@ -277,12 +278,110 @@ const Chat = () => {
                     </Badge>
                     <ListItemText primary="Admin" sx={{ color: "white" }} />
                   </ListItem>
-                </List>
+                </List>{" "}
+                <Typography
+                  variant="body2"
+                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                >
+                  End-to-end encrypted.
+                  <br /> Query your queries with our experts and get solutions
+                  fast.
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                >
+                  Secure. Fast. Reliable. Your queries are our priority.
+                </Typography>
               </Paper>
             </Grid>
           )}
-          <Grid item xs={12} sm={isMobile ? 12 : 9}>
-            {isMobile ? (
+          {isMobile ? (
+            <Grid item xs={12}>
+              <Paper
+                elevation={3}
+                sx={{
+                  height: "calc(100vh - 32px)",
+                  p: 2,
+                  backgroundColor: "primary.main",
+                  overflowY: "auto",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                >
+                  Edugainer Query Portal
+                </Typography>
+                <Avatar
+                  alt="Admin"
+                  src="../../images/logo.jpg"
+                  sx={{ width: 100, height: 100, mx: "auto", mb: 2 }}
+                />
+                <List>
+                  <ListItem
+                    button
+                    onClick={() => handleRoomClick(adminRoomId)}
+                    sx={{
+                      mb: 1,
+                      backgroundColor:
+                        selectedRoom === adminRoomId
+                          ? "warning.main"
+                          : "transparent",
+                      borderRadius: 1,
+                      "&:hover": {
+                        backgroundColor: "warning.light",
+                      },
+                    }}
+                    disabled={!IsUserLoggedIn}
+                  >
+                    <Badge
+                      badgeContent={unreadCounts.announcements}
+                      color="error"
+                    >
+                      <Announcement sx={{ mr: 1, color: "white" }} />
+                    </Badge>
+                    <ListItemText
+                      primary="Announcements"
+                      sx={{ color: "white" }}
+                    />
+                  </ListItem>
+                  <ListItem
+                    button
+                    onClick={() => handleRoomClick(userRoomId)}
+                    sx={{
+                      backgroundColor:
+                        selectedRoom === userRoomId
+                          ? "warning.main"
+                          : "transparent",
+                      borderRadius: 1,
+                      "&:hover": {
+                        backgroundColor: "warning.light",
+                      },
+                    }}
+                    disabled={!IsUserLoggedIn}
+                  >
+                    <Badge badgeContent={unreadCounts.admin} color="error">
+                      <Person sx={{ mr: 1, color: "white" }} />
+                    </Badge>
+                    <ListItemText primary="Admin" sx={{ color: "white" }} />
+                  </ListItem>
+                </List>{" "}
+                <Typography
+                  variant="body2"
+                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                >
+                  End-to-end encrypted.
+                  <br /> Query your queries with our experts and get solutions
+                  fast.
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "white", mb: 2, textAlign: "center" }}
+                >
+                  Secure. Fast. Reliable. Your queries are our priority.
+                </Typography>
+              </Paper>
               <Dialog
                 open={showChatDialog}
                 onClose={handleCloseChat}
@@ -300,13 +399,15 @@ const Chat = () => {
                       <Close />
                     </IconButton>
                   </Grid>
-                </DialogTitle> <Box sx={{ p: 2, textAlign: "center", backgroundColor: "primary.light", borderRadius: 1, mb: 2 }}>
-    <Typography variant="body2" sx={{ color: "white" }}>
-      Ask our expert and solve your query. End-to-end encrypted.
-    </Typography>
-  </Box>
+                </DialogTitle>
                 <DialogContent>
-                  <Box sx={{ height: "60vh", overflowY: "auto", p: 2 }}>
+                  <Box
+                    sx={{
+                      height: "60vh",
+                      overflowY: "auto",
+                      p: 2,
+                    }}
+                  >
                     {(selectedRoom === adminRoomId
                       ? announcementMessages
                       : messages
@@ -367,105 +468,6 @@ const Chat = () => {
                       announcement room.
                     </Typography>
                   ) : (
-                    <Box sx={{ p: 2, backgroundColor: "background.paper" }}>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs>
-                          <TextField
-                            id="outlined-basic-email"
-                            label="Type Something"
-                            fullWidth
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyPress={(e) => {
-                              if (e.key === "Enter") {
-                                sendMessage();
-                              }
-                            }}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <IconButton
-                            color="primary"
-                            onClick={sendMessage}
-                            disabled={!input.trim()}
-                          >
-                            <SendIcon />
-                          </IconButton>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  )}
-                </DialogActions>
-              </Dialog>
-            ) : (
-              <Paper
-                elevation={3}
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
-                  {(selectedRoom === adminRoomId
-                    ? announcementMessages
-                    : messages
-                  ).map((msg, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: "flex",
-                        justifyContent:
-                          msg.messages[0].sender === IsUserLoggedIn._id
-                            ? "flex-end"
-                            : "flex-start",
-                        mb: 2,
-                      }}
-                    >
-                      <Paper
-                        elevation={1}
-                        sx={{
-                          p: 1,
-                          backgroundColor:
-                            msg.messages[0].sender === IsUserLoggedIn._id
-                              ? "secondary.light"
-                              : "primary.light",
-                          borderRadius: 2,
-                          maxWidth: "70%",
-                        }}
-                      >
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            wordBreak: "break-word",
-                            overflowWrap: "break-word",
-                          }}
-                        >
-                          {msg.messages[0].content}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            mt: 0.5,
-                            color: "text.secondary",
-                          }}
-                        >
-                          {new Date(msg.timestamp).toLocaleTimeString()}
-                        </Typography>
-                      </Paper>
-                    </Box>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </Box>
-                <Box sx={{ p: 2, backgroundColor: "background.paper" }}>
-                  {selectedRoom === adminRoomId &&
-                  adminRoomId !== userRoomId ? (
-                    <Typography color="error">
-                      You are not authorized to send messages in the
-                      announcement room.
-                    </Typography>
-                  ) : IsUserLoggedIn ? (
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs>
                         <TextField
@@ -491,31 +493,133 @@ const Chat = () => {
                         </IconButton>
                       </Grid>
                     </Grid>
-                  ) : (
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        p: 4,
-                      }}
-                    >
-                      <Typography variant="h6" sx={{ mb: 2, color: "red" }}>
-                        Please{" "}
-                        <Link to="/login" style={{ color: "red" }}>
-                          Login
-                        </Link>{" "}
-                        to access the admin chat
-                      </Typography>
-                    </Paper>
                   )}
-                </Box>
-              </Paper>
-            )}
-          </Grid>
+                </DialogActions>
+              </Dialog>
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={9}>
+              {IsUserLoggedIn ? (
+                <Paper
+                  elevation={3}
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
+                    {(selectedRoom === adminRoomId
+                      ? announcementMessages
+                      : messages
+                    ).map((msg, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          display: "flex",
+                          justifyContent:
+                            msg.messages[0].sender === IsUserLoggedIn._id
+                              ? "flex-end"
+                              : "flex-start",
+                          mb: 2,
+                        }}
+                      >
+                        <Paper
+                          elevation={1}
+                          sx={{
+                            p: 1,
+                            backgroundColor:
+                              msg.messages[0].sender === IsUserLoggedIn._id
+                                ? "secondary.light"
+                                : "primary.light",
+                            borderRadius: 2,
+                            maxWidth: "70%",
+                          }}
+                        >
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              wordBreak: "break-word",
+                              overflowWrap: "break-word",
+                            }}
+                          >
+                            {msg.messages[0].content}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              mt: 0.5,
+                              color: "text.secondary",
+                            }}
+                          >
+                            {new Date(msg.timestamp).toLocaleTimeString()}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </Box>
+
+                  <Box sx={{ p: 2, backgroundColor: "background.paper" }}>
+                    {selectedRoom === adminRoomId &&
+                    adminRoomId !== userRoomId ? (
+                      <Typography color="error">
+                        You are not authorized to send messages in the
+                        announcement room.
+                      </Typography>
+                    ) : (
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item xs>
+                          <TextField
+                            id="outlined-basic-email"
+                            label="Type Something"
+                            fullWidth
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                sendMessage();
+                              }
+                            }}
+                          />
+                        </Grid>
+                        <Grid item>
+                          <IconButton
+                            color="primary"
+                            onClick={sendMessage}
+                            disabled={!input.trim()}
+                          >
+                            <SendIcon />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    )}
+                  </Box>
+                </Paper>
+              ) : (
+                <Paper
+                  elevation={3}
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    p: 4,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ mb: 2, color: "red" }}>
+                    Please{" "}
+                    <Link to="/login" style={{ color: "red" }}>
+                      Login
+                    </Link>{" "}
+                    to access the admin chat
+                  </Typography>
+                </Paper>
+              )}
+            </Grid>
+          )}
         </Grid>
       </Box>
     </ThemeProvider>

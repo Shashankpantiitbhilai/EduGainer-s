@@ -30,7 +30,7 @@ import {
 } from "@mui/icons-material";
 
 import { fetchUserDataById } from "../../services/utils";
-
+import Footer from "../footer";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [tabValue, setTabValue] = useState(0);
@@ -71,7 +71,7 @@ const Dashboard = () => {
   }
 
   if (!userData) {
-    return (
+    return (<>
       <Box sx={{ maxWidth: 800, margin: "auto", mt: 4 }}>
         <Card elevation={3}>
           <CardContent>
@@ -87,6 +87,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </Box>
+      <Footer/></>
     );
   }
 
@@ -118,106 +119,114 @@ const Dashboard = () => {
   ];
 
   return (
-    <Box sx={{ maxWidth: 800, margin: "auto", mt: 4 }}>
-      <Card elevation={3}>
-        <CardContent>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            Important: If you don't visit the library for 3 consecutive months,
-            you will be charged a registration fee again. This subscription is
-            valid until there's a 3-month consecutive gap in visits.
-          </Alert>
+    <>
+      <Box sx={{ maxWidth: 800, margin: "auto", mt: 4 }}>
+        <Card elevation={3}>
+          <CardContent>
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              Important: If you don't visit the library for 3 consecutive
+              months, you will be charged a registration fee again. This
+              subscription is valid until there's a 3-month consecutive gap in
+              visits.
+            </Alert>
 
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Avatar
-              src={userData?.image?.url}
-              alt={userData.name}
-              sx={{ width: 80, height: 80, mr: 2 }}
-            />
-            <Box>
-              <Typography variant="h4" component="h1">
-                {userData.name}
-              </Typography>
-              <Chip
-                label="Library Subscription Active"
-                color="primary"
-                variant="outlined"
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <Avatar
+                src={userData?.image?.url}
+                alt={userData.name}
+                sx={{ width: 80, height: 80, mr: 2 }}
               />
+              <Box>
+                <Typography variant="h4" component="h1">
+                  {userData.name}
+                </Typography>
+                <Chip
+                  label="Library Subscription Active"
+                  color="primary"
+                  variant="outlined"
+                />
+              </Box>
             </Box>
-          </Box>
 
-          <Divider sx={{ my: 2 }} />
+            <Divider sx={{ my: 2 }} />
 
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            centered
-            sx={{ mb: 2 }}
-          >
-            <Tab label="Library Details" />
-            <Tab label="Payment Info" />
-          </Tabs>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              centered
+              sx={{ mb: 2 }}
+            >
+              <Tab label="Library Details" />
+              <Tab label="Payment Info" />
+            </Tabs>
 
-          {tabValue === 0 && (
-            <Grid container spacing={2}>
-              {libraryContent.map((item, index) => (
-                <Grid item xs={12} sm={6} key={index}>
-                  <Paper
-                    elevation={1}
-                    sx={{ p: 2, display: "flex", alignItems: "center" }}
-                  >
-                    <Box sx={{ mr: 2, color: "primary.main" }}>{item.icon}</Box>
-                    <Box>
-                      <Typography variant="caption" color="textSecondary">
-                        {item.label}
-                      </Typography>
-                      <Typography variant="body1">{item.value}</Typography>
-                    </Box>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
-          )}
-
-          {tabValue === 1 && (
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                Payment Details
-              </Typography>
+            {tabValue === 0 && (
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Paper elevation={1} sx={{ p: 2 }}>
-                    <Typography variant="body2" color="textSecondary">
-                      Razorpay Order ID
-                    </Typography>
-                    <Typography variant="body1">
-                      {userData.Payment_detail?.razorpay_order_id || "N/A"}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Paper elevation={1} sx={{ p: 2 }}>
-                    <Typography variant="body2" color="textSecondary">
-                      Razorpay Payment ID
-                    </Typography>
-                    <Typography variant="body1">
-                      {userData.Payment_detail?.razorpay_payment_id || "N/A"}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12}>
-                  <Paper elevation={1} sx={{ p: 2 }}>
-                    <Typography variant="body2" color="textSecondary">
-                      Consent
-                    </Typography>
-                    <Typography variant="body1">{userData.consent}</Typography>
-                  </Paper>
-                </Grid>
+                {libraryContent.map((item, index) => (
+                  <Grid item xs={12} sm={6} key={index}>
+                    <Paper
+                      elevation={1}
+                      sx={{ p: 2, display: "flex", alignItems: "center" }}
+                    >
+                      <Box sx={{ mr: 2, color: "primary.main" }}>
+                        {item.icon}
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="textSecondary">
+                          {item.label}
+                        </Typography>
+                        <Typography variant="body1">{item.value}</Typography>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                ))}
               </Grid>
-            </Box>
-          )}
-        </CardContent>
-      </Card>
-    </Box>
+            )}
+
+            {tabValue === 1 && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Payment Details
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Paper elevation={1} sx={{ p: 2 }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Razorpay Order ID
+                      </Typography>
+                      <Typography variant="body1">
+                        {userData.Payment_detail?.razorpay_order_id || "N/A"}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Paper elevation={1} sx={{ p: 2 }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Razorpay Payment ID
+                      </Typography>
+                      <Typography variant="body1">
+                        {userData.Payment_detail?.razorpay_payment_id || "N/A"}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Paper elevation={1} sx={{ p: 2 }}>
+                      <Typography variant="body2" color="textSecondary">
+                        Consent
+                      </Typography>
+                      <Typography variant="body1">
+                        {userData.consent}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+      <Footer />
+    </>
   );
 };
 
