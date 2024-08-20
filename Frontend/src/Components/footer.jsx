@@ -1,6 +1,13 @@
 import React from "react";
 import { Box, Container, Grid, Typography, Link } from "@mui/material";
-import { Email, Phone, LocationOn } from "@mui/icons-material";
+import {
+  Email,
+  Phone,
+  LocationOn,
+  Instagram,
+  Facebook,
+  LinkedIn,
+} from "@mui/icons-material";
 
 const footerStyles = {
   footer: {
@@ -23,6 +30,24 @@ const footerStyles = {
     verticalAlign: "middle",
     mr: 1,
   },
+  instagramIcon: {
+    color: "#E1306C",
+    "&:hover": {
+      color: "#FFA500",
+    },
+  },
+  facebookIcon: {
+    color: "#1877F2",
+    "&:hover": {
+      color: "#FFA500",
+    },
+  },
+  linkedinIcon: {
+    color: "#0A66C2",
+    "&:hover": {
+      color: "#FFA500",
+    },
+  },
 };
 
 function Footer() {
@@ -36,9 +61,9 @@ function Footer() {
             </Typography>
             <Typography variant="body2">
               <LocationOn sx={footerStyles.icon} />
-              Court, court road, Uttarkashi - 249193
+              Near Court road,MeriStationary,EduGainer's Classes & Library,
+              Uttarkashi - 249193
               <br />
-              (Beside Goswami School)
             </Typography>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -50,25 +75,52 @@ function Footer() {
                 href="mailto:edugainersclasses@gmail.com"
                 sx={{ color: "orange", textDecoration: "none" }}
               >
-              
                 <Email sx={footerStyles.icon} /> edugainersclasses@gmail.com
               </Link>
             </Typography>
             <Typography variant="body2">
               <Phone sx={footerStyles.icon} />
-              9997999765 | 8126857111
+              +91 8126857111 | +91 6397166682 | +91 9997999768 | +91 9997999765
             </Typography>
           </Grid>
           <Grid item xs={12} md={4}>
             <Typography variant="h6" sx={footerStyles.heading}>
-              Quick Links
+              Connect with Us
             </Typography>
-            <Link href="/Policies" sx={footerStyles.link}>
-              Privacy Policy
+            <Link
+              href="https://www.instagram.com/edugainersclasses/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={footerStyles.link}
+            >
+              <Instagram
+                sx={{ ...footerStyles.icon, ...footerStyles.instagramIcon }}
+              />{" "}
+              Instagram
             </Link>
             <br />
-            <Link href="/Policies" sx={footerStyles.link}>
-              Terms of Service
+            <Link
+              href="https://www.facebook.com/EduGainers/"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={footerStyles.link}
+            >
+              <Facebook
+                sx={{ ...footerStyles.icon, ...footerStyles.facebookIcon }}
+              />{" "}
+              Facebook
+            </Link>
+            <br />
+            <Link
+              href="https://www.linkedin.com/in/edu-gainers-bb128328b/?originalSubdomain=in"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={footerStyles.link}
+            >
+              <LinkedIn
+                sx={{ ...footerStyles.icon, ...footerStyles.linkedinIcon }}
+              />{" "}
+              LinkedIn
             </Link>
           </Grid>
         </Grid>

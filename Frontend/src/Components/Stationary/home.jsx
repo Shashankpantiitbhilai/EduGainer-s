@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-
+import Footer from "../footer";
 // Create a motion-enabled Card component
 const StyledCard = motion(Card);
 
@@ -372,55 +372,8 @@ function Home() {
           </motion.div>
         </Container>
       </Box>
-
-      <Container maxWidth="lg" sx={{ py: 8 }}>
-       
-
-
-              <Box sx={{ textAlign: "center", mb: 4 }}>
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <Typography
-              variant="h5"
-              sx={{ color: theme.palette.primary.main, fontWeight: "bold", mb: 2 }}
-            >
-              Get in Touch
-            </Typography>
-            <Typography variant="body1" paragraph>
-              <CallIcon /> +91 6397166682 | +91 9997999768 | +91 9997999765
-            </Typography>
-            <Typography variant="body1" paragraph>
-              <LocationOnIcon /> Near Court Road, EduGainer's Classes and
-              Library, MeriStationary, Uttarkashi - 249193
-            </Typography>
-          </motion.div>
-        </Box>
-
-        <Box
-          sx={{
-            backgroundColor: theme.palette.background.paper,
-            py: 4,
-            borderTop: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <Container maxWidth="lg">
-            <Typography
-              variant="body2"
-              sx={{
-                color: theme.palette.text.secondary,
-                textAlign: "center",
-                fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-              }}
-            >
-              &copy; {new Date().getFullYear()}EduGainer's Classes and Library. All rights reserved.
-            </Typography>
-      </Container></Box></Container></Box>
-       
-     
-  
+      <Footer/>
+    </Box>
   );
 }
 

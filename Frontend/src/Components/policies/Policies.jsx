@@ -96,7 +96,9 @@ const Policies = () => {
           </ListItem>
         </List>
       </Paper>
+
     </Container>
+    
   );
 };
 

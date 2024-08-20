@@ -48,11 +48,11 @@ const Main = () => {
                 <Route path="/login" element={<Login />} />
 
                 <Route path="/register" element={<Register />} />
-              
+
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
-                <Route path="/chat/home" element={<ProtectedUser><Chat /> </ProtectedUser >} />
+                <Route path="/chat/home" element={<Chat />} />
                 <Route path="/Policies" element={<Policies />} />
                 <Route
                     path="/library/fee-pay"
@@ -62,8 +62,8 @@ const Main = () => {
                         </ProtectedUser>
                     }
                 />
-                
-                  {/* <Route
+
+                {/* <Route
                     path="/fee-payment-success/:id"
                     element={
                         <ProtectedUser>
@@ -71,7 +71,7 @@ const Main = () => {
                         </ProtectedUser>
                     }
                 /> */}
-                
+
                 <Route
                     path="/admin/chat"
                     element={
@@ -80,28 +80,28 @@ const Main = () => {
                         </ProtectedAdmin>
                     }
                 />
-            
+
                 <Route
                     path="/resources"
                     element={
-                        <ProtectedUser>
-                            <Resources />
-                        </ProtectedUser>
+
+                        <Resources />
+
                     }
                 />
                 <Route
                     path="/library"
                     element={
-                       
-                            <Library />
+
+                        <Library />
                     }
                 />
                 <Route
                     path="/classes"
                     element={
-                       
-                            <EdugainerClasses />
-                      
+
+                        <EdugainerClasses />
+
                     }
                 />
                 <Route
@@ -196,16 +196,16 @@ const Main = () => {
                     path="/admin_library/manage-current-month-bookings"
                     element={
                         <ProtectedAdmin>
-                            <StudentManagementTable/>
+                            <StudentManagementTable />
                         </ProtectedAdmin>
                     }
                 />
                 <Route
                     path="/stationary/home"
                     element={
-                        
-                            <StationaryHome />
-                       
+
+                        <StationaryHome />
+
                     }
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />

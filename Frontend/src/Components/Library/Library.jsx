@@ -18,6 +18,7 @@ import {
   Typography,
   Slide,
 } from "@mui/material";
+import Footer from "../footer";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";
@@ -272,7 +273,7 @@ const Library = () => {
     setShowDiscount(!showDiscount);
   };
 
-  return (
+  return (<>
     <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: "lg", mx: "auto" }}>
       <Box
         component="h1"
@@ -608,7 +609,9 @@ const Library = () => {
           </Box>
         </Box>
       </Alert>
+     
     </Box>
+     <Footer/></>
   );
 };
 
