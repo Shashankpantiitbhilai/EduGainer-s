@@ -72,7 +72,7 @@ function App() {
                     <BrowserRouter>
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>
-                                <Main />
+                                <LoadingAnimation />
                             </NotificationWrapper>
                         ) : (
                             <Main />

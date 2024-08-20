@@ -106,7 +106,8 @@ const LearningAnimation = () => {
           sx={{
             width: 200,
             height: 200,
-            borderRadius: "50%",
+            marginTop: 20,
+
             border: "5px solid green",
 
             mb: 2, // Add margin bottom to separate from the progress bar
@@ -120,6 +121,7 @@ const LearningAnimation = () => {
             sx={{
               height: 10,
               borderRadius: 5,
+              marginTop: 7,
               "& .MuiLinearProgress-bar": {
                 borderRadius: 5,
               },
@@ -221,8 +223,8 @@ const LearningAnimation = () => {
             <SchoolIcon sx={{ fontSize: 72, color: "#e67e22" }} />
           </MovingObject>
           <MovingObject
-            initialPosition={{ top: "30%", left: "35%" }}
-            duration={14}
+            initialPosition={{ top: "60%", left: "35%" }}
+            duration={7}
             delay={6}
             curve="Circular"
           >
@@ -256,10 +258,8 @@ const LearningAnimation = () => {
           </MovingObject>
         </Box>{" "}
         <Typography align="center" sx={{ mt: 4, maxWidth: 600 }}>
-          Discover our extensive EduGainer's library classes and stationery
-          services! Access a wide range of books, online resources,courses, and
-          study materials. Enjoy our stationery shop for all your academic
-          needs.
+          Discover our extensive EduGainer's library , classes and stationery
+          services!
         </Typography>
       </Box>
     </ThemeProvider>
