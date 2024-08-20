@@ -2,27 +2,58 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="EduGainer's Web Application" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.jpg" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
+    <!-- Primary Meta Tags -->
+    <meta
+      name="description"
+      content="EduGainer's Web Application - The best EdTech platform in Uttarakhand providing library, classes, and stationary services."
+    />
+    <meta
+      name="keywords"
+      content="EduGainer, education, web application, learning resources, tools, EdTech, Uttarakhand, library, classes, stationary services"
+    />
+    <meta name="author" content="EduGainer" />
+
+    <!-- Open Graph tags for social media -->
+    <meta property="og:title" content="EduGainer's Web App" />
+    <meta
+      property="og:description"
+      content="The best EdTech platform in Uttarakhand providing library, classes, and stationary services."
+    />
+    <meta property="og:image" content="%PUBLIC_URL%/logo.jpg" />
+    <meta property="og:url" content="https://edugainers.com" />
+
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EduGainer's Web App" />
+    <meta
+      name="twitter:description"
+      content="The best EdTech platform in Uttarakhand providing library, classes, and stationary services."
+    />
+    <meta name="twitter:image" content="%PUBLIC_URL%/logo.jpg" />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://edugainers.com",
+        "name": "EduGainer's Web App",
+        "description": "The best EdTech platform in Uttarakhand providing library, classes, and stationary services.",
+        "logo": "%PUBLIC_URL%/logo.jpg",
+        "sameAs": [
+          "https://www.facebook.com/edugainers",
+          "https://twitter.com/edugainers"
+        ]
+      }
+    </script>
+
+    <link rel="icon" href="%PUBLIC_URL%/logo.jpg" />
     <title>EduGainer's Web App</title>
   </head>
+
   <body>
     <noscript>EduGainer's Web Application </noscript>
     <div id="root"></div>

@@ -30,7 +30,7 @@
     "puppeteer": "^22.9.0",
     "razorpay": "^2.9.4",
     "redis": "^4.6.14",
+    "sitemap": "^8.0.0",
     "socket.io": "^4.7.5"
-    
   }
 }
