@@ -273,7 +273,7 @@ const id=IsUserLoggedIn?._id;
                       },
                     }}
                   >
-                    Begin Your Journey
+                    Login
                   </Button>
                 )}
               </IconButton>

@@ -330,7 +330,7 @@ const Chat = () => {
                         <Link to="/login" style={{ color: "error.main" }}>
                           log in
                         </Link>{" "}
-                        to continue.
+                        to access the Query portal.
                       </Typography>
                     </Box>
                   )}
@@ -636,7 +636,7 @@ const Chat = () => {
                     <Link to="/login" style={{ color: "red" }}>
                       Login
                     </Link>{" "}
-                    to access the admin chat
+                    to access the Query portal.
                   </Typography>
                 </Paper>
               )}
