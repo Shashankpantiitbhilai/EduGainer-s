@@ -61,7 +61,7 @@ function Footer() {
             </Typography>
             <Typography variant="body2">
               <LocationOn sx={footerStyles.icon} />
-              Near Court road,MeriStationary,EduGainer's Classes & Library,
+              Near Court road, MeriStationary, EduGainer's Classes & Library,
               Uttarkashi - 249193
               <br />
             </Typography>
@@ -127,12 +127,21 @@ function Footer() {
         <Box
           sx={{ mt: 4, borderTop: "1px solid rgba(255,255,255,0.1)", pt: 2 }}
         >
-          <Typography variant="body2" align="center">
+          <Typography variant="body2" align="center" sx={{ mb: 1 }}>
             {"Copyright © "}
             <Link color="inherit" href="/" sx={footerStyles.link}>
               EduGainer's Classes and Library
             </Link>{" "}
             {new Date().getFullYear()}. All rights reserved.
+          </Typography>
+          <Typography variant="body2" align="center">
+            <Link href="/Policies" sx={footerStyles.link}>
+              Terms of Service
+            </Link>{" "}
+            |{" "}
+            <Link href="/Policies" sx={footerStyles.link}>
+              Privacy Policy
+            </Link>
           </Typography>
         </Box>
       </Container>
