@@ -79,7 +79,7 @@ function Navbar() {
           { name: "Library", link: "/admin_library" },
           { name: "AdminChat", link: "/admin/chat" },
           { name: "MeriStationary", link: "/stationary/home" },
-          { name: "Policies", link: "/Policies" },
+          { name: "Privacy Policy", link: "/Policies" },
         ]
       : [
           { name: "Library", link: "/library" },
@@ -87,7 +87,7 @@ function Navbar() {
           { name: "Resources", link: "/resources" },
           { name: "MeriStationary", link: "/stationary/home" },
           { name: "Query", link: "/chat/home" },
-          { name: "Policies", link: "/Policies" },
+          { name: "Privacy Policy", link: "/Policies" },
         ]
     : [
         { name: "Library", link: "/library" },
@@ -95,7 +95,7 @@ function Navbar() {
         { name: "Resources", link: "/resources" },
         { name: "MeriStationary", link: "/stationary/home" },
         { name: "Query", link: "/chat/home" },
-        { name: "Policies", link: "/Policies" },
+        { name: "Privacy Policy", link: "/Policies" },
       ];
 const id=IsUserLoggedIn?._id;
   const homeURL = isAdmin ? "/admin_home" : "/";
