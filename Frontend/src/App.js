@@ -69,7 +69,7 @@ function App() {
             <CssBaseline />
             <AdminContext.Provider value={{ IsUserLoggedIn, setIsUserLoggedIn }}>
                 <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-                    <BrowserRouter>
+                    <BrowserRouter> <FloatingButton isDarkMode={isDarkMode} onClick={handleThemeToggle} />
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>
                                 <Main />
@@ -77,7 +77,7 @@ function App() {
                         ) : (
                             <Main />
                         )}
-                        <FloatingButton isDarkMode={isDarkMode} onClick={handleThemeToggle} />
+                       
                     </BrowserRouter>
                 </LoadingContext.Provider>
             </AdminContext.Provider>

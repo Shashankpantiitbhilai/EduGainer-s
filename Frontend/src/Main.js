@@ -33,6 +33,7 @@ import StudentManagementTable from "./Components/Admin/Library/seat/ManageSeats.
 import Fee from "./Components/Library/fee.jsx"
 import AdminDashboard from "./Components/Admin/adminDashboard.jsx";
 import StationaryHome from "./Components/Stationary/home.jsx";
+import FeedbackForm from "./Components/feedback/feedback.jsx";
 // import FeePaymentSuccess from "./Components/Library/fee-pay-success.jsx"
 const Main = () => {
     const location = useLocation();
@@ -54,6 +55,7 @@ const Main = () => {
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
                 <Route path="/chat/home" element={<Chat />} />
                 <Route path="/Policies" element={<Policies />} />
+                <Route path="/feedback" element={<ProtectedUser><FeedbackForm /></ProtectedUser>} />
                 <Route
                     path="/library/fee-pay"
                     element={

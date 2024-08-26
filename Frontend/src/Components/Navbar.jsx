@@ -87,6 +87,8 @@ function Navbar() {
           { name: "Resources", link: "/resources" },
           { name: "MeriStationary", link: "/stationary/home" },
           { name: "Query", link: "/chat/home" },
+
+          { name: "Feedback", link: "/feedback" },
           { name: "Privacy Policy", link: "/Policies" },
         ]
     : [
