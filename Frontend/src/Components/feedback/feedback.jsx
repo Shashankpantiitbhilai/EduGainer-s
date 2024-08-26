@@ -5,7 +5,7 @@ const FeedbackForm = () => {
     <div
       style={{ textAlign: "center", margin: "20px auto", maxWidth: "800px" }}
     >
-      <h2>Share Your Thoughts with EduGainers</h2>
+      <h2>Share Your Thoughts with EduGainer's</h2>
       <p>
         We appreciate your input! Help us improve your experience by providing
         feedback on our website and our facilities.
