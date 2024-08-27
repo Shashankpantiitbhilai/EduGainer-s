@@ -1,9 +1,7 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Typography, Button, Container, Box, Grid, Card } from "@mui/material";
-
 import {
-  ArrowForward,
   Wifi,
   PowerSettingsNew,
   Weekend,
@@ -20,19 +18,22 @@ import {
   AutoStories,
   DesktopMac,
   SupportAgent,
+  Celebration,
 } from "@mui/icons-material";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { motion } from "framer-motion";
 import { AdminContext } from "../App";
 import Footer from "./footer";
+import teacher from "../images/teacherday.jpg";
 
 const colors = {
-  primary: "#006400", // Dark Green
-  secondary: "#FFA500", // Orange
+  primary: "#006400",
+  secondary: "#FFA500",
   text: "#333333",
-  background: "#F0F8FF", // Light Sky Blue
+  background: "#F0F8FF",
   white: "#FFFFFF",
-  accent: "#4CAF50", // Light Green
+  accent: "#4CAF50",
+  teacherDay: "#FFD700", // Dark Sea Green, a softer green that complements the primary color
 };
 
 const StyledCard = motion(Card);
@@ -43,7 +44,7 @@ function Home() {
 
   const libraryFacilities = [
     { icon: <WatchLater />, text: "24/7 Accessibility" },
-    { icon: <AcUnitIcon />, text: "Climate Control (Fans, AC, Heater)" },
+    { icon: <AcUnitIcon />, text: "Temperature Control (Fans, AC, Heater)" },
     { icon: <Wifi />, text: "High-Speed WiFi" },
     { icon: <Weekend />, text: "Comfortable Seating" },
     { icon: <PowerSettingsNew />, text: "Individual Power Stations" },
@@ -69,56 +70,134 @@ function Home() {
 
   return (
     <Box sx={{ backgroundColor: colors.background }}>
-      {/* Hero Section */}
+      {/* Enhanced Teacher's Day Themed Hero Section */}
       <Box
         sx={{
-          backgroundColor: colors.primary,
-          color: colors.white,
-          py: 12,
-          borderBottom: `8px solid ${colors.secondary}`,
+          position: "relative",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          overflow: "hidden",
+          background: `linear-gradient(135deg, ${colors.teacherDay}, ${colors.accent})`,
+          py: 8,
         }}
       >
         <Container maxWidth="lg">
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: { xs: "3rem", md: "4.5rem" },
-              fontWeight: "bold",
-              mb: 2,
-              textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
-            }}
-          >
-            Ignite Your Potential with EduGainer's
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: "1.5rem", md: "2rem" },
-              mb: 4,
-              fontWeight: "300",
-            }}
-          >
-            Where Curiosity, Dedication, and Perseverance Shape Your Future
-          </Typography>
-          <Button
-            onClick={handleClick}
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}
-            sx={{
-              backgroundColor: colors.secondary,
-              color: colors.white,
-              "&:hover": { backgroundColor: colors.accent },
-              fontSize: "1.2rem",
-              py: 1.5,
-              px: 4,
-              borderRadius: "50px",
-            }}
-          >
-            Begin Your Journey
-          </Button>
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Box
+                component="img"
+                src={teacher}
+                alt="Teacher's Day"
+                sx={{
+                  width: "100%",
+                  maxHeight: "90vh",
+                  objectFit: "cover",
+                  borderRadius: "15px",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                  transform: "scale(1.05)",
+                  transition: "transform 0.5s ease",
+                  "&:hover": { transform: "scale(1.1)" },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box
+                sx={{
+                  textAlign: "left",
+                  color: colors.text,
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      fontSize: { xs: "3rem", md: "4rem" },
+                      fontWeight: "bold",
+                      mb: 2,
+                      color: colors.primary,
+                      fontFamily: "'Dancing Script', cursive",
+                    }}
+                  >
+                    Happy Teacher's Day!
+                  </Typography>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
+                  <Typography
+                    variant="h2"
+                    sx={{
+                      fontSize: { xs: "1.8rem", md: "2.5rem" },
+                      mb: 4,
+                      fontWeight: "300",
+                      color: colors.white,
+                    }}
+                  >
+                    Celebrating the Heroes Who Shape Our Future
+                  </Typography>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: "1.2rem",
+                      mb: 4,
+                      color: colors.text,
+                    }}
+                  >
+                    Join EduGainer's in honoring our dedicated educators with
+                    special events and heartfelt tributes. This Teacher's Day,
+                    let's come together to show our appreciation for those who
+                    inspire, guide, and nurture our potential.
+                  </Typography>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                >
+                  <Button
+                    onClick={() =>
+                      window.open(
+                        "https://forms.gle/b1NoQfeWCvxvXwdp7",
+                        "_blank"
+                      )
+                    }
+                    variant="contained"
+                    size="large"
+                    endIcon={<Celebration />}
+                    sx={{
+                      backgroundColor: colors.primary,
+                      color: colors.white,
+                      "&:hover": { backgroundColor: colors.accent },
+                      fontSize: "1.2rem",
+                      py: 1.5,
+                      px: 4,
+                      borderRadius: "50px",
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Fill The Form
+                  </Button>
+                </motion.div>
+              </Box>
+            </Grid>
+          </Grid>
         </Container>
       </Box>
+
       <Box
         sx={{
           display: "flex",

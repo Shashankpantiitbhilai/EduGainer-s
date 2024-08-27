@@ -139,7 +139,7 @@ const id=IsUserLoggedIn?._id;
             variant="h6"
             noWrap
             component={Link}
-            to={IsUserLoggedIn?.role==="admin"?"/admin_home" :"/"}
+            to={IsUserLoggedIn?.role === "admin" ? "/admin_home" : "/"}
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -235,7 +235,7 @@ const id=IsUserLoggedIn?._id;
                   color: colors.white,
                   display: "block",
                   "&:hover": {
-                    backgroundColor: colors.accent,
+                    backgroundColor: "orangered",
                     transition: "background-color 0.3s ease-in-out",
                   },
                 }}
@@ -253,9 +253,9 @@ const id=IsUserLoggedIn?._id;
                     alt={IsUserLoggedIn.username}
                     src="/static/images/avatar/2.jpg"
                     sx={{
-                      bgcolor: colors.secondary,
+                      bgcolor: "orange",
                       "&:hover": {
-                        bgcolor: colors.accent,
+                        bgcolor: "orange",
                         transition: "background-color 0.3s ease-in-out",
                       },
                     }}
