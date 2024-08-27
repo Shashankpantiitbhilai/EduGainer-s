@@ -25,7 +25,7 @@ import { motion } from "framer-motion";
 import { AdminContext } from "../App";
 import Footer from "./footer";
 import teacher from "../images/teacherday.jpg";
-import { toast,ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -33,7 +33,8 @@ const colors = {
   background: "#F0F8FF",
   white: "#FFFFFF",
   accent: "#4CAF50",
-  teacherDay: "#FFD700", // Dark Sea Green, a softer green that complements the primary color
+  teacherDay: "#FFD700",
+  blue: "blue", // Dark Sea Green, a softer green that complements the primary color
 };
 
 const StyledCard = motion(Card);
@@ -67,17 +68,17 @@ function Home() {
       navigate("/library");
     }
   };
-const handleViewClick = async () => {
-  if (IsUserLoggedIn) {
-     window.open("https://forms.gle/b1NoQfeWCvxvXwdp7", "_blank")
-  } else {
-    toast.error("You Need to Login to fill this form")
-  }
-};
+  const handleViewClick = async () => {
+    if (IsUserLoggedIn) {
+      window.open("https://forms.gle/b1NoQfeWCvxvXwdp7", "_blank");
+    } else {
+      toast.error("You Need to Login to fill this form");
+    }
+  };
   return (
     <Box sx={{ backgroundColor: colors.background }}>
       {/* Enhanced Teacher's Day Themed Hero Section */}
-      <ToastContainer/>
+      <ToastContainer />
       <Box
         sx={{
           position: "relative",
@@ -130,7 +131,7 @@ const handleViewClick = async () => {
                       fontFamily: "'Dancing Script', cursive",
                     }}
                   >
-                    Happy Teacher's Day!
+                    Teacher's Day Celebration
                   </Typography>
                 </motion.div>
                 <motion.div
@@ -175,26 +176,39 @@ const handleViewClick = async () => {
                   transition={{ duration: 0.8, delay: 0.6 }}
                 >
                   <Button
-                    onClick={() =>
-                     {handleViewClick()}
-                    }
+                    onClick={handleViewClick}
                     variant="contained"
                     size="large"
                     endIcon={<Celebration />}
                     sx={{
-                      backgroundColor: colors.primary,
+                      backgroundImage: `linear-gradient(270deg,#00FFFF, ${colors.accent}, #fd5c63)`,
+                      backgroundSize: "600% 600%",
                       color: colors.white,
-                      "&:hover": { backgroundColor: colors.accent },
+                      animation: "gradientAnimation 5s ease infinite",
                       fontSize: "1.2rem",
                       py: 1.5,
                       px: 4,
                       borderRadius: "50px",
                       boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
                       transition: "all 0.3s ease",
+                      "&:hover": {
+                        boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                      },
                     }}
                   >
                     Fill The Form
                   </Button>
+
+                  {/* Keyframes for the gradient animation */}
+                  <style>
+                    {`
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  `}
+                  </style>
                 </motion.div>
               </Box>
             </Grid>
