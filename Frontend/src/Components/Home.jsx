@@ -25,7 +25,7 @@ import { motion } from "framer-motion";
 import { AdminContext } from "../App";
 import Footer from "./footer";
 import teacher from "../images/teacherday.jpg";
-
+import { toast,ToastContainer } from "react-toastify";
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -67,10 +67,17 @@ function Home() {
       navigate("/library");
     }
   };
-
+const handleViewClick = async () => {
+  if (IsUserLoggedIn) {
+     window.open("https://forms.gle/b1NoQfeWCvxvXwdp7", "_blank")
+  } else {
+    toast.error("You Need to Login to fill this form")
+  }
+};
   return (
     <Box sx={{ backgroundColor: colors.background }}>
       {/* Enhanced Teacher's Day Themed Hero Section */}
+      <ToastContainer/>
       <Box
         sx={{
           position: "relative",
@@ -169,10 +176,7 @@ function Home() {
                 >
                   <Button
                     onClick={() =>
-                      window.open(
-                        "https://forms.gle/b1NoQfeWCvxvXwdp7",
-                        "_blank"
-                      )
+                     {handleViewClick()}
                     }
                     variant="contained"
                     size="large"

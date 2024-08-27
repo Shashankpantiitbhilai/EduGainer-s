@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { sendFeeData } from "../../services/library/utils";
 
 const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) => {
-  console.log(status,"kkkkkk",formData)
+
   const navigate = useNavigate();
   const baseURL = process.env.NODE_ENV === "production"
     ? process.env.REACT_APP_BACKEND_PROD
@@ -63,7 +63,7 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
           let callbackUrl = status === "newRegistration"
             ? `${baseURL}/payment-verification/${userId}`
             : `${baseURL}/library/verify-payment/${userId}`;
-console.log(callbackUrl,"kkkkk",status)
+
           try {
             let verificationResponse;
             if (status === "newRegistration") {
@@ -82,7 +82,7 @@ console.log(callbackUrl,"kkkkk",status)
                 status
               });
             }
-        console.log(verificationResponse.data)
+      
             if (verificationResponse.data.success) {
               if (status === "newRegistration") {
                 
