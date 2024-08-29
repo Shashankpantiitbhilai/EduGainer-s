@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Typography, Button, Container, Box, Grid, Card } from "@mui/material";
 import {
   Wifi,
@@ -20,12 +20,15 @@ import {
   SupportAgent,
   Celebration,
 } from "@mui/icons-material";
+import { Step, StepLabel, Stepper } from "@mui/material";
+import { Login } from "@mui/icons-material";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { motion } from "framer-motion";
 import { AdminContext } from "../App";
 import Footer from "./footer";
 import teacher from "../images/teacherday.jpg";
 import { toast, ToastContainer } from "react-toastify";
+
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -34,11 +37,14 @@ const colors = {
   white: "#FFFFFF",
   accent: "#4CAF50",
   teacherDay: "#FFD700",
-  blue: "blue", // Dark Sea Green, a softer green that complements the primary color
+  blue: "blue",
 };
 
 const StyledCard = motion(Card);
-
+const steps = [
+  { label: "Login", icon: <Login />, link: "/login" },
+  { label: "Fill Form", icon: <Celebration /> },
+];
 function Home() {
   const navigate = useNavigate();
   const { IsUserLoggedIn } = useContext(AdminContext);
@@ -68,6 +74,7 @@ function Home() {
       navigate("/library");
     }
   };
+
   const handleViewClick = async () => {
     if (IsUserLoggedIn) {
       window.open("https://forms.gle/b1NoQfeWCvxvXwdp7", "_blank");
@@ -75,10 +82,45 @@ function Home() {
       toast.error("You Need to Login to fill this form");
     }
   };
+
+  const navigationLinks = [
+    { name: "Library", link: "/library" },
+    { name: "Classes", link: "/classes" },
+    { name: "Resources", link: "/resources" },
+    { name: "MeriStationary", link: "/stationary/home" },
+    { name: "Query", link: "/chat/home" },
+    { name: "Feedback", link: "/feedback" },
+    { name: "Privacy Policy", link: "/Policies" },
+  ];
   return (
     <Box sx={{ backgroundColor: colors.background }}>
-      {/* Enhanced Teacher's Day Themed Hero Section */}
       <ToastContainer />
+
+      {/* Navigation Links */}
+      <Box sx={{ backgroundColor: colors.primary, py: 2, marginTop: 7 }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={2} justifyContent="center">
+            {navigationLinks.map((link, index) => (
+              <Grid item key={index}>
+                <Button
+                  variant="text"
+                  color="inherit"
+                  onClick={() => navigate(link.link)}
+                  sx={{
+                    color: colors.white,
+                    "&:hover": {
+                      backgroundColor: colors.secondary,
+                      color: colors.primary,
+                    },
+                  }}
+                >
+                  {link.name}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
       <Box
         sx={{
           position: "relative",
@@ -175,39 +217,95 @@ function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
                 >
-                  <Button
-                    onClick={handleViewClick}
-                    variant="contained"
-                    size="large"
-                    endIcon={<Celebration />}
-                    sx={{
-                      backgroundImage: `linear-gradient(270deg,#00FFFF, ${colors.accent}, #fd5c63)`,
-                      backgroundSize: "600% 600%",
-                      color: colors.white,
-                      animation: "gradientAnimation 5s ease infinite",
-                      fontSize: "1.2rem",
-                      py: 1.5,
-                      px: 4,
-                      borderRadius: "50px",
-                      boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
-                      },
-                    }}
-                  >
-                    Fill The Form
-                  </Button>
+                  <Box sx={{ width: "100%", mb: 4 }}>
+                    <Stepper activeStep={0} alternativeLabel>
+                      {steps.map((step, index) => (
+                        <Step key={step.label}>
+                          <StepLabel
+                            StepIconComponent={() => (
+                              <Box
+                                sx={{
+                                  backgroundColor:
+                                    index === 0 ? colors.accent : "orange",
+                                  borderRadius: "50%",
+                                  p: 1,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                {step.icon}
+                              </Box>
+                            )}
+                          >
+                            <Typography variant="body2" color="text.secondary">
+                              {step.label}
+                            </Typography>
+                          </StepLabel>
+                        </Step>
+                      ))}
+                    </Stepper>
+                  </Box>
 
-                  {/* Keyframes for the gradient animation */}
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", gap: 2 }}
+                  >
+                    {!IsUserLoggedIn && <Button
+                      component={Link}
+                      to="/login"
+                      variant="outlined"
+                      size="large"
+                      startIcon={<Login />}
+                      sx={{
+                        color: "white",
+                        borderColor: "orange",
+                        fontSize: "1rem",
+                        py: 1.5,
+                        px: 3,
+                        borderRadius: "50px",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          backgroundColor: colors.accent,
+                          color: colors.white,
+                        },
+                      }}
+                    >
+                      Login First
+                    </Button>
+                    }
+                    <Button
+                      onClick={handleViewClick}
+                      variant="contained"
+                      size="large"
+                      endIcon={<Celebration />}
+                      sx={{
+                        backgroundImage: `linear-gradient(270deg,#00FFFF, ${colors.accent}, #fd5c63)`,
+                        backgroundSize: "600% 600%",
+                        color: colors.white,
+                        animation: "gradientAnimation 5s ease infinite",
+                        fontSize: "1rem",
+                        py: 1.5,
+                        px: 3,
+                        borderRadius: "50px",
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                        },
+                      }}
+                    >
+                      Fill The Form
+                    </Button>
+                  </Box>
+
                   <style>
                     {`
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-  `}
+          @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}
                   </style>
                 </motion.div>
               </Box>
