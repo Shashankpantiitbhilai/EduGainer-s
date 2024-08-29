@@ -129,7 +129,11 @@ function Footer() {
         >
           <Typography variant="body2" align="center" sx={{ mb: 1 }}>
             {"Copyright © "}
-            <Link color="inherit" href="/" sx={footerStyles.link}>
+            <Link
+              color="inherit"
+              href="https://maps.app.goo.gl/8CtfP1XWEz7dJaXZ8"
+              sx={footerStyles.link}
+            >
               EduGainer's Classes and Library
             </Link>{" "}
             {new Date().getFullYear()}. All rights reserved.
