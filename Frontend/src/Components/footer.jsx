@@ -8,7 +8,7 @@ import {
   Facebook,
   LinkedIn,
 } from "@mui/icons-material";
-
+import XLogo from "@mui/icons-material/X";
 const footerStyles = {
   footer: {
     backgroundColor: "#006400", // Dark Green
@@ -111,6 +111,15 @@ function Footer() {
               Facebook
             </Link>
             <br />
+            <Link
+              href="https://x.com/edugainers"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={footerStyles.link}
+            >
+              <XLogo sx={{ ...footerStyles.icon, ...footerStyles.xIcon }} />{" "}
+              {/* Replace LinkedIn with XLogo */} Twitter
+            </Link><br/>
             <Link
               href="https://www.linkedin.com/in/edu-gainers-bb128328b/?originalSubdomain=in"
               target="_blank"
