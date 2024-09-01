@@ -1,3 +1,5 @@
+import { red } from "@mui/material/colors";
+
 // Define the shifts
 const shifts = [
   "6:30 AM to 2 PM",
@@ -59,7 +61,10 @@ export const getSeatColor = (seatNumber, seatStatus, selectedShift) => {
   if (!seatStatus[seatNumber]) {
     return "red"; // Default color if seat status is not available
   }
-
+  if (seatStatus === "Unknown")
+  {
+    return "red";
+  }
   // Check if there's a Confirmed status in any overlapping shift
   const hasOverlappingConfirmed = shifts.some(
     (shift) =>

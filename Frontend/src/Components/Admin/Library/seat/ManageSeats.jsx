@@ -157,12 +157,14 @@ const ManageSeats = () => {
            
               statusMap[e.seat] = {};
             }
-          
-            statusMap[e.seat][shift] = e.status || "Confirmed";
+            if (e.seat === "6" && shift === "24*7") {
+console.log(e.status,"staus")
+            }
+            statusMap[e.seat][shift] = e.status || "Unknown";
           });
         }
       });
-       console.log(statusMap,"kkkkkkk")
+       console.log(statusMap)
     
       setSeatStatus(statusMap);
     } catch (error) {
