@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const mongoose = require('mongoose');
 const { getModelForMonth } = require('./models/student'); // Adjust the path to your models file
 
-
+// Schedule the cron job to run daily at 12:33 AM
 cron.schedule('0 1 1 * *', async () => {
     try {
         const currentDate = new Date();
@@ -14,7 +14,7 @@ cron.schedule('0 1 1 * *', async () => {
         // Fetch all bookings from the previous month's collection
         const previousMonthBookings = await previousMonthModel.find({});
 
-        // Filter out records with nextMonthStatus of 'DisContinue'
+        // Filter out records with nextMonthStatus of 'Discontinue'
         const validBookings = previousMonthBookings.filter(
             booking => booking?.nextMonthStatus?.toLowerCase() !== 'discontinue'
         );
@@ -39,7 +39,12 @@ cron.schedule('0 1 1 * *', async () => {
                     ...booking.toObject(),
                     status, // Set status
                     nextMonthStatus: '', // Clear nextMonthStatus for the current month
-                    colors: { ...booking.colors.toObject(), status: color } // Update the colors map with the new color for status
+                    colors: { ...booking.colors.toObject(), status: color }, // Update the colors map with the new color for status
+                    regFee: 0, // Reset regFee to 0
+                    cash: 0, // Reset cash to 0
+                    online: 0, // Reset online to 0
+                    website: 0, // Reset website to 0
+                    TotalMoney: 0 // Reset TotalMoney to 0
                 };
             });
 
