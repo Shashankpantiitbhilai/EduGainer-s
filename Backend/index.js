@@ -20,6 +20,7 @@ const client = redis.createClient();
 const app = express();
 const dotenv = require("dotenv")
 dotenv.config()
+
 // console.log(process.env.FRONTEND_DEV)
 const origin = process.env.NODE_ENV === 'production'
   ? process.env.FRONTEND_PROD
@@ -53,7 +54,7 @@ app.options('*', cors());
 
 // Connect to MongoDB
 connectDB();
-
+require('./cronJobs');
 // Body parser middleware
 app.use(bodyParser.json({ limit: '100mb' }));
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
