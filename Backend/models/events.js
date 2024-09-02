@@ -11,16 +11,18 @@ const eventSchema = new mongoose.Schema({
     },
     googleFormLink: {
         type: String,
-      
     },
-    event: {
-        type: Boolean,
-        default: false,
-    }, imageUrl: {
-        type: String,
-       
+    image: {
+        publicId: { type: String },
+        url: { type: String },
+    },
+    
+    endDate: {
+        type: Date,
+        required: true, // Optional: set to true if the end date is required
     },
 });
+
 
 const Event = mongoose.model('Event', eventSchema);
 

@@ -27,6 +27,7 @@ export async function addEvent(data) {
 // Function to edit an existing event by ID
 export async function editEvent(id, data) {
     try {
+        
         const response = await axiosInstance.patch(`/admin_event/editEvent/${id}`, data);
         return response.data;
     } catch (error) {

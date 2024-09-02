@@ -1,29 +1,28 @@
-const  Event = require('../../models/events');
+const Event = require('../../models/events');
 const { uploadToCloudinary } = require('../../cloudinary');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 
 const addEvent = async (req, res) => {
- 
-    const { title, description, googleFormLink, event } = req.body;
-    const image = req.file; // Assuming the image file is sent in the request
+    const { title, description, googleFormLink,endDate, image } = req.body;
 
     try {
         let newEventData = {
             title,
             description,
             googleFormLink,
-            event,
+           endDate
         };
 
-        // If there is an image file, upload it to Cloudinary and save the URL in the newEventData object
+        // If there is an image file, upload it to Cloudinary and save the URL and public ID
         if (image) {
-            const results = await uploadToCloudinary(image.path, "Events");
+            const result = await uploadToCloudinary(image, "Events");
 
-            // Save the image URL to the newEventData object
-            newEventData.imageUrl = results.url;
-
-            // Optionally, remove the file from the server after uploading
-            fs.unlinkSync(image.path);
+            // Save the image URL and public ID to the newEventData object
+            newEventData.image = {
+                url: result.url,
+                publicId: result.publicId
+            };
         }
 
         // Create a new event record with the provided data
@@ -40,28 +39,45 @@ const addEvent = async (req, res) => {
 
 
 
+
 const editEvent = async (req, res) => {
     const { id } = req.params; // Get event ID from request params
-    const { title, description, googleFormLink, event } = req.body;
-    const image = req.file; // Assuming the image file is sent in the request
+    const { title, description, googleFormLink, image, endDate } = req.body;
+     // Assuming the image file is sent in the request
 
     try {
+        // Find the current event
+        const currentEvent = await Event.findById(id);
+
+        if (!currentEvent) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
         let updateData = {
             title,
             description,
             googleFormLink,
-            event,
+            endDate
         };
 
-        // If there is an image file, upload it to Cloudinary and save the URL in the updateData object
+        // If there is an image file, handle the image update
         if (image) {
-            const results = await uploadToCloudinary(image.path, "Events");
+            // Delete the old image from Cloudinary if it exists
+            if (currentEvent.image && currentEvent.image.publicId) {
+                await cloudinary.uploader.destroy(currentEvent.image.publicId);
+            }
 
-            // Save the image URL to the updateData object
-            updateData.imageUrl = results.url;
+            // Upload the new image to Cloudinary
+            const result = await uploadToCloudinary(image, "Events");
+
+            // Save the new image URL and public ID to the updateData object
+            updateData.image = {
+                url: result.url,
+                publicId:result.publicId
+            };
 
             // Optionally, remove the file from the server after uploading
-            fs.unlinkSync(image.path);
+          
         }
 
         // Update the event record with the new data
@@ -78,13 +94,23 @@ const editEvent = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
-
 const deleteEvent = async (req, res) => {
     const { id } = req.params; // Get event ID from request params
 
     try {
-        // Find the event by ID and remove it from the database
+        // Find the event by ID
+        const event = await Event.findById(id);
+
+        if (!event) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
+        // Delete image from Cloudinary if it exists
+        if (event.image && event.image.publicId) {
+            await cloudinary.uploader.destroy(event.image.publicId);
+        }
+
+        // Delete the event from the database
         const deletedEvent = await Event.findByIdAndDelete(id);
 
         if (!deletedEvent) {
@@ -98,13 +124,12 @@ const deleteEvent = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 const getEvents = async (req, res) => {
     try {
         // Fetch all events from the database
         const events = await Event.find();
         // Respond with the events data
-        console.log(events)
+      
         res.status(200).json(events);
     } catch (error) {
         console.error("Error fetching events:", error);

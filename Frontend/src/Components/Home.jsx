@@ -1,11 +1,24 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Typography, Button, Container, Box, Grid, Card } from "@mui/material";
 import {
+  Typography,
+  Button,
+  Container,
+  Box,
+  Grid,
+  Card,
+  Step,
+  StepLabel,
+  Stepper,
+} from "@mui/material";
+import {
+  Login,
+  Celebration,
+  WatchLater,
+  AcUnit as AcUnitIcon,
   Wifi,
   PowerSettingsNew,
   Weekend,
-  WatchLater,
   MenuBook,
   School,
   EmojiEvents,
@@ -18,16 +31,12 @@ import {
   AutoStories,
   DesktopMac,
   SupportAgent,
-  Celebration,
 } from "@mui/icons-material";
-import { Step, StepLabel, Stepper } from "@mui/material";
-import { Login } from "@mui/icons-material";
-import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { motion } from "framer-motion";
 import { AdminContext } from "../App";
 import Footer from "./footer";
-import teacher from "../images/teacherday.jpg";
 import { toast, ToastContainer } from "react-toastify";
+import { getAllEvents } from "../services/Admin_services/admin_event";
 
 const colors = {
   primary: "#006400",
@@ -45,10 +54,76 @@ const steps = [
   { label: "Login", icon: <Login />, link: "/login" },
   { label: "Fill Form", icon: <Celebration /> },
 ];
+const AnimatedText = motion(Typography);
 function Home() {
   const navigate = useNavigate();
   const { IsUserLoggedIn } = useContext(AdminContext);
+  const [events, setEvents] = useState([]);
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventsData = await getAllEvents();
+        const currentDate = new Date().toISOString().split("T")[0];
+
+        // Filter out past events and events without a valid endDate
+        const currentEvents = eventsData.filter((event) => {
+          if (!event.endDate || typeof event.endDate !== "string") {
+            console.warn("Event with invalid or missing endDate:", event);
+            return false;
+          }
+
+          return event.endDate.split("T")[0] >= currentDate;
+        });
+
+        setEvents(currentEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        toast.error("Failed to load events");
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  const formatDate = (dateString) => {
+    if (!dateString || typeof dateString !== "string") {
+      return "Date not available";
+    }
+    const [year, month, day] = dateString.split("T")[0].split("-");
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
+  };
+
+  const handleViewClick = async (url) => {
+    if (IsUserLoggedIn) {
+      window.open(url, "_blank");
+    } else {
+      toast.error("You Need to Login to fill this form");
+    }
+  };
+
+  const navigationLinks = [
+    { name: "Library", link: "/library" },
+    { name: "Classes", link: "/classes" },
+    { name: "Resources", link: "/resources" },
+    { name: "MeriStationary", link: "/stationary/home" },
+    { name: "Query", link: "/chat/home" },
+    { name: "Feedback", link: "/feedback" },
+    { name: "Privacy Policy", link: "/Policies" },
+  ];
   const libraryFacilities = [
     { icon: <WatchLater />, text: "24/7 Accessibility" },
     { icon: <AcUnitIcon />, text: "Temperature Control (Fans, AC, Heater)" },
@@ -65,32 +140,6 @@ function Home() {
     { icon: <Flag />, text: "Uttarakhand LT Exam" },
     { icon: <Psychology />, text: "Group C Government Exams" },
     { icon: <LocalLibrary />, text: "General Competitive Exams" },
-  ];
-
-  const handleClick = async () => {
-    if (IsUserLoggedIn?.role === "admin") {
-      navigate("/admin_Library");
-    } else {
-      navigate("/library");
-    }
-  };
-
-  const handleViewClick = async () => {
-    if (IsUserLoggedIn) {
-      window.open("https://forms.gle/b1NoQfeWCvxvXwdp7", "_blank");
-    } else {
-      toast.error("You Need to Login to fill this form");
-    }
-  };
-
-  const navigationLinks = [
-    { name: "Library", link: "/library" },
-    { name: "Classes", link: "/classes" },
-    { name: "Resources", link: "/resources" },
-    { name: "MeriStationary", link: "/stationary/home" },
-    { name: "Query", link: "/chat/home" },
-    { name: "Feedback", link: "/feedback" },
-    { name: "Privacy Policy", link: "/Policies" },
   ];
   return (
     <Box sx={{ backgroundColor: colors.background }}>
@@ -121,195 +170,211 @@ function Home() {
           </Grid>
         </Container>
       </Box>
+
       <Box
         sx={{
+          backgroundColor: colors.primary,
+          py: 12,
           position: "relative",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
           overflow: "hidden",
-          background: `linear-gradient(135deg, ${colors.teacherDay}, ${colors.accent})`,
-          py: 8,
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Box
-                component="img"
-                src={teacher}
-                alt="Teacher's Day"
-                sx={{
-                  width: "100%",
-                  maxHeight: "90vh",
-                  objectFit: "cover",
-                  borderRadius: "15px",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                  transform: "scale(1.05)",
-                  transition: "transform 0.5s ease",
-                  "&:hover": { transform: "scale(1.1)" },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  textAlign: "left",
-                  color: colors.text,
-                }}
-              >
+          <Typography
+            variant="h2"
+            sx={{
+              color: colors.white,
+              fontWeight: "bold",
+              mb: 6,
+              textAlign: "center",
+              fontSize: { xs: "2.5rem", md: "3.5rem" },
+            }}
+          >
+            Upcoming Events
+          </Typography>
+          <Grid container spacing={4}>
+            {events.map((event, index) => (
+              <Grid item xs={12} key={index} sx={{ mb: 4 }}>
                 <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  whileInView={{
+                    opacity: 1,
+                    scale: 1,
+                    transition: { duration: 0.5 },
+                  }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  viewport={{ once: true }} // Ensures animation only runs once when in view
                 >
-                  <Typography
-                    variant="h1"
+                  <Card
                     sx={{
-                      fontSize: { xs: "3rem", md: "4rem" },
-                      fontWeight: "bold",
-                      mb: 2,
-                      color: colors.primary,
-                      fontFamily: "'Dancing Script', cursive",
+                      display: "flex",
+                      flexDirection: { xs: "column", sm: "row" },
+                      width: "100%",
+                      height: "auto",
+                      overflow: "hidden",
+                      boxShadow: 3,
+                      borderRadius: 2,
+                      backgroundColor: colors.background,
+                      position: "relative", // Ensure the border is positioned correctly
+                      border: "2px solid transparent", // Initial border
+                      "&:hover": {
+                        border: `2px solid ${colors.secondary}`, // Border on hover
+                        boxShadow: 6, // Increased shadow for more emphasis
+                      },
+                      transition: "border 0.3s ease, box-shadow 0.3s ease", // Smooth transition for border and shadow
                     }}
                   >
-                    Teacher's Day Celebration
-                  </Typography>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                >
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontSize: { xs: "1.8rem", md: "2.5rem" },
-                      mb: 4,
-                      fontWeight: "300",
-                      color: colors.white,
-                    }}
-                  >
-                    Celebrating the Heroes Who Shape Our Future
-                  </Typography>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      fontSize: "1.2rem",
-                      mb: 4,
-                      color: colors.text,
-                    }}
-                  >
-                    Join EduGainer's in honoring our dedicated educators with
-                    special events and heartfelt tributes. This Teacher's Day,
-                    let's come together to show our appreciation for those who
-                    inspire, guide, and nurture our potential.
-                  </Typography>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6 }}
-                >
-                  <Box sx={{ width: "100%", mb: 4 }}>
-                    <Stepper activeStep={0} alternativeLabel>
-                      {steps.map((step, index) => (
-                        <Step key={step.label}>
-                          <StepLabel
-                            StepIconComponent={() => (
-                              <Box
-                                sx={{
-                                  backgroundColor:
-                                    index === 0 ? colors.accent : "orange",
-                                  borderRadius: "50%",
-                                  p: 1,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
+                    <Box
+                      sx={{
+                        flex: "1 1 50%",
+                        position: "relative",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={event.image?.url || "/placeholder-image.jpg"}
+                        alt={event.title || "Event"}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: "8px 0 0 8px",
+                        }}
+                      />
+                    </Box>
+                    <Box
+                      sx={{
+                        flex: "1 1 50%",
+                        p: 3,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Box>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            color: colors.primary,
+                            fontWeight: "bold",
+                            mb: 2,
+                          }}
+                        >
+                          {event.title || "Untitled Event"}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: colors.text, mb: 2 }}
+                        >
+                          {event.description || "No description available"}
+                        </Typography>
+                        <AnimatedText
+                          variant="body2"
+                          sx={{ color: "red", mb: 3 }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1, scale: [1, 1.1, 1] }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                          }}
+                        >
+                          Deadline: {formatDate(event.endDate)}
+                        </AnimatedText>
+                      </Box>
+                      <Box sx={{ width: "100%", mb: 4 }}>
+                        <Stepper activeStep={0} alternativeLabel>
+                          {steps.map((step, index) => (
+                            <Step key={step.label}>
+                              <StepLabel
+                                StepIconComponent={() => (
+                                  <Box
+                                    sx={{
+                                      backgroundColor:
+                                        index === 0 ? colors.accent : "orange",
+                                      borderRadius: "50%",
+                                      p: 1,
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    {step.icon}
+                                  </Box>
+                                )}
                               >
-                                {step.icon}
-                              </Box>
-                            )}
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {step.label}
+                                </Typography>
+                              </StepLabel>
+                            </Step>
+                          ))}
+                        </Stepper>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: 2,
+                        }}
+                      >
+                        {!IsUserLoggedIn && (
+                          <Button
+                            component={Link}
+                            to="/login"
+                            variant="outlined"
+                            size="large"
+                            startIcon={<Login />}
+                            sx={{
+                              color: "orange",
+
+                              fontSize: "1rem",
+                              py: 1.5,
+                              px: 3,
+                              borderRadius: "50px",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                backgroundColor: "orange",
+                                color: "orange",
+                              },
+                            }}
                           >
-                            <Typography variant="body2" color="text.secondary">
-                              {step.label}
-                            </Typography>
-                          </StepLabel>
-                        </Step>
-                      ))}
-                    </Stepper>
-                  </Box>
-
-                  <Box
-                    sx={{ display: "flex", justifyContent: "center", gap: 2 }}
-                  >
-                    {!IsUserLoggedIn && <Button
-                      component={Link}
-                      to="/login"
-                      variant="outlined"
-                      size="large"
-                      startIcon={<Login />}
-                      sx={{
-                        color: "white",
-                        borderColor: "orange",
-                        fontSize: "1rem",
-                        py: 1.5,
-                        px: 3,
-                        borderRadius: "50px",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          backgroundColor: colors.accent,
-                          color: colors.white,
-                        },
-                      }}
-                    >
-                      Login First
-                    </Button>
-                    }
-                    <Button
-                      onClick={handleViewClick}
-                      variant="contained"
-                      size="large"
-                      endIcon={<Celebration />}
-                      sx={{
-                        backgroundImage: `linear-gradient(270deg,#00FFFF, ${colors.accent}, #fd5c63)`,
-                        backgroundSize: "600% 600%",
-                        color: colors.white,
-                        animation: "gradientAnimation 5s ease infinite",
-                        fontSize: "1rem",
-                        py: 1.5,
-                        px: 3,
-                        borderRadius: "50px",
-                        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
-                        },
-                      }}
-                    >
-                      Fill The Form
-                    </Button>
-                  </Box>
-
-                  <style>
-                    {`
-          @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-        `}
-                  </style>
+                            Login First
+                          </Button>
+                        )}
+                        <Button
+                          onClick={() => handleViewClick(event.googleFormLink)}
+                          variant="contained"
+                          size="large"
+                          endIcon={<Celebration />}
+                          sx={{
+                            backgroundImage: `linear-gradient(270deg, #00FFFF, ${colors.accent}, #fd5c63)`,
+                            backgroundSize: "600% 600%",
+                            color: colors.white,
+                            animation: "gradientAnimation 5s ease infinite",
+                            fontSize: "1rem",
+                            py: 1.5,
+                            px: 3,
+                            borderRadius: "50px",
+                            boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                            },
+                          }}
+                        >
+                          Fill The Form
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Card>
                 </motion.div>
-              </Box>
-            </Grid>
+              </Grid>
+            ))}
           </Grid>
         </Container>
       </Box>

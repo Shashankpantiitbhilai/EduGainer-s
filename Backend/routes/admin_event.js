@@ -8,7 +8,7 @@ const admin_event = require("../controllers/Event/admin_event");
 const legend = require("../controllers/library/color")
 
 router.post("/addEvent", admin_event.addEvent)
-router.patch("/editEvent", admin_event.editEvent)
+router.patch("/editEvent/:id", admin_event.editEvent)
 router.delete("/deleteEvent/:id", admin_event.deleteEvent)
 router.get("/getAllEvents", admin_event.getEvents)
 

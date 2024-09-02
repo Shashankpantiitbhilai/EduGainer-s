@@ -34,7 +34,7 @@ import Fee from "./Components/Library/fee.jsx"
 import AdminDashboard from "./Components/Admin/adminDashboard.jsx";
 import StationaryHome from "./Components/Stationary/home.jsx";
 import FeedbackForm from "./Components/feedback/feedback.jsx";
-import Pamplette from "./Components/pamplette.jsx";
+import Pamplette from "./Components/Admin/pamplette.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];

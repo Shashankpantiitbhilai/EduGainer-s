@@ -20,6 +20,7 @@ import {
   Quiz as QuizIcon,
   Chat as ChatIcon,
   Home as HomeIcon,
+  Event as EventIcon,
 } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { logoutUser } from "../../services/auth";
@@ -47,6 +48,7 @@ function ADMIN_HOME() {
   const adminTools = [
     { title: "Manage Library", icon: <LibraryIcon />, link: "/admin_library" },
     { title: "Admin Chat", icon: <ChatIcon />, link: "/admin/chat" },
+    { title: "Manage Events", icon: <EventIcon />, link: "/admin/add-event" },
   ];
 
   return (
@@ -116,7 +118,7 @@ function ADMIN_HOME() {
 
             <Grid container spacing={4}>
               {adminTools.map((tool, index) => (
-                <Grid item xs={12} sm={6} md={6} key={index}>
+                <Grid item xs={12} sm={6} md={4} key={index}>
                   <Card
                     elevation={4}
                     sx={{
