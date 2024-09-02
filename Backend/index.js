@@ -5,7 +5,7 @@ const routes_auth = require("./routes/auth");
 const routes_general = require("./routes/route");
 const routes_admin = require("./routes/admin");
 const routes_classes = require("./routes/classes");
-const routes_quiz = require("./routes/quiz");
+const routes_admin_events = require("./routes/admin_event");
 const routes_chat = require("./routes/chat");
 const routes_library = require("./routes/Library");
 const routes_admin_library = require("./routes/admin_lib");
@@ -88,10 +88,12 @@ app.use(myPassport.session());
 app.use("/traffic", trafficRoutes);
 app.use("/", routes_general);
 app.use("/auth", routes_auth);
+
 app.use("/admin", routes_admin);
 app.use("/classes", routes_classes);
 app.use("/library", routes_library);
 app.use("/admin_library", routes_admin_library);
+app.use("/admin_event", routes_admin_events);
 // Pass Socket.IO instance to chat routes
 app.use("/chat", routes_chat(io));
 

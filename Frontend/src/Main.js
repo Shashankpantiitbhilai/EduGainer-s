@@ -34,7 +34,7 @@ import Fee from "./Components/Library/fee.jsx"
 import AdminDashboard from "./Components/Admin/adminDashboard.jsx";
 import StationaryHome from "./Components/Stationary/home.jsx";
 import FeedbackForm from "./Components/feedback/feedback.jsx";
-// import FeePaymentSuccess from "./Components/Library/fee-pay-success.jsx"
+import Pamplette from "./Components/pamplette.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -65,14 +65,7 @@ const Main = () => {
                     }
                 />
 
-                {/* <Route
-                    path="/fee-payment-success/:id"
-                    element={
-                        <ProtectedUser>
-                            <FeePaymentSuccess/>
-                        </ProtectedUser>
-                    }
-                /> */}
+          
 
                 <Route
                     path="/admin/chat"
@@ -82,7 +75,14 @@ const Main = () => {
                         </ProtectedAdmin>
                     }
                 />
-
+                <Route
+                    path="/admin/add-event"
+                    element={
+                        <ProtectedAdmin>
+                            <Pamplette />
+                        </ProtectedAdmin>
+                    }
+                />
                 <Route
                     path="/resources"
                     element={

@@ -81,6 +81,7 @@ function Navbar() {
           { name: "AdminChat", link: "/admin/chat" },
           { name: "MeriStationary", link: "/stationary/home" },
           { name: "Privacy Policy", link: "/Policies" },
+          { name: "Events", link: "/admin/add-event" },
         ]
       : [
           { name: "Library", link: "/library" },
