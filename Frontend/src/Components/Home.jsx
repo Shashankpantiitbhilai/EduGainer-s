@@ -77,6 +77,11 @@ function Home() {
         });
 
         setEvents(currentEvents);
+        if (events) {
+          console.log(events.length, "ee");
+        } else {
+          console.log("no");
+        }
       } catch (error) {
         console.error("Error fetching events:", error);
         toast.error("Failed to load events");
@@ -179,204 +184,240 @@ function Home() {
           overflow: "hidden",
         }}
       >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h2"
-            sx={{
-              color: colors.white,
-              fontWeight: "bold",
-              mb: 6,
-              textAlign: "center",
-              fontSize: { xs: "2.5rem", md: "3.5rem" },
-            }}
-          >
-            Upcoming Events
-          </Typography>
-          <Grid container spacing={4}>
-            {events.map((event, index) => (
-              <Grid item xs={12} key={index} sx={{ mb: 4 }}>
-                <motion.div
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  whileInView={{
-                    opacity: 1,
-                    scale: 1,
-                    transition: { duration: 0.5 },
-                  }}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  viewport={{ once: true }} // Ensures animation only runs once when in view
-                >
-                  <Card
-                    sx={{
-                      display: "flex",
-                      flexDirection: { xs: "column", sm: "row" },
-                      width: "100%",
-                      height: "auto",
-                      overflow: "hidden",
-                      boxShadow: 3,
-                      borderRadius: 2,
-                      backgroundColor: colors.background,
-                      position: "relative", // Ensure the border is positioned correctly
-                      border: "2px solid transparent", // Initial border
-                      "&:hover": {
-                        border: `2px solid ${colors.secondary}`, // Border on hover
-                        boxShadow: 6, // Increased shadow for more emphasis
-                      },
-                      transition: "border 0.3s ease, box-shadow 0.3s ease", // Smooth transition for border and shadow
+        {events.length !== 0 ? (
+          <Container maxWidth="lg">
+            <Typography
+              variant="h2"
+              sx={{
+                color: colors.white,
+                fontWeight: "bold",
+                mb: 6,
+                textAlign: "center",
+                fontSize: { xs: "2.5rem", md: "3.5rem" },
+              }}
+            >
+              Upcoming Events
+            </Typography>
+            <Grid container spacing={4}>
+              {events.map((event, index) => (
+                <Grid item xs={12} key={index} sx={{ mb: 4 }}>
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    whileInView={{
+                      opacity: 1,
+                      scale: 1,
+                      transition: { duration: 0.5 },
                     }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    viewport={{ once: true }} // Ensures animation only runs once when in view
                   >
-                    <Box
+                    <Card
                       sx={{
-                        flex: "1 1 50%",
-                        position: "relative",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <img
-                        src={event.image?.url || "/placeholder-image.jpg"}
-                        alt={event.title || "Event"}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          borderRadius: "8px 0 0 8px",
-                        }}
-                      />
-                    </Box>
-                    <Box
-                      sx={{
-                        flex: "1 1 50%",
-                        p: 3,
                         display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
+                        flexDirection: { xs: "column", sm: "row" },
+                        width: "100%",
+                        height: "auto",
+                        overflow: "hidden",
+                        boxShadow: 3,
+                        borderRadius: 2,
+                        backgroundColor: colors.background,
+                        position: "relative", // Ensure the border is positioned correctly
+                        border: "2px solid transparent", // Initial border
+                        "&:hover": {
+                          border: `2px solid ${colors.secondary}`, // Border on hover
+                          boxShadow: 6, // Increased shadow for more emphasis
+                        },
+                        transition: "border 0.3s ease, box-shadow 0.3s ease", // Smooth transition for border and shadow
                       }}
                     >
-                      <Box>
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            color: colors.primary,
-                            fontWeight: "bold",
-                            mb: 2,
+                      <Box
+                        sx={{
+                          flex: "1 1 50%",
+                          position: "relative",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <img
+                          src={event.image?.url || "/placeholder-image.jpg"}
+                          alt={event.title || "Event"}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "8px 0 0 8px",
                           }}
-                        >
-                          {event.title || "Untitled Event"}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{ color: colors.text, mb: 2 }}
-                        >
-                          {event.description || "No description available"}
-                        </Typography>
-                        <AnimatedText
-                          variant="body2"
-                          sx={{ color: "red", mb: 3 }}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1, scale: [1, 1.1, 1] }}
-                          transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            repeatType: "reverse",
-                          }}
-                        >
-                          Deadline: {formatDate(event.endDate)}
-                        </AnimatedText>
-                      </Box>
-                      <Box sx={{ width: "100%", mb: 4 }}>
-                        <Stepper activeStep={0} alternativeLabel>
-                          {steps.map((step, index) => (
-                            <Step key={step.label}>
-                              <StepLabel
-                                StepIconComponent={() => (
-                                  <Box
-                                    sx={{
-                                      backgroundColor:
-                                        index === 0 ? colors.accent : "orange",
-                                      borderRadius: "50%",
-                                      p: 1,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                    }}
-                                  >
-                                    {step.icon}
-                                  </Box>
-                                )}
-                              >
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {step.label}
-                                </Typography>
-                              </StepLabel>
-                            </Step>
-                          ))}
-                        </Stepper>
+                        />
                       </Box>
                       <Box
                         sx={{
+                          flex: "1 1 50%",
+                          p: 3,
                           display: "flex",
-                          justifyContent: "center",
-                          gap: 2,
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                         }}
                       >
-                        {!IsUserLoggedIn && (
-                          <Button
-                            component={Link}
-                            to="/login"
-                            variant="outlined"
-                            size="large"
-                            startIcon={<Login />}
+                        <Box>
+                          <Typography
+                            variant="h5"
                             sx={{
-                              color: "orange",
-
-                              fontSize: "1rem",
-                              py: 1.5,
-                              px: 3,
-                              borderRadius: "50px",
-                              transition: "all 0.3s ease",
-                              "&:hover": {
-                                backgroundColor: "orange",
-                                color: "orange",
-                              },
+                              color: colors.primary,
+                              fontWeight: "bold",
+                              mb: 2,
                             }}
                           >
-                            Login First
-                          </Button>
+                            {event.title || "Untitled Event"}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: colors.text, mb: 2 }}
+                          >
+                            {event.description || "No description available"}
+                          </Typography>
+                          <AnimatedText
+                            variant="body2"
+                            sx={{ color: "red", mb: 3 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, scale: [1, 1.1, 1] }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              repeatType: "reverse",
+                            }}
+                          >
+                            Deadline: {formatDate(event.endDate)}
+                          </AnimatedText>
+                        </Box>
+                        {event.googleFormLink && (
+                          <div>
+                            <Box sx={{ width: "100%", mb: 4 }}>
+                              <Stepper activeStep={0} alternativeLabel>
+                                {steps.map((step, index) => (
+                                  <Step key={step.label}>
+                                    <StepLabel
+                                      StepIconComponent={() => (
+                                        <Box
+                                          sx={{
+                                            backgroundColor:
+                                              index === 0
+                                                ? colors.accent
+                                                : "orange",
+                                            borderRadius: "50%",
+                                            p: 1,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                          }}
+                                        >
+                                          {step.icon}
+                                        </Box>
+                                      )}
+                                    >
+                                      <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                      >
+                                        {step.label}
+                                      </Typography>
+                                    </StepLabel>
+                                  </Step>
+                                ))}
+                              </Stepper>
+                            </Box>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                gap: 2,
+                              }}
+                            >
+                              {!IsUserLoggedIn && (
+                                <Button
+                                  component={Link}
+                                  to="/login"
+                                  variant="outlined"
+                                  size="large"
+                                  startIcon={<Login />}
+                                  sx={{
+                                    color: "orange",
+
+                                    fontSize: "1rem",
+                                    py: 1.5,
+                                    px: 3,
+                                    borderRadius: "50px",
+                                    transition: "all 0.3s ease",
+                                    "&:hover": {
+                                      backgroundColor: "orange",
+                                      color: "orange",
+                                    },
+                                  }}
+                                >
+                                  Login First
+                                </Button>
+                              )}
+                              {event.googleFormLink && (
+                                <Button
+                                  onClick={() =>
+                                    handleViewClick(event.googleFormLink)
+                                  }
+                                  variant="contained"
+                                  size="large"
+                                  endIcon={<Celebration />}
+                                  sx={{
+                                    backgroundImage: `linear-gradient(270deg, #00FFFF, ${colors.accent}, #fd5c63)`,
+                                    backgroundSize: "600% 600%",
+                                    color: colors.white,
+                                    animation:
+                                      "gradientAnimation 5s ease infinite",
+                                    fontSize: "1rem",
+                                    py: 1.5,
+                                    px: 3,
+                                    borderRadius: "50px",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                    transition: "all 0.3s ease",
+                                    "&:hover": {
+                                      boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                                    },
+                                  }}
+                                >
+                                  Fill The Form
+                                </Button>
+                              )}
+                            </Box>
+                          </div>
                         )}
-                        <Button
-                          onClick={() => handleViewClick(event.googleFormLink)}
-                          variant="contained"
-                          size="large"
-                          endIcon={<Celebration />}
-                          sx={{
-                            backgroundImage: `linear-gradient(270deg, #00FFFF, ${colors.accent}, #fd5c63)`,
-                            backgroundSize: "600% 600%",
-                            color: colors.white,
-                            animation: "gradientAnimation 5s ease infinite",
-                            fontSize: "1rem",
-                            py: 1.5,
-                            px: 3,
-                            borderRadius: "50px",
-                            boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
-                            },
-                          }}
-                        >
-                          Fill The Form
-                        </Button>
                       </Box>
-                    </Box>
-                  </Card>
-                </motion.div>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
+                    </Card>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        ) : (
+          <Container maxWidth="lg">
+            <Typography
+              variant="h4"
+              sx={{
+                color: colors.white,
+                textAlign: "center",
+                mb: 4,
+              }}
+            >
+              Preparing Lucid Track for Education Gainers
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: colors.white,
+                textAlign: "center",
+              }}
+            >
+              We are here to encourage learning and help learners. EduGainers is
+              the best platform to enhance your knowledge and skills.
+            </Typography>
+          </Container>
+        )}
       </Box>
 
       <Box
