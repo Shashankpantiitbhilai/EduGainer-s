@@ -1,1 +1,77 @@
-<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"><url><loc>https://edugainers.com/</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/login</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/register</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/forgot-password</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/reset-password/:id/:token</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/otp-verify/:id</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/chat/home</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/Policies</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/library/fee-pay</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/resources</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/library</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/classes</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/classes-reg/:id</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/classes/success/:id</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/new-reg</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/success/:id</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/dashboard/:id</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/profile/:id</loc><changefreq>daily</changefreq><priority>0.7</priority></url><url><loc>https://edugainers.com/stationary/home</loc><changefreq>daily</changefreq><priority>0.7</priority></url></urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://edugainers.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/login</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/register</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/forgot-password</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://edugainers.com/chat/home</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/Policies</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/library/fee-pay</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/resources</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/library</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/classes</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+ 
+ 
+  <url>
+    <loc>https://edugainers.com/new-reg</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://edugainers.com/dashboard/:id</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/profile/:id</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://edugainers.com/stationary/home</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
