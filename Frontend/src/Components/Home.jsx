@@ -287,7 +287,7 @@ function Home() {
                                 repeatType: "reverse",
                               }}
                             >
-                              Deadline: {formatDate(event.endDate)}
+                              End Date: {formatDate(event.endDate)}
                             </AnimatedText>
                           )}
                         </Box>
