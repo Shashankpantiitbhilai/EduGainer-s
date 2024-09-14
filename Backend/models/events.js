@@ -16,10 +16,10 @@ const eventSchema = new mongoose.Schema({
         publicId: { type: String },
         url: { type: String },
     },
-    
+
     endDate: {
         type: Date,
-        // Optional: set to true if the end date is required
+        required: true, // Optional: set to true if the end date is required
     },
 });
 
