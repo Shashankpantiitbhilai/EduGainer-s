@@ -196,7 +196,7 @@ function Home() {
                 fontSize: { xs: "2.5rem", md: "3.5rem" },
               }}
             >
-              Upcoming Events
+              Current Events
             </Typography>
             <Grid container spacing={4}>
               {events.map((event, index) => (
@@ -275,19 +275,21 @@ function Home() {
                           >
                             {event.description || "No description available"}
                           </Typography>
-                          <AnimatedText
-                            variant="body2"
-                            sx={{ color: "red", mb: 3 }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1, scale: [1, 1.1, 1] }}
-                            transition={{
-                              duration: 1,
-                              repeat: Infinity,
-                              repeatType: "reverse",
-                            }}
-                          >
-                            Deadline: {formatDate(event.endDate)}
-                          </AnimatedText>
+                          {event.endDate && (
+                            <AnimatedText
+                              variant="body2"
+                              sx={{ color: "red", mb: 3 }}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1, scale: [1, 1.1, 1] }}
+                              transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                repeatType: "reverse",
+                              }}
+                            >
+                              Deadline: {formatDate(event.endDate)}
+                            </AnimatedText>
+                          )}
                         </Box>
                         {event.googleFormLink && (
                           <div>
