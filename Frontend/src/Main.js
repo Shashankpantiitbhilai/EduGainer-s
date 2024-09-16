@@ -35,6 +35,7 @@ import AdminDashboard from "./Components/Admin/adminDashboard.jsx";
 import StationaryHome from "./Components/Stationary/home.jsx";
 import FeedbackForm from "./Components/feedback/feedback.jsx";
 import Pamplette from "./Components/Admin/pamplette.jsx";
+import Credits from "./Components/credits.jsx"
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -56,6 +57,7 @@ const Main = () => {
                 <Route path="/chat/home" element={<Chat />} />
                 <Route path="/Policies" element={<Policies />} />
                 <Route path="/feedback" element={<ProtectedUser><FeedbackForm /></ProtectedUser>} />
+                <Route path="/credits" element={<Credits />} />
                 <Route
                     path="/library/fee-pay"
                     element={
