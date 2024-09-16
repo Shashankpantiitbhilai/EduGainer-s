@@ -15,6 +15,7 @@ import {
   ThemeProvider,
   createTheme,
   styled,
+  Tooltip,
 } from "@mui/material";
 import {
   GitHub,
@@ -25,8 +26,11 @@ import {
   School,
   Code,
   ExpandMore as ExpandMoreIcon,
+  Instagram,
+  Facebook,
 } from "@mui/icons-material";
 import url from "../images/shashank.jpg";
+
 // Create a theme
 const theme = createTheme({
   palette: {
@@ -57,7 +61,17 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     to: { opacity: 1, transform: "translateY(0)" },
   },
 }));
+const SocialIconWithLabel = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: theme.spacing(1),
+}));
 
+const IconLabel = styled(Typography)(({ theme }) => ({
+  fontSize: "0.75rem",
+  color: theme.palette.text.secondary,
+}));
 const AnimatedAvatar = styled(Avatar)(({ theme }) => ({
   width: theme.spacing(20),
   height: theme.spacing(20),
@@ -77,8 +91,8 @@ const AnimatedAvatar = styled(Avatar)(({ theme }) => ({
   },
 }));
 
-const SocialIcon = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.secondary,
+const SocialIcon = styled(IconButton)(({ theme, color }) => ({
+  color: color,
   "&:hover": {
     color: theme.palette.primary.main,
     transform: "scale(1.2)",
@@ -133,7 +147,44 @@ const CreditItem = ({ title, items }) => {
 
 const EduGainerCredits = () => {
   const [animate, setAnimate] = useState(false);
-
+  const socialLinks = [
+    {
+      name: "Email",
+      icon: Mail,
+      href: "mailto:shashankp@iitbhilai.ac.in",
+      color: "#D44638",
+    },
+    {
+      name: "LinkedIn",
+      icon: LinkedIn,
+      href: "https://www.linkedin.com/in/shashankpant12/",
+      color: "#0077B5",
+    },
+    {
+      name: "GitHub",
+      icon: GitHub,
+      href: "https://github.com/shashankpantiitbhilai",
+      color: "#333",
+    },
+    {
+      name: "LeetCode",
+      icon: Code,
+      href: "https://leetcode.com/shashankpant",
+      color: "#FFA116",
+    },
+    {
+      name: "Instagram",
+      icon: Instagram,
+      href: "https://www.instagram.com/llawliet532/",
+      color: "#E1306C",
+    },
+    {
+      name: "Facebook",
+      icon: Facebook,
+      href: "https://www.facebook.com/shashank.pant.79/",
+      color: "#1877F2",
+    },
+  ];
   useEffect(() => {
     setAnimate(true);
   }, []);
@@ -215,38 +266,22 @@ const EduGainerCredits = () => {
               competitive problem-solving.
             </Typography>
             <Grid container justifyContent="center" spacing={2}>
-              <Grid item>
-                <SocialIcon
-                  href="mailto:shashankp@iitbhilai.ac.in"
-                  aria-label="Email"
-                >
-                  <Mail />
-                </SocialIcon>
-              </Grid>
-              <Grid item>
-                <SocialIcon
-                  href="https://www.linkedin.com/in/shashankpant12/"
-                  aria-label="LinkedIn"
-                >
-                  <LinkedIn />
-                </SocialIcon>
-              </Grid>
-              <Grid item>
-                <SocialIcon
-                  href="https://github.com/shashankpantiitbhilai"
-                  aria-label="GitHub"
-                >
-                  <GitHub />
-                </SocialIcon>
-              </Grid>
-              <Grid item>
-                <SocialIcon
-                  href="https://leetcode.com/shashankpant"
-                  aria-label="LeetCode"
-                >
-                  <Code />
-                </SocialIcon>
-              </Grid>
+              {socialLinks.map((link) => (
+                <Grid item key={link.name}>
+                  <SocialIconWithLabel>
+                    <Tooltip title={link.name}>
+                      <SocialIcon
+                        href={link.href}
+                        aria-label={link.name}
+                        color={link.color}
+                      >
+                        <link.icon />
+                      </SocialIcon>
+                    </Tooltip>
+                    <IconLabel>{link.name}</IconLabel>
+                  </SocialIconWithLabel>
+                </Grid>
+              ))}
             </Grid>
             <Box mt={2}>
               <Link
@@ -302,8 +337,6 @@ const EduGainerCredits = () => {
               />
             ))}
           </Box>
-
-     
         </StyledPaper>
       </Box>
     </ThemeProvider>
