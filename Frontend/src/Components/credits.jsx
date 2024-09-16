@@ -217,7 +217,7 @@ const EduGainerCredits = () => {
       ],
     },
     {
-      title: "Role in EduGainer",
+      title: "Role in EduGainer's",
       items: [
         "Led the development of the entire web application from conception to deployment",
         "Implemented real-time features using WebSockets",

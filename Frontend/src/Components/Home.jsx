@@ -77,11 +77,7 @@ function Home() {
         });
 
         setEvents(currentEvents);
-        if (events) {
-          console.log(events.length, "ee");
-        } else {
-          console.log("no");
-        }
+      
       } catch (error) {
         console.error("Error fetching events:", error);
         toast.error("Failed to load events");
@@ -128,6 +124,7 @@ function Home() {
     { name: "Query", link: "/chat/home" },
     { name: "Feedback", link: "/feedback" },
     { name: "Privacy Policy", link: "/Policies" },
+    { name: "Credits", link: "/credits" },
   ];
   const libraryFacilities = [
     { icon: <WatchLater />, text: "24/7 Accessibility" },
