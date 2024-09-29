@@ -16,12 +16,16 @@ import {
   Box,
   Grow,
   useTheme,
+  Paper,
+  Divider,
 } from "@mui/material";
 import { getAllClasses } from "../../services/Admin_services/admin_classes";
 import {
   School as SchoolIcon,
   Event as EventIcon,
   AccessTime as AccessTimeIcon,
+  Star as StarIcon,
+  Speed as SpeedIcon,
 } from "@mui/icons-material";
 
 const EduGainerClassesDisplay = () => {
@@ -57,10 +61,7 @@ const EduGainerClassesDisplay = () => {
 
   const handleRegister = (classItem) => {
     const id = classItem?._id;
-    console.log(id);
-    // Implement registration logic here
     navigate(`/classes-reg/${id}`);
-    console.log(`Registering for ${classItem.name}`);
   };
 
   if (loading) return <Typography>Loading...</Typography>;
@@ -69,20 +70,53 @@ const EduGainerClassesDisplay = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Grow in={true} timeout={1000}>
-        <Box textAlign="center" mb={6}>
+        <Paper elevation={3} sx={{ p: 4, mb: 6, borderRadius: 2 }}>
           <Typography
             variant="h3"
             component="h1"
             gutterBottom
             fontWeight="bold"
             color="primary"
+            align="center"
           >
             Welcome to EduGainer's Classes
           </Typography>
-          <Typography variant="h5" color="text.secondary">
+          <Typography
+            variant="h5"
+            color="text.secondary"
+            align="center"
+            gutterBottom
+          >
             Empowering Education Through Innovation
           </Typography>
-        </Box>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="body1" paragraph>
+            EduGainer is your gateway to excellence in education. We offer
+            cutting-edge courses designed to propel your career forward. Our
+            expert faculty, state-of-the-art curriculum, and innovative teaching
+            methods ensure that you receive the best possible education.
+          </Typography>
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} sm={4}>
+              <Box display="flex" alignItems="center" justifyContent="center">
+                <StarIcon color="secondary" sx={{ mr: 1 }} />
+                <Typography variant="h6">Expert Faculty</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Box display="flex" alignItems="center" justifyContent="center">
+                <SpeedIcon color="secondary" sx={{ mr: 1 }} />
+                <Typography variant="h6">Fast-Track Learning</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Box display="flex" alignItems="center" justifyContent="center">
+                <SchoolIcon color="secondary" sx={{ mr: 1 }} />
+                <Typography variant="h6">Industry-Relevant Skills</Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Paper>
       </Grow>
 
       <Typography
@@ -91,8 +125,10 @@ const EduGainerClassesDisplay = () => {
         gutterBottom
         color="secondary"
         fontWeight="bold"
+        align="center"
+        sx={{ mb: 4 }}
       >
-        Active Batches
+        Active Batches - Register Now!
       </Typography>
       <Grid container spacing={3}>
         {classes.map((classItem, index) => (
@@ -108,8 +144,27 @@ const EduGainerClassesDisplay = () => {
                     transform: "scale(1.05)",
                     boxShadow: theme.shadows[8],
                   },
+                  position: "relative",
+                  overflow: "visible",
                 }}
               >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: -15,
+                    right: -15,
+                    bgcolor: "error.main",
+                    color: "white",
+                    p: 1,
+                    borderRadius: "50%",
+                    zIndex: 1,
+                    fontWeight: "bold",
+                    fontSize: "0.8rem",
+                    boxShadow: theme.shadows[3],
+                  }}
+                >
+                  Limited Seats!
+                </Box>
                 {classItem.image?.url && (
                   <CardMedia
                     component="img"
@@ -136,12 +191,8 @@ const EduGainerClassesDisplay = () => {
                     <Typography variant="body2" color="text.secondary">
                       {classItem.facultyName}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {classItem.amount}
-                    </Typography>
                   </Box>
                   <Box display="flex" alignItems="center" mb={1}>
-                    {" "}
                     <EventIcon sx={{ mr: 1, color: "secondary.main" }} />
                     <Typography variant="body2" color="text.secondary">
                       {classItem.duration}
@@ -151,11 +202,11 @@ const EduGainerClassesDisplay = () => {
                     <AccessTimeIcon sx={{ mr: 1, color: "secondary.main" }} />
                     <Typography variant="body2" color="text.secondary">
                       {classItem.timing}
-                      <Typography variant="body2" color="text.secondary">
-                        {classItem.amount}
-                      </Typography>
                     </Typography>
                   </Box>
+                  <Typography variant="h6" color="error.main" gutterBottom>
+                    ₹{classItem.amount}
+                  </Typography>
                   <Box display="flex" justifyContent="space-between">
                     <Button
                       variant="outlined"
@@ -169,7 +220,7 @@ const EduGainerClassesDisplay = () => {
                       color="secondary"
                       onClick={() => handleRegister(classItem)}
                     >
-                      Register
+                      Register Now
                     </Button>
                   </Box>
                 </CardContent>

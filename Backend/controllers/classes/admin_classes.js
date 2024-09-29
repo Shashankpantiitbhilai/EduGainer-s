@@ -1,10 +1,11 @@
-const { AdminClass} = require('../../models/classes'); // Assuming this is the schema for classes
+const { AdminClass } = require('../../models/classes'); // Assuming this is the schema for classes
 const { uploadToCloudinary } = require('../../cloudinary');
+
 const cloudinary = require('cloudinary').v2;
 
 // Add a new class
 const addClass = async (req, res) => {
-    const { name, description, facultyName,amount, duration, timing, content, additionalDetails, image } = req.body;
+    const { name, description, facultyName, amount, duration, timing, content, additionalDetails, image } = req.body;
 
     try {
         let newClassData = {
@@ -44,7 +45,7 @@ const addClass = async (req, res) => {
 // Edit a class
 const editClass = async (req, res) => {
     const { id } = req.params; // Get class ID from request params
-    const { name, description, facultyName,amount, duration, timing, content, additionalDetails, image } = req.body;
+    const { name, description, facultyName, amount, duration, timing, content, additionalDetails, image } = req.body;
 
     try {
         // Find the current class
@@ -84,7 +85,7 @@ const editClass = async (req, res) => {
 
         // Update the class record with the new data
         const updatedClass = await AdminClass.findByIdAndUpdate(id, updateData, { new: true });
-      
+
         if (!updatedClass) {
             return res.status(404).json({ error: "Class not found" });
         }
@@ -142,11 +143,30 @@ const getClasses = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+const getBatchStudents = async (req, res) => {
+    try {
+        const { batchId } = req.params; // Get batchId from request parameters
+console.log(batchId,"pppppppppp")
+        // Find the batch by its ID and populate the studentIds with student data
+        const batch = await AdminClass.findOne({ _id: batchId }).populate('studentIds');
+console.log(batch,"batch")
+        if (!batch) {
+            return res.status(404).json({ message: 'Batch not found' });
+        }
 
-// Export controller functions
+        // Check if studentIds exist and return only the students
+        const students = batch.studentIds; // This will be an array of student documents
+        console.log(students,"studentisd")
+        res.status(200).json(students); // Send the student data as the response
+    } catch (error) {
+        console.error('Error fetching students:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 module.exports = {
     addClass,
     editClass,
     deleteClass,
-    getClasses
+    getClasses,
+    getBatchStudents
 };

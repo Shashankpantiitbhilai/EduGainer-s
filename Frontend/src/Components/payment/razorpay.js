@@ -93,10 +93,12 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
             }
       
             if (verificationResponse.data.success) {
+              console.log("jijipp")
               if (status === "newRegistration") {
                 toast.success("Registration successful! Please contact the office to get your seat and shift.");
                 navigate(`/success/${userId}`);
               } else if (status === "newClassRegistration") {
+                console.log("jijipp")
                 toast.success("Class registration successful! Please check your email for further instructions.");
                 navigate(`/class-success/${userId}`);
               } else if (status === "Reregistration") {

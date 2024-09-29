@@ -18,7 +18,6 @@ import { getClassStudentInfo } from "../../services/Class/utils"; // Replace wit
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import generatePDF from "react-to-pdf";
-import backgroundChat from "../../images/backgroundChat.jpg"; // Update the path accordingly
 
 const ClassSuccessPage = () => {
   const { id } = useParams();
@@ -153,11 +152,11 @@ const ClassSuccessPage = () => {
         Payment Details
       </Typography>
       <Typography>
-        <strong>Order ID:</strong> {classData.Payment_detail.razorpay_order_id}
+        <strong>Order ID:</strong> {classData?.Payment_detail?.razorpay_order_id}
       </Typography>
       <Typography>
         <strong>Payment ID:</strong>{" "}
-        {classData.Payment_detail.razorpay_payment_id || "Pending"}
+        {classData?.Payment_detail?.razorpay_payment_id || "Pending"}
       </Typography>
       <Typography>
         <strong>Amount Paid:</strong> ₹{classData.amount}

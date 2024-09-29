@@ -56,7 +56,7 @@ export default function ClassReg() {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn?._id;
   const [activeStep, setActiveStep] = useState(0);
-
+  const { ClassId } = useParams();
   const [submit, setSubmit] = useState("");
   const [formData, setFormData] = useState({
     email: IsUserLoggedIn?.username || "",
@@ -70,6 +70,7 @@ export default function ClassReg() {
   } = useForm({
     defaultValues: {
       email: IsUserLoggedIn?.username || "",
+      Batch: ClassId,
     },
   });
   const [imageBase64, setImageBase64] = useState("");
@@ -78,7 +79,7 @@ export default function ClassReg() {
   const [isEligible, setIsEligible] = useState(null);
   const [consentGiven, setConsentGiven] = useState(false);
   const [fileError, setFileError] = useState("");
-  const { ClassId } = useParams();
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [fee, setFee] = useState(0);
@@ -114,9 +115,8 @@ export default function ClassReg() {
           const data = await getStudentDetails(id, ClassId);
           // Populate form fields with fetched data
           const studentDetails = data.studentDetails;
-          console.log(studentDetails, "ooo");
-          console.log(data.fee);
-          setFee(data.fee);
+
+          setFee(data?.fee);
           Object.keys(studentDetails).forEach((key) => {
             console.log(key, studentDetails[key]);
             setValue(key, studentDetails[key]);

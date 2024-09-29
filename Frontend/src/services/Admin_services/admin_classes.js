@@ -1,3 +1,4 @@
+import { gridColumnsTotalWidthSelector } from "@mui/x-data-grid";
 import axios from "axios";
 
 // Determine the baseURL based on the environment
@@ -61,6 +62,19 @@ export async function getClassById(id) {
         const response = await axiosInstance.get(`/admin_classes/getClass/${id}`);
         return response.data;
     } catch (error) {
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+export async function getBatchStudent(batchId) {
+    try {
+
+        // Make the POST request to the server with batchId
+        const response = await axiosInstance.get(`/admin_classes/getBatchData/${batchId}`);
+
+        // Return the response data, likely the student list
+        return response.data;
+    } catch (error) {
+        // Handle any errors here
         throw error; // Propagate the error to handle it in the calling component
     }
 }

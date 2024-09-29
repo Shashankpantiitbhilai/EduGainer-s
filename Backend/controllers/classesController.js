@@ -16,9 +16,7 @@ const getStudentDetails = async (req, res) => {
         console.log(amount,"amount");
         console.log(libStudent)
         // Check if the LibStudent record exists
-        if (!libStudent) {
-            return res.status(404).json({ success: false, error: "Student not found" });
-        }
+        
 
         // Send the required details from the LibStudent schema
         res.status(200).json({
@@ -53,9 +51,9 @@ const getClassStudentById = async (req, res) => {
     try {
         // Fetch the ID from req.params
         const { id } = req.params;
-
+        console.log(id)
         // Find the class registration by ID
-        const classRegistration = await ClassReg.findById(id);
+        const classRegistration = await ClassReg.findOne({ userId: id });
 console.log(classRegistration)
         // Check if the class registration was found
         if (!classRegistration) {
@@ -75,7 +73,7 @@ const paymentVerification = async (req, res) => {
     const { order_id, payment_id, signature, formData } = req.body;
 
     const {
-        name, email,standard, subject, board, faculty,
+        name, email,standard, subject, board, Batch,faculty,
         school, dob, father, mother, contact1, contact2,
         address, aadharNo, preparingForExam, image
     } = formData;
@@ -108,6 +106,10 @@ class:standard,
                     address,
                     aadharNo,
                     preparingForExam,
+                    Payment_detail: {
+                        razorpay_order_id: order_id,
+                        razorpay_payment_id: payment_id
+                    },
                     image: {} // Will be updated after image upload
                 });
 
@@ -119,8 +121,24 @@ class:standard,
                 }
 
                 // Save the class registration document
-                await newClassReg.save();
+                const savedClassReg = await newClassReg.save();
 
+                // Access the ID of the saved document
+                const classRegId = savedClassReg._id;
+                await newClassReg.save();
+                let adminClass = await AdminClass.findOne({ _id: Batch });
+
+                if (!adminClass) {
+                    return res.status(404).json({ message: 'Batch not found' });
+                }
+
+                // Add the userId to the studentIds array if it's not already there
+                if (!adminClass.studentIds.includes(user_id)) {
+                    adminClass.studentIds.push(classRegId);
+                    await adminClass.save(); // Save changes to the database
+                } else {
+                    return res.status(400).json({ message: 'User already enrolled in the batch' });
+                }
                 res.status(200).json({
                     success: true,
                     message: 'Payment verified, class registration created successfully',
@@ -280,6 +298,7 @@ const checkEligibility = async (req, res) => {
 };
 
 module.exports = {
-    getClassStudentById, paymentVerification, verifyPayment, getUserById, createClassStudent, checkEligibility, getStudentDetails, order
+
+    getClassStudentById, paymentVerification, verifyPayment, getUserById,  checkEligibility, getStudentDetails, order
 }
 // Other controller functions for generating and sending PDFs, handling updates, etc.

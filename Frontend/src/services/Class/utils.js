@@ -27,7 +27,7 @@ export async function sendFormData(formData) {
 export async function getClassStudentInfo(userId) {
   try {
     // Send a GET request to the server with the userId as a parameter
-    const response = await axiosInstance.get(`/getStudentDetails/${userId}`);
+    const response = await axiosInstance.get(`/classes/getStudentDetails/${userId}`);
 
     // Return the student data received from the server
     return response.data;

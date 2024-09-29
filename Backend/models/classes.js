@@ -10,23 +10,23 @@ const BatchSchema = new Schema({
     },
     duration: {
         type: String,
-          // Ensure duration is provided
+        // Ensure duration is provided
     },
     facultyName: {
         type: String,
-          // Ensure faculty name is provided
+        // Ensure faculty name is provided
     },
     description: {
         type: String,
-          // Ensure description is provided
+        // Ensure description is provided
     },
     timing: {
         type: String,     // Format as per your needs, e.g., 'Monday 10:00 - 12:00'
-           // Ensure timing is provided
+        // Ensure timing is provided
     },
     contents: {
         type: [String],   // Array of strings to list the contents of the class
-       
+
     }, image: {
         publicId: {
             type: String,
@@ -42,7 +42,7 @@ const BatchSchema = new Schema({
     }
     ,
     amount: {
-        type:Number
+        type: Number
     },
     studentIds: [{
         type: Schema.Types.ObjectId,  // Use ObjectId to reference another model
@@ -57,63 +57,67 @@ const ClassRegSchema = new Schema({
     },
     name: {
         type: String,
-         // Ensure name is provided
+        // Ensure name is provided
+    },
+    amount: {
+        type: Number,
+
     },
     reg: {
         type: String,
         // Ensure registration number is provided
-        unique: true    // Ensure registration number is unique
+        // Ensure registration number is unique
     },
     gender: {
         type: String,
         enum: ['Male', 'Female', 'Other'],  // Options for gender
-       
+
     },
     class: {
         type: String,
-         // Ensure class is provided
+        // Ensure class is provided
     },
     subject: {
         type: String,
-         // Ensure subject is provided
+        // Ensure subject is provided
     },
     board: {
         type: String,
-         // Ensure board (e.g., CBSE, ICSE) is provided
+        // Ensure board (e.g., CBSE, ICSE) is provided
     },
     faculty: {
         type: String,
-         // Ensure faculty name is provided
+        // Ensure faculty name is provided
     },
     school: {
         type: String,
-         // Ensure school name is provided
+        // Ensure school name is provided
     },
     dob: {
         type: Date,
-         // Ensure date of birth is provided
+        // Ensure date of birth is provided
     },
     fatherName: {
         type: String,
-         // Ensure father's name is provided
+        // Ensure father's name is provided
     },
     motherName: {
         type: String,
-         // Ensure mother's name is provided
+        // Ensure mother's name is provided
     },
     contact1: {
         type: String,
-         // Ensure primary contact number is provided
+        // Ensure primary contact number is provided
     },
     contact2: {
         type: String    // Optional secondary contact number
     },
     address: {
         type: String,
-         // Ensure address is provided
+        // Ensure address is provided
     },
     date: {
-        type:String,
+        type: String,
     },
     aadharNo: {
         type: String,
@@ -138,6 +142,15 @@ const ClassRegSchema = new Schema({
 
         }
     },
+    Payment_detail: {
+        razorpay_order_id: { type: String },
+        razorpay_payment_id: { type: String },
+    },
+    Consent: {
+        type: String,
+        default: "Agreed"
+    }
+
 });
 
 // Create and export model based on schema

@@ -4,6 +4,7 @@ import {
   addClass,
   editClass,
   deleteClass,
+  getBatchStudent,
 } from "../../../services/Admin_services/admin_classes"; // Adjust path accordingly
 import {
   Button,
@@ -13,6 +14,8 @@ import {
   DialogActions,
   TextField,
   List,
+  ListItem,
+  ListItemText,
   IconButton,
   CircularProgress,
   Typography,
@@ -26,6 +29,12 @@ import {
   Avatar,
   Snackbar,
   Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -42,7 +51,7 @@ const AdminBatches = () => {
   const [imageBase64, setImageBase64] = useState("");
   const [batchToDelete, setBatchToDelete] = useState(null);
   const [openWarningDialog, setOpenWarningDialog] = useState(false);
-  const [error, setError] = useState(null); // Error state
+  const [error, setError] = useState(null);
   const [currentBatch, setCurrentBatch] = useState({
     id: null,
     name: "",
@@ -57,6 +66,8 @@ const AdminBatches = () => {
       publicId: "",
     },
   });
+  const [studentDetails, setStudentDetails] = useState(null);
+  const [openStudentDialog, setOpenStudentDialog] = useState(false);
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -134,8 +145,8 @@ const AdminBatches = () => {
     formData.append("duration", currentBatch.duration);
     formData.append("facultyName", currentBatch.facultyName);
     formData.append("description", currentBatch.description);
-      formData.append("timing", currentBatch.timing);
-       formData.append("amount", currentBatch.amount);
+    formData.append("timing", currentBatch.timing);
+    formData.append("amount", currentBatch.amount);
     formData.append("contents", currentBatch.contents.join(","));
     formData.append("additionalDetails", currentBatch.additionalDetails);
     if (imageBase64) {
@@ -186,7 +197,23 @@ const AdminBatches = () => {
   };
 
   const handleCloseError = () => {
-    setError(null); // Clear the error state
+    setError(null);
+  };
+
+  const handleOpenStudentDetails = async (batch) => {
+    try {
+      const students = await getBatchStudent(batch._id);
+      setStudentDetails(students);
+      setOpenStudentDialog(true);
+    } catch (error) {
+      console.error("Error fetching student details:", error);
+      setError("Error fetching student details.");
+    }
+  };
+
+  const handleCloseStudentDialog = () => {
+    setOpenStudentDialog(false);
+    setStudentDetails(null);
   };
 
   return (
@@ -240,8 +267,8 @@ const AdminBatches = () => {
                       <Typography variant="h6">{batch.name}</Typography>
                       <Typography variant="body2" color="text.secondary">
                         facultyName: {batch.facultyName} - Timing:{" "}
-                                    {batch.timing} - Duration: {batch.duration} - Fee:{""}
-                                     {batch.amount} 
+                        {batch.timing} - Duration: {batch.duration} - Fee:{" "}
+                        {batch.amount}
                       </Typography>
                       <Chip
                         label={`Contents: ${batch.contents.join(", ")}`}
@@ -263,6 +290,13 @@ const AdminBatches = () => {
                       >
                         <DeleteIcon />
                       </IconButton>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleOpenStudentDetails(batch)}
+                      >
+                        View Students
+                      </Button>
                     </Box>
                   </Box>
 
@@ -282,12 +316,8 @@ const AdminBatches = () => {
         )}
       </Paper>
 
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        fullWidth
-        maxWidth="sm"
-      >
+      {/* Add/Edit Class Dialog */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>
           {currentBatch.id ? "Edit Class" : "Add Class"}
         </DialogTitle>
@@ -306,7 +336,7 @@ const AdminBatches = () => {
           <TextField
             margin="dense"
             name="facultyName"
-            label="facultyName "
+            label="Faculty Name"
             type="text"
             fullWidth
             variant="outlined"
@@ -315,14 +345,12 @@ const AdminBatches = () => {
           />
           <TextField
             margin="dense"
-            name="description"
-            label="Description"
+            name="duration"
+            label="Duration"
             type="text"
             fullWidth
             variant="outlined"
-            multiline
-            rows={4}
-            value={currentBatch.description}
+            value={currentBatch.duration}
             onChange={handleInputChange}
           />
           <TextField
@@ -338,8 +366,8 @@ const AdminBatches = () => {
           <TextField
             margin="dense"
             name="amount"
-            label="amount"
-            type="number"
+            label="Fee"
+            type="text"
             fullWidth
             variant="outlined"
             value={currentBatch.amount}
@@ -347,12 +375,12 @@ const AdminBatches = () => {
           />
           <TextField
             margin="dense"
-            name="duration"
-            label="Duration"
+            name="description"
+            label="Description"
             type="text"
             fullWidth
             variant="outlined"
-            value={currentBatch.duration}
+            value={currentBatch.description}
             onChange={handleInputChange}
           />
           <TextField
@@ -375,57 +403,127 @@ const AdminBatches = () => {
             value={currentBatch.additionalDetails}
             onChange={handleInputChange}
           />
-          <Box mt={2}>
-            <Button variant="contained" component="label">
-              Upload Image
-              <input
-                type="file"
-                hidden
-                onChange={handleImageChange}
-                accept="image/*"
-              />
-            </Button>
-            {imagePreview && (
-              <Box mt={2}>
-                <Avatar
-                  alt="Preview"
-                  src={imagePreview}
-                  sx={{ width: 100, height: 100 }}
-                />
-              </Box>
-            )}
-          </Box>
+          <input type="file" onChange={handleImageChange} />
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              style={{ width: "100%", marginTop: "10px" }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : "Save"}
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} color="primary">
+            {currentBatch.id ? "Update" : "Add"}
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={openWarningDialog} onClose={handleCancelDelete}>
-        <DialogTitle>Are you sure you want to delete this class?</DialogTitle>
+      {/* Student Details Dialog */}
+      <Dialog
+        open={openStudentDialog}
+        onClose={handleCloseStudentDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Student Details</DialogTitle>
+        <DialogContent>
+          {studentDetails && studentDetails.length > 0 ? (
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="student details table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Amount</TableCell>
+                    <TableCell>Registration No</TableCell>
+                    <TableCell>Gender</TableCell>
+                    <TableCell>Class</TableCell>
+                    <TableCell>Subject</TableCell>
+                    <TableCell>School</TableCell>
+                    <TableCell>Date of Birth</TableCell>
+                    <TableCell>Father's Name</TableCell>
+                    <TableCell>Mother's Name</TableCell>
+                    <TableCell>Contact 1</TableCell>
+                    <TableCell>Contact 2</TableCell>
+                    <TableCell>Address</TableCell>
+                    <TableCell>Aadhar No</TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Preparing For Exam</TableCell>
+                    <TableCell>Image</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {studentDetails.map((student) => (
+                    <TableRow key={student._id}>
+                      <TableCell>{student.name}</TableCell>
+                      <TableCell>{student.amount}</TableCell>
+                      <TableCell>{student.reg}</TableCell>
+                      <TableCell>{student.gender}</TableCell>
+                      <TableCell>{student.class}</TableCell>
+                      <TableCell>{student.subject}</TableCell>
+                      <TableCell>{student.school}</TableCell>
+                      <TableCell>
+                        {student.dob
+                          ? new Date(student.dob).toLocaleDateString()
+                          : "N/A"}
+                      </TableCell>
+                      <TableCell>{student.fatherName}</TableCell>
+                      <TableCell>{student.motherName}</TableCell>
+                      <TableCell>{student.contact1}</TableCell>
+                      <TableCell>{student.contact2}</TableCell>
+                      <TableCell>{student.address}</TableCell>
+                      <TableCell>{student.aadharNo}</TableCell>
+                      <TableCell>{student.email}</TableCell>
+                      <TableCell>{student.preparingForExam}</TableCell>
+                      <TableCell>
+                        <img
+                          src={student.image.url}
+                          alt={student.name}
+                          style={{ width: "50px", height: "auto" }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <Typography>No student details available.</Typography>
+          )}
+        </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete} color="secondary">
+          <Button onClick={handleCloseStudentDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Warning Dialog for Deletion */}
+      <Dialog open={openWarningDialog} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this class?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error">
+          <Button onClick={handleConfirmDelete} color="primary">
             Confirm
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Error Snackbar */}
       <Snackbar
         open={!!error}
         autoHideDuration={6000}
         onClose={handleCloseError}
       >
-        <Alert
-          onClose={handleCloseError}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
+        <Alert onClose={handleCloseError} severity="error">
           {error}
         </Alert>
       </Snackbar>

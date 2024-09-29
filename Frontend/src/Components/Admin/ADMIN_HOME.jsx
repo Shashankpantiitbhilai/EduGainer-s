@@ -12,6 +12,12 @@ import {
   IconButton,
   Paper,
   Avatar,
+  Tooltip,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider,
 } from "@mui/material";
 import {
   ExitToApp as LogoutIcon,
@@ -21,6 +27,10 @@ import {
   Chat as ChatIcon,
   Home as HomeIcon,
   Event as EventIcon,
+  People as UsersIcon,
+  Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  Dashboard as DashboardIcon,
 } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { logoutUser } from "../../services/auth";
@@ -47,25 +57,34 @@ function ADMIN_HOME() {
 
   const adminTools = [
     { title: "Manage Library", icon: <LibraryIcon />, link: "/admin_library" },
+    {
+      title: "Manage Classes",
+      icon: <ClassIcon />,
+      link: "/admin/classes",
+    },
     { title: "Admin Chat", icon: <ChatIcon />, link: "/admin/chat" },
     { title: "Manage Events", icon: <EventIcon />, link: "/admin/add-event" },
   ];
 
+  const quickStats = [
+    { title: "Total Users", value: "1,234", icon: <UsersIcon /> },
+    { title: "Active Classes", value: "42", icon: <ClassIcon /> },
+    { title: "Library Items", value: "5,678", icon: <LibraryIcon /> },
+    { title: "Upcoming Events", value: "7", icon: <EventIcon /> },
+  ];
+
+  const recentNotifications = [
+    "New user registration: John Doe",
+    "Class 'Advanced Math' starts in 1 hour",
+    "3 new books added to the library",
+    "System maintenance scheduled for tonight",
+  ];
+
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        minHeight: "100vh",
-      }}
-    >
+    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "#f5f5f5" }}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={3} sx={{ borderRadius: "15px", overflow: "hidden" }}>
-          <Box
-            sx={{
-              p: 3,
-              borderBottom: "4px solid",
-            }}
-          >
+          <Box sx={{ p: 3, borderBottom: "1px solid #e0e0e0" }}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -73,11 +92,7 @@ function ADMIN_HOME() {
             >
               <Box display="flex" alignItems="center">
                 <Avatar
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    mr: 2,
-                  }}
+                  sx={{ width: 60, height: 60, mr: 2, bgcolor: "#1976d2" }}
                 >
                   A
                 </Avatar>
@@ -91,17 +106,21 @@ function ADMIN_HOME() {
                 </Box>
               </Box>
               <Box>
-                <IconButton
-                  component={Link}
-                  to="/admin_home"
-                  color="primary"
-                  sx={{ mr: 1 }}
-                >
-                  <HomeIcon />
-                </IconButton>
-                <IconButton onClick={handleLogout} color="secondary">
-                  <LogoutIcon />
-                </IconButton>
+                <Tooltip title="Dashboard">
+                  <IconButton color="primary" sx={{ mr: 1 }}>
+                    <DashboardIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Settings">
+                  <IconButton color="primary" sx={{ mr: 1 }}>
+                    <SettingsIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Logout">
+                  <IconButton onClick={handleLogout} color="secondary">
+                    <LogoutIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
           </Box>
@@ -111,61 +130,97 @@ function ADMIN_HOME() {
               variant="h5"
               component="div"
               gutterBottom
-              sx={{ mb: 4, textAlign: "center" }}
+              sx={{ mb: 4, fontWeight: "bold" }}
             >
-              Manage EduGainer's Resources and Services
+              Admin Dashboard
             </Typography>
 
             <Grid container spacing={4}>
-              {adminTools.map((tool, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
-                  <Card
-                    elevation={4}
-                    sx={{
-                      height: "100%",
-                      display: "flex",
-                      flexDirection: "column",
-                      transition: "all 0.3s",
-                      borderRadius: "10px",
-                      overflow: "hidden",
-                      "&:hover": {
-                        transform: "translateY(-5px)",
-                        boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-                      },
-                    }}
-                  >
-                    <CardContent
-                      sx={{
-                        flexGrow: 1,
-                        textAlign: "center",
-                      }}
-                    >
-                      {React.cloneElement(tool.icon, {
-                        style: {
-                          fontSize: 60,
-                          marginBottom: "16px",
-                        },
-                      })}
-                      <Typography variant="h6" component="div">
-                        {tool.title}
-                      </Typography>
-                    </CardContent>
-                    <CardActions sx={{ justifyContent: "center", p: 2 }}>
-                      <Button
-                        variant="contained"
-                        component={Link}
-                        to={tool.link}
-                        sx={{
-                          borderRadius: "20px",
-                          px: 4,
-                        }}
-                      >
-                        Access
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
+              <Grid item xs={12} md={8}>
+                <Paper elevation={2} sx={{ p: 2, mb: 4 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Quick Stats
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {quickStats.map((stat, index) => (
+                      <Grid item xs={6} sm={3} key={index}>
+                        <Box textAlign="center">
+                          {React.cloneElement(stat.icon, {
+                            sx: { fontSize: 40, color: "#1976d2", mb: 1 },
+                          })}
+                          <Typography variant="h4" component="div">
+                            {stat.value}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {stat.title}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+
+                <Paper elevation={2} sx={{ p: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Admin Tools
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {adminTools.map((tool, index) => (
+                      <Grid item xs={12} sm={6} md={3} key={index}>
+                        <Card
+                          sx={{
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                          }}
+                        >
+                          <CardContent
+                            sx={{ flexGrow: 1, textAlign: "center" }}
+                          >
+                            {React.cloneElement(tool.icon, {
+                              sx: { fontSize: 40, color: "#1976d2", mb: 1 },
+                            })}
+                            <Typography variant="subtitle1">
+                              {tool.title}
+                            </Typography>
+                          </CardContent>
+                          <CardActions>
+                            <Button
+                              fullWidth
+                              variant="outlined"
+                              component={Link}
+                              to={tool.link}
+                            >
+                              Access
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <Paper elevation={2} sx={{ p: 2, height: "100%" }}>
+                  <Typography variant="h6" gutterBottom>
+                    Recent Notifications
+                  </Typography>
+                  <List>
+                    {recentNotifications.map((notification, index) => (
+                      <React.Fragment key={index}>
+                        <ListItem>
+                          <ListItemIcon>
+                            <NotificationsIcon color="primary" />
+                          </ListItemIcon>
+                          <ListItemText primary={notification} />
+                        </ListItem>
+                        {index < recentNotifications.length - 1 && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </List>
+                </Paper>
+              </Grid>
             </Grid>
           </Box>
         </Paper>
