@@ -36,6 +36,8 @@ import StationaryHome from "./Components/Stationary/home.jsx";
 import FeedbackForm from "./Components/feedback/feedback.jsx";
 import Pamplette from "./Components/Admin/pamplette.jsx";
 import Credits from "./Components/credits.jsx"
+import Classes from "./Components/Admin/classes/batches.jsx"
+import ClassSuccess from "./Components/Classes/Success.jsx"
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -109,7 +111,16 @@ const Main = () => {
                     }
                 />
                 <Route
-                    path="/classes-reg/:id"
+                    path="/class-success/:id"
+                    element={
+                        <ProtectedUser>
+                        <ClassSuccess />
+                        </ProtectedUser>
+
+                    }
+                />
+                <Route
+                    path="/classes-reg/:ClassId"
                     element={
                         <ProtectedUser>
                             <ClassesRegistration />
@@ -169,6 +180,14 @@ const Main = () => {
                     element={
                         <ProtectedAdmin>
                             <AdminLibrary />
+                        </ProtectedAdmin>
+                    }
+                />
+                <Route
+                    path="/admin/classes"
+                    element={
+                        <ProtectedAdmin>
+                            <Classes />
                         </ProtectedAdmin>
                     }
                 />

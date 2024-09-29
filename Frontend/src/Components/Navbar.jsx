@@ -78,6 +78,8 @@ function Navbar() {
     ? isAdmin
       ? [
           { name: "Library", link: "/admin_library" },
+
+          { name: "Classes", link: "/admin/classes" },
           { name: "AdminChat", link: "/admin/chat" },
           { name: "MeriStationary", link: "/stationary/home" },
 

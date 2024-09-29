@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { sendFormData } from "../../services/utils";
 import { toast } from 'react-toastify';
 import { sendFeeData } from "../../services/library/utils";
+import { createOrder} from "../../services/Class/utils"
 
 const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) => {
-
   const navigate = useNavigate();
   const baseURL = process.env.NODE_ENV === "production"
     ? process.env.REACT_APP_BACKEND_PROD
@@ -32,8 +32,11 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
 
     try {
       let result;
+      console.log(status,"kkk")
       if (status === "newRegistration") {
         result = await sendFormData(amount);
+      } else if (status === "newClassRegistration") {
+        result = await createOrder(amount);
       } else {
         result = await sendFeeData(amount, status);
       }
@@ -43,8 +46,8 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
         key,
         amount: order.amount,
         currency: "INR",
-        name: "EduGainer's Library",
-        description: "Library Registration Fee",
+        name: "EduGainer's Classes & Library",
+        description: "Registration Fee",
         image: "https://res.cloudinary.com/dlxbl2ero/image/upload/v1721800478/Library_Resources/sjnicynl3rfkomnfc884.jpg",
         order_id: order.id,
         prefill: {
@@ -60,13 +63,19 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
         },
         handler: async (response) => {
           const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = response;
-          let callbackUrl = status === "newRegistration"
-            ? `${baseURL}/payment-verification/${userId}`
-            : `${baseURL}/library/verify-payment/${userId}`;
+          let callbackUrl;
+          
+          if (status === "newRegistration") {
+            callbackUrl = `${baseURL}/payment-verification/${userId}`;
+          } else if (status === "newClassRegistration") {
+            callbackUrl = `${baseURL}/classes/payment-verification/${userId}`;
+          } else {
+            callbackUrl = `${baseURL}/library/verify-payment/${userId}`;
+          }
 
           try {
             let verificationResponse;
-            if (status === "newRegistration") {
+            if (status === "newRegistration" || status === "newClassRegistration") {
               verificationResponse = await axios.post(callbackUrl, {
                 order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
@@ -85,11 +94,14 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
       
             if (verificationResponse.data.success) {
               if (status === "newRegistration") {
-                
-                toast.success("Registration successful! Please contact the office to get your seat and shift."); navigate(`/success/${userId}`);
+                toast.success("Registration successful! Please contact the office to get your seat and shift.");
+                navigate(`/success/${userId}`);
+              } else if (status === "newClassRegistration") {
+                toast.success("Class registration successful! Please check your email for further instructions.");
+                navigate(`/class-success/${userId}`);
               } else if (status === "Reregistration") {
                 toast.success("Re-registration successful! Please contact the office to get your shift and seat.");
-                setTimeout(()=>navigate('/'),3000)
+                setTimeout(() => navigate('/'), 3000);
               } else {
                 toast.success("Fee paid successfully!");
                 navigate(`/`);

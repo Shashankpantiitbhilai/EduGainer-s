@@ -1,30 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Card, CardImg, CardTitle, CardSubtitle } from "reactstrap";
 import {
-  sendIdCard,
-  fetchUserClassesDataById,
-} from "../../services/Class/utils";
-
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Grid,
+  Avatar,
+  Chip,
+  CircularProgress,
+} from "@mui/material";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DownloadIcon from "@mui/icons-material/Download";
+import { getClassStudentInfo } from "../../services/Class/utils"; // Replace with your actual service
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { toast, ToastContainer, Bounce } from "react-toastify";
+import generatePDF from "react-to-pdf";
+import backgroundChat from "../../images/backgroundChat.jpg"; // Update the path accordingly
 
-const SuccessClasses = () => {
+const ClassSuccessPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const [userImage, setUserImage] = useState("");
-  const [isFetched, setIsFetched] = useState(false);
+  const [classData, setClassData] = useState(null);
+  const pdfRef = useRef();
 
   useEffect(() => {
-    if (isFetched) return; // Prevents duplicate execution
-    const getUserData = async () => {
+    const getClassData = async () => {
       try {
-        const userData = await fetchUserClassesDataById(id);
-        setUserData(userData);
-        setUserImage(userData.image.url);
-        await sendIdCard(id);
-        toast.success("👍 Check your mail for Id card!", {
+        const data = await getClassStudentInfo(id);
+        setClassData(data);
+        toast.success("🎉 Class registration successful!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -32,66 +39,165 @@ const SuccessClasses = () => {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "light",
-          transition: Bounce,
         });
-        setTimeout(() => {
-          const url = `/dashboard/${id}`;
-          navigate(url);
-        }, 6000);
-        setIsFetched(true); // Mark as fetched
       } catch (error) {
-        // console.error("Error fetching user data or sending ID card:", error);
-        toast.error("Error sending ID card. Please try again.");
+        toast.error("Error fetching class data. Please try again.");
       }
     };
+    getClassData();
+  }, [id]);
 
-    getUserData();
-  }, [id, navigate, isFetched]);
+  const handleDownloadPDF = () => {
+    generatePDF(pdfRef, {
+      filename: `class_registration_${classData.reg}.pdf`,
+      page: { margin: 10 },
+    });
+  };
 
-  if (!userData) {
-    return <div>Loading...</div>;
+  if (!classData) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
+  const PDFContent = () => (
+    <Box
+      sx={{
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundPosition: "center",
+          backgroundSize: "50%",
+          opacity: 0.9,
+          zIndex: -1,
+        },
+      }}
+    >
+      <Typography variant="h6" gutterBottom align="center">
+        EduGainer's Classes & Library
+      </Typography>
+
+      <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+        <CheckCircleOutlineIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
+        <Typography variant="h4" component="h1" gutterBottom>
+          Class Registration Successful!
+        </Typography>
+        <Chip label={`Reg. No: ${classData.reg}`} color="primary" />
+      </Box>
+
+      <Grid container spacing={3} justifyContent="center" mb={4}>
+        <Grid item xs={12} md={4}>
+          <Avatar
+            src={classData.image?.url}
+            alt={classData?.name}
+            sx={{ width: 150, height: 150, margin: "0 auto" }}
+          />
+        </Grid>
+        <Grid item xs={12} md={8}>
+          <Typography variant="h5" gutterBottom>
+            {classData.name}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph>
+            {classData.email}
+          </Typography>
+          <Typography variant="body2" paragraph>
+            Class: {classData.class}
+          </Typography>
+          <Typography variant="body2" paragraph>
+            Subject: {classData.subject}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Typography variant="h6" gutterBottom>
+        Additional Information
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Typography>
+            <strong>Faculty:</strong> {classData.faculty}
+          </Typography>
+          <Typography>
+            <strong>Board:</strong> {classData.board}
+          </Typography>
+          <Typography>
+            <strong>School:</strong> {classData.school}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Typography>
+            <strong>Father's Name:</strong> {classData.fatherName}
+          </Typography>
+          <Typography>
+            <strong>Mother's Name:</strong> {classData.motherName}
+          </Typography>
+          <Typography>
+            <strong>Contact:</strong> {classData.contact1}, {classData.contact2}
+          </Typography>
+        </Grid>
+      </Grid>
+
+      <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+        Payment Details
+      </Typography>
+      <Typography>
+        <strong>Order ID:</strong> {classData.Payment_detail.razorpay_order_id}
+      </Typography>
+      <Typography>
+        <strong>Payment ID:</strong>{" "}
+        {classData.Payment_detail.razorpay_payment_id || "Pending"}
+      </Typography>
+      <Typography>
+        <strong>Amount Paid:</strong> ₹{classData.amount}
+      </Typography>
+    </Box>
+  );
+
   return (
-    <Container className="d-flex justify-content-center align-items-center SuccessClasses-container">
-      <Card style={{ width: "80%", padding: "20px", margin: "20px" }}>
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: "1", paddingRight: "20px" }}>
-            <CardTitle tag="h3">{userData.name}</CardTitle>
-            <CardSubtitle tag="h5" className="mb-2 text-muted">
-              Student
-            </CardSubtitle>
-            <p style={{ fontSize: "1.2rem" }}>Batch: {userData.Batch}</p>
-            <p style={{ fontSize: "1.2rem" }}>Email: {userData.email}</p>
-            <p style={{ fontSize: "1.2rem" }}>Mobile: {userData.mobile}</p>
-            <p style={{ fontSize: "1.2rem" }}>Address: {userData.address}</p>
-          </div>
-          <div style={{ flex: "1", height: "100%", overflow: "hidden" }}>
-            <CardImg
-              top
-              width="100%"
-              src={userImage}
-              alt="User Image"
-              style={{ height: "100%" }}
-            />
-          </div>
-        </div>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Card elevation={3}>
+        <CardContent>
+          <Box ref={pdfRef}>
+            <PDFContent />
+          </Box>
+
+          <Box mt={4} textAlign="center">
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => navigate(`/dashboard/${id}`)}
+              sx={{ mr: 2 }}
+            >
+              Go to Dashboard
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="large"
+              startIcon={<DownloadIcon />}
+              onClick={handleDownloadPDF}
+            >
+              Download PDF
+            </Button>
+          </Box>
+        </CardContent>
       </Card>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
+      <ToastContainer />
     </Container>
   );
 };
 
-export default SuccessClasses;
+export default ClassSuccessPage;

@@ -1,12 +1,164 @@
-const { Class } = require("../models/student");
+const { LibStudent } = require("../models/student");
+const { AdminClass, ClassReg } = require("../models/classes");
 const { uploadToCloudinary } = require("../cloudinary");
 const { createOrder, verifyPaymentSignature } = require("../routes/payment");
-const axios = require("axios");
-const fs = require('fs');
-const path = require('path');
-const PDFDocument = require('pdfkit');
-const { sendEmailWithAttachment } = require("../emailSender");
 
+const getStudentDetails = async (req, res) => {
+    const { id, classId } = req.params; // Get userId from the request body
+
+    try {
+        // Fetch the LibStudent details based on userId
+        const libStudent = await LibStudent.findOne({ userId: id });
+        console.log(libStudent, id)
+        const { amount } = await AdminClass.findOne({
+            _id: classId
+        });
+        console.log(amount,"amount");
+        console.log(libStudent)
+        // Check if the LibStudent record exists
+        if (!libStudent) {
+            return res.status(404).json({ success: false, error: "Student not found" });
+        }
+
+        // Send the required details from the LibStudent schema
+        res.status(200).json({
+            success: true,
+            fee: amount,
+            studentDetails: {
+                name: libStudent?.name,
+                reg: libStudent?.reg,
+                email: libStudent?.email,
+                address: libStudent?.address,
+                gender: libStudent?.gender,
+                dob: libStudent?.dob,
+                fatherName: libStudent?.fatherName,
+                motherName: libStudent?.motherName,
+                contact1: libStudent?.contact1,
+                contact2: libStudent?.contact2,
+                aadhaar: libStudent?.aadhaar,
+                examPreparation: libStudent?.examPreparation,
+                image: {
+                    url: libStudent?.image?.url, // The image URL
+                    public_id: libStudent?.image?.public_id // The public ID of the image
+                },
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching student details:", error);
+        res.status(500).json({ success: false, error: "Failed to fetch student details" });
+    }
+};
+
+const getClassStudentById = async (req, res) => {
+    try {
+        // Fetch the ID from req.params
+        const { id } = req.params;
+
+        // Find the class registration by ID
+        const classRegistration = await ClassReg.findById(id);
+console.log(classRegistration)
+        // Check if the class registration was found
+        if (!classRegistration) {
+            return res.status(404).json({ message: 'Class registration not found' });
+        }
+
+        // Send the class registration data to the client
+        res.status(200).json(classRegistration);
+    } catch (error) {
+        // Handle any errors that occur
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+const paymentVerification = async (req, res) => {
+    const { order_id, payment_id, signature, formData } = req.body;
+
+    const {
+        name, email,standard, subject, board, faculty,
+        school, dob, father, mother, contact1, contact2,
+        address, aadharNo, preparingForExam, image
+    } = formData;
+
+    const { user_id } = req.params;
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    try {
+        // Verify the payment signature
+        const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
+
+        if (isSignatureValid) {
+            try {
+                // Create new ClassReg document
+                const newClassReg = new ClassReg({
+                    userId:user_id,
+                    name,
+                    email,
+                    date:currentDate,
+class:standard,
+                    subject,
+                    board,
+                    faculty,
+                    school,
+                    dob,
+                    father,
+                    mother,
+                    contact1,
+                    contact2,
+                    address,
+                    aadharNo,
+                    preparingForExam,
+                    image: {} // Will be updated after image upload
+                });
+
+                // Upload image if it exists
+                if (image) {
+                    const results = await uploadToCloudinary(image, "Class_Registrations");
+                    newClassReg.image.publicId = results.publicId;
+                    newClassReg.image.url = results.url;
+                }
+
+                // Save the class registration document
+                await newClassReg.save();
+
+                res.status(200).json({
+                    success: true,
+                    message: 'Payment verified, class registration created successfully',
+                    data: newClassReg
+                });
+            } catch (error) {
+                console.error("Error creating class registration:", error);
+                res.status(500).json({ success: false, error: 'Internal server error' });
+            }
+        } else {
+            // Signature does not match, payment is not verified
+            res.status(400).json({ success: false, error: 'Invalid signature' });
+        }
+    } catch (error) {
+        console.error("Error in payment verification process:", error);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+};
+
+
+const order = async (req, res) => {
+    console.log("jiii")
+    const { amount } = req.body;
+    try {
+        const order = await createOrder(amount)
+        // console.log(user);
+
+        res.status(200).json({
+            success: true,
+            order,
+
+            key: process.env.KEY_ID_RZRPAY
+        });
+    } catch (error) {
+        console.error("Error creating user or processing payment:", error);
+        res.status(500).json({ error: "A server error occurred with this request" });
+    }
+}
 const createClassRegistration = async (req, res) => {
     const { name, email, image, mobile, Batch, address, amount, userId } = req.body;
     console.log(Batch, req.body);
@@ -98,125 +250,36 @@ const verifyPayment = async (req, res) => {
     }
 }
 
-const sendIdCard = async (req, res) => {
+
+
+const checkEligibility = async (req, res) => {
+    const { user_id } = req.body;
+    const { classId } = req.params; // Assuming you're passing the classId in the request params
+    console.log(req.body, "ppppppppppppppp", classId)
     try {
-        const { id } = req.params;
-        console.log("server")
-        // Fetch the student data from MongoDB
-        const student = await Class.findOne({ userId: id }).exec();
-        if (!student) {
-            return res.status(404).send('Student not found');
+        // Find the class by its ID
+        const classData = await AdminClass.findById(classId);
+
+        if (!classData) {
+            return res.status(404).json({ error: "Class not found" });
         }
 
-        // Ensure the 'idcard' directory exists
-        const pdfDir = process.env.NODE_ENV == 'development' ? path.join(__dirname, '..', 'uploads') : '/tmp/uploads';
+        // Check if the user_id exists in the studentIds array
+        const isEligible = !classData.studentIds.includes(user_id);
 
-        if (!fs.existsSync(pdfDir)) {
-            fs.mkdirSync(pdfDir);
+        if (isEligible) {
+            res.status(200).json({ eligible: true, message: "Student is eligible for registration" });
+        } else {
+            res.status(200).json({ eligible: false, message: "Student is already registered for this class" });
         }
 
-        // Create a new PDF document with ID card dimensions
-        const doc = new PDFDocument({ size: [300, 200], margins: { top: 10, bottom: 10, left: 10, right: 10 } }); // Adjusted size and added margins
-        const pdfPath = path.join(pdfDir, `Id${id}.pdf`);
-        const writeStream = fs.createWriteStream(pdfPath);
-        doc.pipe(writeStream);
-
-        doc.rect(0, 0, doc.page.width, doc.page.height).fill('#008000'); // Green background
-
-        doc.fillColor('#FFFF00') // Yellow text
-            .fontSize(16)
-            .font('Helvetica-Bold')
-            .text("EduGainer's Library", { align: 'center', width: doc.page.width, lineGap: 2 });
-
-        // Add horizontal line below the heading
-        doc.strokeColor('#FFFF00') // Yellow line
-            .lineWidth(2)
-            .moveTo(20, 30)
-            .lineTo(doc.page.width - 20, 30)
-            .stroke();
-
-        const imageUrl = student.image.url;
-        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-        const imageBuffer = Buffer.from(response.data, 'binary');
-        const imageWidth = 80;
-        const imageHeight = 80;
-        const imageX = doc.page.width - imageWidth - 20;
-        const imageY = 40; // Adjusted position
-
-        // Add a rounded rectangle border for the image
-        doc.strokeColor('#FFFFFF') // Yellow border
-            .lineWidth(2)
-            .roundedRect(imageX - 5, imageY - 5, imageWidth + 10, imageHeight + 10, 5)
-            .stroke();
-
-        doc.image(imageBuffer, { fit: [imageWidth, imageHeight], x: imageX, y: imageY });
-
-        const formX = 20;
-        const formY = 40;
-        const lineSpacing = 16;
-        doc.fillColor('#FFFF00') // Yellow text
-            .fontSize(10)
-            .font('Helvetica-Bold')
-            .text(`Name: ${student.name}`, formX, formY);
-        doc.font('Helvetica') // Switch to regular font for other fields
-            .text(`Batch: ${student.Batch}`, formX, formY + lineSpacing)
-            // .text(`Amount: ${student.amount}`, formX, formY + 2 * lineSpacing)
-            .text(`Email: ${student.email}`, formX, formY + 2 * lineSpacing)
-            .text(`Mobile: ${student.mobile}`, formX, formY + 3 * lineSpacing)
-            .text(`Address: ${student.address}`, formX, formY + 4 * lineSpacing);
-
-        doc.end();
-
-
-        writeStream.on('finish', async () => {
-            const email = student.email;
-            const subject = 'Your EduGainer Library ID Card';
-            const text = 'Thank you for registering! Here is your ID card.';
-            const attachments = [
-                {
-                    filename: 'IDCard.pdf',
-                    path: pdfPath
-                }
-            ];
-
-            try {
-                await sendEmailWithAttachment(email, subject, text, attachments);
-                emailSent = true;
-                console.log('Email sent successfully');
-                res.send('Email sent successfully');
-            } catch (error) {
-                console.error('Failed to send email:', error);
-                res.status(500).send('Failed to send email');
-            }
-
-            //   // Delete the generated PDF file if the email was sent successfully
-            //   if (emailSent) {
-            //     fs.unlink(pdfPath, (err) => {
-            //       if (err) {
-            //         console.error('Failed to delete PDF file:', err);
-            //       } else {
-            //         console.log('PDF file deleted successfully');
-            //       }
-            //     });
-            //   }
-            // });
-        })
-
-
-
-
-        writeStream.on('error', (error) => {
-            console.error('Error writing PDF file:', error);
-            res.status(500).send('Failed to generate PDF');
-        });
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('An error occurred');
+        console.error("Error checking eligibility:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
-
 module.exports = {
-    verifyPayment, getUserById, createClassRegistration, sendIdCard
+    getClassStudentById, paymentVerification, verifyPayment, getUserById, createClassStudent, checkEligibility, getStudentDetails, order
 }
 // Other controller functions for generating and sending PDFs, handling updates, etc.

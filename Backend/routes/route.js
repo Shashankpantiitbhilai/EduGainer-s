@@ -61,7 +61,23 @@ router.put('/profile/:id', async (req, res) => {
 
 
 
+router.get("/Lib_student/:user_id", async (req, res) => {
+  const { user_id } = req.params;
 
+
+  try {
+    const user = await LibStudent.findOne({ userId: user_id });
+    // console.log(user);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    res.status(500).json({ error: "A server error occurred with this request" });
+  }
+});
  
 
 router.post("/Lib-new-reg", async (req, res) => {
@@ -88,23 +104,7 @@ router.post("/Lib-new-reg", async (req, res) => {
  
 
 
-router.get("/Lib_student/:user_id", async (req, res) => {
-  const { user_id } = req.params;
 
-
-  try {
-    const user = await LibStudent.findOne({ userId: user_id });
-    // console.log(user);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-   
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    res.status(500).json({ error: "A server error occurred with this request" });
-  }
-});
 
 
 
@@ -123,7 +123,7 @@ router.post('/payment-verification/:user_id', async (req, res) => {
 
   try {
     // Generate Razorpay order first
-    const order = await createOrder(amount);
+   
 
     // Verify the payment signature
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);

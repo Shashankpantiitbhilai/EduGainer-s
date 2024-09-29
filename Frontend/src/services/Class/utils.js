@@ -24,17 +24,19 @@ export async function sendFormData(formData) {
   }
 }
 
-export async function fetchUserClassesDataById(user_id) {
+export async function getClassStudentInfo(userId) {
   try {
-    const response = await axiosInstance.get(`/classes/${user_id}`);
-    // console.log(response.data);// Adjust the endpoint as per your API
-    return response.data; // Assuming the API returns JSON data representing the user object
+    // Send a GET request to the server with the userId as a parameter
+    const response = await axiosInstance.get(`/getStudentDetails/${userId}`);
+
+    // Return the student data received from the server
+    return response.data;
   } catch (error) {
-    // console.error("Error fetching user data:", error);
+    // Log the error if the request fails
+    console.error("Error fetching student details:", error);
     throw error; // Propagate the error to handle it in the calling component
   }
 }
-
 export async function sendIdCard(id) {
   try {
     // console.log(id, "reached utils")
@@ -71,4 +73,48 @@ export async function updateUserDetails(id, data) {
   }
 }
 
+export async function getStudentDetails(userId,BatchId) {
+  try {
+    const response = await axiosInstance.get(`/classes/getStudentDetails/${userId}/${BatchId}`
+    );
+    return response.data; // Return the student details from the response
+  } catch (error) {
+    console.error("Error fetching student details:", error);
+    throw new Error("Unable to fetch student details.");
+  }
+}
 
+export const eligibleForNewRegistration = async (userId, classId) => {
+  console.log(classId)
+  try {
+    const response = await axiosInstance.post(`/classes/eligibility/${classId}`, {
+      user_id: userId,
+    });
+console.log(response.data,"kkkk")
+    return response.data;
+  } catch (error) {
+    console.error("Error checking eligibility:", error);
+    throw new Error("Unable to check eligibility.");
+  }
+};
+export const createOrder = async (amount) => {
+  try {
+    console.log(amount,"amount")
+    const response = await axiosInstance.post("classes/create-order", { amount });
+    return response.data; // Return the response data
+  } catch (error) {
+    console.error("Error creating order:", error);
+    throw error; // Rethrow the error for handling in the calling component
+  }
+};
+
+// Function to verify payment
+export const verifyPayment = async (userId, orderData) => {
+  try {
+    const response = await axiosInstance.post(`classes/payment-verification/${userId}`, orderData);
+    return response.data; // Return the response data
+  } catch (error) {
+    console.error("Error verifying payment:", error);
+    throw error; // Rethrow the error for handling in the calling component
+  }
+}
