@@ -47,7 +47,7 @@ const Main = () => {
         <>
             {!shouldHideNavbar && <Navbar />}
             <Routes>
-                <Route path="/admin_home" element={<AdminHome />} />
+                <Route path="/admin_home" element={ <ProtectedAdmin><AdminHome/></ProtectedAdmin> } />
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
 
@@ -71,22 +71,7 @@ const Main = () => {
 
           
 
-                <Route
-                    path="/admin/chat"
-                    element={
-                        <ProtectedAdmin>
-                            <AdminChat />
-                        </ProtectedAdmin>
-                    }
-                />
-                <Route
-                    path="/admin/add-event"
-                    element={
-                        <ProtectedAdmin>
-                            <Pamplette />
-                        </ProtectedAdmin>
-                    }
-                />
+            
                 <Route
                     path="/resources"
                     element={
@@ -162,9 +147,9 @@ const Main = () => {
                 <Route
                     path="/admin_dashboard"
                     element={
-                        <ProtectedUser>
+                        <ProtectedAdmin>
                             <AdminDashboard />
-                        </ProtectedUser>
+                        </ProtectedAdmin>
                     }
                 />
                 <Route
@@ -216,6 +201,22 @@ const Main = () => {
                     }
                 />
                 <Route
+                    path="/admin/chat"
+                    element={
+                        <ProtectedAdmin>
+                            <AdminChat />
+                        </ProtectedAdmin>
+                    }
+                />
+                <Route
+                    path="/admin/add-event"
+                    element={
+                        <ProtectedAdmin>
+                            <Pamplette />
+                        </ProtectedAdmin>
+                    }
+                />
+                <Route
                     path="/admin_library/manage-current-month-bookings"
                     element={
                         <ProtectedAdmin>
@@ -231,6 +232,7 @@ const Main = () => {
 
                     }
                 />
+
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </>
