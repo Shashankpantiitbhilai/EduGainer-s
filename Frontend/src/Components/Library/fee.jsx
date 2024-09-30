@@ -97,14 +97,14 @@ const Fee = () => {
   const regNo = watch("regNo");
   const id = IsUserLoggedIn?._id;
 
-  const { initializePayment } = Payment({
-    formData,
-    imageBase64: "",
-    amount: calculatedFee,
-    userId: id,
-    setLoading,
-    status,
-  });
+const { initializePayment } = Payment({
+  formData,
+  imageBase64: "",
+  amount: calculatedFee,
+  userId: id,
+  setLoading,
+  status,
+});
 
   useEffect(() => {
     if (shouldInitiatePayment) {
