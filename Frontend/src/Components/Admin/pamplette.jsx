@@ -19,6 +19,11 @@ import {
   CardMedia,
   Alert,
   Backdrop,
+  Chip,
+  Fade,
+  useTheme,
+  useMediaQuery,
+  Paper,
 } from "@mui/material";
 import { AdminContext } from "../../App";
 import {
@@ -31,11 +36,17 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import EventIcon from "@mui/icons-material/Event";
+import LinkIcon from "@mui/icons-material/Link";
+import CelebrationIcon from "@mui/icons-material/Celebration";
+import SchoolIcon from "@mui/icons-material/School";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB in bytes
 
 function Pamplette() {
   const { adminSettings, updateAdminSettings } = useContext(AdminContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -178,82 +189,149 @@ function Pamplette() {
   return (
     <Box sx={{ backgroundColor: "#F0F8FF", minHeight: "100vh", py: 4 }}>
       <Container maxWidth="lg">
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 4,
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{ fontWeight: "bold", color: "#1976d2" }}
+        <Paper elevation={3} sx={{ p: 4, borderRadius: "20px", mb: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 4,
+            }}
           >
-            Admin Event Settings
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddEvent}
-          >
-            Add Event
-          </Button>
-        </Box>
-
-        <Grid container spacing={3}>
-          {events?.map((event) => (
-            <Grid item xs={12} sm={6} md={4} key={event._id}>
-              <Card
-                elevation={3}
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <CelebrationIcon sx={{ fontSize: 40, color: "#1976d2", mr: 2 }} />
+              <Typography
+                variant="h4"
                 sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
+                  fontWeight: "bold",
+                  color: "#1976d2",
+                  textShadow: "2px 2px 4px rgba(0,0,0,0.1)",
                 }}
               >
-                {event.image && (
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={event.image.url}
-                    alt={event.title}
-                  />
-                )}
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {event.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" paragraph>
-                    {event.description}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    End Date: {new Date(event.endDate).toLocaleDateString()}
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    href={event.googleFormLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{ mt: 1 }}
-                  >
-                    Google Form
-                  </Button>
-                </CardContent>
-                <CardActions>
-                  <IconButton onClick={() => handleEdit(event)} color="primary">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDelete(event._id)}
-                    color="error"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </CardActions>
-              </Card>
+                EduGainer's Events
+              </Typography>
+            </Box>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleAddEvent}
+              sx={{
+                borderRadius: "20px",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                transition: "all 0.3s",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 6px 8px rgba(0,0,0,0.15)",
+                },
+              }}
+            >
+              Add Event
+            </Button>
+          </Box>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+            Welcome to EduGainer's event management system. Here you can add,
+            edit, and manage exciting educational events for our community.
+            Let's create opportunities for learning and growth!
+          </Typography>
+        </Paper>
+
+        <Grid container spacing={3}>
+          {events?.map((event, index) => (
+            <Grid item xs={12} sm={6} md={4} key={event._id}>
+              <Fade in={true} timeout={500 * (index + 1)}>
+                <Card
+                  elevation={3}
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    borderRadius: "15px",
+                    overflow: "hidden",
+                    transition: "all 0.3s",
+                    "&:hover": {
+                      transform: "translateY(-5px)",
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                    },
+                  }}
+                >
+                  {event.image && (
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={event.image.url}
+                      alt={event.title}
+                      sx={{ objectFit: "cover" }}
+                    />
+                  )}
+                  <CardContent sx={{ flexGrow: 1, position: "relative" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <SchoolIcon sx={{ mr: 1, color: "#1976d2" }} />
+                      <Typography variant="h6" fontWeight="bold">
+                        {event.title}
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      paragraph
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {event.description}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mt: 2,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <Chip
+                        icon={<EventIcon />}
+                        label={new Date(event.endDate).toLocaleDateString()}
+                        size="small"
+                        sx={{ mr: 1, mb: 1 }}
+                      />
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        href={event.googleFormLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        startIcon={<LinkIcon />}
+                        sx={{ mb: 1 }}
+                      >
+                        Registration Form
+                      </Button>
+                    </Box>
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: "flex-end" }}>
+                    <IconButton
+                      onClick={() => handleEdit(event)}
+                      color="primary"
+                      size="small"
+                      title="Edit Event"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleDelete(event._id)}
+                      color="error"
+                      size="small"
+                      title="Delete Event"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              </Fade>
             </Grid>
           ))}
         </Grid>
@@ -263,6 +341,8 @@ function Pamplette() {
           onClose={handleCloseDialog}
           fullWidth
           maxWidth="sm"
+          TransitionComponent={Fade}
+          transitionDuration={300}
         >
           <DialogTitle>
             {currentEvent ? "Edit Event" : "Add New Event"}
@@ -318,7 +398,14 @@ function Pamplette() {
                 id="raised-button-file"
               />
               <label htmlFor="raised-button-file">
-                <Button variant="contained" component="span">
+                <Button
+                  variant="contained"
+                  component="span"
+                  sx={{
+                    borderRadius: "20px",
+                    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  }}
+                >
                   Choose File
                 </Button>
               </label>
@@ -343,6 +430,10 @@ function Pamplette() {
               color="primary"
               variant="contained"
               disabled={loadingButtons.save}
+              sx={{
+                borderRadius: "20px",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+              }}
             >
               {loadingButtons.save ? (
                 <CircularProgress size={24} />
@@ -358,6 +449,8 @@ function Pamplette() {
         <Dialog
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
+          TransitionComponent={Fade}
+          transitionDuration={300}
         >
           <DialogTitle>Confirm Delete</DialogTitle>
           <DialogContent>
@@ -372,6 +465,10 @@ function Pamplette() {
               color="error"
               variant="contained"
               disabled={loadingButtons.delete}
+              sx={{
+                borderRadius: "20px",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+              }}
             >
               {loadingButtons.delete ? (
                 <CircularProgress size={24} />
@@ -392,6 +489,7 @@ function Pamplette() {
             onClose={() => setOpenSnackbar(false)}
             severity={snackbarSeverity}
             variant="filled"
+            sx={{ width: "100%" }}
           >
             {snackbarMessage}
           </Alert>
