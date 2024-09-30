@@ -149,7 +149,7 @@ const getBatchStudents = async (req, res) => {
 console.log(batchId,"pppppppppp")
         // Find the batch by its ID and populate the studentIds with student data
         const batch = await AdminClass.findOne({ _id: batchId }).populate('studentIds');
-console.log(batch,"batch")
+
         if (!batch) {
             return res.status(404).json({ message: 'Batch not found' });
         }

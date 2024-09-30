@@ -1,0 +1,21 @@
+export const columnOrder = [
+    "reg",
+    "name",
+    "seat",
+    "date",
+    "regFee",
+    "website",
+    "cash",
+    "online",
+    "TotalMoney",
+    "shift",
+    "receipt",
+    "due",
+    "advance",
+    "status",
+    "remarks",
+    "nextMonthStatus",
+    "razorpay_order_id",
+    "razorpay_payment_id",
+    
+];

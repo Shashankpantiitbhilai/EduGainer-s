@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-const jwt=require("jsonwebtoken")
+const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const otpGenerator = require('otp-generator')
@@ -11,6 +11,10 @@ const {
 
   User,
 } = require("../models/student");
+const {
+
+  AdminClass,
+} = require("../models/classes");
 const passport = require("../models/passportConfig");
 const { connectDB, closeDB } = require("../db");
 
@@ -22,6 +26,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 const redisClient = require('../redis'); // Assuming redis client setup in separate file
+
 
 router.post("/register", async (req, res) => {
   let { password, email } = req.body;
@@ -227,12 +232,19 @@ router.post("/login", passport.authenticate("local"), async (req, res) => {
 
   // Find LibStudent by email
   const libStudent = await LibStudent.findOne({ email: emailRegex });
-
+  const classStudent = await AdminClass.findOne({ email: emailRegex });
   if (libStudent) {
 
     // Update LibStudent with userId
     libStudent.userId = req.user._id;
     await libStudent.save();
+
+  }
+  if (classStudent) {
+
+    // Update LibStudent with userId
+    classStudent.userId = req.user._id;
+    await classStudent.save();
 
   }
   // console.log(req.body);
@@ -267,23 +279,30 @@ router.get('/google/callback',
     // Prepare user info
     // console.log("ncjcnd", req.user)
     const userInfo = {
-     ...req.user._doc,
+      ...req.user._doc,
 
       // Assuming you have a way to determine the user's role
     };
-  
+
     const emailRegex = new RegExp(`^\\s*${userInfo.username}\\s*$`, 'i');
 
     const libStudent = await LibStudent.findOne({ email: emailRegex });
-
+    const classStudent = await AdminClass.findOne({ email: emailRegex });
     if (libStudent) {
 
       // Update LibStudent with userId
-      libStudent.userId = userInfo._id
+      libStudent.userId = userInfo._id;
+
       await libStudent.save();
 
     }
+    if (classStudent) {
 
+      // Update LibStudent with userId
+      classStudent.userId = req.user._id;
+      await classStudent.save();
+
+    }
     // Encode and stringify user info
     const encodedUserInfo = encodeURIComponent(JSON.stringify(userInfo));
 

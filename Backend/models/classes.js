@@ -130,7 +130,7 @@ const ClassRegSchema = new Schema({
     email: {
         type: String,
         // Ensure email is provided
-        unique: true    // Ensure email is unique
+        // Ensure email is unique
     },
     image: {
         publicId: {

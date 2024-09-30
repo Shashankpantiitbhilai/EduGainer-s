@@ -13,10 +13,10 @@ const getStudentDetails = async (req, res) => {
         const { amount } = await AdminClass.findOne({
             _id: classId
         });
-        console.log(amount,"amount");
+        console.log(amount, "amount");
         console.log(libStudent)
         // Check if the LibStudent record exists
-        
+
 
         // Send the required details from the LibStudent schema
         res.status(200).json({
@@ -54,7 +54,7 @@ const getClassStudentById = async (req, res) => {
         console.log(id)
         // Find the class registration by ID
         const classRegistration = await ClassReg.findOne({ userId: id });
-console.log(classRegistration)
+        console.log(classRegistration)
         // Check if the class registration was found
         if (!classRegistration) {
             return res.status(404).json({ message: 'Class registration not found' });
@@ -73,7 +73,7 @@ const paymentVerification = async (req, res) => {
     const { order_id, payment_id, signature, formData } = req.body;
 
     const {
-        name, email,standard, subject, board, Batch,faculty,
+        name, email, standard, subject, board, Batch, faculty,
         school, dob, father, mother, contact1, contact2,
         address, aadharNo, preparingForExam, image
     } = formData;
@@ -89,11 +89,11 @@ const paymentVerification = async (req, res) => {
             try {
                 // Create new ClassReg document
                 const newClassReg = new ClassReg({
-                    userId:user_id,
+                    userId: user_id,
                     name,
                     email,
-                    date:currentDate,
-class:standard,
+                    date: currentDate,
+                    class: standard,
                     subject,
                     board,
                     faculty,
@@ -273,7 +273,7 @@ const verifyPayment = async (req, res) => {
 const checkEligibility = async (req, res) => {
     const { user_id } = req.body;
     const { classId } = req.params; // Assuming you're passing the classId in the request params
-    console.log(req.body, "ppppppppppppppp", classId)
+
     try {
         // Find the class by its ID
         const classData = await AdminClass.findById(classId);
@@ -281,10 +281,23 @@ const checkEligibility = async (req, res) => {
         if (!classData) {
             return res.status(404).json({ error: "Class not found" });
         }
-
+        console.log(classData,"ppp")
+        let isEligible;
+        const data = await ClassReg.findOne({ userId: user_id });
         // Check if the user_id exists in the studentIds array
-        const isEligible = !classData.studentIds.includes(user_id);
+        console.log(data._id,req.user._id)
+        if (classData && Array.isArray(classData.studentIds)) {
+            // Check if the user_id exists in the studentIds array
+            const t = classData.studentIds.includes(data._id);
+            isEligible = !classData.studentIds.includes(data._id);
+            console.log(t,isEligible,"tttttttttt")
+        } else {
+            // Handle the case where classData or studentIds is not an array
+            console.error('classData.studentIds is not an array or classData is undefined');
+            isEligible = false; // Default value when the data isn't available or valid
+        }
 
+        console.log(isEligible, req.user._id)
         if (isEligible) {
             res.status(200).json({ eligible: true, message: "Student is eligible for registration" });
         } else {
@@ -299,6 +312,6 @@ const checkEligibility = async (req, res) => {
 
 module.exports = {
 
-    getClassStudentById, paymentVerification, verifyPayment, getUserById,  checkEligibility, getStudentDetails, order
+    getClassStudentById, paymentVerification, verifyPayment, getUserById, checkEligibility, getStudentDetails, order
 }
 // Other controller functions for generating and sending PDFs, handling updates, etc.

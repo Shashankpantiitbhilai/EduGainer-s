@@ -663,7 +663,7 @@ export default function ClassReg() {
 
   if (submit === "Payment") {
     return <CircularProgress />;
-  } else {
+  } else if(isEligible){
     return (
       <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
         <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
