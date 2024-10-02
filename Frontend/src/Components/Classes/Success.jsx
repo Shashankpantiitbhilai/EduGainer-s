@@ -93,7 +93,6 @@ const ClassSuccessPage = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Class Registration Successful!
         </Typography>
-        <Chip label={`Reg. No: ${classData.reg}`} color="primary" />
       </Box>
 
       <Grid container spacing={3} justifyContent="center" mb={4}>
