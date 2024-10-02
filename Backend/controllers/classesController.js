@@ -298,7 +298,7 @@ const checkEligibility = async (req, res) => {
         } else {
             // Handle the case where classData or studentIds is not an array
             console.error('classData.studentIds is not an array or classData is undefined');
-            isEligible = false; // Default value when the data isn't available or valid
+            isEligible = true; // Default value when the data isn't available or valid
         }
 
        
