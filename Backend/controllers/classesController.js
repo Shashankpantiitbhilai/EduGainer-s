@@ -27,6 +27,7 @@ const getStudentDetails = async (req, res) => {
                 facultyName
             ,
             studentDetails: {
+                amount:amount,
                 name: libStudent?.name,
                 reg: libStudent?.reg,
                 email: libStudent?.email,
@@ -79,7 +80,7 @@ const paymentVerification = async (req, res) => {
     const {
         name, email, standard, subject, board, Batch, faculty,
         school, dob, fatherName, motherName, contact1, contact2,
-        address, aadhar, preparingForExam, image
+        address, aadhar, preparingForExam, image,amount
     } = formData;
 
     const { user_id } = req.params;
@@ -96,6 +97,7 @@ const paymentVerification = async (req, res) => {
                     userId: user_id,
                     name,
                     email,
+                    amount,
                     date: currentDate,
                     class: standard,
                     subject,
@@ -114,6 +116,7 @@ const paymentVerification = async (req, res) => {
                         razorpay_order_id: order_id,
                         razorpay_payment_id: payment_id
                     },
+                   
                     image: {} // Will be updated after image upload
                 });
 
