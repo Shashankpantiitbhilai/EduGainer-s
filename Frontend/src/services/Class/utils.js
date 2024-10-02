@@ -77,6 +77,7 @@ export async function getStudentDetails(userId,BatchId) {
   try {
     const response = await axiosInstance.get(`/classes/getStudentDetails/${userId}/${BatchId}`
     );
+
     return response.data; // Return the student details from the response
   } catch (error) {
     console.error("Error fetching student details:", error);
@@ -85,12 +86,12 @@ export async function getStudentDetails(userId,BatchId) {
 }
 
 export const eligibleForNewRegistration = async (userId, classId) => {
-  console.log(classId)
+ 
   try {
     const response = await axiosInstance.post(`/classes/eligibility/${classId}`, {
       user_id: userId,
     });
-console.log(response.data,"kkkk")
+
     return response.data;
   } catch (error) {
     console.error("Error checking eligibility:", error);
@@ -99,7 +100,7 @@ console.log(response.data,"kkkk")
 };
 export const createOrder = async (amount) => {
   try {
-    console.log(amount,"amount")
+  
     const response = await axiosInstance.post("classes/create-order", { amount });
     return response.data; // Return the response data
   } catch (error) {

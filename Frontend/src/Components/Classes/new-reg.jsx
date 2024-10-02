@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { keyframes } from "@emotion/react";
 import {
+  Fade,
   Alert,
   AlertTitle,
   Container,
@@ -51,7 +52,57 @@ const steps = [
 ];
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB in bytes
+const pulse = keyframes`
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+`;
 
+const InteractiveCenteredLoading = () => {
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <Box
+        sx={{
+          animation: `${pulse} 2s infinite`,
+          borderRadius: "50%",
+          padding: "10px",
+        }}
+      >
+        <CircularProgress size={80} thickness={4} />
+      </Box>
+      <Fade in={true} style={{ transitionDelay: "500ms" }}>
+        <Typography variant="h5" style={{ marginTop: "20px" }}>
+          Please wait{dots}
+        </Typography>
+      </Fade>
+    </Box>
+  );
+};
 export default function ClassReg() {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn?._id;
@@ -96,8 +147,8 @@ export default function ClassReg() {
     const checkEligibility = async () => {
       try {
         const response = await eligibleForNewRegistration(id, ClassId);
-        console.log(response);
-        setIsEligible(response);
+      
+        setIsEligible(response.eligible);
       } catch (error) {
         setIsEligible(false);
       }
@@ -115,16 +166,16 @@ export default function ClassReg() {
           const data = await getStudentDetails(id, ClassId);
           // Populate form fields with fetched data
           const studentDetails = data.studentDetails;
-
+// console.log(data,"ppp")
           setFee(data?.fee);
           Object.keys(studentDetails).forEach((key) => {
-            console.log(key, studentDetails[key]);
+           
             setValue(key, studentDetails[key]);
           });
           setFormData((prev) => ({ ...prev, ...studentDetails }));
 
           // If there's a profile picture, set it
-          console.log(formData, "ppppppp");
+        
           if (studentDetails.image) {
             setImageBase64(studentDetails.image);
           }
@@ -661,69 +712,69 @@ export default function ClassReg() {
     );
   }
 
-  if (submit === "Payment") {
-    return <CircularProgress />;
-  } else if(isEligible){
-    return (
-      <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
-        <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
-          <Typography component="h1" variant="h5" align="center" gutterBottom>
-            <HowToReg fontSize="large" /> Class Registration
-          </Typography>
-          <Stepper
-            activeStep={activeStep}
-            sx={{ pt: 3, pb: 5 }}
-            orientation={isMobile ? "vertical" : "horizontal"}
-          >
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <form onSubmit={handleSubmit(handleStepSubmit)}>
-            {getStepContent(activeStep)}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: 3,
-                flexDirection: isMobile ? "column" : "row",
-              }}
-            >
-              {activeStep !== 0 && (
-                <Button
-                  onClick={handleBack}
-                  sx={{ mr: 1, mb: isMobile ? 2 : 0 }}
-                  fullWidth={isMobile}
-                >
-                  Back
-                </Button>
-              )}
-              {activeStep === steps.length - 1 ? (
-                <Button
-                  type="button"
-                  variant="contained"
-                  onClick={onSubmit}
-                  disabled={loading || !consentGiven}
-                  fullWidth={isMobile}
-                >
-                  Submit and Pay ₹{fee}
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={activeStep === 4 && !consentGiven}
-                  fullWidth={isMobile}
-                >
-                  Next
-                </Button>
-              )}
-            </Box>
-          </form>
-        </Paper>
-      </Container>
-    );
-  }
+   if (submit==="Payment") {
+     return <InteractiveCenteredLoading/>;
+   } else if (isEligible) {
+     return (
+       <Container component="main" maxWidth="sm" sx={{ my: 4 }}>
+         <Paper elevation={6} sx={{ p: { xs: 2, sm: 3 } }}>
+           <Typography component="h1" variant="h5" align="center" gutterBottom>
+             <HowToReg fontSize="large" /> Class Registration 
+           </Typography>
+           <Stepper
+             activeStep={activeStep}
+             sx={{ pt: 3, pb: 5 }}
+             orientation={isMobile ? "vertical" : "horizontal"}
+           >
+             {steps.map((label) => (
+               <Step key={label}>
+                 <StepLabel>{label}</StepLabel>
+               </Step>
+             ))}
+           </Stepper>
+           <form onSubmit={handleSubmit(handleStepSubmit)}>
+             {getStepContent(activeStep)}
+             <Box
+               sx={{
+                 display: "flex",
+                 justifyContent: "space-between",
+                 mt: 3,
+                 flexDirection: isMobile ? "column" : "row",
+               }}
+             >
+               {activeStep !== 0 && (
+                 <Button
+                   onClick={handleBack}
+                   sx={{ mr: 1, mb: isMobile ? 2 : 0 }}
+                   fullWidth={isMobile}
+                 >
+                   Back
+                 </Button>
+               )}
+               {activeStep === steps.length - 1 ? (
+                 <Button
+                   type="button"
+                   variant="contained"
+                   onClick={onSubmit}
+                   disabled={loading || !consentGiven}
+                   fullWidth={isMobile}
+                 >
+                   Submit and Pay ₹{fee}
+                 </Button>
+               ) : (
+                 <Button
+                   type="submit"
+                   variant="contained"
+                   disabled={activeStep === 4 && !consentGiven}
+                   fullWidth={isMobile}
+                 >
+                   Next
+                 </Button>
+               )}
+             </Box>
+           </form>
+         </Paper>
+       </Container>
+     );
+   }
 }

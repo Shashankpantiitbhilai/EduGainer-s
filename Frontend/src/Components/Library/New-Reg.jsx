@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
+import { keyframes } from "@emotion/react";
 import {
+  Fade,
   Alert,
   AlertTitle,
   Divider,
@@ -46,9 +47,58 @@ const steps = [
   "Additional Info",
   "Payment",
 ];
+const pulse = keyframes`
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+`;
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 3 MB in bytes
+const InteractiveCenteredLoading = () => {
+  const [dots, setDots] = useState("");
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <Box
+        sx={{
+          animation: `${pulse} 2s infinite`,
+          borderRadius: "50%",
+          padding: "10px",
+        }}
+      >
+        <CircularProgress size={80} thickness={4} />
+      </Box>
+      <Fade in={true} style={{ transitionDelay: "500ms" }}>
+        <Typography variant="h5" style={{ marginTop: "20px" }}>
+          Please wait{dots}
+        </Typography>
+      </Fade>
+    </Box>
+  );
+};
 export default function LibraryRegistration() {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const id = IsUserLoggedIn?._id;
@@ -339,23 +389,23 @@ export default function LibraryRegistration() {
               />
             </Grid>
             <Grid item xs={12}>
-             <Controller
-  name="email"
-  control={control}
-  defaultValue={IsUserLoggedIn?.username || ""}
-  render={({ field }) => (
-    <TextField
-      {...field}
-      fullWidth
-      label="Email Address"
-      disabled
-      InputProps={{
-        readOnly: true,
-      }}
-      value={IsUserLoggedIn?.username || ""}
-    />
-  )}
-/>
+              <Controller
+                name="email"
+                control={control}
+                defaultValue={IsUserLoggedIn?.username || ""}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Email Address"
+                    disabled
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    value={IsUserLoggedIn?.username || ""}
+                  />
+                )}
+              />
             </Grid>
             <Grid item xs={12}>
               <Controller
@@ -593,7 +643,7 @@ export default function LibraryRegistration() {
   }
 
   if (submit === "Payment") {
-    return <CircularProgress />;
+    return <InteractiveCenteredLoading />;
   } else {
     return (
       <Container component="main" maxWidth="sm" sx={{ my: 4 }}>

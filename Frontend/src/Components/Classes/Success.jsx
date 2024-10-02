@@ -126,9 +126,6 @@ const ClassSuccessPage = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <Typography>
-            <strong>Faculty:</strong> {classData.faculty}
-          </Typography>
-          <Typography>
             <strong>Board:</strong> {classData.board}
           </Typography>
           <Typography>
@@ -152,7 +149,8 @@ const ClassSuccessPage = () => {
         Payment Details
       </Typography>
       <Typography>
-        <strong>Order ID:</strong> {classData?.Payment_detail?.razorpay_order_id}
+        <strong>Order ID:</strong>{" "}
+        {classData?.Payment_detail?.razorpay_order_id}
       </Typography>
       <Typography>
         <strong>Payment ID:</strong>{" "}

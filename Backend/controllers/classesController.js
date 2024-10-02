@@ -9,19 +9,23 @@ const getStudentDetails = async (req, res) => {
     try {
         // Fetch the LibStudent details based on userId
         const libStudent = await LibStudent.findOne({ userId: id });
-        console.log(libStudent, id)
-        const { amount } = await AdminClass.findOne({
+        // console.log(libStudent, id)
+        const { amount,facultyName } = await AdminClass.findOne({
             _id: classId
         });
-        console.log(amount, "amount");
-        console.log(libStudent)
+        
+      
         // Check if the LibStudent record exists
 
 
         // Send the required details from the LibStudent schema
+     
         res.status(200).json({
             success: true,
             fee: amount,
+            faculty: 
+                facultyName
+            ,
             studentDetails: {
                 name: libStudent?.name,
                 reg: libStudent?.reg,
@@ -51,10 +55,10 @@ const getClassStudentById = async (req, res) => {
     try {
         // Fetch the ID from req.params
         const { id } = req.params;
-        console.log(id)
+       
         // Find the class registration by ID
         const classRegistration = await ClassReg.findOne({ userId: id });
-        console.log(classRegistration)
+      
         // Check if the class registration was found
         if (!classRegistration) {
             return res.status(404).json({ message: 'Class registration not found' });
@@ -74,8 +78,8 @@ const paymentVerification = async (req, res) => {
 
     const {
         name, email, standard, subject, board, Batch, faculty,
-        school, dob, father, mother, contact1, contact2,
-        address, aadharNo, preparingForExam, image
+        school, dob, fatherName, motherName, contact1, contact2,
+        address, aadhar, preparingForExam, image
     } = formData;
 
     const { user_id } = req.params;
@@ -99,12 +103,12 @@ const paymentVerification = async (req, res) => {
                     faculty,
                     school,
                     dob,
-                    father,
-                    mother,
+                    fatherName,
+                    motherName,
                     contact1,
                     contact2,
                     address,
-                    aadharNo,
+                    aadharNo:aadhar,
                     preparingForExam,
                     Payment_detail: {
                         razorpay_order_id: order_id,
@@ -160,7 +164,7 @@ const paymentVerification = async (req, res) => {
 
 
 const order = async (req, res) => {
-    console.log("jiii")
+   
     const { amount } = req.body;
     try {
         const order = await createOrder(amount)
@@ -179,7 +183,7 @@ const order = async (req, res) => {
 }
 const createClassRegistration = async (req, res) => {
     const { name, email, image, mobile, Batch, address, amount, userId } = req.body;
-    console.log(Batch, req.body);
+  
     try {
         let imageData = {};
         if (image) {
@@ -209,7 +213,7 @@ const createClassRegistration = async (req, res) => {
             }
         });
 
-        console.log(user);
+      
 
         res.status(200).json({
             success: true,
@@ -225,14 +229,14 @@ const createClassRegistration = async (req, res) => {
 
 const getUserById = async (req, res) => {
     const { user_id } = req.params;
-    console.log(user_id, req.params);
+   
 
     try {
         const user = await Class.findOne({ userId: user_id });
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        console.log(user);
+     
         res.status(200).json(user);
     } catch (error) {
         console.error("Error fetching user data:", error);
@@ -243,10 +247,10 @@ const getUserById = async (req, res) => {
 const verifyPayment = async (req, res) => {
     const { order_id, payment_id, signature } = req.body;
     const { user_id } = req.params;
-    console.log(user_id, "paymentverify");
+    
 
     const isSignatureValid = verifyPaymentSignature(order_id, payment_id, signature);
-    console.log(isSignatureValid, "payment verify");
+    // console.log(isSignatureValid, "payment verify");
     if (isSignatureValid) {
         try {
             const user = await Class.findOne({ userId: user_id });
@@ -281,23 +285,23 @@ const checkEligibility = async (req, res) => {
         if (!classData) {
             return res.status(404).json({ error: "Class not found" });
         }
-        console.log(classData,"ppp")
+     
         let isEligible;
         const data = await ClassReg.findOne({ userId: user_id });
         // Check if the user_id exists in the studentIds array
-        console.log(data._id,req.user._id)
-        if (classData && Array.isArray(classData.studentIds)) {
+    
+        if (classData &&data && Array.isArray(classData.studentIds)) {
             // Check if the user_id exists in the studentIds array
-            const t = classData.studentIds.includes(data._id);
+          
             isEligible = !classData.studentIds.includes(data._id);
-            console.log(t,isEligible,"tttttttttt")
+          
         } else {
             // Handle the case where classData or studentIds is not an array
             console.error('classData.studentIds is not an array or classData is undefined');
             isEligible = false; // Default value when the data isn't available or valid
         }
 
-        console.log(isEligible, req.user._id)
+       
         if (isEligible) {
             res.status(200).json({ eligible: true, message: "Student is eligible for registration" });
         } else {

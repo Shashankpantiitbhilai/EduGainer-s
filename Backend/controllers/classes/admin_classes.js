@@ -101,11 +101,11 @@ const editClass = async (req, res) => {
 // Delete a class
 const deleteClass = async (req, res) => {
     const { id } = req.params; // Get class ID from request params
-    console.log(id);
+   
     try {
         // Find the class by ID
         const classData = await AdminClass.findById(id);
-        console.log(classData);
+        // console.log(classData);
         if (!classData) {
             return res.status(404).json({ error: "Class not found" });
         }
@@ -146,7 +146,7 @@ const getClasses = async (req, res) => {
 const getBatchStudents = async (req, res) => {
     try {
         const { batchId } = req.params; // Get batchId from request parameters
-console.log(batchId,"pppppppppp")
+// console.log(batchId,"pppppppppp")
         // Find the batch by its ID and populate the studentIds with student data
         const batch = await AdminClass.findOne({ _id: batchId }).populate('studentIds');
 
@@ -156,7 +156,7 @@ console.log(batchId,"pppppppppp")
 
         // Check if studentIds exist and return only the students
         const students = batch.studentIds; // This will be an array of student documents
-        console.log(students,"studentisd")
+        // console.log(students,"studentisd")
         res.status(200).json(students); // Send the student data as the response
     } catch (error) {
         console.error('Error fetching students:', error);
