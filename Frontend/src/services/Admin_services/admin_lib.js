@@ -14,7 +14,16 @@ const axiosInstance = axios.create({
         "Content-Type": "application/json",
     },
 });
-
+export async function sendFinancialSummary(data) {
+    try {
+        const response = await axiosInstance.post("/admin_library/addMoneyInfo", data);
+        return response.data; // Return the response from the server
+    } catch (error) {
+        // Handle the error appropriately
+        console.error("Error adding money info:", error);
+        throw error;
+    }
+}
 export async function makeSeatEmpty(seat,shift) {
   
     try {

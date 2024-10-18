@@ -1,12 +1,33 @@
 const { ConsoleMessage } = require('puppeteer');
 const { LibStudent, getModelForMonth } = require('../../models/student');
-
+const {Budget}=require("../../models/budget")
 // Helper function to get the current month's Booking model
 const getCurrentMonthBookingModel = () => {
     const now = new Date();
     return getModelForMonth(now.getMonth() + 1);
 };
+const addMoneyInfo = async (req, res) => {
+    try {
+        // Create a new Budget document with the data provided in the request body
+        const newBudget = new Budget(req.body);
 
+        // Save the new budget entry to the database
+        const savedBudget = await newBudget.save();
+
+        // Respond with the newly created budget entry
+        res.status(201).json({
+            message: "Financial information added successfully.",
+            data: savedBudget
+        });
+
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error("Error adding money info:", error);
+        res.status(500).json({
+            error: "An error occurred while adding financial information."
+        });
+    }
+};
 const getSeatInfo = async (req, res) => {
     const { seat } = req.params;
     try {
@@ -284,4 +305,5 @@ module.exports = {
     getSeatInfo,
     getStudentInfo,
     updateSeatStatus,
+    addMoneyInfo
 };

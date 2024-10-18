@@ -34,7 +34,7 @@ import { columnOrder } from "./constants";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ExcelJS from "exceljs";
-
+import Calender from "./calender"
 const months = [
   { display: "January", value: "1" },
   { display: "February", value: "2" },
@@ -468,7 +468,8 @@ const StudentManagementTable = () => {
               setLegends={setLegends}
               selectedColor={selectedColor}
               setSelectedColor={setSelectedColor}
-            />
+              />
+              <Calender/>
           </Grid>
         </Grid>
       )}
