@@ -85,12 +85,28 @@ export default function Login() {
       setError("Authentication failed");
     }
   }, [navigate, setIsUserLoggedIn, setError]);
-
-  const handleGoogleSignIn = () => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    const googleAuthUrl = `${backendUrl}/auth/google`;
-    window.location.href = googleAuthUrl;
+ const getBackendUrl = () => {
+    if (process.env.NODE_ENV === "production") {
+      return `${process.env.REACT_APP_BACKEND_PROD}`;
+    }
+    return (
+      process.env.REACT_APP_BACKEND_DEV || process.env.REACT_APP_BACKEND_URL
+    );
   };
+    const handleGoogleSignIn = () => {
+      const backendUrl = getBackendUrl();
+
+      if (backendUrl) {
+        const googleAuthUrl = `${backendUrl}/auth/google`;
+
+        window.location.href = googleAuthUrl;
+      } else {
+        console.error("Backend URL is undefined");
+        toast.error(
+          "Unable to initiate Google Sign-In. Please check the application configuration."
+        );
+      }
+    };
 
   const onSubmit = async (data) => {
     try {
