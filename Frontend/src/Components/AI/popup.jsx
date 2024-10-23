@@ -72,7 +72,8 @@ const ChatPopup = () => {
           ...prevMessages,
           {
             sender: "bot",
-            content: "Just a sec, I'm putting my digital thinking cap on!",
+            content:
+              "I'm currently under development, but I’ll be ready to assist you soon",
           },
         ]);
       }, 1000); // Simulate a 1-second delay for the bot's response
