@@ -1,54 +1,96 @@
 import React, { useState } from 'react';
-import { IconButton, Tooltip, Box, Typography } from '@mui/material';
+import { IconButton, Tooltip, Box, Typography, useTheme } from '@mui/material';
 import { Brightness4 as Brightness4Icon, Brightness7 as Brightness7Icon } from '@mui/icons-material';
 import Draggable from 'react-draggable';
-const FloatingButton = ({ isDarkMode, onClick }) => {
+import ChatPopup from './Components/AI/popup'; // Your existing ChatPopup component
+
+const FloatingButtons = ({ isDarkMode, onThemeToggle }) => {
     const [rotate, setRotate] = useState(false);
 
-    const handleClick = () => {
+    const theme = useTheme();
+
+    const handleThemeClick = () => {
         setRotate(true);
-        onClick();
-        // Reset rotation after animation duration
-        setTimeout(() => setRotate(false), 300); // Match this with the animation duration
+        onThemeToggle();
+        setTimeout(() => setRotate(false), 300);
     };
 
     return (
-        <Draggable>
-            <Tooltip title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}>
-                <Box
-                    sx={{
-                        position: 'fixed',
-                        bottom: 16,
-                        right: 16,
-                        zIndex: 1200, // Ensure the button is above other content
-                        display: 'flex',
-                        alignItems: 'center',
-                        backgroundColor: 'background.paper',
-                        borderRadius: '50%',
-                        boxShadow: 3,
-                        transition: 'transform 0.3s ease',
-                        transform: rotate ? 'rotate(360deg)' : 'rotate(0deg)',
-                    }}
+        <>
+            {/* Left side - Theme Toggle */}
+            <Draggable bounds="parent">
+                <Tooltip
+                    title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    placement="right"
                 >
-                    <IconButton
-                        onClick={handleClick}
-                        color="inherit"
-                    >
-                        {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-                    </IconButton>
-                    <Typography
-                        variant="caption"
+                    <Box
                         sx={{
-                            ml: 1,
-                            color: 'text.primary',
-                            fontWeight: 'bold',
+                            position: 'fixed',
+                            bottom: 16,
+                            left: 16,
+                            zIndex: 1200,
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: theme.palette.background.paper,
+                            borderRadius: '24px',
+                            boxShadow: theme.shadows[3],
+                            transition: 'all 0.3s ease',
+                            transform: rotate ? 'rotate(360deg)' : 'rotate(0deg)',
+                            '&:hover': {
+                                boxShadow: theme.shadows[6],
+                                backgroundColor: theme.palette.action.hover,
+                            },
+                            padding: '4px',
+                            cursor: 'move',
                         }}
                     >
-                        {isDarkMode ? 'Dark Mode' : 'Light Mode'}
-                    </Typography>
-                </Box>
-            </Tooltip></Draggable>
+                        <IconButton
+                            onClick={handleThemeClick}
+                            color="inherit"
+                            sx={{
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                    backgroundColor: 'transparent',
+                                    transform: 'scale(1.1)',
+                                }
+                            }}
+                        >
+                            {isDarkMode ?
+                                <Brightness7Icon sx={{ color: theme.palette.warning.main }} /> :
+                                <Brightness4Icon sx={{ color: theme.palette.primary.main }} />
+                            }
+                        </IconButton>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                mx: 1,
+                                color: theme.palette.text.primary,
+                                fontWeight: 600,
+                                userSelect: 'none',
+                                display: { xs: 'none', sm: 'block' },
+                                minWidth: '70px',
+                            }}
+                        >
+                            {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+                        </Typography>
+                    </Box>
+                </Tooltip>
+            </Draggable>
+
+            {/* Right side - Chat Button */}
+            <Box
+                sx={{
+                    position: 'fixed',
+                    bottom: 24,
+                    right: 24,
+                    zIndex: 1200,
+                }}
+            >
+                {/* Your existing ChatPopup component */}
+                <ChatPopup />
+            </Box>
+        </>
     );
 };
 
-export default FloatingButton;
+export default FloatingButtons;

@@ -1,14 +1,14 @@
 import "./App.css";
 import React, { useEffect, useState, createContext } from "react";
 import { BrowserRouter } from "react-router-dom";
-import Main from "./Main";
-import { fetchCredentials } from "./services/auth";
-import LoadingAnimation from "./Components/loadingAnimation/loading.jsx";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { lightTheme, darkTheme } from "./theme";
 
-import NotificationWrapper from "../src/Components/Library/notification-wrapper.jsx"; // Import the NotificationWrapper
-import FloatingButton from "./floatingButton.js";
+import Main from "./Main";
+import { fetchCredentials } from "./services/auth";
+import LoadingAnimation from "./Components/loadingAnimation/loading.jsx";
+import NotificationWrapper from "../src/Components/Library/notification-wrapper.jsx";
+import FloatingButtons from "./floatingButton.js"; // Make sure this is the correct import
 
 // Create contexts
 const AdminContext = createContext();
@@ -28,34 +28,17 @@ function App() {
             setIsLoading(false);
         });
 
-        // Load the theme preference from localStorage
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = localStorage.getItem("theme");
         if (savedTheme) {
-            setIsDarkMode(savedTheme === 'dark');
+            setIsDarkMode(savedTheme === "dark");
         }
 
-        // Disable right-click
-        // document.addEventListener('contextmenu', (event) => event.preventDefault());
-
-        // // Disable common keyboard shortcuts
-        const handleKeyDown = (event) => {
-            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I')) {
-                event.preventDefault();
-            }
-        };
-        // document.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('contextmenu', (event) => event.preventDefault());
-            document.removeEventListener('keydown', handleKeyDown);
-        };
     }, []);
 
     const handleThemeToggle = () => {
-        setIsDarkMode(prevMode => {
+        setIsDarkMode((prevMode) => {
             const newMode = !prevMode;
-            // Save the preference to localStorage
-            localStorage.setItem('theme', newMode ? 'dark' : 'light');
+            localStorage.setItem("theme", newMode ? "dark" : "light");
             return newMode;
         });
     };
@@ -69,7 +52,13 @@ function App() {
             <CssBaseline />
             <AdminContext.Provider value={{ IsUserLoggedIn, setIsUserLoggedIn }}>
                 <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
-                    <BrowserRouter> <FloatingButton isDarkMode={isDarkMode} onClick={handleThemeToggle} />
+                    <BrowserRouter>
+                        {/* Pass handleThemeToggle as a prop */}
+                        <FloatingButtons
+                            isDarkMode={isDarkMode}
+                            onThemeToggle={handleThemeToggle}
+                        />
+
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>
                                 <Main />
@@ -77,7 +66,6 @@ function App() {
                         ) : (
                             <Main />
                         )}
-                       
                     </BrowserRouter>
                 </LoadingContext.Provider>
             </AdminContext.Provider>
