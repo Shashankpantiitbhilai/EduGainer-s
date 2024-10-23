@@ -23,7 +23,7 @@ const getGeminiResponse = async (req, res) => {
 // Function to fetch response from the Gemini API
 const fetchGeminiResponse = async (input) => {
     const model = genAI.getGenerativeModel({
-        model: 'tunedModels/expandedfinetuninggooglegmein50line-tnxr',
+        model: process.env.AI_MODEL,
     });
 
     const generationConfig = {
@@ -40,7 +40,7 @@ const fetchGeminiResponse = async (input) => {
     });
 
     const result = await chatSession.sendMessage(input);
-   
+
     return result.response.text(); // Adjust based on the structure of the response
 };
 
