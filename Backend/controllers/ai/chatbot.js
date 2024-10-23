@@ -11,7 +11,7 @@ const getGeminiResponse = async (req, res) => {
         console.log(input, "input");
         // Call the function to get the Gemini response
         const response = await fetchGeminiResponse(input);
-       
+
         // Send the response back to the client
         res.json({ response });
     } catch (error) {
@@ -23,15 +23,15 @@ const getGeminiResponse = async (req, res) => {
 // Function to fetch response from the Gemini API
 const fetchGeminiResponse = async (input) => {
     const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'tunedModels/expandedfinetuninggooglegmein50line-tnxr',
     });
 
     const generationConfig = {
-        temperature: 1,
-        topP: 0.95,
-        topK: 64,
-        maxOutputTokens: 8192,
-        responseMimeType: 'text/plain',
+        temperature: 0.7, // Lowering temperature for more deterministic answers
+        topP: 0.9,        // Maintaining diversity while focusing on high-probability responses
+        topK: 40,         // Focusing on a smaller number of top candidates for more relevant answers
+        maxOutputTokens: 512, // Reducing output length for concise answers
+        responseMimeType: 'text/plain', // Keeping the response type as plain text
     };
 
     const chatSession = model.startChat({
@@ -40,7 +40,7 @@ const fetchGeminiResponse = async (input) => {
     });
 
     const result = await chatSession.sendMessage(input);
-    console.log(result.response.text(),"text")
+   
     return result.response.text(); // Adjust based on the structure of the response
 };
 
