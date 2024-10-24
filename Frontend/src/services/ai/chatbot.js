@@ -6,6 +6,7 @@ const baseURL =
         ? process.env.REACT_APP_BACKEND_PROD
         : process.env.REACT_APP_BACKEND_DEV;
 
+// Create axios instance for regular JSON requests
 const axiosInstance = axios.create({
     baseURL,
     withCredentials: true,
@@ -14,14 +15,93 @@ const axiosInstance = axios.create({
     },
 });
 
+// Create axios instance for multipart/form-data requests
+const axiosFileInstance = axios.create({
+    baseURL,
+    withCredentials: true,
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+});
+
 // Function to send user text to the chatbot
 export async function sendMessageToChatbot(userInput) {
     try {
-        const response = await axiosInstance.post("/gemini/chatbot", { input: userInput });
-        console.log(response.data, "response");
-        return response.data; // Assuming the response contains the chatbot's reply
+        const response = await axiosInstance.post("/gemini/chatbot", {
+            input: userInput
+        });
+        console.log("Text response:", response.data);
+        return response.data;
     } catch (error) {
         console.error("Error sending message to chatbot:", error);
-        throw error; // Propagate the error to handle it in the calling component
+        throw formatError(error);
+    }
+}
+
+// Function to send file to the chatbot
+export async function sendFileToChatbot(file, prompt, onProgress = null) {
+    try {
+        // Validate file before sending
+        validateFile(file);
+
+        // Create FormData and append file and prompt
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("prompt", prompt);
+
+        // Configure request with progress tracking
+        const config = {
+            onUploadProgress: onProgress ? (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                onProgress(percentCompleted);
+            } : undefined
+        };
+
+        const response = await axiosFileInstance.post(
+            "/gemini/chatbot/file",
+            formData,
+            config
+        );
+
+        console.log("File upload response:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending file to chatbot:", error);
+        throw formatError(error);
+    }
+}
+
+// Helper function to validate file
+function validateFile(file) {
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+        throw new Error("File size exceeds 5MB limit");
+    }
+
+    // Check file type
+    const allowedTypes = [
+        'application/pdf',
+        'image/png',
+        'image/jpeg',
+        'image/gif'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+        throw new Error("Invalid file type. Only PDF and images (PNG, JPEG, GIF) are allowed.");
+    }
+}
+
+// Helper function to format error messages
+function formatError(error) {
+    if (error.response) {
+        // Server responded with error
+        return new Error(error.response.data.error || "Server error occurred");
+    } else if (error.request) {
+        // Request made but no response
+        return new Error("No response from server. Please check your connection.");
+    } else {
+        // Error in request setup
+        return error;
     }
 }

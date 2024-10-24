@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { sendMessageToChatbot } from "../../services/ai/chatbot";
+import {
+  sendMessageToChatbot,
+  sendFileToChatbot,
+} from "../../services/ai/chatbot";
 import {
   Box,
   Drawer,
@@ -14,14 +17,35 @@ import {
   CircularProgress,
   Zoom,
   Tooltip,
+  Button,
+  LinearProgress,
+  Badge,
 } from "@mui/material";
 import {
   Send as SendIcon,
   Close as CloseIcon,
   SmartToy as BotIcon,
+  AttachFile as AttachFileIcon,
+  Clear as ClearIcon,
 } from "@mui/icons-material";
 import { lightTheme } from "../../theme";
 import robotIcon from "../../images/AI-chatbot.png";
+const FileUploadPreview = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(1),
+  margin: theme.spacing(1, 0),
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.spacing(1),
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  backgroundColor: theme.palette.grey[50],
+}));
+
+const UploadProgress = styled(LinearProgress)(({ theme }) => ({
+  width: "100%",
+  marginTop: theme.spacing(1),
+  borderRadius: theme.spacing(0.5),
+}));
 
 const MessageContainer = styled(Box)(({ theme, sender }) => ({
   display: "flex",
@@ -114,6 +138,7 @@ const ChatPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const [messages, setMessages] = useState([
@@ -127,6 +152,10 @@ const ChatPopup = () => {
         "I can help you with your studies, answer questions, and explain complex topics. What would you like to learn about?",
     },
   ]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -153,7 +182,105 @@ const ChatPopup = () => {
       setTimeout(scrollToBottom, 100);
     }
   }, [isOpen]);
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = [
+        "application/pdf",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+      ];
 
+      if (file.size > maxSize) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            content:
+              "File size exceeds 5MB limit. Please choose a smaller file.",
+          },
+        ]);
+        return;
+      }
+
+      if (!allowedTypes.includes(file.type)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            content:
+              "Invalid file type. Only PDF and images (PNG, JPEG, GIF) are allowed.",
+          },
+        ]);
+        return;
+      }
+
+      setSelectedFile(file);
+    }
+  };
+
+  const handleFileClear = () => {
+    setSelectedFile(null);
+    setUploadProgress(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // Add file message to chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "user",
+          content: `📎 Uploaded: ${selectedFile.name}`,
+        },
+      ]);
+
+      // Show typing indicator
+      setIsTyping(true);
+
+      const response = await sendFileToChatbot(
+        selectedFile,
+        "Please analyze this file and provide insights.",
+        (progress) => setUploadProgress(progress)
+      );
+
+      // Add response to chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          content:
+            response.response ||
+            "I've analyzed your file. Is there anything specific you'd like to know about it?",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          content:
+            "I apologize, but I had trouble processing your file. Please try again or use a different file.",
+        },
+      ]);
+    } finally {
+      setIsTyping(false);
+      setIsUploading(false);
+      handleFileClear();
+    }
+  };
   const handleSend = async () => {
     if (input.trim()) {
       const userMessage = input.trim();
@@ -309,7 +436,39 @@ const ChatPopup = () => {
             backgroundColor: "background.paper",
           }}
         >
-          <Box sx={{ display: "flex", gap: 1 }}>
+          {selectedFile && (
+            <FileUploadPreview>
+              <Typography noWrap sx={{ flex: 1 }}>
+                📎 {selectedFile.name}
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                {isUploading && (
+                  <Typography variant="caption">{uploadProgress}%</Typography>
+                )}
+                <IconButton
+                  size="small"
+                  onClick={handleFileClear}
+                  disabled={isUploading}
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </FileUploadPreview>
+          )}
+
+          {isUploading && (
+            <UploadProgress variant="determinate" value={uploadProgress} />
+          )}
+
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept=".pdf,.png,.jpg,.jpeg,.gif"
+              style={{ display: "none" }}
+            />
+
             <TextField
               fullWidth
               multiline
@@ -320,6 +479,7 @@ const ChatPopup = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
+              disabled={isUploading}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
@@ -334,20 +494,54 @@ const ChatPopup = () => {
                 },
               }}
             />
-            <IconButton
-              sx={{
-                color: "#1a237e",
-                "&:hover": {
-                  bgcolor: "rgba(26, 35, 126, 0.04)",
-                  transform: "scale(1.1)",
-                },
-                transition: "all 0.2s ease",
-              }}
-              onClick={handleSend}
-              disabled={!input.trim() || isTyping}
-            >
-              <SendIcon />
-            </IconButton>
+
+            <Box sx={{ display: "flex", gap: 0.5 }}>
+              <IconButton
+                color="primary"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading || isTyping}
+                sx={{
+                  color: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "rgba(26, 35, 126, 0.04)",
+                  },
+                }}
+              >
+                <AttachFileIcon />
+              </IconButton>
+
+              {selectedFile ? (
+                <IconButton
+                  onClick={handleFileUpload}
+                  disabled={isUploading || isTyping}
+                  sx={{
+                    color: "#1a237e",
+                    "&:hover": {
+                      bgcolor: "rgba(26, 35, 126, 0.04)",
+                      transform: "scale(1.1)",
+                    },
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <SendIcon />
+                </IconButton>
+              ) : (
+                <IconButton
+                  onClick={handleSend}
+                  disabled={!input.trim() || isTyping || isUploading}
+                  sx={{
+                    color: "#1a237e",
+                    "&:hover": {
+                      bgcolor: "rgba(26, 35, 126, 0.04)",
+                      transform: "scale(1.1)",
+                    },
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <SendIcon />
+                </IconButton>
+              )}
+            </Box>
           </Box>
         </Box>
       </Drawer>
