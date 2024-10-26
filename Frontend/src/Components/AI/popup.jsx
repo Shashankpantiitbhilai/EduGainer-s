@@ -210,13 +210,13 @@ const WelcomePopup = styled(Paper)(({ theme }) => ({
   },
 }));
 const ChatPopup = () => {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-    const [isOpen, setIsOpen] = useState(!isMobile);
-    const [showWelcome, setShowWelcome] = useState(isMobile);
-    const [input, setInput] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
-    const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isOpen, setIsOpen] = useState(!isMobile);
+  const [showWelcome, setShowWelcome] = useState(isMobile);
+  const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
 
   const messagesContainerRef = useRef(null);
   const initialMessages = [
@@ -299,7 +299,7 @@ const ChatPopup = () => {
     if (isMobile && showWelcome) {
       const timer = setTimeout(() => {
         setShowWelcome(false);
-      }, 5000);
+      }, 8000);
       return () => clearTimeout(timer);
     }
   }, [isMobile, showWelcome]);
@@ -476,8 +476,8 @@ const ChatPopup = () => {
                 👋 Hey there!
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Need help with your studies? I'm your AI study buddy, ready to
-                assist!
+                Need help with your studies? I'm your AI study buddy,your
+                ClassMate ready to assist!
               </Typography>
             </WelcomePopup>
           )}
