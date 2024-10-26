@@ -9,6 +9,8 @@ import {
   InputAdornment,
   Grid,
   Link,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Visibility,
@@ -42,6 +44,8 @@ function Register() {
   const { errors } = formState;
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const onSubmit = async (data) => {
     try {
@@ -67,115 +71,119 @@ function Register() {
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Grid container>
         {/* Left Section - Marketing Content */}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            bgcolor: colors.background,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            p: 6,
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{ color: colors.primary, fontWeight: 500, mb: 2 }}
+        {!isMobile && (
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{
+              bgcolor: colors.background,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              p: 6,
+            }}
           >
-            Uttarkashi's Complete Education Hub-EduGainer's
-          </Typography>
+            <Typography
+              variant="h4"
+              sx={{ color: colors.primary, fontWeight: 500, mb: 2 }}
+            >
+              Uttarkashi's Complete Education Hub-EduGainer's
+            </Typography>
 
-          {/* First marketing info section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-            <LibraryBooksIcon sx={{ fontSize: 40, color: colors.primary }} />
-            <Box>
-              <Typography
-                variant="h6"
-                sx={{ color: colors.primary, fontWeight: 500 }}
-              >
-                Best Library in Uttarkashi
-              </Typography>
-              <Typography sx={{ color: colors.textMuted }}>
-                Access our extensive collection of books, study materials, and
-                resources for Board classes 6-12, JEE, NEET, UPSC, and PCS
-                preparation.
-              </Typography>
+            {/* First marketing info section */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+              <LibraryBooksIcon sx={{ fontSize: 40, color: colors.primary }} />
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: colors.primary, fontWeight: 500 }}
+                >
+                  Best Library in Uttarkashi
+                </Typography>
+                <Typography sx={{ color: colors.textMuted }}>
+                  Access our extensive collection of books, study materials, and
+                  resources for Board classes 6-12, JEE, NEET, UPSC, and PCS
+                  preparation.
+                </Typography>
+              </Box>
             </Box>
-          </Box>
 
-          {/* Second marketing info section - Stationery */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-            <LocalMallIcon sx={{ fontSize: 40, color: colors.secondary }} />
-            <Box>
-              <Typography
-                variant="h6"
-                sx={{ color: colors.secondary, fontWeight: 500 }}
-              >
-                MeriStationary - Your Complete Stationery Store
-              </Typography>
-              <Typography sx={{ color: colors.textMuted }}>
-                Uttarkashi's largest collection of quality stationery, books,
-                art supplies, and educational materials at the best prices.
-                One-stop shop for all your academic needs.
-              </Typography>
+            {/* Second marketing info section - Stationery */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+              <LocalMallIcon sx={{ fontSize: 40, color: colors.secondary }} />
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: colors.secondary, fontWeight: 500 }}
+                >
+                  MeriStationary - Your Complete Stationery Store
+                </Typography>
+                <Typography sx={{ color: colors.textMuted }}>
+                  Uttarkashi's largest collection of quality stationery, books,
+                  art supplies, and educational materials at the best prices.
+                  One-stop shop for all your academic needs.
+                </Typography>
+              </Box>
             </Box>
-          </Box>
 
-          {/* Third marketing info section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-            <ClassIcon sx={{ fontSize: 40, color: colors.primary }} />
-            <Box>
-              <Typography
-                variant="h6"
-                sx={{ color: colors.primary, fontWeight: 500 }}
-              >
-                Expert Faculty
-              </Typography>
-              <Typography sx={{ color: colors.textMuted }}>
-                Learn from Uttarkashi's most experienced teachers who understand
-                students' needs and competitive exam patterns.
-              </Typography>
+            {/* Third marketing info section */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+              <ClassIcon sx={{ fontSize: 40, color: colors.primary }} />
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: colors.primary, fontWeight: 500 }}
+                >
+                  Expert Faculty
+                </Typography>
+                <Typography sx={{ color: colors.textMuted }}>
+                  Learn from Uttarkashi's most experienced teachers who
+                  understand students' needs and competitive exam patterns.
+                </Typography>
+              </Box>
             </Box>
-          </Box>
 
-          {/* Fourth marketing info section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-            <OndemandVideoIcon sx={{ fontSize: 40, color: colors.secondary }} />
-            <Box>
-              <Typography
-                variant="h6"
-                sx={{ color: colors.secondary, fontWeight: 500 }}
-              >
-                Comprehensive Study Programs
-              </Typography>
-              <Typography sx={{ color: colors.textMuted }}>
-                Complete preparation for Boards (6-12), JEE, NEET, UPSC, and PCS
-                with regular mock tests and personalized guidance.
-              </Typography>
+            {/* Fourth marketing info section */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+              <OndemandVideoIcon
+                sx={{ fontSize: 40, color: colors.secondary }}
+              />
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: colors.secondary, fontWeight: 500 }}
+                >
+                  Comprehensive Study Programs
+                </Typography>
+                <Typography sx={{ color: colors.textMuted }}>
+                  Complete preparation for Boards (6-12), JEE, NEET, UPSC, and
+                  PCS with regular mock tests and personalized guidance.
+                </Typography>
+              </Box>
             </Box>
-          </Box>
 
-          {/* Fifth marketing info section */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <StarIcon sx={{ fontSize: 40, color: colors.primary }} />
-            <Box>
-              <Typography
-                variant="h6"
-                sx={{ color: colors.primary, fontWeight: 500 }}
-              >
-                Premium Services & Support
-              </Typography>
-              <Typography sx={{ color: colors.textMuted }}>
-                Everything under one roof - MeriStationary store, study
-                materials, expert counseling, and dedicated academic support for
-                all subjects.
-              </Typography>
+            {/* Fifth marketing info section */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <StarIcon sx={{ fontSize: 40, color: colors.primary }} />
+              <Box>
+                <Typography
+                  variant="h6"
+                  sx={{ color: colors.primary, fontWeight: 500 }}
+                >
+                  Premium Services & Support
+                </Typography>
+                <Typography sx={{ color: colors.textMuted }}>
+                  Everything under one roof - MeriStationary store, study
+                  materials, expert counseling, and dedicated academic support
+                  for all subjects.
+                </Typography>
+              </Box>
             </Box>
-          </Box>
 
-          {/* Unique Selling Proposition section */}
-        </Grid>
+            {/* Unique Selling Proposition section */}
+          </Grid>
+        )}
 
         {/* Right Section - Registration Form */}
         <Grid
