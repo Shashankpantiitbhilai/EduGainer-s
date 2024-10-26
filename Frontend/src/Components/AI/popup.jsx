@@ -32,7 +32,7 @@ import {
 } from "@mui/icons-material";
 import { lightTheme } from "../../theme";
 import robotIcon from "../../images/AI-chatbot.png";
-import {AdminContext} from "../../App";
+import { AdminContext } from "../../App";
 // Existing styled components remain the same...
 const FileUploadPreview = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -568,8 +568,9 @@ const ChatPopup = () => {
                 👋 Hey there!
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Need help with your studies? I'm your AI study buddy,your
-                classmate ready to assist!
+                Need assistance with our website? I'm your Classmate chatbot,
+                here to help with any queries you have about the site or
+                anything else you need!
               </Typography>
             </WelcomePopup>
           )}
@@ -634,7 +635,7 @@ const ChatPopup = () => {
             </IconButton>
           </Box>
 
-          {!IsUserLoggedIn && 
+          {!IsUserLoggedIn && (
             <AuthButtons>
               <Button
                 fullWidth
@@ -656,7 +657,7 @@ const ChatPopup = () => {
                 Create Account
               </Button>
             </AuthButtons>
-          }
+          )}
         </Box>
 
         <MessagesList ref={messagesContainerRef}>
