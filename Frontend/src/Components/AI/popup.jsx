@@ -19,6 +19,8 @@ import {
   Tooltip,
   Button,
   LinearProgress,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Send as SendIcon,
@@ -175,12 +177,46 @@ const AssistantAvatar = ({ size = 40, pulseAnimation = false }) => (
     alt="AI Assistant"
   />
 );
-
+const WelcomePopup = styled(Paper)(({ theme }) => ({
+  position: "fixed",
+  bottom: 90,
+  right: 24,
+  padding: theme.spacing(2),
+  borderRadius: theme.spacing(2),
+  maxWidth: 250,
+  boxShadow: theme.shadows[6],
+  backgroundColor: "white",
+  animation: "slideUp 0.3s ease-out",
+  "@keyframes slideUp": {
+    from: {
+      opacity: 0,
+      transform: "translateY(20px)",
+    },
+    to: {
+      opacity: 1,
+      transform: "translateY(0)",
+    },
+  },
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: -10,
+    right: 20,
+    width: 0,
+    height: 0,
+    borderStyle: "solid",
+    borderWidth: "10px 10px 0 10px",
+    borderColor: "white transparent transparent transparent",
+  },
+}));
 const ChatPopup = () => {
-  const [isOpen, setIsOpen] = useState(true); // Set to true by default
-  const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const [isOpen, setIsOpen] = useState(!isMobile);
+    const [showWelcome, setShowWelcome] = useState(isMobile);
+    const [input, setInput] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
+    const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
 
   const messagesContainerRef = useRef(null);
   const initialMessages = [
@@ -259,7 +295,20 @@ const ChatPopup = () => {
       scrollToBottom();
     }
   }, [messages]);
+  useEffect(() => {
+    if (isMobile && showWelcome) {
+      const timer = setTimeout(() => {
+        setShowWelcome(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile, showWelcome]);
 
+  // Handle chat open
+  const handleChatOpen = () => {
+    setIsOpen(true);
+    setShowWelcome(false);
+  };
   // Ensure scroll on drawer open
   useEffect(() => {
     if (isOpen) {
@@ -419,28 +468,43 @@ const ChatPopup = () => {
 
   return (
     <ThemeProvider theme={lightTheme}>
-      <Tooltip title="Chat with ClassMate" placement="left" arrow>
-        <Zoom in={!isOpen}>
-          <Fab
-            sx={{
-              position: "fixed",
-              bottom: 24,
-              right: 24,
-              bgcolor: "#1a237e",
-              "&:hover": {
-                bgcolor: "#000051",
-                transform: "scale(1.1)",
-              },
-              transition: "all 0.3s ease",
-              padding: 0,
-              overflow: "hidden",
-            }}
-            onClick={() => setIsOpen(true)}
-          >
-            <AssistantAvatar pulseAnimation={true} />
-          </Fab>
-        </Zoom>
-      </Tooltip>
+      {!isOpen && (
+        <>
+          {showWelcome && (
+            <WelcomePopup>
+              <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                👋 Hey there!
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Need help with your studies? I'm your AI study buddy, ready to
+                assist!
+              </Typography>
+            </WelcomePopup>
+          )}
+          <Tooltip title="Chat with ClassMate" placement="left" arrow>
+            <Zoom in={true}>
+              <Fab
+                sx={{
+                  position: "fixed",
+                  bottom: 24,
+                  right: 24,
+                  bgcolor: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "#000051",
+                    transform: "scale(1.1)",
+                  },
+                  transition: "all 0.3s ease",
+                  padding: 0,
+                  overflow: "hidden",
+                }}
+                onClick={handleChatOpen}
+              >
+                <AssistantAvatar pulseAnimation={true} />
+              </Fab>
+            </Zoom>
+          </Tooltip>
+        </>
+      )}
 
       <Drawer
         anchor="right"
