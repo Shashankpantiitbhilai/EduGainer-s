@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import {
   sendMessageToChatbot,
   sendFileToChatbot,
@@ -32,7 +32,7 @@ import {
 } from "@mui/icons-material";
 import { lightTheme } from "../../theme";
 import robotIcon from "../../images/AI-chatbot.png";
-
+import {AdminContext} from "../../App";
 // Existing styled components remain the same...
 const FileUploadPreview = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -209,16 +209,42 @@ const WelcomePopup = styled(Paper)(({ theme }) => ({
     borderColor: "white transparent transparent transparent",
   },
 }));
+
+const SuggestedQuestion = styled(Button)(({ theme }) => ({
+  marginBottom: theme.spacing(0.5),
+  textAlign: "left",
+  justifyContent: "flex-start",
+  textTransform: "none",
+  backgroundColor: "rgba(26, 35, 126, 0.08)",
+  color: "#1a237e",
+  borderRadius: theme.spacing(2),
+  padding: theme.spacing(0.5, 2),
+  "&:hover": {
+    backgroundColor: "rgba(26, 35, 126, 0.15)",
+  },
+}));
+
+const SuggestedQuestionsContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(0.5),
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+}));
+
 const ChatPopup = () => {
+  const { IsUserLoggedIn } = useContext(AdminContext);
   const theme = useTheme();
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isOpen, setIsOpen] = useState(!isMobile);
   const [showWelcome, setShowWelcome] = useState(isMobile);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
-
+  const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesContainerRef = useRef(null);
+
   const initialMessages = [
     {
       sender: "bot",
@@ -235,6 +261,7 @@ const ChatPopup = () => {
 
   const handleQuestionClick = async (question) => {
     setShowDefaultQuestions(false);
+    setSuggestedQuestions([]); // Clear previous suggestions
 
     // Add user message
     setMessages((prev) => [...prev, { sender: "user", content: question }]);
@@ -245,6 +272,7 @@ const ChatPopup = () => {
     try {
       const botResponse = await sendMessageToChatbot(question);
 
+      // Add bot response
       setMessages((prev) => [
         ...prev,
         {
@@ -254,6 +282,14 @@ const ChatPopup = () => {
             "Let me help you with that query about " + question.toLowerCase(),
         },
       ]);
+
+      // Set suggested questions if they exist
+      if (
+        botResponse.followUpQuestions &&
+        Array.isArray(botResponse.followUpQuestions)
+      ) {
+        setSuggestedQuestions(botResponse.followUpQuestions);
+      }
     } catch (error) {
       console.error("Error sending message:", error);
       setMessages((prev) => [
@@ -266,6 +302,61 @@ const ChatPopup = () => {
       ]);
     } finally {
       setIsTyping(false);
+    }
+  };
+
+  const handleSend = async () => {
+    if (input.trim()) {
+      const userMessage = input.trim();
+      setInput("");
+      setSuggestedQuestions([]); // Clear previous suggestions
+
+      // Add user message
+      setMessages((prev) => [
+        ...prev,
+        { sender: "user", content: userMessage },
+      ]);
+
+      // Show typing indicator
+      setIsTyping(true);
+
+      try {
+        // Simulate network delay for better UX
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const botResponse = await sendMessageToChatbot(userMessage);
+
+        // Add bot response
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            content:
+              botResponse.response ||
+              "I apologize, but I didn't quite understand that. Could you please rephrase?",
+          },
+        ]);
+
+        // Set suggested questions if they exist
+        if (
+          botResponse.followUpQuestions &&
+          Array.isArray(botResponse.followUpQuestions)
+        ) {
+          setSuggestedQuestions(botResponse.followUpQuestions);
+        }
+      } catch (error) {
+        console.error("Error sending message:", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            content:
+              "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.",
+          },
+        ]);
+      } finally {
+        setIsTyping(false);
+      }
     }
   };
 
@@ -299,7 +390,7 @@ const ChatPopup = () => {
     if (isMobile && showWelcome) {
       const timer = setTimeout(() => {
         setShowWelcome(false);
-      }, 8000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [isMobile, showWelcome]);
@@ -414,50 +505,51 @@ const ChatPopup = () => {
       handleFileClear();
     }
   };
-  const handleSend = async () => {
-    if (input.trim()) {
-      const userMessage = input.trim();
-      setInput("");
+  // const handleSend = async () => {
+  //   if (input.trim()) {
+  //     const userMessage = input.trim();
+  //     setInput("");
 
-      // Add user message
-      setMessages((prev) => [
-        ...prev,
-        { sender: "user", content: userMessage },
-      ]);
+  //     // Add user message
+  //     setMessages((prev) => [
+  //       ...prev,
+  //       { sender: "user", content: userMessage },
+  //     ]);
 
-      // Show typing indicator
-      setIsTyping(true);
+  //     // Show typing indicator
+  //     setIsTyping(true);
 
-      try {
-        // Simulate network delay for better UX
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     try {
+  //       // Simulate network delay for better UX
+  //       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const botResponse = await sendMessageToChatbot(userMessage);
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "bot",
-            content:
-              botResponse.response ||
-              "I apologize, but I didn't quite understand that. Could you please rephrase?",
-          },
-        ]);
-      } catch (error) {
-        console.error("Error sending message:", error);
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "bot",
-            content:
-              "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.",
-          },
-        ]);
-      } finally {
-        setIsTyping(false);
-      }
-    }
-  };
+  //       const botResponse = await sendMessageToChatbot(userMessage);
+  //       const followUpQuestion = botResponse.followUpQuestions
+  //       follo qup ques is an array haivng three subarray as elements extract the contne tof each subarray and display them as suggeested question after asking any question to chatbot
+  //       setMessages((prev) => [
+  //         ...prev,
+  //         {
+  //           sender: "bot",
+  //           content:
+  //             botResponse.response ||
+  //             "I apologize, but I didn't quite understand that. Could you please rephrase?",
+  //         },
+  //       ]);
+  //     } catch (error) {
+  //       console.error("Error sending message:", error);
+  //       setMessages((prev) => [
+  //         ...prev,
+  //         {
+  //           sender: "bot",
+  //           content:
+  //             "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.",
+  //         },
+  //       ]);
+  //     } finally {
+  //       setIsTyping(false);
+  //     }
+  //   }
+  // };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -477,7 +569,7 @@ const ChatPopup = () => {
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Need help with your studies? I'm your AI study buddy,your
-                ClassMate ready to assist!
+                classmate ready to assist!
               </Typography>
             </WelcomePopup>
           )}
@@ -542,27 +634,29 @@ const ChatPopup = () => {
             </IconButton>
           </Box>
 
-          <AuthButtons>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              startIcon={<LoginIcon />}
-              onClick={() => handleAuthClick("login")}
-              sx={{ bgcolor: "white", color: "#1a237e" }}
-            >
-              Sign In
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<SignUpIcon />}
-              onClick={() => handleAuthClick("register")}
-              sx={{ borderColor: "white", color: "white" }}
-            >
-              Create Account
-            </Button>
-          </AuthButtons>
+          {!IsUserLoggedIn && 
+            <AuthButtons>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                startIcon={<LoginIcon />}
+                onClick={() => handleAuthClick("login")}
+                sx={{ bgcolor: "white", color: "#1a237e" }}
+              >
+                Sign In
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<SignUpIcon />}
+                onClick={() => handleAuthClick("register")}
+                sx={{ borderColor: "white", color: "white" }}
+              >
+                Create Account
+              </Button>
+            </AuthButtons>
+          }
         </Box>
 
         <MessagesList ref={messagesContainerRef}>
@@ -572,6 +666,29 @@ const ChatPopup = () => {
                 {message.sender === "bot" && <AssistantAvatar size={32} />}
                 <MessageBubble sender={message.sender} elevation={1}>
                   <Typography variant="body1">{message.content}</Typography>
+                  {message.sender === "bot" &&
+                    index === messages.length - 1 &&
+                    suggestedQuestions.length > 0 && (
+                      <SuggestedQuestionsContainer>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ mb: 0.5 }}
+                        >
+                          Follow-up Questions:
+                        </Typography>
+                        {suggestedQuestions.map((question, qIndex) => (
+                          <SuggestedQuestion
+                            key={qIndex}
+                            variant="text"
+                            size="small"
+                            onClick={() => handleQuestionClick(question)}
+                          >
+                            {question}
+                          </SuggestedQuestion>
+                        ))}
+                      </SuggestedQuestionsContainer>
+                    )}
                 </MessageBubble>
               </MessageContainer>
             ))}

@@ -76,7 +76,7 @@ const FloatingButtons = ({ isDarkMode, onThemeToggle }) => {
                     </Box>
                 </Tooltip>
             </Draggable>
-
+            <Draggable bounds="parent">
             {/* Right side - Chat Button */}
             <Box
                 sx={{
@@ -88,7 +88,7 @@ const FloatingButtons = ({ isDarkMode, onThemeToggle }) => {
             >
                 {/* Your existing ChatPopup component */}
                 <ChatPopup />
-            </Box>
+            </Box></Draggable>
         </>
     );
 };

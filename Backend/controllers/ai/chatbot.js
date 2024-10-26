@@ -18,21 +18,6 @@ const generationConfig = {
 };
 
 // Controller function to handle text-based Gemini API requests
-const getGeminiResponse = async (req, res) => {
-    try {
-        const { input } = req.body;
-        console.log('Processing text input:', input);
-
-        const response = await fetchGeminiTextResponse(input);
-        res.json({ response });
-    } catch (error) {
-        console.error('Error in text processing:', error);
-        res.status(500).json({
-            error: 'Internal Server Error',
-            details: error.message
-        });
-    }
-};
 
 // Controller function to handle file upload and processing
 const processFileWithGemini = async (req, res) => {
@@ -68,7 +53,25 @@ const processFileWithGemini = async (req, res) => {
     }
 };
 
-// Function to fetch text-based response from Gemini
+const getGeminiResponse = async (req, res) => {
+    try {
+        const { input } = req.body;
+        console.log('Processing text input:', input);
+
+        const { responseText, followUpQuestions } = await fetchGeminiTextResponse(input);
+
+        // Send back both response and suggested follow-up questions
+        res.json({ response: responseText, followUpQuestions });
+    } catch (error) {
+        console.error('Error in text processing:', error);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            details: error.message
+        });
+    }
+};
+
+// Function to fetch text-based response from Gemini and suggest follow-up questions
 const fetchGeminiTextResponse = async (input) => {
     const model = genAI.getGenerativeModel({
         model: process.env.AI_MODEL,
@@ -79,8 +82,36 @@ const fetchGeminiTextResponse = async (input) => {
         history: [],
     });
 
+    // Send user input to the model
     const result = await chatSession.sendMessage(input);
-    return result.response.text();
+
+    // Extract response text
+    const responseText = result.response.text();
+
+    // Request suggested follow-up questions based on the response
+    const suggestedQuestions = await chatSession.sendMessage(
+        `Based on the provided answer, please suggest exactly three relevant follow-up questions. Ensure that the output is formatted as an array with three elements. The format should be: ["Question 1", "Question 2", "Question 3"].`
+    );
+
+    // Log the raw response text
+    const suggestedQuestionsText = suggestedQuestions.response.text();
+  
+
+    let followUpQuestions;
+    try {
+        // Directly parse the suggestedQuestionsText without modification
+        followUpQuestions = JSON.parse(suggestedQuestionsText);
+    } catch (error) {
+        console.error("Failed to parse follow-up questions:", error);
+        throw new Error("Failed to parse follow-up questions from the response.");
+    }
+
+    // Ensure the followUpQuestions array has exactly three elements
+    if (followUpQuestions.length !== 3) {
+        throw new Error("The follow-up questions array must contain exactly three elements.");
+    }
+
+    return { responseText, followUpQuestions };
 };
 
 // Function to process file and generate response
