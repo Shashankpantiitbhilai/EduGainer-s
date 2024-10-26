@@ -568,13 +568,13 @@ const ChatPopup = () => {
                 👋 Hey there!
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Need assistance with our website? I'm your Classmate chatbot,
-                here to help with any queries you have about the site or
-                anything else you need!
+                Need assistance with our website? I'm your EduMate , here to
+                help with any queries you have about the site or anything else
+                you need!
               </Typography>
             </WelcomePopup>
           )}
-          <Tooltip title="Chat with ClassMate" placement="left" arrow>
+          <Tooltip title="Chat with EduMate" placement="left" arrow>
             <Zoom in={true}>
               <Fab
                 sx={{
@@ -623,7 +623,7 @@ const ChatPopup = () => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <AssistantAvatar size={48} />
             <Box>
-              <Typography variant="h6">ClassMate</Typography>
+              <Typography variant="h6">EduMate</Typography>
               <Typography variant="caption">Your Educational Helper</Typography>
             </Box>
             <IconButton
