@@ -355,11 +355,13 @@ const ChatPopup = () => {
     {
       sender: "bot",
       content: "👋 Welcome to EduGainer's! I'm your educational assistant.",
+      time: 0,
     },
     {
       sender: "bot",
       content:
         "I can help you manage classes,manage library, track progress, and optimize your educational workflow. Please sign in or create an account to get started, or explore our features below!",
+      time: 0,
     },
   ];
 
@@ -815,72 +817,77 @@ const ChatPopup = () => {
                         </SuggestedQuestionsContainer>
                       )}
                   </Box>
-                  <MessageActions
-                    className="message-actions"
-                    sender={message.sender}
-                  >
-                    {message.sender === "bot" && (
-                      <>
-                        <ActionButton
-                          size="small"
-                          onClick={() => handleFeedback(index, "like")}
-                          sx={{
-                            color:
-                              message.sender === "user" ? "white" : "inherit",
-                            backgroundColor:
-                              feedback[index] === "like"
-                                ? "rgba(25, 118, 210, 0.12)"
-                                : "transparent",
-                          }}
-                        >
-                          <Tooltip title="Helpful" placement="top">
-                            <ThumbUpIcon
-                              fontSize="inherit"
-                              sx={{ fontSize: "0.75rem" }}
-                            />{" "}
-                            {/* Adjust icon size */}
-                          </Tooltip>
-                        </ActionButton>
-                        <ActionButton
-                          size="small"
-                          onClick={() => handleFeedback(index, "dislike")}
-                          sx={{
-                            color:
-                              message.sender === "user" ? "white" : "inherit",
-                            backgroundColor:
-                              feedback[index] === "dislike"
-                                ? "rgba(211, 47, 47, 0.12)"
-                                : "transparent",
-                          }}
-                        >
-                          <Tooltip title="Not helpful" placement="top">
-                            <ThumbDownIcon
-                              fontSize="inherit"
-                              sx={{ fontSize: "0.75rem" }}
-                            />{" "}
-                            {/* Adjust icon size */}
-                          </Tooltip>
-                        </ActionButton>
-                      </>
-                    )}
-
-                    <ActionButton
-                      size="small"
-                      onClick={() => handleCopyMessage(message.content, index)}
-                      sx={{
-                        color: message.sender === "user" ? "white" : "inherit",
-                      }}
+                  {messages.length > 2 && message?.time !== 0 && (
+                    <MessageActions
+                      className="message-actions"
+                      sender={message.sender}
                     >
-                      <Tooltip
-                        title={
-                          copiedMessageId === index ? "Copied!" : "Copy message"
+                      {message.sender === "bot" && (
+                        <>
+                          <ActionButton
+                            size="small"
+                            onClick={() => handleFeedback(index, "like")}
+                            sx={{
+                              color:
+                                message.sender === "user" ? "white" : "inherit",
+                              backgroundColor:
+                                feedback[index] === "like"
+                                  ? "rgba(25, 118, 210, 0.12)"
+                                  : "transparent",
+                            }}
+                          >
+                            <Tooltip title="Helpful" placement="top">
+                              <ThumbUpIcon
+                                fontSize="inherit"
+                                sx={{ fontSize: "0.75rem" }} // Adjust icon size
+                              />
+                            </Tooltip>
+                          </ActionButton>
+                          <ActionButton
+                            size="small"
+                            onClick={() => handleFeedback(index, "dislike")}
+                            sx={{
+                              color:
+                                message.sender === "user" ? "white" : "inherit",
+                              backgroundColor:
+                                feedback[index] === "dislike"
+                                  ? "rgba(211, 47, 47, 0.12)"
+                                  : "transparent",
+                            }}
+                          >
+                            <Tooltip title="Not helpful" placement="top">
+                              <ThumbDownIcon
+                                fontSize="inherit"
+                                sx={{ fontSize: "0.75rem" }} // Adjust icon size
+                              />
+                            </Tooltip>
+                          </ActionButton>
+                        </>
+                      )}
+
+                      <ActionButton
+                        size="small"
+                        onClick={() =>
+                          handleCopyMessage(message.content, index)
                         }
-                        placement="top"
+                        sx={{
+                          color:
+                            message.sender === "user" ? "white" : "inherit",
+                        }}
                       >
-                        <CopyIcon fontSize="small" />
-                      </Tooltip>
-                    </ActionButton>
-                  </MessageActions>
+                        <Tooltip
+                          title={
+                            copiedMessageId === index
+                              ? "Copied!"
+                              : "Copy message"
+                          }
+                          placement="top"
+                        >
+                          <CopyIcon fontSize="small" />
+                        </Tooltip>
+                      </ActionButton>
+                    </MessageActions>
+                  )}
                 </MessageBubble>
               </MessageContainer>
             ))}
