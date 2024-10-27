@@ -172,7 +172,12 @@ const UploadProgress = styled(LinearProgress)(({ theme }) => ({
   marginTop: theme.spacing(1),
   borderRadius: theme.spacing(0.5),
 }));
-
+const getTimeBasedGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning!";
+  if (hour < 18) return "Good afternoon!";
+  return "Good evening!";
+};
 const QuestionButton = styled(Button)(({ theme }) => ({
   marginBottom: theme.spacing(1),
   textAlign: "left",
@@ -354,13 +359,14 @@ const ChatPopup = () => {
   const initialMessages = [
     {
       sender: "bot",
-      content: "👋 Welcome to EduGainer's! I'm your educational assistant.",
+      content:
+        "👋 Hi there! Welcome to EduGainer's! I’m Aiden, your friendly guide.",
       time: 0,
     },
     {
       sender: "bot",
       content:
-        "I can help you manage classes,manage library, track progress, and optimize your educational workflow. Please sign in or create an account to get started, or explore our features below!",
+        "I’m here to help you with everything from managing your classes to exploring our library. Just sign in or create an account to get started, and let’s make your learning journey fun and easy!",
       time: 0,
     },
   ];
@@ -489,7 +495,7 @@ const ChatPopup = () => {
     if (isMobile && showWelcome) {
       const timer = setTimeout(() => {
         setShowWelcome(false);
-      }, 5000);
+      }, 12000);
       return () => clearTimeout(timer);
     }
   }, [isMobile, showWelcome]);
@@ -619,16 +625,17 @@ const ChatPopup = () => {
           {showWelcome && (
             <WelcomePopup>
               <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
-                👋 Hey there!
+                👋 Hi there! 🌟
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Need assistance with our website? I'm your EduMate, here to help
-                with any queries you have about the site or anything else you
-                need!
+                Welcome to EduGainer's! I'm Aiden, your personal assistant. If
+                you have any questions about the site or need help with
+                anything, just let me know! I'm here to make your experience
+                enjoyable and easy!
               </Typography>
             </WelcomePopup>
           )}
-          <Tooltip title="Chat with EduMate" placement="left" arrow>
+          <Tooltip title="Chat with Aiden" placement="left" arrow>
             <Zoom in={true}>
               <Fab
                 sx={{
@@ -682,8 +689,12 @@ const ChatPopup = () => {
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <AssistantAvatar size={48} />
             <Box>
-              <Typography variant="h6">EduMate</Typography>
-              <Typography variant="caption">Your Educational Helper</Typography>
+              <Typography variant="h6">
+                {getTimeBasedGreeting()} I’m Aiden!
+              </Typography>
+              <Typography variant="caption">
+                Here to help you learn and explore!
+              </Typography>
             </Box>
             <BetaTag>BETA</BetaTag>
             <IconButton
@@ -696,8 +707,8 @@ const ChatPopup = () => {
           </Box>
 
           <BetaNote>
-            Note: EduMate is in beta and may occasionally make mistakes. Please
-            verify important information.
+            Note: Aiden is in beta version and may occasionally make mistakes.
+            Please verify important information.
           </BetaNote>
 
           {!IsUserLoggedIn && (
