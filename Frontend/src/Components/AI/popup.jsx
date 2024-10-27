@@ -33,7 +33,37 @@ import {
 import { lightTheme } from "../../theme";
 import robotIcon from "../../images/AI-chatbot.png";
 import { AdminContext } from "../../App";
+import { ContentCopy as CopyIcon } from "@mui/icons-material";
 // Existing styled components remain the same...
+const BetaTag = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  right: 40,
+  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  color: 'white',
+  padding: '2px 8px',
+  borderRadius: '0 0 4px 4px',
+  fontSize: '0.75rem',
+  fontWeight: 500,
+}));
+
+const BetaNote = styled(Typography)(({ theme }) => ({
+  fontSize: '0.75rem',
+  color: 'rgba(255, 255, 255, 0.7)',
+  marginTop: theme.spacing(1),
+}));
+
+const CopyButton = styled(IconButton)(({ theme }) => ({
+  padding: 4,
+  marginLeft: 8,
+  opacity: 0,
+  transition: 'opacity 0.2s ease',
+  '&:hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+  },
+}));
+
+
 const FileUploadPreview = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
   margin: theme.spacing(1, 0),
@@ -73,6 +103,14 @@ const MessageBubble = styled(Paper)(({ theme, sender }) => ({
   backgroundColor: sender === "user" ? "#1a237e" : theme.palette.grey[100],
   color: sender === "user" ? "white" : theme.palette.text.primary,
   position: "relative",
+  display: "flex",
+  alignItems: "flex-start",
+  gap: theme.spacing(1),
+  "&:hover": {
+    "& .copy-button": {
+      opacity: 1,
+    },
+  },
   "&::after": {
     content: '""',
     position: "absolute",
@@ -244,7 +282,17 @@ const ChatPopup = () => {
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesContainerRef = useRef(null);
+ const [copiedMessageId, setCopiedMessageId] = useState(null);
 
+ const handleCopyMessage = async (content, messageId) => {
+   try {
+     await navigator.clipboard.writeText(content);
+     setCopiedMessageId(messageId);
+     setTimeout(() => setCopiedMessageId(null), 2000);
+   } catch (err) {
+     console.error("Failed to copy text:", err);
+   }
+ };
   const initialMessages = [
     {
       sender: "bot",
@@ -505,52 +553,7 @@ const ChatPopup = () => {
       handleFileClear();
     }
   };
-  // const handleSend = async () => {
-  //   if (input.trim()) {
-  //     const userMessage = input.trim();
-  //     setInput("");
-
-  //     // Add user message
-  //     setMessages((prev) => [
-  //       ...prev,
-  //       { sender: "user", content: userMessage },
-  //     ]);
-
-  //     // Show typing indicator
-  //     setIsTyping(true);
-
-  //     try {
-  //       // Simulate network delay for better UX
-  //       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  //       const botResponse = await sendMessageToChatbot(userMessage);
-  //       const followUpQuestion = botResponse.followUpQuestions
-  //       follo qup ques is an array haivng three subarray as elements extract the contne tof each subarray and display them as suggeested question after asking any question to chatbot
-  //       setMessages((prev) => [
-  //         ...prev,
-  //         {
-  //           sender: "bot",
-  //           content:
-  //             botResponse.response ||
-  //             "I apologize, but I didn't quite understand that. Could you please rephrase?",
-  //         },
-  //       ]);
-  //     } catch (error) {
-  //       console.error("Error sending message:", error);
-  //       setMessages((prev) => [
-  //         ...prev,
-  //         {
-  //           sender: "bot",
-  //           content:
-  //             "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.",
-  //         },
-  //       ]);
-  //     } finally {
-  //       setIsTyping(false);
-  //     }
-  //   }
-  // };
-
+ 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -620,12 +623,13 @@ const ChatPopup = () => {
             color: "white",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <AssistantAvatar size={48} />
             <Box>
               <Typography variant="h6">EduMate</Typography>
               <Typography variant="caption">Your Educational Helper</Typography>
             </Box>
+            <BetaTag>BETA</BetaTag>
             <IconButton
               color="inherit"
               onClick={() => setIsOpen(false)}
@@ -634,6 +638,10 @@ const ChatPopup = () => {
               <CloseIcon />
             </IconButton>
           </Box>
+
+          <BetaNote>
+            Note: EduMate is in beta and may occasionally make mistakes. Please verify important information.
+          </BetaNote>
 
           {!IsUserLoggedIn && (
             <AuthButtons>
@@ -660,17 +668,18 @@ const ChatPopup = () => {
           )}
         </Box>
 
-        <MessagesList ref={messagesContainerRef}>
+         <MessagesList ref={messagesContainerRef}>
           <Box sx={{ p: 2, display: "flex", flexDirection: "column" }}>
             {messages.map((message, index) => (
               <MessageContainer key={index} sender={message.sender}>
                 {message.sender === "bot" && <AssistantAvatar size={32} />}
                 <MessageBubble sender={message.sender} elevation={1}>
-                  <Typography variant="body1">{message.content}</Typography>
-                  {message.sender === "bot" &&
-                    index === messages.length - 1 &&
-                    suggestedQuestions.length > 0 && (
-                      <SuggestedQuestionsContainer>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body1">{message.content}</Typography>
+                    {message.sender === "bot" &&
+                      index === messages.length - 1 &&
+                      suggestedQuestions.length > 0 && (
+                        <SuggestedQuestionsContainer>
                         <Typography
                           variant="caption"
                           color="text.secondary"
@@ -689,10 +698,28 @@ const ChatPopup = () => {
                           </SuggestedQuestion>
                         ))}
                       </SuggestedQuestionsContainer>
-                    )}
+                    
+                      )}
+                  </Box>
+                  <CopyButton
+                    className="copy-button"
+                    size="small"
+                    onClick={() => handleCopyMessage(message.content, index)}
+                    sx={{
+                      color: message.sender === "user" ? "white" : "inherit",
+                    }}
+                  >
+                    <Tooltip
+                      title={copiedMessageId === index ? "Copied!" : "Copy message"}
+                      placement="left"
+                    >
+                      <CopyIcon fontSize="small" />
+                    </Tooltip>
+                  </CopyButton>
                 </MessageBubble>
-              </MessageContainer>
+             </MessageContainer>
             ))}
+              
             {isTyping && (
               <MessageContainer sender="bot">
                 <AssistantAvatar size={32} />
