@@ -36,20 +36,20 @@ import { AdminContext } from "../../App";
 import { ContentCopy as CopyIcon } from "@mui/icons-material";
 // Existing styled components remain the same...
 const BetaTag = styled(Box)(({ theme }) => ({
-  position: 'absolute',
+  position: "absolute",
   top: 0,
   right: 40,
-  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  color: 'white',
-  padding: '2px 8px',
-  borderRadius: '0 0 4px 4px',
-  fontSize: '0.75rem',
+  backgroundColor: "rgba(255, 255, 255, 0.2)",
+  color: "white",
+  padding: "2px 8px",
+  borderRadius: "0 0 4px 4px",
+  fontSize: "0.75rem",
   fontWeight: 500,
 }));
 
 const BetaNote = styled(Typography)(({ theme }) => ({
-  fontSize: '0.75rem',
-  color: 'rgba(255, 255, 255, 0.7)',
+  fontSize: "0.75rem",
+  color: "rgba(255, 255, 255, 0.7)",
   marginTop: theme.spacing(1),
 }));
 
@@ -57,12 +57,11 @@ const CopyButton = styled(IconButton)(({ theme }) => ({
   padding: 4,
   marginLeft: 8,
   opacity: 0,
-  transition: 'opacity 0.2s ease',
-  '&:hover': {
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+  transition: "opacity 0.2s ease",
+  "&:hover": {
+    backgroundColor: "rgba(0, 0, 0, 0.04)",
   },
 }));
-
 
 const FileUploadPreview = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -277,21 +276,21 @@ const ChatPopup = () => {
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesContainerRef = useRef(null);
- const [copiedMessageId, setCopiedMessageId] = useState(null);
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
 
- const handleCopyMessage = async (content, messageId) => {
-   try {
-     await navigator.clipboard.writeText(content);
-     setCopiedMessageId(messageId);
-     setTimeout(() => setCopiedMessageId(null), 2000);
-   } catch (err) {
-     console.error("Failed to copy text:", err);
-   }
- };
+  const handleCopyMessage = async (content, messageId) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy text:", err);
+    }
+  };
   const initialMessages = [
     {
       sender: "bot",
-      content: "👋 Welcome to EduGainer's's! I'm your educational assistant.",
+      content: "👋 Welcome to EduGainer's! I'm your educational assistant.",
     },
     {
       sender: "bot",
@@ -548,7 +547,7 @@ const ChatPopup = () => {
       handleFileClear();
     }
   };
- 
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -618,7 +617,7 @@ const ChatPopup = () => {
             color: "white",
           }}
         >
-           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <AssistantAvatar size={48} />
             <Box>
               <Typography variant="h6">EduMate</Typography>
@@ -635,7 +634,8 @@ const ChatPopup = () => {
           </Box>
 
           <BetaNote>
-            Note: EduMate is in beta and may occasionally make mistakes. Please verify important information.
+            Note: EduMate is in beta and may occasionally make mistakes. Please
+            verify important information.
           </BetaNote>
 
           {!IsUserLoggedIn && (
@@ -663,7 +663,7 @@ const ChatPopup = () => {
           )}
         </Box>
 
-         <MessagesList ref={messagesContainerRef}>
+        <MessagesList ref={messagesContainerRef}>
           <Box sx={{ p: 2, display: "flex", flexDirection: "column" }}>
             {messages.map((message, index) => (
               <MessageContainer key={index} sender={message.sender}>
@@ -675,25 +675,24 @@ const ChatPopup = () => {
                       index === messages.length - 1 &&
                       suggestedQuestions.length > 0 && (
                         <SuggestedQuestionsContainer>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ mb: 0.5 }}
-                        >
-                          Follow-up Questions:
-                        </Typography>
-                        {suggestedQuestions.map((question, qIndex) => (
-                          <SuggestedQuestion
-                            key={qIndex}
-                            variant="text"
-                            size="small"
-                            onClick={() => handleQuestionClick(question)}
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ mb: 0.5 }}
                           >
-                            {question}
-                          </SuggestedQuestion>
-                        ))}
-                      </SuggestedQuestionsContainer>
-                    
+                            Follow-up Questions:
+                          </Typography>
+                          {suggestedQuestions.map((question, qIndex) => (
+                            <SuggestedQuestion
+                              key={qIndex}
+                              variant="text"
+                              size="small"
+                              onClick={() => handleQuestionClick(question)}
+                            >
+                              {question}
+                            </SuggestedQuestion>
+                          ))}
+                        </SuggestedQuestionsContainer>
                       )}
                   </Box>
                   <CopyButton
@@ -705,16 +704,18 @@ const ChatPopup = () => {
                     }}
                   >
                     <Tooltip
-                      title={copiedMessageId === index ? "Copied!" : "Copy message"}
+                      title={
+                        copiedMessageId === index ? "Copied!" : "Copy message"
+                      }
                       placement="left"
                     >
                       <CopyIcon fontSize="small" />
                     </Tooltip>
                   </CopyButton>
                 </MessageBubble>
-             </MessageContainer>
+              </MessageContainer>
             ))}
-              
+
             {isTyping && (
               <MessageContainer sender="bot">
                 <AssistantAvatar size={32} />
