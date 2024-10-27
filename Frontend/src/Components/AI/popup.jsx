@@ -34,11 +34,35 @@ import {
 import { lightTheme } from "../../theme";
 import robotIcon from "../../images/AI-chatbot.png";
 import { AdminContext } from "../../App";
-import { ContentCopy as CopyIcon } from "@mui/icons-material";
+
 // Existing styled components remain the same...
-
+import {
+  ThumbUp as ThumbUpIcon,
+  ThumbDown as ThumbDownIcon,
+  ContentCopy as CopyIcon,
+} from "@mui/icons-material";
 // ... (keep existing imports)
+const MessageActions = styled(Box)(({ theme, sender }) => ({
+  display: "flex",
+  gap: "2px",
+  alignItems: "center",
 
+  position: "absolute",
+  right: theme.spacing(1),
+  bottom: theme.spacing(1),
+  backgroundColor:
+    sender === "user" ? "rgba(0, 0, 0, 0.2)" : "rgba(255, 255, 255, 0.9)",
+  borderRadius: theme.spacing(1),
+  padding: theme.spacing(0.5),
+}));
+
+const ActionButton = styled(IconButton)(({ theme, sender }) => ({
+  padding: 4,
+  "&:hover": {
+    backgroundColor:
+      sender === "user" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.04)",
+  },
+}));
 const MessagesList = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   overflow: "auto",
@@ -98,11 +122,7 @@ const MessageBubble = styled(Paper)(({ theme, sender }) => ({
   "& a": {
     wordBreak: "break-all",
   },
-  "&:hover": {
-    "& .copy-button": {
-      opacity: 1,
-    },
-  },
+
   [theme.breakpoints.down("sm")]: {
     maxWidth: "85%", // Even more width on mobile
   },
@@ -129,7 +149,7 @@ const BetaNote = styled(Typography)(({ theme }) => ({
 const CopyButton = styled(IconButton)(({ theme }) => ({
   padding: 4,
   marginLeft: 8,
-  opacity: 0,
+  opacity: 1,
   transition: "opacity 0.2s ease",
   "&:hover": {
     backgroundColor: "rgba(0, 0, 0, 0.04)",
@@ -171,26 +191,6 @@ const QuestionButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const MessageContent = styled(Box)({
-  width: "100%",
-  "& p, & a": {
-    margin: 0,
-    wordBreak: "break-word",
-  },
-  "& a": {
-    display: "inline-block",
-    maxWidth: "100%",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-  },
-});
-
-const MessageWrapper = styled(Box)({
-  width: "100%",
-  maxWidth: "600px",
-  margin: "0 auto",
-});
-
 const defaultQuestions = [
   "How do I access the library section of EduGainer's?",
   "How can I pay the library fee?",
@@ -213,8 +213,6 @@ const AuthButtons = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1),
   marginBottom: theme.spacing(2),
 }));
-
-
 
 const TypingIndicator = () => (
   <Box sx={{ display: "flex", gap: 0.5, px: 1 }}>
@@ -325,7 +323,15 @@ const SuggestedQuestionsContainer = styled(Box)(({ theme }) => ({
 const ChatPopup = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const theme = useTheme();
+  const [feedback, setFeedback] = useState({});
 
+  const handleFeedback = (messageId, type) => {
+    setFeedback((prev) => ({
+      ...prev,
+      [messageId]: type,
+    }));
+    // Here you can add API call to send feedback to backend
+  };
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isOpen, setIsOpen] = useState(!isMobile);
   const [showWelcome, setShowWelcome] = useState(isMobile);
@@ -614,7 +620,9 @@ const ChatPopup = () => {
                 👋 Hey there!
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Need assistance with our website? I'm your EduMate, here to help with any queries you have about the site or anything else you need!
+                Need assistance with our website? I'm your EduMate, here to help
+                with any queries you have about the site or anything else you
+                need!
               </Typography>
             </WelcomePopup>
           )}
@@ -622,17 +630,17 @@ const ChatPopup = () => {
             <Zoom in={true}>
               <Fab
                 sx={{
-                  position: 'fixed',
+                  position: "fixed",
                   bottom: 24,
                   right: 24,
-                  bgcolor: '#1a237e',
-                  '&:hover': {
-                    bgcolor: '#000051',
-                    transform: 'scale(1.1)',
+                  bgcolor: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "#000051",
+                    transform: "scale(1.1)",
                   },
-                  transition: 'all 0.3s ease',
+                  transition: "all 0.3s ease",
                   padding: 0,
-                  overflow: 'hidden',
+                  overflow: "hidden",
                 }}
                 onClick={handleChatOpen}
               >
@@ -649,12 +657,12 @@ const ChatPopup = () => {
         onClose={() => setIsOpen(false)}
         PaperProps={{
           sx: {
-            width: { xs: '100%', sm: 380 },
-            height: '100%',
-            bgcolor: 'background.default',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
+            width: { xs: "100%", sm: 380 },
+            height: "100%",
+            bgcolor: "background.default",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
           },
         }}
       >
@@ -662,14 +670,14 @@ const ChatPopup = () => {
         <Box
           sx={{
             p: 2,
-            background: 'linear-gradient(45deg, orange 100%, #534bae 90%)',
-            color: 'white',
+            background: "linear-gradient(45deg, orange 100%, #534bae 90%)",
+            color: "white",
             flexShrink: 0,
             zIndex: 2,
             boxShadow: 1,
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
             <AssistantAvatar size={48} />
             <Box>
               <Typography variant="h6">EduMate</Typography>
@@ -679,14 +687,15 @@ const ChatPopup = () => {
             <IconButton
               color="inherit"
               onClick={() => setIsOpen(false)}
-              sx={{ ml: 'auto' }}
+              sx={{ ml: "auto" }}
             >
               <CloseIcon />
             </IconButton>
           </Box>
 
           <BetaNote>
-            Note: EduMate is in beta and may occasionally make mistakes. Please verify important information.
+            Note: EduMate is in beta and may occasionally make mistakes. Please
+            verify important information.
           </BetaNote>
 
           {!IsUserLoggedIn && (
@@ -695,12 +704,12 @@ const ChatPopup = () => {
                 fullWidth
                 variant="contained"
                 startIcon={<LoginIcon />}
-                onClick={() => handleAuthClick('login')}
+                onClick={() => handleAuthClick("login")}
                 sx={{
-                  bgcolor: 'white',
-                  color: '#1a237e',
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.9)',
+                  bgcolor: "white",
+                  color: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "rgba(255, 255, 255, 0.9)",
                   },
                 }}
               >
@@ -710,13 +719,13 @@ const ChatPopup = () => {
                 fullWidth
                 variant="outlined"
                 startIcon={<SignUpIcon />}
-                onClick={() => handleAuthClick('register')}
+                onClick={() => handleAuthClick("register")}
                 sx={{
-                  borderColor: 'white',
-                  color: 'white',
-                  '&:hover': {
-                    borderColor: 'rgba(255, 255, 255, 0.9)',
-                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  borderColor: "white",
+                  color: "white",
+                  "&:hover": {
+                    borderColor: "rgba(255, 255, 255, 0.9)",
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
                   },
                 }}
               >
@@ -728,84 +737,150 @@ const ChatPopup = () => {
 
         {/* Messages Section */}
         <MessagesList ref={messagesContainerRef}>
-          <Box sx={{
-            p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: 'min-content',
-            gap: 2,
-          }}>
+          <Box
+            sx={{
+              p: 2,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "min-content",
+              gap: 2,
+            }}
+          >
             {messages.map((message, index) => (
               <MessageContainer key={index} sender={message.sender}>
-                {message.sender === 'bot' && <AssistantAvatar size={32} />}
+                {message.sender === "bot" && <AssistantAvatar size={32} />}
                 <MessageBubble
                   sender={message.sender}
                   elevation={1}
                   sx={{
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      transform: 'translateY(-1px)',
+                    position: "relative",
+                    "&:hover .message-actions": {
+                      opacity: 1,
+                    },
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      transform: "translateY(-1px)",
                       boxShadow: 2,
                     },
+                    pb: 3,
                   }}
                 >
-                  <Box sx={{ flex: 1, width: '100%' }}>
-                    <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+                  <Box sx={{ flex: 1, width: "100%" }}>
+                    <Typography
+                      variant="body1"
+                      sx={{ wordBreak: "break-word" }}
+                    >
                       {message.content}
                     </Typography>
-                    {message.sender === 'bot' && message.link && (
+                    {message.sender === "bot" && message.link && (
                       <MessageLink
                         href={message.link}
                         target="_blank"
                         rel="noopener noreferrer"
                         sx={{
-                          display: 'inline-block',
-                          maxWidth: '100%',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                          display: "inline-block",
+                          maxWidth: "100%",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                       >
                         Open Link →
                       </MessageLink>
                     )}
-                    {message.sender === 'bot' && index === messages.length - 1 && suggestedQuestions.length > 0 && (
-                      <SuggestedQuestionsContainer>
-                        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
-                          Follow-up Questions:
-                        </Typography>
-                        {suggestedQuestions.map((question, qIndex) => (
-                          <SuggestedQuestion
-                            key={qIndex}
-                            variant="text"
-                            size="small"
-                            onClick={() => handleQuestionClick(question)}
-                            sx={{
-                              textAlign: 'left',
-                              justifyContent: 'flex-start',
-                            }}
+                    {message.sender === "bot" &&
+                      index === messages.length - 1 &&
+                      suggestedQuestions.length > 0 && (
+                        <SuggestedQuestionsContainer>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ mb: 0.5 }}
                           >
-                            {question}
-                          </SuggestedQuestion>
-                        ))}
-                      </SuggestedQuestionsContainer>
-                    )}
+                            Follow-up Questions:
+                          </Typography>
+                          {suggestedQuestions.map((question, qIndex) => (
+                            <SuggestedQuestion
+                              key={qIndex}
+                              variant="text"
+                              size="small"
+                              onClick={() => handleQuestionClick(question)}
+                              sx={{
+                                textAlign: "left",
+                                justifyContent: "flex-start",
+                              }}
+                            >
+                              {question}
+                            </SuggestedQuestion>
+                          ))}
+                        </SuggestedQuestionsContainer>
+                      )}
                   </Box>
-                  <CopyButton
-                    className="copy-button"
-                    size="small"
-                    onClick={() => handleCopyMessage(message.content, index)}
-                    sx={{
-                      color: message.sender === 'user' ? 'white' : 'inherit',
-                      opacity: copiedMessageId === index ? 1 : 0,
-                    }}
+                  <MessageActions
+                    className="message-actions"
+                    sender={message.sender}
                   >
-                    <Tooltip
-                      title={copiedMessageId === index ? 'Copied!' : 'Copy message'}
-                      placement="left"
+                    {message.sender === "bot" && (
+                      <>
+                        <ActionButton
+                          size="small"
+                          onClick={() => handleFeedback(index, "like")}
+                          sx={{
+                            color:
+                              message.sender === "user" ? "white" : "inherit",
+                            backgroundColor:
+                              feedback[index] === "like"
+                                ? "rgba(25, 118, 210, 0.12)"
+                                : "transparent",
+                          }}
+                        >
+                          <Tooltip title="Helpful" placement="top">
+                            <ThumbUpIcon
+                              fontSize="inherit"
+                              sx={{ fontSize: "0.75rem" }}
+                            />{" "}
+                            {/* Adjust icon size */}
+                          </Tooltip>
+                        </ActionButton>
+                        <ActionButton
+                          size="small"
+                          onClick={() => handleFeedback(index, "dislike")}
+                          sx={{
+                            color:
+                              message.sender === "user" ? "white" : "inherit",
+                            backgroundColor:
+                              feedback[index] === "dislike"
+                                ? "rgba(211, 47, 47, 0.12)"
+                                : "transparent",
+                          }}
+                        >
+                          <Tooltip title="Not helpful" placement="top">
+                            <ThumbDownIcon
+                              fontSize="inherit"
+                              sx={{ fontSize: "0.75rem" }}
+                            />{" "}
+                            {/* Adjust icon size */}
+                          </Tooltip>
+                        </ActionButton>
+                      </>
+                    )}
+
+                    <ActionButton
+                      size="small"
+                      onClick={() => handleCopyMessage(message.content, index)}
+                      sx={{
+                        color: message.sender === "user" ? "white" : "inherit",
+                      }}
                     >
-                      <CopyIcon fontSize="small" />
-                    </Tooltip>
-                  </CopyButton>
+                      <Tooltip
+                        title={
+                          copiedMessageId === index ? "Copied!" : "Copy message"
+                        }
+                        placement="top"
+                      >
+                        <CopyIcon fontSize="small" />
+                      </Tooltip>
+                    </ActionButton>
+                  </MessageActions>
                 </MessageBubble>
               </MessageContainer>
             ))}
@@ -820,22 +895,25 @@ const ChatPopup = () => {
             )}
 
             {showDefaultQuestions && (
-              <Box sx={{ mt: 2, width: '100%' }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
+              <Box sx={{ mt: 2, width: "100%" }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 1, color: "text.secondary" }}
+                >
                   Frequently Asked Questions:
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   {defaultQuestions.map((question, index) => (
                     <QuestionButton
                       key={index}
                       fullWidth
                       onClick={() => handleQuestionClick(question)}
                       sx={{
-                        textAlign: 'left',
-                        justifyContent: 'flex-start',
-                        whiteSpace: 'normal',
-                        height: 'auto',
-                        minHeight: '36px',
+                        textAlign: "left",
+                        justifyContent: "flex-start",
+                        whiteSpace: "normal",
+                        height: "auto",
+                        minHeight: "36px",
                       }}
                     >
                       {question}
@@ -852,8 +930,8 @@ const ChatPopup = () => {
           sx={{
             p: 2,
             borderTop: 1,
-            borderColor: 'divider',
-            backgroundColor: 'background.paper',
+            borderColor: "divider",
+            backgroundColor: "background.paper",
             flexShrink: 0,
             zIndex: 2,
           }}
@@ -863,7 +941,7 @@ const ChatPopup = () => {
               <Typography noWrap sx={{ flex: 1 }}>
                 📎 {selectedFile.name}
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 {isUploading && (
                   <Typography variant="caption">{uploadProgress}%</Typography>
                 )}
@@ -882,13 +960,13 @@ const ChatPopup = () => {
             <UploadProgress variant="determinate" value={uploadProgress} />
           )}
 
-          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileSelect}
               accept=".pdf,.png,.jpg,.jpeg,.gif"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
             />
 
             <TextField
@@ -903,29 +981,29 @@ const ChatPopup = () => {
               onKeyPress={handleKeyPress}
               disabled={isUploading}
               sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderColor: '#1a237e',
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "#1a237e",
                   },
-                  '&:hover fieldset': {
-                    borderColor: '#000051',
+                  "&:hover fieldset": {
+                    borderColor: "#000051",
                   },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#1a237e',
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#1a237e",
                   },
                 },
               }}
             />
 
-            <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <Box sx={{ display: "flex", gap: 0.5 }}>
               <IconButton
                 color="primary"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading || isTyping}
                 sx={{
-                  color: '#1a237e',
-                  '&:hover': {
-                    bgcolor: 'rgba(26, 35, 126, 0.04)',
+                  color: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "rgba(26, 35, 126, 0.04)",
                   },
                 }}
               >
@@ -934,14 +1012,16 @@ const ChatPopup = () => {
 
               <IconButton
                 onClick={selectedFile ? handleFileUpload : handleSend}
-                disabled={(!input.trim() && !selectedFile) || isTyping || isUploading}
+                disabled={
+                  (!input.trim() && !selectedFile) || isTyping || isUploading
+                }
                 sx={{
-                  color: '#1a237e',
-                  '&:hover': {
-                    bgcolor: 'rgba(26, 35, 126, 0.04)',
-                    transform: 'scale(1.1)',
+                  color: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "rgba(26, 35, 126, 0.04)",
+                    transform: "scale(1.1)",
                   },
-                  transition: 'all 0.2s ease',
+                  transition: "all 0.2s ease",
                 }}
               >
                 <SendIcon />
@@ -952,5 +1032,5 @@ const ChatPopup = () => {
       </Drawer>
     </ThemeProvider>
   );
-}
-export default ChatPopup
+};
+export default ChatPopup;
