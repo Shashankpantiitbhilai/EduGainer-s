@@ -21,6 +21,7 @@ import {
   LinearProgress,
   useMediaQuery,
   useTheme,
+  Link,
 } from "@mui/material";
 import {
   Send as SendIcon,
@@ -35,6 +36,78 @@ import robotIcon from "../../images/AI-chatbot.png";
 import { AdminContext } from "../../App";
 import { ContentCopy as CopyIcon } from "@mui/icons-material";
 // Existing styled components remain the same...
+
+// ... (keep existing imports)
+
+const MessagesList = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  overflow: "auto",
+  scrollBehavior: "smooth",
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  maxHeight: "calc(100vh - 200px)", // Account for header and input area
+  "&::-webkit-scrollbar": {
+    width: "6px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "transparent",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#888",
+    borderRadius: "3px",
+    "&:hover": {
+      background: "#666",
+    },
+  },
+}));
+
+const MessageContainer = styled(Box)(({ theme, sender }) => ({
+  display: "flex",
+  justifyContent: sender === "user" ? "flex-end" : "flex-start",
+  marginBottom: theme.spacing(1),
+  opacity: 0,
+  transform: "translateY(20px)",
+  animation: "slideDown 0.3s ease forwards",
+  width: "100%",
+  padding: theme.spacing(0, 2),
+  maxWidth: "100%",
+  "@keyframes slideDown": {
+    to: {
+      opacity: 1,
+      transform: "translateY(0)",
+    },
+  },
+}));
+
+const MessageBubble = styled(Paper)(({ theme, sender }) => ({
+  padding: theme.spacing(1.5),
+  maxWidth: "80%", // Increased from 70% to allow more content
+  width: "fit-content",
+  borderRadius: theme.spacing(2),
+  backgroundColor: sender === "user" ? "#1a237e" : theme.palette.grey[100],
+  color: sender === "user" ? "white" : theme.palette.text.primary,
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  gap: theme.spacing(1),
+  overflowWrap: "break-word",
+  wordBreak: "break-word",
+  whiteSpace: "pre-wrap",
+  "& a": {
+    wordBreak: "break-all",
+  },
+  "&:hover": {
+    "& .copy-button": {
+      opacity: 1,
+    },
+  },
+  [theme.breakpoints.down("sm")]: {
+    maxWidth: "85%", // Even more width on mobile
+  },
+}));
+
 const BetaTag = styled(Box)(({ theme }) => ({
   position: "absolute",
   top: 0,
@@ -80,52 +153,6 @@ const UploadProgress = styled(LinearProgress)(({ theme }) => ({
   borderRadius: theme.spacing(0.5),
 }));
 
-const MessageContainer = styled(Box)(({ theme, sender }) => ({
-  display: "flex",
-  justifyContent: sender === "user" ? "flex-end" : "flex-start",
-  marginBottom: theme.spacing(1),
-  opacity: 0,
-  transform: "translateY(20px)",
-  animation: "slideDown 0.3s ease forwards",
-  "@keyframes slideDown": {
-    to: {
-      opacity: 1,
-      transform: "translateY(0)",
-    },
-  },
-}));
-
-const MessageBubble = styled(Paper)(({ theme, sender }) => ({
-  padding: theme.spacing(1.5),
-  maxWidth: "70%",
-  borderRadius: theme.spacing(2),
-  backgroundColor: sender === "user" ? "#1a237e" : theme.palette.grey[100],
-  color: sender === "user" ? "white" : theme.palette.text.primary,
-  position: "relative",
-  display: "flex",
-  alignItems: "flex-start",
-  gap: theme.spacing(1),
-  "&:hover": {
-    "& .copy-button": {
-      opacity: 1,
-    },
-  },
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    bottom: 0,
-    [sender === "user" ? "right" : "left"]: -8,
-    width: 0,
-    height: 0,
-    borderStyle: "solid",
-    borderWidth: sender === "user" ? "0 0 10px 10px" : "0 10px 10px 0",
-    borderColor:
-      sender === "user"
-        ? "transparent transparent transparent #1a237e"
-        : "transparent transparent transparent #f5f5f5",
-  },
-}));
-
 const QuestionButton = styled(Button)(({ theme }) => ({
   marginBottom: theme.spacing(1),
   textAlign: "left",
@@ -133,10 +160,36 @@ const QuestionButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   backgroundColor: theme.palette.grey[100],
   color: theme.palette.text.primary,
+  maxWidth: "100%",
+  padding: theme.spacing(1, 2),
+  whiteSpace: "normal",
+  wordWrap: "break-word",
+  height: "auto",
+  minHeight: theme.spacing(4),
   "&:hover": {
     backgroundColor: theme.palette.grey[200],
   },
 }));
+
+const MessageContent = styled(Box)({
+  width: "100%",
+  "& p, & a": {
+    margin: 0,
+    wordBreak: "break-word",
+  },
+  "& a": {
+    display: "inline-block",
+    maxWidth: "100%",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+});
+
+const MessageWrapper = styled(Box)({
+  width: "100%",
+  maxWidth: "600px",
+  margin: "0 auto",
+});
 
 const defaultQuestions = [
   "How do I access the library section of EduGainer's?",
@@ -161,24 +214,7 @@ const AuthButtons = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const MessagesList = styled(Box)({
-  flexGrow: 1,
-  overflow: "auto",
-  scrollBehavior: "smooth",
-  "&::-webkit-scrollbar": {
-    width: "6px",
-  },
-  "&::-webkit-scrollbar-track": {
-    background: "transparent",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    background: "#888",
-    borderRadius: "3px",
-    "&:hover": {
-      background: "#666",
-    },
-  },
-});
+
 
 const TypingIndicator = () => (
   <Box sx={{ display: "flex", gap: 0.5, px: 1 }}>
@@ -255,7 +291,29 @@ const SuggestedQuestion = styled(Button)(({ theme }) => ({
     backgroundColor: "rgba(26, 35, 126, 0.15)",
   },
 }));
-
+const MessageLink = styled(Link)(({ theme }) => ({
+  color: "white",
+  backgroundColor: "#1a237e",
+  padding: theme.spacing(1, 2),
+  borderRadius: theme.spacing(1),
+  marginTop: theme.spacing(1.5),
+  display: "inline-flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  textDecoration: "none",
+  fontWeight: 500,
+  fontSize: "0.875rem",
+  maxWidth: "100%",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+  transition: "all 0.2s ease",
+  "&:hover": {
+    backgroundColor: "#000051",
+    transform: "translateY(-2px)",
+    boxShadow: theme.shadows[2],
+  },
+}));
 const SuggestedQuestionsContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -303,18 +361,14 @@ const ChatPopup = () => {
 
   const handleQuestionClick = async (question) => {
     setShowDefaultQuestions(false);
-    setSuggestedQuestions([]); // Clear previous suggestions
+    setSuggestedQuestions([]);
 
-    // Add user message
     setMessages((prev) => [...prev, { sender: "user", content: question }]);
-
-    // Show typing indicator
     setIsTyping(true);
 
     try {
       const botResponse = await sendMessageToChatbot(question);
-
-      // Add bot response
+      console.log(botResponse.link);
       setMessages((prev) => [
         ...prev,
         {
@@ -322,10 +376,10 @@ const ChatPopup = () => {
           content:
             botResponse.response ||
             "Let me help you with that query about " + question.toLowerCase(),
+          link: botResponse.link, // Add link to message object
         },
       ]);
 
-      // Set suggested questions if they exist
       if (
         botResponse.followUpQuestions &&
         Array.isArray(botResponse.followUpQuestions)
@@ -351,24 +405,20 @@ const ChatPopup = () => {
     if (input.trim()) {
       const userMessage = input.trim();
       setInput("");
-      setSuggestedQuestions([]); // Clear previous suggestions
+      setSuggestedQuestions([]);
 
-      // Add user message
       setMessages((prev) => [
         ...prev,
         { sender: "user", content: userMessage },
       ]);
 
-      // Show typing indicator
       setIsTyping(true);
 
       try {
-        // Simulate network delay for better UX
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const botResponse = await sendMessageToChatbot(userMessage);
 
-        // Add bot response
         setMessages((prev) => [
           ...prev,
           {
@@ -376,10 +426,10 @@ const ChatPopup = () => {
             content:
               botResponse.response ||
               "I apologize, but I didn't quite understand that. Could you please rephrase?",
+            link: botResponse.link, // Add link to message object
           },
         ]);
 
-        // Set suggested questions if they exist
         if (
           botResponse.followUpQuestions &&
           Array.isArray(botResponse.followUpQuestions)
@@ -401,7 +451,6 @@ const ChatPopup = () => {
       }
     }
   };
-
   const handleAuthClick = (type) => {
     window.location.href = type === "login" ? "/login" : "/register";
   };
@@ -565,9 +614,7 @@ const ChatPopup = () => {
                 👋 Hey there!
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Need assistance with our website? I'm your EduMate , here to
-                help with any queries you have about the site or anything else
-                you need!
+                Need assistance with our website? I'm your EduMate, here to help with any queries you have about the site or anything else you need!
               </Typography>
             </WelcomePopup>
           )}
@@ -575,17 +622,17 @@ const ChatPopup = () => {
             <Zoom in={true}>
               <Fab
                 sx={{
-                  position: "fixed",
+                  position: 'fixed',
                   bottom: 24,
                   right: 24,
-                  bgcolor: "#1a237e",
-                  "&:hover": {
-                    bgcolor: "#000051",
-                    transform: "scale(1.1)",
+                  bgcolor: '#1a237e',
+                  '&:hover': {
+                    bgcolor: '#000051',
+                    transform: 'scale(1.1)',
                   },
-                  transition: "all 0.3s ease",
+                  transition: 'all 0.3s ease',
                   padding: 0,
-                  overflow: "hidden",
+                  overflow: 'hidden',
                 }}
                 onClick={handleChatOpen}
               >
@@ -602,22 +649,27 @@ const ChatPopup = () => {
         onClose={() => setIsOpen(false)}
         PaperProps={{
           sx: {
-            width: { xs: "100%", sm: 380 },
-            height: "100%",
-            bgcolor: "background.default",
-            display: "flex",
-            flexDirection: "column",
+            width: { xs: '100%', sm: 380 },
+            height: '100%',
+            bgcolor: 'background.default',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
           },
         }}
       >
+        {/* Header Section */}
         <Box
           sx={{
             p: 2,
-            background: "linear-gradient(45deg, orange 100%, #534bae 90%)",
-            color: "white",
+            background: 'linear-gradient(45deg, orange 100%, #534bae 90%)',
+            color: 'white',
+            flexShrink: 0,
+            zIndex: 2,
+            boxShadow: 1,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <AssistantAvatar size={48} />
             <Box>
               <Typography variant="h6">EduMate</Typography>
@@ -627,15 +679,14 @@ const ChatPopup = () => {
             <IconButton
               color="inherit"
               onClick={() => setIsOpen(false)}
-              sx={{ ml: "auto" }}
+              sx={{ ml: 'auto' }}
             >
               <CloseIcon />
             </IconButton>
           </Box>
 
           <BetaNote>
-            Note: EduMate is in beta and may occasionally make mistakes. Please
-            verify important information.
+            Note: EduMate is in beta and may occasionally make mistakes. Please verify important information.
           </BetaNote>
 
           {!IsUserLoggedIn && (
@@ -643,10 +694,15 @@ const ChatPopup = () => {
               <Button
                 fullWidth
                 variant="contained"
-                color="primary"
                 startIcon={<LoginIcon />}
-                onClick={() => handleAuthClick("login")}
-                sx={{ bgcolor: "white", color: "#1a237e" }}
+                onClick={() => handleAuthClick('login')}
+                sx={{
+                  bgcolor: 'white',
+                  color: '#1a237e',
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.9)',
+                  },
+                }}
               >
                 Sign In
               </Button>
@@ -654,8 +710,15 @@ const ChatPopup = () => {
                 fullWidth
                 variant="outlined"
                 startIcon={<SignUpIcon />}
-                onClick={() => handleAuthClick("register")}
-                sx={{ borderColor: "white", color: "white" }}
+                onClick={() => handleAuthClick('register')}
+                sx={{
+                  borderColor: 'white',
+                  color: 'white',
+                  '&:hover': {
+                    borderColor: 'rgba(255, 255, 255, 0.9)',
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
               >
                 Create Account
               </Button>
@@ -663,50 +726,81 @@ const ChatPopup = () => {
           )}
         </Box>
 
+        {/* Messages Section */}
         <MessagesList ref={messagesContainerRef}>
-          <Box sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+          <Box sx={{
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 'min-content',
+            gap: 2,
+          }}>
             {messages.map((message, index) => (
               <MessageContainer key={index} sender={message.sender}>
-                {message.sender === "bot" && <AssistantAvatar size={32} />}
-                <MessageBubble sender={message.sender} elevation={1}>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="body1">{message.content}</Typography>
-                    {message.sender === "bot" &&
-                      index === messages.length - 1 &&
-                      suggestedQuestions.length > 0 && (
-                        <SuggestedQuestionsContainer>
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ mb: 0.5 }}
+                {message.sender === 'bot' && <AssistantAvatar size={32} />}
+                <MessageBubble
+                  sender={message.sender}
+                  elevation={1}
+                  sx={{
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
+                      boxShadow: 2,
+                    },
+                  }}
+                >
+                  <Box sx={{ flex: 1, width: '100%' }}>
+                    <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+                      {message.content}
+                    </Typography>
+                    {message.sender === 'bot' && message.link && (
+                      <MessageLink
+                        href={message.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                          display: 'inline-block',
+                          maxWidth: '100%',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        Open Link →
+                      </MessageLink>
+                    )}
+                    {message.sender === 'bot' && index === messages.length - 1 && suggestedQuestions.length > 0 && (
+                      <SuggestedQuestionsContainer>
+                        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+                          Follow-up Questions:
+                        </Typography>
+                        {suggestedQuestions.map((question, qIndex) => (
+                          <SuggestedQuestion
+                            key={qIndex}
+                            variant="text"
+                            size="small"
+                            onClick={() => handleQuestionClick(question)}
+                            sx={{
+                              textAlign: 'left',
+                              justifyContent: 'flex-start',
+                            }}
                           >
-                            Follow-up Questions:
-                          </Typography>
-                          {suggestedQuestions.map((question, qIndex) => (
-                            <SuggestedQuestion
-                              key={qIndex}
-                              variant="text"
-                              size="small"
-                              onClick={() => handleQuestionClick(question)}
-                            >
-                              {question}
-                            </SuggestedQuestion>
-                          ))}
-                        </SuggestedQuestionsContainer>
-                      )}
+                            {question}
+                          </SuggestedQuestion>
+                        ))}
+                      </SuggestedQuestionsContainer>
+                    )}
                   </Box>
                   <CopyButton
                     className="copy-button"
                     size="small"
                     onClick={() => handleCopyMessage(message.content, index)}
                     sx={{
-                      color: message.sender === "user" ? "white" : "inherit",
+                      color: message.sender === 'user' ? 'white' : 'inherit',
+                      opacity: copiedMessageId === index ? 1 : 0,
                     }}
                   >
                     <Tooltip
-                      title={
-                        copiedMessageId === index ? "Copied!" : "Copy message"
-                      }
+                      title={copiedMessageId === index ? 'Copied!' : 'Copy message'}
                       placement="left"
                     >
                       <CopyIcon fontSize="small" />
@@ -724,34 +818,44 @@ const ChatPopup = () => {
                 </MessageBubble>
               </MessageContainer>
             )}
+
             {showDefaultQuestions && (
-              <Box sx={{ mt: 2 }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 1, color: "text.secondary" }}
-                >
+              <Box sx={{ mt: 2, width: '100%' }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, color: 'text.secondary' }}>
                   Frequently Asked Questions:
                 </Typography>
-                {defaultQuestions.map((question, index) => (
-                  <QuestionButton
-                    key={index}
-                    fullWidth
-                    onClick={() => handleQuestionClick(question)}
-                  >
-                    {question}
-                  </QuestionButton>
-                ))}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {defaultQuestions.map((question, index) => (
+                    <QuestionButton
+                      key={index}
+                      fullWidth
+                      onClick={() => handleQuestionClick(question)}
+                      sx={{
+                        textAlign: 'left',
+                        justifyContent: 'flex-start',
+                        whiteSpace: 'normal',
+                        height: 'auto',
+                        minHeight: '36px',
+                      }}
+                    >
+                      {question}
+                    </QuestionButton>
+                  ))}
+                </Box>
               </Box>
             )}
           </Box>
         </MessagesList>
 
+        {/* Input Section */}
         <Box
           sx={{
             p: 2,
             borderTop: 1,
-            borderColor: "divider",
-            backgroundColor: "background.paper",
+            borderColor: 'divider',
+            backgroundColor: 'background.paper',
+            flexShrink: 0,
+            zIndex: 2,
           }}
         >
           {selectedFile && (
@@ -759,7 +863,7 @@ const ChatPopup = () => {
               <Typography noWrap sx={{ flex: 1 }}>
                 📎 {selectedFile.name}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {isUploading && (
                   <Typography variant="caption">{uploadProgress}%</Typography>
                 )}
@@ -778,13 +882,13 @@ const ChatPopup = () => {
             <UploadProgress variant="determinate" value={uploadProgress} />
           )}
 
-          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileSelect}
               accept=".pdf,.png,.jpg,.jpeg,.gif"
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
             />
 
             <TextField
@@ -799,72 +903,54 @@ const ChatPopup = () => {
               onKeyPress={handleKeyPress}
               disabled={isUploading}
               sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "#1a237e",
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#1a237e',
                   },
-                  "&:hover fieldset": {
-                    borderColor: "#000051",
+                  '&:hover fieldset': {
+                    borderColor: '#000051',
                   },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#1a237e",
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#1a237e',
                   },
                 },
               }}
             />
 
-            <Box sx={{ display: "flex", gap: 0.5 }}>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
               <IconButton
                 color="primary"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading || isTyping}
                 sx={{
-                  color: "#1a237e",
-                  "&:hover": {
-                    bgcolor: "rgba(26, 35, 126, 0.04)",
+                  color: '#1a237e',
+                  '&:hover': {
+                    bgcolor: 'rgba(26, 35, 126, 0.04)',
                   },
                 }}
               >
                 <AttachFileIcon />
               </IconButton>
 
-              {selectedFile ? (
-                <IconButton
-                  onClick={handleFileUpload}
-                  disabled={isUploading || isTyping}
-                  sx={{
-                    color: "#1a237e",
-                    "&:hover": {
-                      bgcolor: "rgba(26, 35, 126, 0.04)",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <SendIcon />
-                </IconButton>
-              ) : (
-                <IconButton
-                  onClick={handleSend}
-                  disabled={!input.trim() || isTyping || isUploading}
-                  sx={{
-                    color: "#1a237e",
-                    "&:hover": {
-                      bgcolor: "rgba(26, 35, 126, 0.04)",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <SendIcon />
-                </IconButton>
-              )}
+              <IconButton
+                onClick={selectedFile ? handleFileUpload : handleSend}
+                disabled={(!input.trim() && !selectedFile) || isTyping || isUploading}
+                sx={{
+                  color: '#1a237e',
+                  '&:hover': {
+                    bgcolor: 'rgba(26, 35, 126, 0.04)',
+                    transform: 'scale(1.1)',
+                  },
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <SendIcon />
+              </IconButton>
             </Box>
           </Box>
         </Box>
       </Drawer>
     </ThemeProvider>
   );
-};
-
-export default ChatPopup;
+}
+export default ChatPopup

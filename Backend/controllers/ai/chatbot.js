@@ -58,10 +58,10 @@ const getGeminiResponse = async (req, res) => {
         const { input } = req.body;
         // console.log('Processing text input:', input);
 
-        const { responseText, followUpQuestions } = await fetchGeminiTextResponse(input);
+        const { responseText, followUpQuestions,link } = await fetchGeminiTextResponse(input);
 
         // Send back both response and suggested follow-up questions
-        res.json({ response: responseText, followUpQuestions });
+        res.json({ response: responseText, followUpQuestions ,link});
     } catch (error) {
         console.error('Error in text processing:', error);
         res.status(500).json({
@@ -82,37 +82,88 @@ const fetchGeminiTextResponse = async (input) => {
         history: [],
     });
 
-    // Send user input to the model
-    const result = await chatSession.sendMessage(input);
-
-    // Extract response text
-    const responseText = result.response.text();
-
-    // Request suggested follow-up questions based on the response
-    const suggestedQuestions = await chatSession.sendMessage(
-        `Based on the provided answer, please suggest exactly three relevant follow-up questions. Ensure that the output is formatted as an array with three elements. The format should be: ["Question 1", "Question 2", "Question 3"].`
+    // Get main response
+    const result = await chatSession.sendMessage(
+        `Provide a clear response to the following input, ensuring you include exactly one helpful https link relevant to the topic. 
+         Response should be useful and, wherever possible, should contain a directly related https link: "${input}"`
     );
 
-    // Log the raw response text
-    const suggestedQuestionsText = suggestedQuestions.response.text();
-  
+    const responseText = result.response.text();
 
+    // Extract HTTPS link if present
+    const linkMatch = responseText.match(/https:\/\/[^\s\)\}\]]+/);
+    const link = linkMatch ? linkMatch[0] : null;
+
+    // First attempt to get follow-up questions with strict JSON formatting
+    const getFollowUpQuestions = async () => {
+        const response = await chatSession.sendMessage(
+            `Based on the previous response about "${input}", generate exactly three follow-up questions.
+             Your response must be in valid JSON array format.
+             Format your response EXACTLY like this, with no additional text:
+             ["First question here?", "Second question here?", "Third question here?"]`
+        );
+        
+        return response.response.text().trim();
+    };
+
+    // Keep trying until we get valid JSON
     let followUpQuestions;
-    try {
-        // Directly parse the suggestedQuestionsText without modification
-        followUpQuestions = JSON.parse(suggestedQuestionsText);
-    } catch (error) {
-        console.error("Failed to parse follow-up questions:", error);
-        throw new Error("Failed to parse follow-up questions from the response.");
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
+        try {
+            const questionsText = await getFollowUpQuestions();
+            // Try to extract anything that looks like a JSON array
+            const jsonMatch = questionsText.match(/\[[\s\S]*\]/);
+            
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (Array.isArray(parsed) && parsed.length === 3 && 
+                    parsed.every(q => typeof q === 'string' && q.trim().length > 0)) {
+                    followUpQuestions = parsed;
+                    break;
+                }
+            }
+        } catch (error) {
+            console.error(`Attempt ${attempts + 1} failed:`, error);
+        }
+        attempts++;
+
+        // If we failed, try again with an even stricter prompt
+        if (attempts < maxAttempts) {
+            await chatSession.sendMessage(
+                `Please provide exactly three follow-up questions in strict JSON array format. 
+                 Response must be ONLY a JSON array with three strings. 
+                 No other text. No explanations. No formatting.`
+            );
+        }
     }
 
-    // Ensure the followUpQuestions array has exactly three elements
-    if (followUpQuestions.length !== 3) {
-        throw new Error("The follow-up questions array must contain exactly three elements.");
+    // If we still don't have valid questions, make one final attempt with an extremely strict prompt
+    if (!followUpQuestions) {
+        try {
+            const finalAttempt = await chatSession.sendMessage(
+                `Return ONLY three questions in this exact format, replacing the example questions:
+                 ["Question one?","Question two?","Question three?"]`
+            );
+            const finalText = finalAttempt.response.text().trim();
+            const jsonMatch = finalText.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                followUpQuestions = JSON.parse(jsonMatch[0]);
+            }
+        } catch (error) {
+            throw new Error("Unable to generate valid follow-up questions after all attempts");
+        }
     }
 
-    return { responseText, followUpQuestions };
+    if (!Array.isArray(followUpQuestions) || followUpQuestions.length !== 3) {
+        throw new Error("Failed to generate valid follow-up questions");
+    }
+
+    return { responseText, followUpQuestions, link };
 };
+
 
 // Function to process file and generate response
 const processFileAndGenerateResponse = async (file, prompt) => {
