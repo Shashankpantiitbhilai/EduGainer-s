@@ -56,7 +56,7 @@ const processFileWithGemini = async (req, res) => {
 const getGeminiResponse = async (req, res) => {
     try {
         const { input } = req.body;
-        console.log('Processing text input:', input);
+        // console.log('Processing text input:', input);
 
         const { responseText, followUpQuestions } = await fetchGeminiTextResponse(input);
 
