@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IconButton, Tooltip, Box, Typography, useTheme } from '@mui/material';
 import { Brightness4 as Brightness4Icon, Brightness7 as Brightness7Icon } from '@mui/icons-material';
-import Draggable from 'react-draggable';
+
 import ChatPopup from './Components/AI/popup'; // Your existing ChatPopup component
 
 const FloatingButtons = ({ isDarkMode, onThemeToggle }) => {

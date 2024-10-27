@@ -140,25 +140,20 @@ const QuestionButton = styled(Button)(({ theme }) => ({
 }));
 
 const defaultQuestions = [
-  "How can I borrow books from the library?",
-  "What classes are currently available at EduGainer's?",
-  "How can I track my progress in each subject?",
-  "Can you recommend study materials from the library?",
-  "How do I purchase stationery items through EduGainer?",
-  "Can you help me understand a difficult topic?",
-  "What are some tips for preparing for exams?",
-  "How can I get personalized learning recommendations?",
-  "What resources can help me improve my weak areas?",
-  "How do I create a study plan with EduGainer's resources?",
-  "What reports are available for tracking my academic performance?",
-  "How can I manage my time better for assignments and exams?",
-  "Are there any online resources or classes available?",
-  "Can you quiz me on topics I’ve studied?",
-  "How can I improve my grades in this subject?",
-  "What should I do if I don’t understand something in class?",
-  "How can I access my teachers' feedback on my assignments?",
-  "Can I review past assessments to learn from my mistakes?",
-  "What additional books or materials should I read?",
+  "How do I access the library section of EduGainer's?",
+  "How can I pay the library fee?",
+  "What classes can I enroll in at EduGainer's?",
+  "How can I access the EduGainer's homepage?",
+  "How do I log in to my EduGainer's account?",
+  "What is the process to register on the EduGainer's website?",
+  "What should I do if I forgot my password?",
+  "How can I start chatting with the EduGainer's assistant?",
+  "Where can I find the policies of EduGainer's?",
+  "What resources are available on the EduGainer's platform?",
+  "How do I complete the new registration process?",
+  "How can I access my dashboard?",
+  "How can I view and edit my profile?",
+  "Where can I find stationery items on EduGainer's?",
 ];
 
 const AuthButtons = styled(Box)(({ theme }) => ({
@@ -296,7 +291,7 @@ const ChatPopup = () => {
   const initialMessages = [
     {
       sender: "bot",
-      content: "👋 Welcome to EduGainer's! I'm your educational assistant.",
+      content: "👋 Welcome to EduGainer's's! I'm your educational assistant.",
     },
     {
       sender: "bot",
