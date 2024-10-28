@@ -10,11 +10,12 @@ const fileManager = new GoogleAIFileManager(apiKey);
 
 // Common generation config
 const generationConfig = {
-    temperature: 0.7,
-    topP: 0.9,
-    topK: 40,
-    maxOutputTokens: 512,
-    responseMimeType: 'text/plain',
+    temperature: 0.3,  // Lower temperature for more deterministic responses
+    topP: 0.95,        // Slightly higher topP for broader response diversity without sacrificing precision
+    topK: 30,          // Lower topK to focus on high-probability words
+    maxOutputTokens: 1024,  // Increased token count to accommodate detailed answers
+    responseMimeType: 'text/plain',  // Set for flexible output that can support text with markdown for image or link embedding
+    // Enables multimodal input (text + references to images)
 };
 
 // Controller function to handle text-based Gemini API requests
@@ -64,17 +65,17 @@ const getGeminiResponse = async (req, res) => {
         req.session.history = sessionHistory;
 
         // User personalization
-       
+
 
         // Keyword extraction
-     
-        
+
+
 
         // Pass context to Gemini
         const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
             sessionHistory,
-           
-          
+
+
         });
 
         res.json({ response: responseText, followUpQuestions, link });
@@ -88,20 +89,35 @@ const getGeminiResponse = async (req, res) => {
 };
 
 // Function to fetch text-based response from Gemini and suggest follow-up questions
-const fetchGeminiTextResponse = async (input) => {
+// Function to fetch text-based response from Gemini and suggest follow-up questions
+const fetchGeminiTextResponse = async (input, { sessionHistory }) => {
+    // Transform session history into the format expected by Gemini
+    const formattedHistory = sessionHistory.map(entry => ([
+        // User message
+        {
+            role: "user",
+            parts: [{ text: entry.user }]
+        },
+        // If there's a response, include it
+        entry.assistant && {
+            role: "model",
+            parts: [{ text: entry.assistant }]
+        }
+    ]).filter(Boolean)); // Remove undefined entries
+
     const model = genAI.getGenerativeModel({
         model: process.env.AI_MODEL,
     });
 
     const chatSession = model.startChat({
         generationConfig,
-        history: [],
+        history: formattedHistory.flat(), // Flatten the array of message pairs
     });
 
     // Get main response
     const result = await chatSession.sendMessage(
-        `Provide a clear response to the following input, ensuring you include exactly one helpful https link relevant to the topic. 
-         Response should be useful and, wherever possible, should contain a directly related https link: "${input}"`
+        `Respond to the user's input: "${input}"
+        Please include exactly one helpful https link relevant to the topic in your response.`
     );
 
     const responseText = result.response.text();
@@ -110,15 +126,15 @@ const fetchGeminiTextResponse = async (input) => {
     const linkMatch = responseText.match(/https:\/\/[^\s\)\}\]]+/);
     const link = linkMatch ? linkMatch[0] : null;
 
-    // First attempt to get follow-up questions with strict JSON formatting
+    // Function to get follow-up questions with strict JSON formatting
     const getFollowUpQuestions = async () => {
         const response = await chatSession.sendMessage(
-            `Based on the previous response about "${input}", generate exactly three follow-up questions.
-             Your response must be in valid JSON array format.
-             Format your response EXACTLY like this, with no additional text:
-             ["First question here?", "Second question here?", "Third question here?"]`
+            `Based on our conversation, generate exactly three follow-up questions.
+            Your response must be in valid JSON array format.
+            Format your response EXACTLY like this:
+            ["First question here?", "Second question here?", "Third question here?"]`
         );
-        
+
         return response.response.text().trim();
     };
 
@@ -130,12 +146,12 @@ const fetchGeminiTextResponse = async (input) => {
     while (attempts < maxAttempts) {
         try {
             const questionsText = await getFollowUpQuestions();
-            // Try to extract anything that looks like a JSON array
             const jsonMatch = questionsText.match(/\[[\s\S]*\]/);
-            
+
             if (jsonMatch) {
                 const parsed = JSON.parse(jsonMatch[0]);
-                if (Array.isArray(parsed) && parsed.length === 3 && 
+                if (Array.isArray(parsed) &&
+                    parsed.length === 3 &&
                     parsed.every(q => typeof q === 'string' && q.trim().length > 0)) {
                     followUpQuestions = parsed;
                     break;
@@ -146,22 +162,22 @@ const fetchGeminiTextResponse = async (input) => {
         }
         attempts++;
 
-        // If we failed, try again with an even stricter prompt
+        // If we failed, try again with a stricter prompt
         if (attempts < maxAttempts) {
             await chatSession.sendMessage(
-                `Please provide exactly three follow-up questions in strict JSON array format. 
-                 Response must be ONLY a JSON array with three strings. 
-                 No other text. No explanations. No formatting.`
+                `Please provide exactly three follow-up questions in strict JSON array format.
+                Response must be ONLY a JSON array with three strings.
+                No other text.`
             );
         }
     }
 
-    // If we still don't have valid questions, make one final attempt with an extremely strict prompt
+    // Final attempt with extremely strict prompt if needed
     if (!followUpQuestions) {
         try {
             const finalAttempt = await chatSession.sendMessage(
-                `Return ONLY three questions in this exact format, replacing the example questions:
-                 ["Question one?","Question two?","Question three?"]`
+                `Return ONLY three questions in this exact format:
+                ["Question one?", "Question two?", "Question three?"]`
             );
             const finalText = finalAttempt.response.text().trim();
             const jsonMatch = finalText.match(/\[[\s\S]*\]/);
@@ -179,6 +195,7 @@ const fetchGeminiTextResponse = async (input) => {
 
     return { responseText, followUpQuestions, link };
 };
+
 
 
 // Function to process file and generate response
