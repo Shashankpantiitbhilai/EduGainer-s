@@ -107,7 +107,7 @@ const GoogleReviewPopup = () => {
           </Box>
         </Box>
         <Typography variant="body1" gutterBottom>
-          Please take a moment to leave a review for EduGainer on Google. Your
+          Please take a moment to leave a review for EduGainer's on Google. Your
           feedback helps us improve our services.
         </Typography>
         <Divider sx={{ my: 2 }} />
