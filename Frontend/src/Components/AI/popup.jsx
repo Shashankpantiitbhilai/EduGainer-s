@@ -329,7 +329,7 @@ const ChatPopup = () => {
   };
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isOpen, setIsOpen] = useState(!isMobile);
-  const [showWelcome, setShowWelcome] = useState(isMobile);
+  const [showWelcome, setShowWelcome] = useState(true);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
@@ -626,8 +626,7 @@ const ChatPopup = () => {
                   👋 Hi there! 🌟
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Welcome to EduGainer's! <br />
-                  I'm Aiden, here to help! <br />
+                  Welcome to EduGainer's! <br/>I'm Aiden, here to help! <br />
                   Have questions or need assistance? <br />
                   Just ask—I'm here to make things easy and enjoyable for you!
                 </Typography>
