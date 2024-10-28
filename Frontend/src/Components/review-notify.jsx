@@ -77,16 +77,12 @@ const GoogleReviewPopup = () => {
   };
 
   return (
-    <StyledDialog open={showPopup} onClose={handleClose}>
-      <StyledDialogTitle>
-        Review EduGainer's on Google
-        <IconButton
-          onClick={handleClose}
-          sx={{ position: "absolute", right: 8, top: 8, color: "white" }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </StyledDialogTitle>
+    <StyledDialog
+      open={showPopup}
+      onClose={() => {}} // Prevent closing when clicking outside
+      disableBackdropClick // Disable closing on backdrop click
+    >
+      <StyledDialogTitle>Review EduGainer's on Google</StyledDialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
           <img
