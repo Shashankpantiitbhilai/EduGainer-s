@@ -10,13 +10,12 @@ const fileManager = new GoogleAIFileManager(apiKey);
 
 // Common generation config
 const generationConfig = {
-    temperature: 0.3,  // Lower temperature for more deterministic responses
-    topP: 0.95,        // Slightly higher topP for broader response diversity without sacrificing precision
-    topK: 30,          // Lower topK to focus on high-probability words
-    maxOutputTokens: 512,  // Increased token count to accommodate detailed answers
-    responseMimeType: 'text/plain',  // Set for flexible output that can support text with markdown for image or link embedding
-    // Enables multimodal input (text + references to images)
-};
+    temperature: 0.7,
+    topP: 0.9,
+    topK: 40,
+    maxOutputTokens: 512,
+    responseMimeType: 'text/plain',
+}; 
 
 // Controller function to handle text-based Gemini API requests
 
@@ -64,140 +63,154 @@ const getGeminiResponse = async (req, res) => {
         if (sessionHistory.length > 10) sessionHistory.shift();
         req.session.history = sessionHistory;
 
-        // User personalization
-
-
-        // Keyword extraction
-
-
-
-        // Pass context to Gemini
         const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
             sessionHistory,
-
-
         });
 
         res.json({ response: responseText, followUpQuestions, link });
     } catch (error) {
         console.error('Error in text processing:', error);
-        res.status(500).json({
-            error: 'Internal Server Error',
-            details: error.message
+        // Send a more graceful response with default follow-up questions
+        res.json({
+            response: error.mainResponse || "I apologize, but I encountered an error processing your request.",
+            followUpQuestions: [
+                "Could you rephrase your question?",
+                "Would you like to try a different approach?",
+                "Should we explore a different topic?"
+            ],
+            link: null
         });
     }
 };
 
-// Function to fetch text-based response from Gemini and suggest follow-up questions
-// Function to fetch text-based response from Gemini and suggest follow-up questions
+const extractLink = (text) => {
+    const linkMatch = text.match(/https:\/\/[^\s\)\}\]]+/);
+    return linkMatch ? linkMatch[0] : null;
+};
+
 const fetchGeminiTextResponse = async (input, { sessionHistory }) => {
-    // Transform session history into the format expected by Gemini
+    // Transform session history into Gemini's format
     const formattedHistory = sessionHistory.map(entry => ([
-        // User message
         {
             role: "user",
             parts: [{ text: entry.user }]
         },
-        // If there's a response, include it
         entry.assistant && {
             role: "model",
             parts: [{ text: entry.assistant }]
         }
-    ]).filter(Boolean)); // Remove undefined entries
+    ]).filter(Boolean));
 
     const model = genAI.getGenerativeModel({
-        model: process.env.AI_MODEL,
+        model: process.env.AI_MODEL || "gemini-pro",
     });
 
     const chatSession = model.startChat({
         generationConfig,
-        history: formattedHistory.flat(), // Flatten the array of message pairs
+        history: formattedHistory.flat(),
     });
 
-    // Get main response
+    // Get main response first
     const result = await chatSession.sendMessage(
         `Respond to the user's input: "${input}"
         Please include exactly one helpful https link relevant to the topic in your response.`
     );
 
     const responseText = result.response.text();
+    const link = extractLink(responseText);
 
-    // Extract HTTPS link if present
-    const linkMatch = responseText.match(/https:\/\/[^\s\)\}\]]+/);
-    const link = linkMatch ? linkMatch[0] : null;
-
-    // Function to get follow-up questions with strict JSON formatting
+    // Simplified follow-up questions generation with better error handling
     const getFollowUpQuestions = async () => {
-        const response = await chatSession.sendMessage(
-            `Based on our conversation, generate exactly three follow-up questions.
-            Your response must be in valid JSON array format.
-            Format your response EXACTLY like this:
-            ["First question here?", "Second question here?", "Third question here?"]`
-        );
-
-        return response.response.text().trim();
-    };
-
-    // Keep trying until we get valid JSON
-    let followUpQuestions;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (attempts < maxAttempts) {
         try {
-            const questionsText = await getFollowUpQuestions();
-            const jsonMatch = questionsText.match(/\[[\s\S]*\]/);
+            const response = await chatSession.sendMessage(`
+                Based on the user's message: "${input}" and our conversation history,
+                generate 3 NEW, DIFFERENT follow-up questions that:
+                1. Are directly related to the specific topic discussed
+                2. Encourage deeper exploration of different aspects
+                3. Are NOT generic questions like "Can you elaborate?" or "Would you like to know more?"
+                
+                Format EXACTLY as JSON array: ["Question 1?", "Question 2?", "Question 3?"]
+                IMPORTANT: Questions must be different from previous ones and specific to the topic.
+            `);
 
-            if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[0]);
-                if (Array.isArray(parsed) &&
-                    parsed.length === 3 &&
-                    parsed.every(q => typeof q === 'string' && q.trim().length > 0)) {
-                    followUpQuestions = parsed;
-                    break;
+            const text = response.response.text().trim();
+
+            // Enhanced JSON extraction with stricter pattern matching
+            const jsonPattern = /\[\s*"[^"]+\?"\s*,\s*"[^"]+\?"\s*,\s*"[^"]+\?"\s*\]/;
+            const match = text.match(jsonPattern);
+
+            if (match) {
+                const questions = JSON.parse(match[0]);
+
+                // Validate questions are unique and topic-specific
+                const areQuestionsValid = questions.length === 3 &&
+                    questions.every(q => q.endsWith('?')) &&
+                    questions.every(q => q.length > 15) && // Ensure meaningful length
+                    new Set(questions).size === 3; // Ensure all questions are unique
+
+                if (areQuestionsValid) {
+                    return questions;
                 }
             }
+
+            // If we get here, generate contextual fallback questions
+            return generateContextualQuestions(input);
         } catch (error) {
-            console.error(`Attempt ${attempts + 1} failed:`, error);
+            console.warn('Error generating follow-up questions:', error);
+            return generateContextualQuestions(input);
         }
-        attempts++;
+    };
 
-        // If we failed, try again with a stricter prompt
-        if (attempts < maxAttempts) {
-            await chatSession.sendMessage(
-                `Please provide exactly three follow-up questions in strict JSON array format.
-                Response must be ONLY a JSON array with three strings.
-                No other text.`
-            );
+    const generateContextualQuestions = (input) => {
+        // Extract key terms from input
+        const keywords = input.toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(' ')
+            .filter(word => word.length > 3)
+            .slice(0, 2);
+
+        // If we have meaningful keywords, use them
+        if (keywords.length > 0) {
+            const topic = keywords.join(' ');
+            return [
+                `What specific aspects of ${topic} would you like to learn more about?`,
+                `How do you currently use or interact with ${topic}?`,
+                `What challenges have you faced regarding ${topic}?`
+            ];
         }
-    }
 
-    // Final attempt with extremely strict prompt if needed
-    if (!followUpQuestions) {
-        try {
-            const finalAttempt = await chatSession.sendMessage(
-                `Return ONLY three questions in this exact format:
-                ["Question one?", "Question two?", "Question three?"]`
-            );
-            const finalText = finalAttempt.response.text().trim();
-            const jsonMatch = finalText.match(/\[[\s\S]*\]/);
-            if (jsonMatch) {
-                followUpQuestions = JSON.parse(jsonMatch[0]);
-            }
-        } catch (error) {
-            throw new Error("Unable to generate valid follow-up questions after all attempts");
-        }
-    }
+        // Rotate through different sets of fallback questions to avoid repetition
+        const fallbackSets = [
+            [
+                "What specific aspects of this topic interest you most?",
+                "How would you like to apply this information?",
+                "What related areas should we explore next?"
+            ],
+            [
+                "Could you share your experience with this subject?",
+                "What practical applications are you looking for?",
+                "Which parts would you like me to clarify further?"
+            ],
+            [
+                "How does this relate to your current goals?",
+                "What background knowledge do you have in this area?",
+                "What practical examples would be most helpful?"
+            ]
+        ];
 
-    if (!Array.isArray(followUpQuestions) || followUpQuestions.length !== 3) {
-        throw new Error("Failed to generate valid follow-up questions");
-    }
+        // Use session history length to rotate through different sets
+        const setIndex = (sessionHistory.length || 0) % fallbackSets.length;
+        return fallbackSets[setIndex];
+    };
 
-    return { responseText, followUpQuestions, link };
+    const followUpQuestions = await getFollowUpQuestions();
+
+    return {
+        responseText,
+        followUpQuestions,
+        link
+    };
 };
-
-
-
 // Function to process file and generate response
 const processFileAndGenerateResponse = async (file, prompt) => {
     try {
