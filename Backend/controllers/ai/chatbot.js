@@ -13,7 +13,7 @@ const generationConfig = {
     temperature: 0.3,  // Lower temperature for more deterministic responses
     topP: 0.95,        // Slightly higher topP for broader response diversity without sacrificing precision
     topK: 30,          // Lower topK to focus on high-probability words
-    maxOutputTokens: 1024,  // Increased token count to accommodate detailed answers
+    maxOutputTokens: 512,  // Increased token count to accommodate detailed answers
     responseMimeType: 'text/plain',  // Set for flexible output that can support text with markdown for image or link embedding
     // Enables multimodal input (text + references to images)
 };
