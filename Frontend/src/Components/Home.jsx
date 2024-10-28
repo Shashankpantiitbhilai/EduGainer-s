@@ -37,7 +37,7 @@ import { AdminContext } from "../App";
 import Footer from "./footer";
 import { toast, ToastContainer } from "react-toastify";
 import { getAllEvents } from "../services/Admin_services/admin_event";
-
+import GoogleReviews from "./google-review";
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -77,7 +77,6 @@ function Home() {
         });
 
         setEvents(currentEvents);
-      
       } catch (error) {
         console.error("Error fetching events:", error);
         toast.error("Failed to load events");
@@ -418,7 +417,7 @@ function Home() {
           </Container>
         )}
       </Box>
-
+      <GoogleReviews />
       <Box
         sx={{
           display: "flex",
