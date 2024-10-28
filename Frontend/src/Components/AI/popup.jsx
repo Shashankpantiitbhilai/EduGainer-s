@@ -32,7 +32,7 @@ import {
   PersonAdd as SignUpIcon,
 } from "@mui/icons-material";
 import { lightTheme } from "../../theme";
-import robotIcon from "../../images/AI-chatbot.png";
+import robotIcon from "../../images/AI-chatbot.jpg";
 import { AdminContext } from "../../App";
 
 // Existing styled components remain the same...
@@ -146,16 +146,6 @@ const BetaNote = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(1),
 }));
 
-const CopyButton = styled(IconButton)(({ theme }) => ({
-  padding: 4,
-  marginLeft: 8,
-  opacity: 1,
-  transition: "opacity 0.2s ease",
-  "&:hover": {
-    backgroundColor: "rgba(0, 0, 0, 0.04)",
-  },
-}));
-
 const FileUploadPreview = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
   margin: theme.spacing(1, 0),
@@ -248,6 +238,7 @@ const AssistantAvatar = ({ size = 40, pulseAnimation = false }) => (
     alt="AI Assistant"
   />
 );
+
 const WelcomePopup = styled(Paper)(({ theme }) => ({
   position: "fixed",
   bottom: 90,
@@ -280,7 +271,6 @@ const WelcomePopup = styled(Paper)(({ theme }) => ({
     borderColor: "white transparent transparent transparent",
   },
 }));
-
 const SuggestedQuestion = styled(Button)(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
   textAlign: "left",
@@ -491,14 +481,6 @@ const ChatPopup = () => {
       scrollToBottom();
     }
   }, [messages]);
-  useEffect(() => {
-    if (isMobile && showWelcome) {
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-      }, 12000);
-      return () => clearTimeout(timer);
-    }
-  }, [isMobile, showWelcome]);
 
   // Handle chat open
   const handleChatOpen = () => {
@@ -624,15 +606,31 @@ const ChatPopup = () => {
         <>
           {showWelcome && (
             <WelcomePopup>
-              <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
-                👋 Hi there! 🌟
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Welcome to EduGainer's! I'm Aiden, your personal assistant. If
-                you have any questions about the site or need help with
-                anything, just let me know! I'm here to make your experience
-                enjoyable and easy!
-              </Typography>
+              <Box sx={{ position: "relative" }}>
+                <IconButton
+                  size="small"
+                  onClick={() => setShowWelcome(false)}
+                  sx={{
+                    position: "absolute",
+                    right: -8,
+                    top: -8,
+                    color: "text.secondary",
+                    "&:hover": {
+                      bgcolor: "rgba(0, 0, 0, 0.04)",
+                    },
+                  }}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+                <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                  👋 Hi there! 🌟
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Welcome to EduGainer's! I'm Aiden, here to help! <br />
+                  Have questions or need assistance? <br />
+                  Just ask—I'm here to make things easy and enjoyable for you!
+                </Typography>
+              </Box>
             </WelcomePopup>
           )}
           <Tooltip title="Chat with Aiden" placement="left" arrow>
