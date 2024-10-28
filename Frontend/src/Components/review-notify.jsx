@@ -64,7 +64,6 @@ const GoogleReviewPopup = () => {
     setLoading(true);
     try {
       window.open("https://g.page/r/CeRJN-J1nirIEBM/review", "_blank");
-      setShowPopup(false);
     } catch (error) {
       console.error("Error opening Google review page:", error);
     } finally {
