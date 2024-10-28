@@ -626,7 +626,8 @@ const ChatPopup = () => {
                   👋 Hi there! 🌟
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Welcome to EduGainer's! <br/>I'm Aiden, here to help! <br />
+                  Welcome to EduGainer's! <br />
+                  I'm Aiden, here to help! <br />
                   Have questions or need assistance? <br />
                   Just ask—I'm here to make things easy and enjoyable for you!
                 </Typography>
@@ -677,7 +678,7 @@ const ChatPopup = () => {
         <Box
           sx={{
             p: 2,
-            background: "linear-gradient(45deg, orange 100%, #534bae 90%)",
+            background: "linear-gradient(45deg, green 100%, #534bae 90%)",
             color: "white",
             flexShrink: 0,
             zIndex: 2,
