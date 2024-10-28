@@ -45,7 +45,7 @@ const NotificationWrapper = ({ children }) => {
 
       try {
         const response = await getStudentLibSeat(IsUserLoggedIn?._id);
-        console.log(response);
+      
         if (response.booking && response.booking.reg) {
           setBookingReg(response.booking.reg);
           checkDateAndShowNotification();

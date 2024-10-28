@@ -8,7 +8,8 @@ import Main from "./Main";
 import { fetchCredentials } from "./services/auth";
 import LoadingAnimation from "./Components/loadingAnimation/loading.jsx";
 import NotificationWrapper from "../src/Components/Library/notification-wrapper.jsx";
-import FloatingButtons from "./floatingButton.js"; // Make sure this is the correct import
+import FloatingButtons from "./floatingButton.js";
+import GoogleReviews from "./Components/review-notify.jsx";
 
 // Create contexts
 const AdminContext = createContext();
@@ -32,7 +33,6 @@ function App() {
         if (savedTheme) {
             setIsDarkMode(savedTheme === "dark");
         }
-
     }, []);
 
     const handleThemeToggle = () => {
@@ -58,6 +58,9 @@ function App() {
                             isDarkMode={isDarkMode}
                             onThemeToggle={handleThemeToggle}
                         />
+
+                        {/* Add the GoogleReviews component */}
+                        <GoogleReviews />
 
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>

@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Button,
-  IconButton,
-} from "@mui/material";
+import { Card, CardContent, Box, Button } from "@mui/material";
 import { ExpandMore, ExpandLess } from "@mui/icons-material";
-import { motion } from "framer-motion";
 
 const GoogleReviews = () => {
   const [showFullReviews, setShowFullReviews] = useState(false);
