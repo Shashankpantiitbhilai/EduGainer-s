@@ -56,12 +56,28 @@ const processFileWithGemini = async (req, res) => {
 const getGeminiResponse = async (req, res) => {
     try {
         const { input } = req.body;
-        // console.log('Processing text input:', input);
 
-        const { responseText, followUpQuestions,link } = await fetchGeminiTextResponse(input);
+        // Session-based history
+        const sessionHistory = req.session.history || [];
+        sessionHistory.push({ user: input });
+        if (sessionHistory.length > 10) sessionHistory.shift();
+        req.session.history = sessionHistory;
 
-        // Send back both response and suggested follow-up questions
-        res.json({ response: responseText, followUpQuestions ,link});
+        // User personalization
+       
+
+        // Keyword extraction
+     
+        
+
+        // Pass context to Gemini
+        const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
+            sessionHistory,
+           
+          
+        });
+
+        res.json({ response: responseText, followUpQuestions, link });
     } catch (error) {
         console.error('Error in text processing:', error);
         res.status(500).json({
