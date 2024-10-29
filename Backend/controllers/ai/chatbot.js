@@ -10,12 +10,199 @@ const fileManager = new GoogleAIFileManager(apiKey);
 
 // Common generation config
 const generationConfig = {
-    temperature: 0.7,
-    topP: 0.9,
-    topK: 40,
-    maxOutputTokens: 512,
+    temperature: 0.7,  // Lower temperature to reduce randomness
+    topP: 0.8,         // Slightly lower topP to prioritize EduGainer context
+    topK: 20,          // Lower topK to keep responses focused on EduGainer
+    maxOutputTokens: 1024,
     responseMimeType: 'text/plain',
-}; 
+};
+const getGeminiResponse = async (req, res) => {
+    try {
+        const { input } = req.body;
+
+        // Session-based history to maintain conversation context
+        const sessionHistory = req.session.history || [];
+        sessionHistory.push({ user: input });
+        if (sessionHistory.length > 10) sessionHistory.shift();
+        req.session.history = sessionHistory;
+
+        // Fetch response strictly related to EduGainer
+        const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
+            sessionHistory,
+        });
+
+        res.json({ response: responseText, followUpQuestions, link });
+    } catch (error) {
+        console.error('Error in text processing:', error);
+
+        // Error fallback with EduGainer-specific questions
+        res.json({
+            response: "I'm sorry, there was an issue processing your request. Please try asking about EduGainer's services, such as the library, classes, or stationery.",
+            followUpQuestions: [
+                "What can I help you with regarding EduGainer’s library services?",
+                "Would you like information on EduGainer’s classes?",
+                "Are you interested in EduGainer's stationery offerings?"
+            ],
+            link: null
+        });
+    }
+};
+const extractLink = (text) => {
+    const linkMatch = text.match(/https:\/\/[^\s\)\}\]]+/);
+    return linkMatch ? linkMatch[0] : null;
+};
+
+
+// Adjusted function to generate responses strictly related to EduGainer
+const fetchGeminiTextResponse = async (input, { sessionHistory }) => {
+    // Step 1: Format session history for Gemini
+    const formattedHistory = sessionHistory.map(entry => {
+        if (entry.user) {
+            return { role: "user", parts: [{ text: entry.user }] };
+        }
+        if (entry.assistant) {
+            return { role: "model", parts: [{ text: entry.assistant }] };
+        }
+        return null;
+    }).filter(Boolean);
+
+    // Initialize Gemini model
+    const model = genAI.getGenerativeModel({
+        model: process.env.AI_MODEL || "gemini-pro",
+    });
+
+    // Step 2: Classify user input as EduGainer-related (1) or not (0)
+    const classificationAgent = model.startChat({
+        generationConfig,
+        history: formattedHistory,
+    });
+
+    const classificationResult = await classificationAgent.sendMessage(
+        ` Context:
+EduGainer's is an educational platform in Uttarkashi, Uttarakhand that provides:
+1. Library services with extensive study materials
+2. Coaching classes across various subjects
+3. Stationery supplies for students
+They operate both online and offline, focusing on quality educational support.
+
+Task:
+Classify the following questions as either:
+1 = Related to EduGainer's services and offerings
+0 = Not related to EduGainer's
+
+Examples:
+Q: "Do you have NCERT books for class 12th science?"
+A: 1 (Related - asks about library resources)
+
+Q: "What are your coaching timings for JEE preparation?"
+A: 1 (Related - asks about coaching services)
+
+Q: "Where can I buy graph papers and geometry box?"
+A: 1 (Related - asks about stationery)
+
+Q: "What's the best restaurant in Uttarkashi?"
+A: 0 (Not related - about restaurants)
+
+Q: "How to prepare dal makhani?"
+A: 0 (Not related - about cooking)
+
+Please classify the following question as 1 (Related) or 0 (Not Related):
+ \`${input}\`.
+    
+        `
+    );
+    const chatSession = model.startChat({
+        generationConfig,
+        history: formattedHistory,
+    });
+
+    const classificationResponse = (await classificationResult.response.text()).trim();
+    console.log(classificationResponse, "response-class")
+    // Step 3: Proceed based on classification
+    if (classificationResponse.includes("1")){
+        // If related to EduGainer, start chat session for generating a helpful response
+
+        const result = await chatSession.sendMessage(
+            `You are Aiden, an assistant working for EduGainer's to help users with inquiries about EduGainer's classes, library, and related services. 
+            EduGainer's is well-known for providing the best library services, coaching classes, and a wide range of stationery items in Uttarkashi, all focused on delivering exceptional educational support.
+
+            Act as a human-like assistant; your role is to respond in a friendly and helpful manner. Analyze the user question: \`${input}\`. 
+
+            Here are some helpful links based on potential questions about EduGainer's:
+            1. "How do I access the library section of EduGainer's?": "https://edugainers.com/library"
+            2. "How can I pay the library fee?": "https://edugainers.com/library/fee-pay"
+            3. "What classes can I enroll in at EduGainer?": "https://edugainers.com/classes"
+            4. "How can I access the EduGainer homepage?": "https://edugainers.com/"
+            5. "How do I log in to my EduGainer account?": "https://edugainers.com/login"
+            6. "What is the process to register on the EduGainer website?": "https://edugainers.com/register"
+            7. "What should I do if I forgot my password?": "https://edugainers.com/forgot-password"
+            8. "How can I start chatting with the EduGainer assistant?": "https://edugainers.com/chat/home"
+            9. "Where can I find the policies of EduGainer?": "https://edugainers.com/Policies"
+            10. "What resources are available on the EduGainer platform?": "https://edugainers.com/resources"
+            11. "How do I complete the new registration process?": "https://edugainers.com/new-reg"
+            12. "How can I access my dashboard?": "https://edugainers.com/dashboard/:id" (replace :id with your user ID)
+            13. "How can I view and edit my profile?": "https://edugainers.com/profile/:id" (replace :id with your user ID)
+            14. "Where can I find stationery items on EduGainer?": "https://edugainers.com/stationary/home"
+            15. "What resources are available on the EduGainer platform?": "https://edugainers.com/resources"
+            Only provide a link if the user's question \`${input}\` matches one of the specified queries about EduGainer's services.`
+        );
+
+        const responseText = await result.response.text();
+        const link = extractLink(responseText);
+
+        // Generate follow-up questions
+        const followUpQuestions = await generateFollowUpQuestions(chatSession, input);
+
+        return {
+            responseText,
+            followUpQuestions,
+            link
+        };
+
+    } else {
+        const followUpQuestions = await generateFollowUpQuestions(chatSession, input);
+        // Respond for irrelevant questions
+        console.log(followUpQuestions)
+        return {
+            responseText: "I can only assist with inquiries related to EduGainer's services. Could you please ask a question related to EduGainer?",
+            followUpQuestions: followUpQuestions,
+            link: null
+        };
+    }
+};
+
+// Separate function to handle follow-up questions generation with error handling
+const generateFollowUpQuestions = async (chatSession, input) => {
+    try {
+        const response = await chatSession.sendMessage(`
+            Assume you are an AI chatbot named Aiden, designed to assist users specifically with EduGainer's services, which provide the best library, classes, and stationery offerings in Uttarkashi.
+            Act as a human. Based on the user's message: "${input}" and the conversation history, generate exactly 3 follow-up questions phrased from the user's perspective. For example, questions should start with "Can I..." or "How can I...". 
+            Format the output as an array: ["Question 1?", "Question 2?", "Question 3?"]
+        `);
+
+        const text = response.response.text().trim();
+        console.log('Response:', text); // Log the raw response text
+
+        const jsonPattern = /\[\s*"[^"]+"\s*,\s*"[^"]+"\s*,\s*"[^"]+"\s*\]/; // Updated regex pattern
+        const match = text.match(jsonPattern);
+
+        if (match) {
+            console.log('Matched text:', match[0]); // Log the matched JSON array
+            const questions = JSON.parse(match[0]);
+            console.log(questions, "ques");
+            const areQuestionsValid = questions.length === 3 && new Set(questions).size === 3;
+            if (areQuestionsValid) {
+                return questions;
+            }
+        }
+
+        return ["Could you specify more about EduGainer's services?", "Do you have questions about the library?", "Would you like information on classes?"];
+    } catch (error) {
+        console.warn('Error generating follow-up questions:', error);
+        return ["What would you like to know about EduGainer?", "How can I help with your EduGainer queries?", "Would you like details on EduGainer’s offerings?"];
+    }
+};
+
 
 // Controller function to handle text-based Gemini API requests
 
@@ -53,164 +240,7 @@ const processFileWithGemini = async (req, res) => {
     }
 };
 
-const getGeminiResponse = async (req, res) => {
-    try {
-        const { input } = req.body;
 
-        // Session-based history
-        const sessionHistory = req.session.history || [];
-        sessionHistory.push({ user: input });
-        if (sessionHistory.length > 10) sessionHistory.shift();
-        req.session.history = sessionHistory;
-
-        const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
-            sessionHistory,
-        });
-
-        res.json({ response: responseText, followUpQuestions, link });
-    } catch (error) {
-        console.error('Error in text processing:', error);
-        // Send a more graceful response with default follow-up questions
-        res.json({
-            response: error.mainResponse || "I apologize, but I encountered an error processing your request.",
-            followUpQuestions: [
-                "Could you rephrase your question?",
-                "Would you like to try a different approach?",
-                "Should we explore a different topic?"
-            ],
-            link: null
-        });
-    }
-};
-
-const extractLink = (text) => {
-    const linkMatch = text.match(/https:\/\/[^\s\)\}\]]+/);
-    return linkMatch ? linkMatch[0] : null;
-};
-
-const fetchGeminiTextResponse = async (input, { sessionHistory }) => {
-    // Transform session history into Gemini's format
-    const formattedHistory = sessionHistory.map(entry => ([
-        {
-            role: "user",
-            parts: [{ text: entry.user }]
-        },
-        entry.assistant && {
-            role: "model",
-            parts: [{ text: entry.assistant }]
-        }
-    ]).filter(Boolean));
-
-    const model = genAI.getGenerativeModel({
-        model: process.env.AI_MODEL || "gemini-pro",
-    });
-
-    const chatSession = model.startChat({
-        generationConfig,
-        history: formattedHistory.flat(),
-    });
-
-    // Get main response first
-    const result = await chatSession.sendMessage(
-        `Respond to the user's input: "${input}"
-        Please include exactly one helpful https link relevant to the topic in your response.`
-    );
-
-    const responseText = result.response.text();
-    const link = extractLink(responseText);
-
-    // Simplified follow-up questions generation with better error handling
-    const getFollowUpQuestions = async () => {
-        try {
-            const response = await chatSession.sendMessage(`
-                Based on the user's message: "${input}" and our conversation history,
-                generate 3 NEW, DIFFERENT follow-up questions that:
-                1. Are directly related to the specific topic discussed
-                2. Encourage deeper exploration of different aspects
-                3. Are NOT generic questions like "Can you elaborate?" or "Would you like to know more?"
-                
-                Format EXACTLY as JSON array: ["Question 1?", "Question 2?", "Question 3?"]
-                IMPORTANT: Questions must be different from previous ones and specific to the topic.
-            `);
-
-            const text = response.response.text().trim();
-
-            // Enhanced JSON extraction with stricter pattern matching
-            const jsonPattern = /\[\s*"[^"]+\?"\s*,\s*"[^"]+\?"\s*,\s*"[^"]+\?"\s*\]/;
-            const match = text.match(jsonPattern);
-
-            if (match) {
-                const questions = JSON.parse(match[0]);
-
-                // Validate questions are unique and topic-specific
-                const areQuestionsValid = questions.length === 3 &&
-                    questions.every(q => q.endsWith('?')) &&
-                    questions.every(q => q.length > 15) && // Ensure meaningful length
-                    new Set(questions).size === 3; // Ensure all questions are unique
-
-                if (areQuestionsValid) {
-                    return questions;
-                }
-            }
-
-            // If we get here, generate contextual fallback questions
-            return generateContextualQuestions(input);
-        } catch (error) {
-            console.warn('Error generating follow-up questions:', error);
-            return generateContextualQuestions(input);
-        }
-    };
-
-    const generateContextualQuestions = (input) => {
-        // Extract key terms from input
-        const keywords = input.toLowerCase()
-            .replace(/[^\w\s]/g, '')
-            .split(' ')
-            .filter(word => word.length > 3)
-            .slice(0, 2);
-
-        // If we have meaningful keywords, use them
-        if (keywords.length > 0) {
-            const topic = keywords.join(' ');
-            return [
-                `What specific aspects of ${topic} would you like to learn more about?`,
-                `How do you currently use or interact with ${topic}?`,
-                `What challenges have you faced regarding ${topic}?`
-            ];
-        }
-
-        // Rotate through different sets of fallback questions to avoid repetition
-        const fallbackSets = [
-            [
-                "What specific aspects of this topic interest you most?",
-                "How would you like to apply this information?",
-                "What related areas should we explore next?"
-            ],
-            [
-                "Could you share your experience with this subject?",
-                "What practical applications are you looking for?",
-                "Which parts would you like me to clarify further?"
-            ],
-            [
-                "How does this relate to your current goals?",
-                "What background knowledge do you have in this area?",
-                "What practical examples would be most helpful?"
-            ]
-        ];
-
-        // Use session history length to rotate through different sets
-        const setIndex = (sessionHistory.length || 0) % fallbackSets.length;
-        return fallbackSets[setIndex];
-    };
-
-    const followUpQuestions = await getFollowUpQuestions();
-
-    return {
-        responseText,
-        followUpQuestions,
-        link
-    };
-};
 // Function to process file and generate response
 const processFileAndGenerateResponse = async (file, prompt) => {
     try {

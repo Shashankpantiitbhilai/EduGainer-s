@@ -17,13 +17,58 @@ import {
   CardContent,
   Typography,
   Slide,
+  Divider,
+  Chip,
+  Container,
+  IconButton,
+  Tooltip,
+  Stack,
 } from "@mui/material";
+import {
+  WatchLater,
+  AcUnit as AcUnitIcon,
+  Wifi,
+  Weekend,
+  PowerSettingsNew,
+  MenuBook,
+  Info as InfoIcon,
+  ChevronRight,
+  ChevronLeft,
+} from "@mui/icons-material";
 import Footer from "../footer";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";
 import { io } from "socket.io-client";
 import { fetchAdminCredentials } from "../../services/chat/utils";
+
+const libraryFacilities = [
+  { icon: <WatchLater />, text: "24/7 Accessibility" },
+  { icon: <AcUnitIcon />, text: "Temperature Control (Fans, AC, Heater)" },
+  { icon: <Wifi />, text: "High-Speed WiFi" },
+  { icon: <Weekend />, text: "Comfortable Seating" },
+  { icon: <PowerSettingsNew />, text: "Individual Power Stations" },
+  { icon: <MenuBook />, text: "Extensive Study Materials" },
+];
+
+const libraryRules = [
+  "Maintain silence at all times",
+
+  "Keep your mobile phones on silent mode",
+  "Handle study materials with care",
+  "Clean your space before leaving",
+  "Report any issues to staff immediately",
+];
+
+const FacilityCard = ({ icon, text }) => (
+  <Card sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+    <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ color: 'primary.main' }}>{icon}</Box>
+      <Typography variant="body1">{text}</Typography>
+    </CardContent>
+  </Card>
+);
+
 
 const shifts = [
   "6:30 AM to 2 PM",
@@ -175,6 +220,18 @@ const Library = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [showDiscount, setShowDiscount] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const maxSlides = Math.ceil(libraryRules.length / 2);
+
+  // Previous useEffect and handler functions remain the same...
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % maxSlides);
+  };
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + maxSlides) % maxSlides);
+  };
 
   const socketRef = useRef(null);
 
@@ -272,75 +329,111 @@ const Library = () => {
   const toggleDiscountCards = () => {
     setShowDiscount(!showDiscount);
   };
+return (
+    <>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Hero Section */}
+        <Box sx={{ mb: 6, textAlign: 'center' }}>
+          <Typography variant="h3" component="h1" gutterBottom>
+            EduGainer's Library
+          </Typography>
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+            Your Gateway to Focused Learning and Academic Excellence
+          </Typography>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            justifyContent="center"
+          >
+            <Button
+              component={Link}
+              to="/new-reg"
+              variant="contained"
+              size="large"
+              sx={{ minWidth: 200 }}
+            >
+              Register Now
+            </Button>
+            <Button
+              component={Link}
+              to="/library/fee-pay"
+              variant="outlined"
+              size="large"
+              sx={{ minWidth: 200 }}
+            >
+              Pay Fee
+            </Button>
+          </Stack>
+        </Box>
 
-  return (<>
-    <Box sx={{ p: { xs: 2, sm: 4 }, maxWidth: "lg", mx: "auto" }}>
-      <Box
-        component="h1"
-        sx={{ fontSize: { xs: "xl", sm: "2xl" }, fontWeight: "bold", mb: 4 }}
-      >
-        EduGainer's Live Seat Tracker
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          justifyContent: "center",
-          gap: 2,
-          mb: 4,
-        }}
-      >
-        <Button
-          component={Link}
-          to="/new-reg"
-          variant="contained"
-          color="primary"
-          size={isMobile ? "medium" : "large"}
-          sx={{
-            minWidth: 150,
-            fontSize: { xs: "1rem", sm: "1.1rem" },
-            transition: "transform 0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          Register Now
-        </Button>
-        <Button
-          component={Link}
-          to="/library/fee-pay"
-          variant="contained"
-          color="secondary"
-          size={isMobile ? "medium" : "large"}
-          sx={{
-            minWidth: 150,
-            fontSize: { xs: "1rem", sm: "1.1rem" },
-            transition: "transform 0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          Pay Fee
-        </Button>
-        <Button
-          onClick={toggleDiscountCards}
-          variant="outlined"
-          color="info"
-          size={isMobile ? "medium" : "large"}
-          sx={{
-            minWidth: 150,
-            fontSize: { xs: "1rem", sm: "1.1rem" },
-            transition: "transform 0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-          }}
-        >
-          {showDiscount ? "Hide Offers" : "View Offers"}
-        </Button>
-      </Box>
+        {/* Facilities Section */}
+        <Box sx={{ mb: 6 }}>
+          <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
+            Our Facilities
+          </Typography>
+          <Grid container spacing={3}>
+            {libraryFacilities.map((facility, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <FacilityCard {...facility} />
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* Rules Section */}
+        <Paper elevation={3} sx={{ p: 3, mb: 6 }}>
+          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <InfoIcon color="primary" />
+            Library Rules
+          </Typography>
+          <Box sx={{ position: 'relative', my: 2 }}>
+            <IconButton
+              onClick={handlePrevSlide}
+              sx={{ position: 'absolute', left: -20, top: '50%', transform: 'translateY(-50%)' }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              onClick={handleNextSlide}
+              sx={{ position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)' }}
+            >
+              <ChevronRight />
+            </IconButton>
+            <Box sx={{ overflow: 'hidden' }}>
+              <Grid container spacing={2} sx={{ transform: `translateX(-${currentSlide * 100}%)`, transition: 'transform 0.3s' }}>
+                {libraryRules.map((rule, index) => (
+                  <Grid item xs={12} sm={6} key={index}>
+                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Chip size="small" label={index + 1} color="primary" />
+                      {rule}
+                    </Typography>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </Box>
+        </Paper>
+
+        {/* Shift Selection */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Select Your Shift
+          </Typography>
+          <FormControl fullWidth>
+            <InputLabel id="shift-select-label">Time Slot</InputLabel>
+            <Select
+              labelId="shift-select-label"
+              value={selectedShift}
+              onChange={handleShiftChange}
+              label="Time Slot"
+            >
+              {shifts.map((shift) => (
+                <MenuItem key={shift} value={shift}>{shift}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
 
       <Slide direction="up" in={showDiscount} mountOnEnter unmountOnExit>
         <Box
@@ -358,31 +451,17 @@ const Library = () => {
         </Box>
       </Slide>
 
-      <FormControl
-        sx={{ mb: 4, minWidth: 200, width: { xs: "100%", sm: "auto" } }}
-      >
-        <InputLabel id="shift-select-label">Select Shift</InputLabel>
-        <Select
-          labelId="shift-select-label"
-          id="shift-select"
-          value={selectedShift}
-          onChange={handleShiftChange}
-          label="Select Shift"
-        >
-          {shifts.map((shift) => (
-            <MenuItem key={shift} value={shift}>
-              {shift}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+    
 
       <Alert severity="warning" sx={{ mt: 2, mb: 4 }}>
         <AlertTitle>Note</AlertTitle>
         In case the seat you need is not empty, kindly contact our office.
         Register early to secure your preferred seat!
       </Alert>
-
+ <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            Seat Layout
+          </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper
@@ -569,19 +648,8 @@ const Library = () => {
           </Paper>
         </Grid>
       </Grid>
-
-      <Snackbar
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-      />
-
-      <Alert severity="info" sx={{ mt: 4 }}>
+      </Paper>
+        <Alert severity="info" sx={{ mt: 4 }}>
         <AlertTitle>Legend</AlertTitle>
         <Box
           sx={{
@@ -609,9 +677,19 @@ const Library = () => {
           </Box>
         </Box>
       </Alert>
-     
-    </Box>
-     <Footer/></>
+      <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          open={snackbarOpen}
+          autoHideDuration={4000}
+          onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+        />
+      </Container>
+      <Footer />
+    </>
+
+    
+   
   );
 };
 
