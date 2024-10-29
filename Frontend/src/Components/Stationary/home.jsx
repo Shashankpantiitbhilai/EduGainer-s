@@ -205,7 +205,7 @@ function Home() {
                   borderRadius: "50px",
                 }}
               >
-                Join Our WhatsApp Group
+               Order on WhatsApp 
               </Button>
             </motion.div>
           </Box>
