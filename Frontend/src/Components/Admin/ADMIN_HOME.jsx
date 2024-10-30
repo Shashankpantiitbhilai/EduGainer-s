@@ -152,8 +152,8 @@ function ADMIN_HOME() {
 
   const recentNotifications = [
   
-    "Class 'Advanced Math' starts in 1 hour",
-    "3 new books added to the library",
+   
+    "2 new books added to the library",
     "System maintenance scheduled for tonight",
   ];
 
