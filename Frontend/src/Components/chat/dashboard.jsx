@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import {
@@ -19,7 +20,7 @@ import {
   DialogActions,
   Button,
   useMediaQuery,
-  useTheme,
+  useTheme,Stack,Slide
 } from "@mui/material";
 import {
   Send as SendIcon,
@@ -33,12 +34,33 @@ import { AdminContext } from "../../App";
 import {
   fetchChatMessages,
   postChatMessages,
-  fetchAdminCredentials,
+  fetchAdminCredentials,fetchUnseenMessages,updateSeenMessage
 } from "../../services/chat/utils";
 import { fetchAllChats } from "../../services/Admin_services/adminUtils";
 import RoomSelectDialog from "./roomSelectDialog";
-import { makeAllMessagesSeenForUser } from "../../services/chat/utils";
+import {
+  ExitToApp as LogoutIcon,
+  LibraryBooks as LibraryIcon,
+  Class as ClassIcon,
+  Chat as ChatIcon,
+  Home as HomeIcon,
+  Event as EventIcon,
+  People as UsersIcon,
+  Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  Dashboard as DashboardIcon,
+  Close as CloseIcon,
+  Mail as MailIcon,
+} from "@mui/icons-material";
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+
+
+  
 const Chat = () => {
+  const navigate = useNavigate();
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -54,11 +76,52 @@ const Chat = () => {
     admin: 0,
   });
 const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New dialog state
-
+ const [showNotification, setShowNotification] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
- const [isRoomSelected, setIsRoomSelected] = useState(false); // New state
+  const [isRoomSelected, setIsRoomSelected] = useState(false); // New state
+   const fetchAndUpdateUnseenMessages = async () => {
+    try {
+      const unseenMessages = await fetchUnseenMessages(userRoomId);
+      let adminCount = 0;
+      let announcementCount = 0;
+console.log(unseenMessages,"unseen messages")
+      unseenMessages.forEach(msg => {
+       console.log(msg.messages[0].sender,msg.messages[0].receiver,typeof(msg.messages),(msg.messages[0].sender===msg.messages[0].receiver))
+        if (msg.messages[0].receiver==="All") {
+    
+        
+            console.log("announcement")
+            announcementCount++;
+        }
+        else  if(msg.user===IsUserLoggedIn?._id){
+          console.log("admin")
+          adminCount++;
+          }
+        
+      });
+
+      setUnreadCounts({
+        announcements: announcementCount,
+        admin: adminCount,
+      });
+
+      // Show notification for new messages
+      if (adminCount + announcementCount > 0) {
+     setShowNotification(true)
+      }
+      console.log(unreadCounts,"unreadCounts")
+    } catch (error) {
+      console.error("Error fetching unseen messages:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (IsUserLoggedIn) {
+      fetchAndUpdateUnseenMessages();
+    }
+  }, [IsUserLoggedIn]);
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
       try {
@@ -137,7 +200,7 @@ const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New 
 
   const sendMessage = async () => {
     if (!isRoomSelected) {
-      console.log("isroomselected is false"
+      console.log("is roomselected is false"
         )
       setShowRoomSelectDialog(true); // Show dialog if room not selected
       return;
@@ -153,6 +216,7 @@ const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New 
             sender: IsUserLoggedIn._id,
             receiver: adminRoomId,
             content: input,
+            
           },
         ],
         user: IsUserLoggedIn._id,
@@ -181,7 +245,8 @@ const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New 
  const handleRoomClick = async (id) => {
     try {
         setSelectedRoom(id);
-        setIsRoomSelected(true);
+      setIsRoomSelected(true);
+      updateSeenMessage(id);
         const response = await fetchAllChats(id);
         const roomId = id;
 
@@ -199,7 +264,7 @@ const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New 
         }
 
         // Call makeAllMessagesSeenForUser here
-        await makeAllMessagesSeenForUser(userRoomId);
+     
         
         scrollToBottom();
         setShowChatDialog(true);
@@ -207,13 +272,21 @@ const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New 
         console.error("Error fetching chat messages:", error);
     }
 };
+const handleCloseNotification = () => {
+    setShowNotification(false);
+  };
 
+  const handleViewMessages = () => {
+    setShowNotification(false);
+    navigate("/admin/chat");
+  };
   const handleCloseChat = () => {
     setShowChatDialog(false);
   };
 
   return (
     <ThemeProvider theme={lightTheme}>
+     
       <Box
         sx={{
           flexGrow: 1,

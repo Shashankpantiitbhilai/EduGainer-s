@@ -11,7 +11,7 @@ module.exports = (io) => {
     router.post('/postChatMessages', chatController.postChatMessages);
     router.get('/fetchAdminCredentials', chatController.fetchAdminCredentials);
 
-    router.post("/makeAllMessagesSeen", chatController.makeAllMessagesSeen); 
+
     router.patch("/updateSeenMessage", chatController.updateMessageSeenStatus);
     return router;
 };

@@ -288,16 +288,18 @@ const AdminChat = () => {
 
   const handleSendMessage = async () => {
     if (!input.trim() || !selectedRoom) return;
+console.log(selectedRoom,adminRoomId,"d")
+   const receiver = selectedRoom && selectedRoom !== adminRoomId ? selectedRoom : "All";
 
-    const messageData = {
-      messages: [{
+const messageData = {
+    messages: [{
         sender: IsUserLoggedIn?._id,
-        receiver: selectedRoom?._id,
+        receiver: receiver,  // Use the defined `receiver` variable
         content: input,
-      }],
-      user: IsUserLoggedIn?._id,
-      timestamp: new Date(),
-    };
+    }],
+    user: selectedRoom,
+    timestamp: new Date(),
+};
 
     try {
       if (socketRef.current) {

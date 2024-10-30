@@ -57,10 +57,7 @@ function ADMIN_HOME() {
   const [unseenMessageCount, setUnseenMessageCount] = useState(0);
   const [showNotification, setShowNotification] = useState(false);
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+ 
 
   useEffect(() => {
   const fetchData = async () => {
@@ -100,20 +97,7 @@ function ADMIN_HOME() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    // Fetch unseen messages count on component load
-    const fetchData = async () => {
-      try {
-        const  unseenMessages  = await fetchUnseenMessages();
-        console.log(unseenMessages)
-        setUnseenMessageCount(unseenMessages.length); // Update the count with length of unseen messages
-      } catch (error) {
-        console.error("Error fetching unseen messages:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
+ 
   const handleLogout = async () => {
     try {
       await logoutUser();

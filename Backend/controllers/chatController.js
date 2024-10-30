@@ -7,7 +7,8 @@ module.exports = (io) => {
     const fetchChatMessages = async (req, res) => {
         try {
 
-            const messages = await Message.find({ user: req.user._id });
+            const messages = await Message.find({ user: req.user._id }); 
+
             // console.log("messages hi reached fetchchat rouyte",messages);
             res.json(messages);
         } catch (error) {
@@ -19,10 +20,11 @@ module.exports = (io) => {
     const postChatMessages = async (req, res) => {
         const { messages, user } = req.body;
 
-      
+    
 
         try {
             const newMessage = await Message.create({ messages, user });
+            console.log(newMessage,newMessage.messages[0].seen,"seen")
             await newMessage.save();
 
 
@@ -69,13 +71,21 @@ module.exports = (io) => {
     const findUnseenMessages = async (req, res) => {
         try {
             const userId = req.user?._id; // Get user ID from the authenticated request
-            console.log(userId)
+          
 
             // Find unseen messages for users other than the current user
             const unseenMessages = await Message.find({
-                user: { $ne: userId },      // Exclude messages from the authenticated user
-                "messages.seen": false      // Only get unseen messages
+                $and: [
+                    {
+                        $or: [
+                            { "messages.receiver": userId },  // Receiver is the specific user
+                            { "messages.receiver": "All" }   // OR receiver is "All"
+                        ]
+                    },
+                    { "messages.seen": false }               // Only get unseen messages
+                ]
             });
+
           
             res.status(200).json(unseenMessages);
         } catch (error) {
@@ -85,12 +95,12 @@ module.exports = (io) => {
     };
     const updateMessageSeenStatus = async (req, res) => {
         const { userId } = req.body; // Assuming userId is sent in the request body
-        console.log("User ID:", userId);
+       
 
         try {
             // Find all messages for the specified user
             const foundMessages = await Message.find({ user: userId });
-            console.log("Found messages count:", foundMessages.length);
+           
 
             // Update all messages for a specific user by setting seen to true
             const result = await Message.updateMany(
@@ -98,7 +108,7 @@ module.exports = (io) => {
                 { $set: { "messages.$[].seen": true } } // Set seen to true for each message in the array
             );
 
-            console.log("Modified count:", result.modifiedCount);
+           
 
             // Check if any messages were updated
           

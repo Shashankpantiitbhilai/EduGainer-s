@@ -1,16 +1,41 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { AdminContext } from "../App";
+import { toast, ToastContainer } from "react-toastify";
+import { motion } from "framer-motion";
+import { getAllEvents } from "../services/Admin_services/admin_event";
+import { fetchUnseenMessages } from "../services/chat/utils";
+import NotificationDialog from "./notificationDialog";
 import {
-  Typography,
-  Button,
   Container,
   Box,
   Grid,
   Card,
+  Stepper,
   Step,
   StepLabel,
-  Stepper,
+  Button,
+  Typography,
+  CardContent,
+  CardActions,
+  IconButton,
+  Paper,
+  Avatar,
+  Tooltip,
+  Badge,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
+  Stack,
 } from "@mui/material";
+
 import {
   Login,
   Celebration,
@@ -26,18 +51,27 @@ import {
   LocalLibrary,
   Flag,
   BookOnline,
-  Class,
+  Class as ClassIcon,
   Store,
   AutoStories,
   DesktopMac,
   SupportAgent,
+  ExitToApp as LogoutIcon,
+  LibraryBooks as LibraryIcon,
+  Chat as ChatIcon,
+  Home as HomeIcon,
+  Event as EventIcon,
+  People as UsersIcon,
+  Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  Dashboard as DashboardIcon,
+  Close as CloseIcon,
+  Mail as MailIcon,Class
 } from "@mui/icons-material";
-import { motion } from "framer-motion";
-import { AdminContext } from "../App";
+
 import Footer from "./footer";
-import { toast, ToastContainer } from "react-toastify";
-import { getAllEvents } from "../services/Admin_services/admin_event";
 import GoogleReviews from "./google-review";
+
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -49,6 +83,10 @@ const colors = {
   blue: "blue",
 };
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const StyledCard = motion(Card);
 const steps = [
   { label: "Login", icon: <Login />, link: "/login" },
@@ -59,7 +97,44 @@ function Home() {
   const navigate = useNavigate();
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [events, setEvents] = useState([]);
+const [unseenMessageCount, setUnseenMessageCount] = useState(0);
+  const [showNotification, setShowNotification] = useState(false);
+   useEffect(() => {
+  const fetchData = async () => {
+    try {
+     const userId=IsUserLoggedIn?._id
 
+      const unseenMessages = await fetchUnseenMessages();
+      
+      // Filter messages where the sender is not the admin
+      const validMessages = unseenMessages.filter(
+        (message) => message.messages[0].receiever !== userId || message.messages[0].receiever ==="All"
+      );
+      console.log(validMessages,userId)
+      setUnseenMessageCount(validMessages.length);
+      
+      // Show notification popup if there are unseen messages not from the admin
+      if (validMessages.length > 0) {
+        setShowNotification(true);
+      }
+    } catch (error) {
+      console.error("Error fetching unseen messages:", error);
+    }
+  };
+  fetchData();
+}, []);
+
+  const handleCloseNotification = () => {
+    setShowNotification(false);
+  };
+
+  const handleViewMessages = () => {
+    setShowNotification(false);
+    navigate("/chat/home");
+  };
+ 
+
+ 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -145,7 +220,12 @@ function Home() {
   return (
     <Box sx={{ backgroundColor: colors.background }}>
       <ToastContainer />
-
+    <NotificationDialog
+        open={showNotification}
+        onClose={handleCloseNotification}
+        unseenMessageCount={unseenMessageCount}
+        onViewMessages={handleViewMessages}
+      />
       {/* Navigation Links */}
       <Box sx={{ backgroundColor: colors.primary, py: 2, marginTop: 7 }}>
         <Container maxWidth="lg">
