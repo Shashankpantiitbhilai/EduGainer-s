@@ -47,7 +47,7 @@ const Main = () => {
         <>
             {!shouldHideNavbar && <Navbar />}
             <Routes>
-                <Route path="/admin_home" element={ <ProtectedAdmin><AdminHome/></ProtectedAdmin> } />
+                <Route path="/admin_home" element={<ProtectedAdmin><AdminHome /></ProtectedAdmin>} />
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
 
@@ -69,9 +69,9 @@ const Main = () => {
                     }
                 />
 
-          
 
-            
+
+
                 <Route
                     path="/resources"
                     element={
@@ -99,7 +99,7 @@ const Main = () => {
                     path="/class-success/:id"
                     element={
                         <ProtectedUser>
-                        <ClassSuccess />
+                            <ClassSuccess />
                         </ProtectedUser>
 
                     }

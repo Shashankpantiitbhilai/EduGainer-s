@@ -22,7 +22,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { AdminContext } from "../App";
 import { logoutUser } from "../services/auth";
 import logoImage from "../images/logo.jpg";
-
+import DarkModeToggle from '../darkmode'; // Import the DarkModeToggle component
+import { LoadingContext } from "../App";
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -38,7 +39,7 @@ function Navbar() {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
-
+ const { isDarkMode, setIsDarkMode } = useContext(LoadingContext); //
   useEffect(() => {
     if (IsUserLoggedIn && IsUserLoggedIn.username) {
       const userInitials = IsUserLoggedIn.username
@@ -54,7 +55,13 @@ function Navbar() {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
+const toggleTheme = () => {
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      localStorage.setItem("theme", newMode ? "dark" : "light");
+      return newMode;
+    });
+  };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -78,13 +85,11 @@ function Navbar() {
     ? isAdmin
       ? [
           { name: "Library", link: "/admin_library" },
-
           { name: "Classes", link: "/admin/classes" },
           { name: "AdminChat", link: "/admin/chat" },
           { name: "MeriStationary", link: "/stationary/home" },
-
           { name: "Events", link: "/admin/add-event" },
-          { name: "Privacy Policy", link: "/Policies" },
+          { name: "Privacy", link: "/Policies" },
           { name: "Credits", link: "/credits" },
         ]
       : [
@@ -94,7 +99,7 @@ function Navbar() {
           { name: "MeriStationary", link: "/stationary/home" },
           { name: "Query", link: "/chat/home" },
           { name: "Feedback", link: "/feedback" },
-          { name: "Privacy Policy", link: "/Policies" },
+          { name: "Privacy", link: "/Policies" },
           { name: "Credits", link: "/credits" },
         ]
     : [
@@ -103,7 +108,7 @@ function Navbar() {
         { name: "Resources", link: "/resources" },
         { name: "MeriStationary", link: "/stationary/home" },
         { name: "Query", link: "/chat/home" },
-        { name: "Privacy Policy", link: "/Policies" },
+        { name: "Privacy", link: "/Policies" },
         { name: "Credits", link: "/credits" },
       ];
 
@@ -216,6 +221,11 @@ function Navbar() {
             >
               Menu
             </Button>
+          </Box>
+
+          {/* Dark Mode Toggle inside Navbar */}
+          <Box sx={{ flexGrow: 0, ml: 2 }}>
+            <DarkModeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
           </Box>
 
           <Box sx={{ flexGrow: 0, ml: 2 }}>

@@ -13,17 +13,23 @@ import {
   Paper,
   Avatar,
   Tooltip,
+  Badge,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slide,
+  Stack,
 } from "@mui/material";
 import {
   ExitToApp as LogoutIcon,
   LibraryBooks as LibraryIcon,
   Class as ClassIcon,
-  Quiz as QuizIcon,
   Chat as ChatIcon,
   Home as HomeIcon,
   Event as EventIcon,
@@ -31,18 +37,81 @@ import {
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
   Dashboard as DashboardIcon,
+  Close as CloseIcon,
+  Mail as MailIcon,
 } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { logoutUser } from "../../services/auth";
+import { fetchUnseenMessages } from "../../services/chat/utils";
+
+// Transition component for smooth popup animation
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 
 function ADMIN_HOME() {
   const navigate = useNavigate();
-  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
+  const {IsUserLoggedIn,setIsUserLoggedIn } = useContext(AdminContext);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [unseenMessageCount, setUnseenMessageCount] = useState(0);
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+  const fetchData = async () => {
+    try {
+     const adminId=IsUserLoggedIn?._id
+
+      const unseenMessages = await fetchUnseenMessages();
+      
+      // Filter messages where the sender is not the admin
+      const nonAdminMessages = unseenMessages.filter(
+        (message) => message.user !== adminId
+      );
+      console.log(nonAdminMessages,adminId)
+      setUnseenMessageCount(nonAdminMessages.length);
+      
+      // Show notification popup if there are unseen messages not from the admin
+      if (nonAdminMessages.length > 0) {
+        setShowNotification(true);
+      }
+    } catch (error) {
+      console.error("Error fetching unseen messages:", error);
+    }
+  };
+  fetchData();
+}, []);
+
+  const handleCloseNotification = () => {
+    setShowNotification(false);
+  };
+
+  const handleViewMessages = () => {
+    setShowNotification(false);
+    navigate("/admin/chat");
+  };
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Fetch unseen messages count on component load
+    const fetchData = async () => {
+      try {
+        const  unseenMessages  = await fetchUnseenMessages();
+        console.log(unseenMessages)
+        setUnseenMessageCount(unseenMessages.length); // Update the count with length of unseen messages
+      } catch (error) {
+        console.error("Error fetching unseen messages:", error);
+      }
+    };
+    fetchData();
   }, []);
 
   const handleLogout = async () => {
@@ -62,7 +131,15 @@ function ADMIN_HOME() {
       icon: <ClassIcon />,
       link: "/admin/classes",
     },
-    { title: "Admin Chat", icon: <ChatIcon />, link: "/admin/chat" },
+    {
+      title: "Admin Chat",
+      icon: (
+        <Badge badgeContent={unseenMessageCount} color="error"> {/* Display unseen messages count as badge */}
+          <ChatIcon />
+        </Badge>
+      ),
+      link: "/admin/chat",
+    },
     { title: "Manage Events", icon: <EventIcon />, link: "/admin/add-event" },
   ];
 
@@ -74,7 +151,7 @@ function ADMIN_HOME() {
   ];
 
   const recentNotifications = [
-    "New user registration: John Doe",
+  
     "Class 'Advanced Math' starts in 1 hour",
     "3 new books added to the library",
     "System maintenance scheduled for tonight",
@@ -82,20 +159,66 @@ function ADMIN_HOME() {
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "#f5f5f5" }}>
+        <Dialog
+        open={showNotification}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseNotification}
+        aria-describedby="notification-dialog"
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ m: 0, p: 2, bgcolor: "#1976d2", color: "white" }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <MailIcon />
+            <Typography variant="h6">New Messages</Typography>
+          </Stack>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseNotification}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: 'white'
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Box sx={{ py: 2, textAlign: 'center' }}>
+            <Badge badgeContent={unseenMessageCount} color="error" sx={{ mb: 2 }}>
+              <ChatIcon sx={{ fontSize: 40, color: '#1976d2' }} />
+            </Badge>
+            <Typography variant="h6" gutterBottom>
+              You have {unseenMessageCount} new message{unseenMessageCount !== 1 ? 's' : ''}!
+            </Typography>
+            <Typography color="text.secondary">
+              Click below to view your messages in the chat section.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button onClick={handleCloseNotification} color="inherit">
+            Dismiss
+          </Button>
+          <Button 
+            onClick={handleViewMessages} 
+            variant="contained" 
+            startIcon={<ChatIcon />}
+          >
+            View Messages
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Paper elevation={3} sx={{ borderRadius: "15px", overflow: "hidden" }}>
           <Box sx={{ p: 3, borderBottom: "1px solid #e0e0e0" }}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+            <Box display="flex" justifyContent="space-between" alignItems="center">
               <Box display="flex" alignItems="center">
-                <Avatar
-                  sx={{ width: 60, height: 60, mr: 2, bgcolor: "#1976d2" }}
-                >
-                  A
-                </Avatar>
+                <Avatar sx={{ width: 60, height: 60, mr: 2, bgcolor: "#1976d2" }}>A</Avatar>
                 <Box>
                   <Typography variant="h4" component="h1" fontWeight="bold">
                     Welcome, Admin
@@ -126,12 +249,7 @@ function ADMIN_HOME() {
           </Box>
 
           <Box sx={{ p: 4 }}>
-            <Typography
-              variant="h5"
-              component="div"
-              gutterBottom
-              sx={{ mb: 4, fontWeight: "bold" }}
-            >
+            <Typography variant="h5" component="div" gutterBottom sx={{ mb: 4, fontWeight: "bold" }}>
               Admin Dashboard
             </Typography>
 
@@ -167,30 +285,13 @@ function ADMIN_HOME() {
                   <Grid container spacing={2}>
                     {adminTools.map((tool, index) => (
                       <Grid item xs={12} sm={6} md={3} key={index}>
-                        <Card
-                          sx={{
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <CardContent
-                            sx={{ flexGrow: 1, textAlign: "center" }}
-                          >
-                            {React.cloneElement(tool.icon, {
-                              sx: { fontSize: 40, color: "#1976d2", mb: 1 },
-                            })}
-                            <Typography variant="subtitle1">
-                              {tool.title}
-                            </Typography>
+                        <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                          <CardContent sx={{ flexGrow: 1, textAlign: "center" }}>
+                            {tool.icon}
+                            <Typography variant="subtitle1">{tool.title}</Typography>
                           </CardContent>
                           <CardActions>
-                            <Button
-                              fullWidth
-                              variant="outlined"
-                              component={Link}
-                              to={tool.link}
-                            >
+                            <Button fullWidth variant="outlined" component={Link} to={tool.link}>
                               Access
                             </Button>
                           </CardActions>

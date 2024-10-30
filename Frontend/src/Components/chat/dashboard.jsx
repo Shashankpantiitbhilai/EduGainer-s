@@ -36,7 +36,8 @@ import {
   fetchAdminCredentials,
 } from "../../services/chat/utils";
 import { fetchAllChats } from "../../services/Admin_services/adminUtils";
-
+import RoomSelectDialog from "./roomSelectDialog";
+import { makeAllMessagesSeenForUser } from "../../services/chat/utils";
 const Chat = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
@@ -52,10 +53,12 @@ const Chat = () => {
     announcements: 0,
     admin: 0,
   });
+const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New dialog state
+
   const [showChatDialog, setShowChatDialog] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+ const [isRoomSelected, setIsRoomSelected] = useState(false); // New state
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
       try {
@@ -133,6 +136,12 @@ const Chat = () => {
   };
 
   const sendMessage = async () => {
+    if (!isRoomSelected) {
+      console.log("isroomselected is false"
+        )
+      setShowRoomSelectDialog(true); // Show dialog if room not selected
+      return;
+    }
     if (selectedRoom === adminRoomId && adminRoomId !== userRoomId) {
       setError(
         "You are not authorized to send messages in the announcement room."
@@ -169,28 +178,35 @@ const Chat = () => {
     }
   };
 
-  const handleRoomClick = async (id) => {
+ const handleRoomClick = async (id) => {
     try {
-      const response = await fetchAllChats(id);
-      const roomId = id;
+        setSelectedRoom(id);
+        setIsRoomSelected(true);
+        const response = await fetchAllChats(id);
+        const roomId = id;
 
-      if (id === adminRoomId) {
-        setAnnouncementMessages(response);
-        setUnreadCounts((prev) => ({ ...prev, announcements: 0 }));
-      } else {
-        setMessages(response);
-        setUnreadCounts((prev) => ({ ...prev, admin: 0 }));
-      }
-      setSelectedRoom(id);
-      if (socketRef.current) {
-        socketRef.current.emit("joinRoom", roomId);
-      }
-      scrollToBottom();
-      setShowChatDialog(true);
+        if (id === adminRoomId) {
+            setAnnouncementMessages(response);
+            setUnreadCounts((prev) => ({ ...prev, announcements: 0 }));
+        } else {
+            setMessages(response);
+            setUnreadCounts((prev) => ({ ...prev, admin: 0 }));
+        }
+
+        if (socketRef.current) {
+            socketRef.current.emit("joinRoom", roomId);
+            socketRef.current.emit("onSeen", id, userRoomId);
+        }
+
+        // Call makeAllMessagesSeenForUser here
+        await makeAllMessagesSeenForUser(userRoomId);
+        
+        scrollToBottom();
+        setShowChatDialog(true);
     } catch (error) {
-      console.error("Error fetching chat messages:", error);
+        console.error("Error fetching chat messages:", error);
     }
-  };
+};
 
   const handleCloseChat = () => {
     setShowChatDialog(false);
@@ -373,7 +389,7 @@ const Chat = () => {
                     onClick={() => handleRoomClick(userRoomId)}
                     sx={{
                       backgroundColor:
-                        selectedRoom === userRoomId
+                       selectedRoom === userRoomId
                           ? "warning.main"
                           : "transparent",
                       borderRadius: 1,
@@ -499,7 +515,7 @@ const Chat = () => {
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           onKeyPress={(e) => {
-                            if (e.key === "Enter") {
+                            if (e.key === "Enter" ) {
                               sendMessage();
                             }
                           }}
@@ -509,7 +525,7 @@ const Chat = () => {
                         <IconButton
                           color="primary"
                           onClick={sendMessage}
-                          disabled={!input.trim()}
+                          disabled={!input.trim() && !isRoomSelected}
                         >
                           <SendIcon />
                         </IconButton>
@@ -609,8 +625,8 @@ const Chat = () => {
                         <Grid item>
                           <IconButton
                             color="primary"
-                            onClick={sendMessage}
-                            disabled={!input.trim()}
+                            onClick={sendMessage }
+                            disabled={!input.trim() && !isRoomSelected}
                           >
                             <SendIcon />
                           </IconButton>
@@ -643,6 +659,10 @@ const Chat = () => {
             </Grid>
           )}
         </Grid>
+           <RoomSelectDialog
+          open={showRoomSelectDialog}
+          onClose={() => setShowRoomSelectDialog(false)}
+        />
       </Box>
     </ThemeProvider>
   );

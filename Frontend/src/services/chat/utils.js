@@ -44,7 +44,7 @@ export async function fetchAdminCredentials() {
     try {
         const response = await axiosInstance.get("/chat/fetchAdminCredentials");
         // console.log("utils", response);
-        const { _id, role, strategy, username } = response.data[0];
+ 
 
         // Log individual properties to ensure they are correctly parsed
         // console.log("Parsed _id:", _id);
@@ -58,3 +58,37 @@ export async function fetchAdminCredentials() {
         return null;
     }
 }
+
+
+// services/chat/utils.js
+
+export async function makeAllMessagesSeenForUser(userRoomId) {
+    try {
+        const response = await axiosInstance.post("/chat/makeAllMessagesSeen", { userRoomId });
+        return response.data;
+    } catch (error) {
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+
+// services/chat/utils.js
+
+export async function fetchUnseenMessages() {
+    try {
+        const response = await axiosInstance.get("/chat/findUnseenMessage");
+        return response.data;
+    } catch (error) {
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+// services/chat/utils.js
+
+export async function updateSeenMessage(userId) {
+    try {
+        const response = await axiosInstance.patch("/chat/updateSeenMessage", { userId });
+        return response.data; // Return the response data
+    } catch (error) {
+        throw error; // Propagate the error to handle it in the calling component
+    }
+}
+

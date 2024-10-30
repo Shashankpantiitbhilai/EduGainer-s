@@ -241,14 +241,14 @@ const AssistantAvatar = ({ size = 40, pulseAnimation = false }) => (
 
 const WelcomePopup = styled(Paper)(({ theme }) => ({
   position: "fixed",
-  bottom: 90,
-  right: 24,
+  bottom: 80, // You can adjust this value as needed
+  right: -16,  // Move it closer to the right side of the screen
   padding: theme.spacing(2),
   borderRadius: theme.spacing(2),
-  maxWidth: 250,
+  maxWidth: 300,
   boxShadow: theme.shadows[6],
-  backgroundColor: "white",
   animation: "slideUp 0.3s ease-out",
+
   "@keyframes slideUp": {
     from: {
       opacity: 0,
@@ -271,6 +271,8 @@ const WelcomePopup = styled(Paper)(({ theme }) => ({
     borderColor: "white transparent transparent transparent",
   },
 }));
+
+
 const SuggestedQuestion = styled(Button)(({ theme }) => ({
   marginBottom: theme.spacing(0.5),
   textAlign: "left",
@@ -628,8 +630,8 @@ const ChatPopup = () => {
                 <Typography variant="body2" color="text.secondary">
                   Welcome to EduGainer's! <br />
                   I'm Aiden, here to help! <br />
-                  Have questions or need assistance? <br />
-                  Just ask—I'm here to make things easy and enjoyable for you!
+              
+                 
                 </Typography>
               </Box>
             </WelcomePopup>

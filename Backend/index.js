@@ -109,42 +109,45 @@ app.get("/", (req, res) => {
 
 
 io.on('connection', (socket) => {
-
+  
   // Handle joinRoom event
   socket.on('joinRoom', (roomId) => {
-   
+
     socket.join(roomId);
   });
   socket.on("joinSeatsRoom", (roomId) => {
-   
-    socket.join(roomId);
-})
 
-  
+    socket.join(roomId);
+  })
+
+
   // Handle sendMessage event
   socket.on('updateSeatStatus', async (data) => {
-    const { id, status, seat ,shift} = data;
-   
-  
+    const { id, status, seat, shift } = data;
+
+
 
     try {
-   
-      io.emit('seatStatusUpdate', { id, status,seat,shift });
+
+      io.emit('seatStatusUpdate', { id, status, seat, shift });
     } catch (error) {
       console.error('Error updating seat status:', error);
       // Optionally, you can emit an error event back to the client
       socket.emit('updateSeatStatusError', { error: 'Failed to update seat status' });
     }
   });
-  socket.on('sendMessage', (messageData, roomId,sender) => {
+  socket.on('sendMessage', (messageData, roomId, sender) => {
 
-  
-    const { messages, user } = messageData;
-   
+
+
+
     // Broadcast the message to all clients in the room
-    io.to(roomId).emit('receiveMessage', messageData, roomId,sender);
+    io.to(roomId).emit('receiveMessage', messageData, roomId, sender);
   });
-
+  socket.on('onSeen', (roomId, messageId) => {
+    // Emit an event to notify other clients in the room that a message has been seen
+    socket.to(roomId).emit('messageSeen', { messageId, seenBy: socket.id });
+  });
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });

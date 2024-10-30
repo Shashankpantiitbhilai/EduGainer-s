@@ -35,14 +35,6 @@ function App() {
         }
     }, []);
 
-    const handleThemeToggle = () => {
-        setIsDarkMode((prevMode) => {
-            const newMode = !prevMode;
-            localStorage.setItem("theme", newMode ? "dark" : "light");
-            return newMode;
-        });
-    };
-
     if (isLoading) {
         return <LoadingAnimation />;
     }
@@ -51,16 +43,11 @@ function App() {
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
             <CssBaseline />
             <AdminContext.Provider value={{ IsUserLoggedIn, setIsUserLoggedIn }}>
-                <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
+                <LoadingContext.Provider value={{ isLoading, setIsLoading, isDarkMode, setIsDarkMode }}>
                     <BrowserRouter>
-                        {/* Pass handleThemeToggle as a prop */}
-                        <FloatingButtons
-                            isDarkMode={isDarkMode}
-                            onThemeToggle={handleThemeToggle}
-                        />
-
-                        {/* Add the GoogleReviews component */}
+                        {/* Google Reviews and Floating Buttons are added here */}
                         <GoogleReviews />
+                        <FloatingButtons />
 
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>

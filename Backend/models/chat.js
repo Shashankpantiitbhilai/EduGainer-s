@@ -5,7 +5,8 @@ const MessageSchema = new mongoose.Schema({
         {
             sender: String,
             receiver: String,
-            content: String
+            content: String,
+            seen: { type: Boolean, default: false } // Default to false
         }
     ],
     user: {
