@@ -13,10 +13,6 @@ import {
   Tooltip,
   MenuItem,
   Fade,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
   Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,6 +22,7 @@ import logoImage from "../images/logo.jpg";
 import DarkModeToggle from '../darkmode';
 import { LoadingContext } from "../App";
 import { fetchUnseenMessages } from "../services/chat/utils";
+import CustomDrawer from './Drawer';
 
 const colors = {
   primary: "#006400",
@@ -46,7 +43,7 @@ function Navbar() {
   const { isDarkMode, setIsDarkMode } = useContext(LoadingContext);
 
   useEffect(() => {
-    if (IsUserLoggedIn && IsUserLoggedIn.username) {
+    if (IsUserLoggedIn?.username) {
       const userInitials = IsUserLoggedIn.username
         .split(" ")
         .map((name) => name[0])
@@ -57,7 +54,6 @@ function Navbar() {
     }
   }, [IsUserLoggedIn]);
 
-  // Fetch unseen messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -94,7 +90,7 @@ function Navbar() {
   };
 
   const handleDrawerToggle = () => {
-    setUnseenMessageCount(0)
+    setUnseenMessageCount(0);
     setDrawerOpen(!drawerOpen);
   };
 
@@ -156,58 +152,31 @@ function Navbar() {
     { name: "Logout", link: "/logout", action: handleLogout },
   ];
 
-  const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        EduGainer's
-      </Typography>
-      <List>
-        {pages.map((page) => (
-          <ListItem
-            key={page.name}
-            component={Link}
-            to={page.link}
-            sx={{ textAlign: "center" }}
-          >
-            <Badge 
-              badgeContent={page.showBadge ? unseenMessageCount : 0} 
-              color="error"
-              invisible={!page.showBadge || unseenMessageCount === 0}
-            >
-              <ListItemText primary={page.name} />
-            </Badge>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-
   return (
     <AppBar position="sticky" sx={{ backgroundColor: colors.primary }}>
       <Container maxWidth="lg">
-        <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+        <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
+          {/* Logo Section */}
+          <Box component={Link} to={homeURL} sx={{ display: "flex", alignItems: "center" }}>
             <Box
               component="img"
               src={logoImage}
               alt="EduGainer's Logo"
               sx={{
-                height: 40,
-                marginRight: 2,
-                display: { xs: "none", sm: "flex" },
+                height: { xs: 40, sm: 40 },
+                display: "block",
               }}
             />
             <Typography
               variant="h6"
               noWrap
-              component={Link}
-              to={homeURL}
               sx={{
                 fontFamily: "monospace",
                 fontWeight: 700,
                 letterSpacing: ".1rem",
                 color: colors.white,
                 textDecoration: "none",
+                display: { xs: "none", md: "block" },
                 "&:hover": {
                   color: colors.secondary,
                   transition: "color 0.3s ease-in-out",
@@ -218,7 +187,8 @@ function Navbar() {
             </Typography>
           </Box>
 
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+          {/* Desktop Navigation */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
             {pages.map((page) => (
               <Badge
                 key={page.name}
@@ -245,119 +215,109 @@ function Navbar() {
             ))}
           </Box>
 
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <Badge 
-              badgeContent={unseenMessageCount} 
-              color="error"
-              invisible={unseenMessageCount === 0}
-            >
-              <Button
-                variant="contained"
-                startIcon={<MenuIcon />}
-                onClick={handleDrawerToggle}
-                sx={{
-                  backgroundColor: colors.secondary,
-                  color: colors.white,
-                  "&:hover": {
-                    backgroundColor: colors.accent,
-                    transition: "background-color 0.3s ease-in-out",
-                  },
-                }}
+          {/* Mobile Actions */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Dark Mode Toggle */}
+            <Box sx={{ display: "flex" }}>
+              <DarkModeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
+            </Box>
+
+            {/* Mobile Menu Button */}
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <Badge 
+                badgeContent={unseenMessageCount} 
+                color="error"
+                invisible={unseenMessageCount === 0}
               >
-                Menu
-              </Button>
-            </Badge>
-          </Box>
-
-          <Box sx={{ flexGrow: 0, ml: 2 }}>
-            <DarkModeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
-          </Box>
-
-          <Box sx={{ flexGrow: 0, ml: 2 }}>
-            <Tooltip title={IsUserLoggedIn ? "Open settings" : "Login"}>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                {IsUserLoggedIn ? (
-                  <Avatar
-                    alt={IsUserLoggedIn.username}
-                    sx={{
-                      bgcolor: colors.secondary,
-                      "&:hover": {
-                        bgcolor: colors.accent,
-                        transition: "background-color 0.3s ease-in-out",
-                      },
-                    }}
-                  >
-                    {initials}
-                  </Avatar>
-                ) : (
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate("/login")}
-                    sx={{
-                      backgroundColor: colors.secondary,
-                      color: colors.white,
-                      "&:hover": {
-                        backgroundColor: colors.accent,
-                        transition: "background-color 0.3s ease-in-out",
-                      },
-                    }}
-                  >
-                    Login
-                  </Button>
-                )}
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-              TransitionComponent={Fade}
-            >
-              {settings.map((setting) => (
-                <MenuItem
-                  key={setting.name}
-                  onClick={setting.action || handleCloseUserMenu}
-                  component={setting.action ? "div" : Link}
-                  to={setting.link}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: colors.background,
-                      transition: "background-color 0.3s ease-in-out",
-                    },
-                  }}
+                <IconButton
+                  onClick={handleDrawerToggle}
+                  sx={{ color: colors.white }}
                 >
-                  <Typography textAlign="center">{setting.name}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+                  <MenuIcon />
+                </IconButton>
+              </Badge>
+            </Box>
+
+            {/* User Settings */}
+            <Box>
+              <Tooltip title={IsUserLoggedIn ? "Open settings" : "Login"}>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  {IsUserLoggedIn ? (
+                    <Avatar
+                      alt={IsUserLoggedIn.username}
+                      sx={{
+                        bgcolor: colors.secondary,
+                        "&:hover": {
+                          bgcolor: colors.accent,
+                          transition: "background-color 0.3s ease-in-out",
+                        },
+                      }}
+                    >
+                      {initials}
+                    </Avatar>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={() => navigate("/login")}
+                      sx={{
+                        backgroundColor: colors.secondary,
+                        color: colors.white,
+                        "&:hover": {
+                          backgroundColor: colors.accent,
+                          transition: "background-color 0.3s ease-in-out",
+                        },
+                      }}
+                    >
+                      Login
+                    </Button>
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+                TransitionComponent={Fade}
+              >
+                {settings.map((setting) => (
+                  <MenuItem
+                    key={setting.name}
+                    onClick={setting.action || handleCloseUserMenu}
+                    component={setting.action ? "div" : Link}
+                    to={setting.link}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: colors.background,
+                        transition: "background-color 0.3s ease-in-out",
+                      },
+                    }}
+                  >
+                    <Typography textAlign="center">{setting.name}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
           </Box>
         </Toolbar>
       </Container>
-      <Drawer
-        variant="temporary"
+
+      <CustomDrawer
         open={drawerOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        sx={{
-          display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 240 },
-        }}
-      >
-        {drawer}
-      </Drawer>
+        pages={pages}
+        unseenMessageCount={unseenMessageCount}
+      />
     </AppBar>
   );
 }

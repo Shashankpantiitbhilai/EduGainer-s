@@ -29,18 +29,19 @@ const colors = {
 };
 
 const features = [
+     {
+    icon: <LibraryBooks fontSize="large" />,
+    title: "24/7 Library",
+    description: "Unlimited access to study resources",
+    link: "/library",
+  },
   {
     icon: <School fontSize="large" />,
     title: "Comprehensive Classes",
     description: "Expert-led coaching for competitive exams",
     link: "/classes",
   },
-  {
-    icon: <LibraryBooks fontSize="large" />,
-    title: "24/7 Library",
-    description: "Unlimited access to study resources",
-    link: "/library",
-  },
+ 
   {
     icon: <Store fontSize="large" />,
     title: "MeriStationary",
