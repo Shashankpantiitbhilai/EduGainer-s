@@ -94,6 +94,7 @@ function Navbar() {
   };
 
   const handleDrawerToggle = () => {
+    setUnseenMessageCount(0)
     setDrawerOpen(!drawerOpen);
   };
 
