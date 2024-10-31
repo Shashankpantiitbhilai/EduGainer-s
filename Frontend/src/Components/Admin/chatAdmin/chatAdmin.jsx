@@ -194,6 +194,7 @@ const AdminChat = () => {
         }
 
         if (adminData) {
+          // console.log(adminData,"admin")
           setAdminRoomId(adminData._id);
           setupSocket(adminData._id);
         }
@@ -228,7 +229,7 @@ const AdminChat = () => {
 
     socket.on('receiveMessage', (message, roomId, sender) => {
    
-      handleNewMessage(message, roomId, sender);
+      handleNewMessage(message, roomId, sender,adminId);
     });
 
     socket.on('connect', () => {
@@ -248,16 +249,19 @@ const AdminChat = () => {
     });
   };
 
-  const handleNewMessage = (message, roomId, sender) => {
+  const handleNewMessage = (message, roomId, sender,adminId) => {
+   
     if (sender === selectedRoom) {
-      if (roomId === adminRoomId) {
+      if (roomId === adminId) {
         setAnnouncementMessages(prev => [...prev, message]);
       } else {
+      
         setMessages(prev => [...prev, message]);
       }
     }
 
-    if (roomId !== selectedRoom && sender !== adminRoomId) {
+    if (roomId !== selectedRoom && sender !== adminId) {
+
       setUnreadCounts(prev => ({
         ...prev,
         [roomId]: (prev[roomId] || 0) + 1,
@@ -288,7 +292,7 @@ const AdminChat = () => {
 
   const handleSendMessage = async () => {
     if (!input.trim() || !selectedRoom) return;
-console.log(selectedRoom,adminRoomId,"d")
+
    const receiver = selectedRoom && selectedRoom !== adminRoomId ? selectedRoom : "All";
 
 const messageData = {
@@ -326,7 +330,7 @@ const messageData = {
   const handleUserSelect = async (userId) => {
     try {
       setSelectedRoom(userId);
-      await updateSeenMessage(userId);
+      if (userId === adminRoomId) { await updateSeenMessage(userId); }
       setUnreadCounts(prev => ({
         ...prev,
         [userId]: 0,

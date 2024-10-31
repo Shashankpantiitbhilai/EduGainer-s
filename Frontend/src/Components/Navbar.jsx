@@ -17,13 +17,16 @@ import {
   List,
   ListItem,
   ListItemText,
+  Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { AdminContext } from "../App";
 import { logoutUser } from "../services/auth";
 import logoImage from "../images/logo.jpg";
-import DarkModeToggle from '../darkmode'; // Import the DarkModeToggle component
+import DarkModeToggle from '../darkmode';
 import { LoadingContext } from "../App";
+import { fetchUnseenMessages } from "../services/chat/utils";
+
 const colors = {
   primary: "#006400",
   secondary: "#FFA500",
@@ -38,8 +41,10 @@ function Navbar() {
   const [initials, setInitials] = useState("");
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [unseenMessageCount, setUnseenMessageCount] = useState(0);
   const navigate = useNavigate();
- const { isDarkMode, setIsDarkMode } = useContext(LoadingContext); //
+  const { isDarkMode, setIsDarkMode } = useContext(LoadingContext);
+
   useEffect(() => {
     if (IsUserLoggedIn && IsUserLoggedIn.username) {
       const userInitials = IsUserLoggedIn.username
@@ -52,16 +57,38 @@ function Navbar() {
     }
   }, [IsUserLoggedIn]);
 
+  // Fetch unseen messages
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const userId = IsUserLoggedIn?._id;
+        const unseenMessages = await fetchUnseenMessages();
+        const validMessages = unseenMessages.filter(
+          (message) => message.messages[0].receiever !== userId || message.messages[0].receiever === "All"
+        );
+        setUnseenMessageCount(validMessages.length);
+      } catch (error) {
+        console.error("Error fetching unseen messages:", error);
+      }
+    };
+
+    if (IsUserLoggedIn) {
+      fetchMessages();
+    }
+  }, [IsUserLoggedIn]);
+
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-const toggleTheme = () => {
+
+  const toggleTheme = () => {
     setIsDarkMode((prevMode) => {
       const newMode = !prevMode;
       localStorage.setItem("theme", newMode ? "dark" : "light");
       return newMode;
     });
   };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -97,7 +124,7 @@ const toggleTheme = () => {
           { name: "Classes", link: "/classes" },
           { name: "Resources", link: "/resources" },
           { name: "MeriStationary", link: "/stationary/home" },
-          { name: "Query", link: "/chat/home" },
+          { name: "Query", link: "/chat/home", showBadge: true },
           { name: "Feedback", link: "/feedback" },
           { name: "Privacy", link: "/Policies" },
           { name: "Credits", link: "/credits" },
@@ -107,7 +134,7 @@ const toggleTheme = () => {
         { name: "Classes", link: "/classes" },
         { name: "Resources", link: "/resources" },
         { name: "MeriStationary", link: "/stationary/home" },
-        { name: "Query", link: "/chat/home" },
+        { name: "Query", link: "/chat/home", showBadge: true },
         { name: "Privacy", link: "/Policies" },
         { name: "Credits", link: "/credits" },
       ];
@@ -141,7 +168,13 @@ const toggleTheme = () => {
             to={page.link}
             sx={{ textAlign: "center" }}
           >
-            <ListItemText primary={page.name} />
+            <Badge 
+              badgeContent={page.showBadge ? unseenMessageCount : 0} 
+              color="error"
+              invisible={!page.showBadge || unseenMessageCount === 0}
+            >
+              <ListItemText primary={page.name} />
+            </Badge>
           </ListItem>
         ))}
       </List>
@@ -186,44 +219,55 @@ const toggleTheme = () => {
 
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
-              <Button
+              <Badge
                 key={page.name}
-                component={Link}
-                to={page.link}
-                sx={{
-                  color: colors.white,
-                  display: "block",
-                  mx: 1,
-                  "&:hover": {
-                    backgroundColor: colors.secondary,
-                    transition: "background-color 0.3s ease-in-out",
-                  },
-                }}
+                badgeContent={page.showBadge ? unseenMessageCount : 0}
+                color="error"
+                invisible={!page.showBadge || unseenMessageCount === 0}
               >
-                {page.name}
-              </Button>
+                <Button
+                  component={Link}
+                  to={page.link}
+                  sx={{
+                    color: colors.white,
+                    display: "block",
+                    mx: 1,
+                    "&:hover": {
+                      backgroundColor: colors.secondary,
+                      transition: "background-color 0.3s ease-in-out",
+                    },
+                  }}
+                >
+                  {page.name}
+                </Button>
+              </Badge>
             ))}
           </Box>
 
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <Button
-              variant="contained"
-              startIcon={<MenuIcon />}
-              onClick={handleDrawerToggle}
-              sx={{
-                backgroundColor: colors.secondary,
-                color: colors.white,
-                "&:hover": {
-                  backgroundColor: colors.accent,
-                  transition: "background-color 0.3s ease-in-out",
-                },
-              }}
+            <Badge 
+              badgeContent={unseenMessageCount} 
+              color="error"
+              invisible={unseenMessageCount === 0}
             >
-              Menu
-            </Button>
+              <Button
+                variant="contained"
+                startIcon={<MenuIcon />}
+                onClick={handleDrawerToggle}
+                sx={{
+                  backgroundColor: colors.secondary,
+                  color: colors.white,
+                  "&:hover": {
+                    backgroundColor: colors.accent,
+                    transition: "background-color 0.3s ease-in-out",
+                  },
+                }}
+              >
+                Menu
+              </Button>
+            </Badge>
           </Box>
 
-          {/* Dark Mode Toggle inside Navbar */}
           <Box sx={{ flexGrow: 0, ml: 2 }}>
             <DarkModeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
           </Box>
@@ -304,7 +348,7 @@ const toggleTheme = () => {
         open={drawerOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
+          keepMounted: true,
         }}
         sx={{
           display: { xs: "block", md: "none" },
