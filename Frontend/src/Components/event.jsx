@@ -172,7 +172,7 @@ function EventsPage({ showDialog = false }) {
     <Box sx={{ bgcolor: 'background.default', minHeight: "100vh" }}>
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <PageTitle variant="h2">
-          Upcoming Events
+           Current Events
         </PageTitle>
         
       
