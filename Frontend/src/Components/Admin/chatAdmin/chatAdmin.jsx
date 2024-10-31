@@ -330,8 +330,8 @@ const messageData = {
   const handleUserSelect = async (userId) => {
     try {
       setSelectedRoom(userId);
-      if(userId===adminRoomId)
-      {await updateSeenMessage(userId);}
+     
+      await updateSeenMessage(userId);
       setUnreadCounts(prev => ({
         ...prev,
         [userId]: 0,

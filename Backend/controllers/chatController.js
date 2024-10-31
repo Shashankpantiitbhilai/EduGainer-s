@@ -7,7 +7,7 @@ module.exports = (io) => {
     const fetchChatMessages = async (req, res) => {
         try {
 
-            const messages = await Message.find({ user: req.user._id }); 
+            const messages = await Message.find({ user: req.user._id });
 
             // console.log("messages hi reached fetchchat rouyte",messages);
             res.json(messages);
@@ -20,11 +20,11 @@ module.exports = (io) => {
     const postChatMessages = async (req, res) => {
         const { messages, user } = req.body;
 
-    
+
 
         try {
             const newMessage = await Message.create({ messages, user });
-            console.log(newMessage,newMessage.messages[0].seen,"seen")
+            console.log(newMessage, newMessage.messages[0].seen, "seen")
             await newMessage.save();
 
 
@@ -71,7 +71,7 @@ module.exports = (io) => {
     const findUnseenMessages = async (req, res) => {
         try {
             const userId = req.user?._id; // Get user ID from the authenticated request
-          
+
 
             // Find unseen messages for users other than the current user
             const unseenMessages = await Message.find({
@@ -86,7 +86,7 @@ module.exports = (io) => {
                 ]
             });
 
-          
+
             res.status(200).json(unseenMessages);
         } catch (error) {
             console.error("Error fetching unseen messages:", error);
@@ -95,12 +95,12 @@ module.exports = (io) => {
     };
     const updateMessageSeenStatus = async (req, res) => {
         const { userId } = req.body; // Assuming userId is sent in the request body
-       
+
 
         try {
             // Find all messages for the specified user
             const foundMessages = await Message.find({ user: userId });
-           
+
 
             // Update all messages for a specific user by setting seen to true
             const result = await Message.updateMany(
@@ -108,12 +108,12 @@ module.exports = (io) => {
                 { $set: { "messages.$[].seen": true } } // Set seen to true for each message in the array
             );
 
-           
+
 
             // Check if any messages were updated
-          
-                return res.status(200).json({ message: "All messages for the user have been marked as seen." });
-            
+
+            return res.status(200).json({ message: "All messages for the user have been marked as seen." });
+
         } catch (error) {
             console.error("Error updating message seen status:", error);
             return res.status(500).json({ message: "An error occurred while updating the message status." });
@@ -129,5 +129,5 @@ module.exports = (io) => {
         updateMessageSeenStatus // Expose the new function
     };
 
-   
+
 };
