@@ -39,6 +39,7 @@ import Credits from "./Components/credits.jsx"
 import Classes from "./Components/Admin/classes/batches.jsx"
 import ClassSuccess from "./Components/Classes/Success.jsx"
 import ProtectedLibrary from "./ProtectedLibrary.js"
+import ProtectedSuperAdmin from "./ProtectedSuperAdmin.js";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -148,9 +149,9 @@ const Main = () => {
                 <Route
                     path="/admin_dashboard"
                     element={
-                        <ProtectedAdmin>
+                        <ProtectedSuperAdmin>
                             <AdminDashboard />
-                        </ProtectedAdmin>
+                        </ProtectedSuperAdmin>
                     }
                 />
                 <Route
@@ -209,21 +210,20 @@ const Main = () => {
                         </ProtectedAdmin>
                     }
                 />
-               
-                <Route
-                    path="/admin_library/manage-current-month-bookings"
-                    element={
-                        <ProtectedLibrary>
-                            <StudentManagementTable />
-                        </ProtectedLibrary>
-                    }
-                />
                 <Route
                     path="/admin/add-event"
                     element={
                         <ProtectedAdmin>
                             <Pamplette />
                         </ProtectedAdmin>
+                    }
+                />
+                <Route
+                    path="/admin_library/manage-current-month-bookings"
+                    element={
+                    <ProtectedLibrary>
+                            <StudentManagementTable />
+                        </ProtectedLibrary>
                     }
                 />
                 <Route

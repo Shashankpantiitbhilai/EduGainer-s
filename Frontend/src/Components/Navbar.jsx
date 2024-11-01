@@ -106,7 +106,7 @@ function Navbar() {
     }
   };
 
-  const isAdmin = IsUserLoggedIn?.role === "admin";
+  const isAdmin = IsUserLoggedIn?.role === "admin" || IsUserLoggedIn?.role === "superAdmin" ;
   const pages = IsUserLoggedIn
     ? isAdmin
       ? [

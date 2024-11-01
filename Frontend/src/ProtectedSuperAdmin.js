@@ -4,15 +4,14 @@ import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AdminContext } from "./App";
 
-const Protected_Admin = ({ children }) => {
+const ProtectedSuperAdmin = ({ children }) => {
     const { IsUserLoggedIn } = useContext(AdminContext);
-   
-    if (IsUserLoggedIn?.role === "superAdmin")return children
-   if (!IsUserLoggedIn || IsUserLoggedIn?.role === "user") {
+console.log(IsUserLoggedIn)
+    if (!IsUserLoggedIn || IsUserLoggedIn?.role !== "superAdmin") {
         return <Navigate to="/login" replace />;
     }
 
     return children;
 };
 
-export default Protected_Admin;
+export default ProtectedSuperAdmin;

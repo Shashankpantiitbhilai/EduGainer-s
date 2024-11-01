@@ -52,7 +52,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const { setIsUserLoggedIn } = useContext(AdminContext);
   const navigate = useNavigate();
-  const location = useLocation();
+ 
   const form = useForm();
   const { register, handleSubmit, formState, setError, clearErrors } = form;
   const { errors } = formState;
@@ -74,7 +74,7 @@ export default function Login() {
           return;
         }
 
-        if (user.role === "admin") {
+        if (user.role === "admin" || user.role==="superadmin") {
           navigate("/admin_home");
         } else {
           navigate("/");
@@ -122,7 +122,8 @@ export default function Login() {
         }
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
-        if (response.user.role === "admin") navigate("/admin_home");
+        console.log(response.user.role,"role")
+        if (response.user.role === "admin" ||response.user.role === "superAdmin" ) navigate("/admin_home");
         else navigate("/");
       } else {
         setError("login", { type: "manual", message: "Invalid credentials" });

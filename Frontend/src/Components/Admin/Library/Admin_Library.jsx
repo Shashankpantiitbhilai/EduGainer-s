@@ -161,13 +161,13 @@ function Admin_Library() {
       </Grid>
 
       {/* Library Access Dialog */}
-      <LibraryAccessDialog
+      {IsUserLoggedIn.role !== "superAdmin" && <LibraryAccessDialog
         open={dialogOpen}
         onSuccess={handleDialogSuccess}
         onClose={handleDialogClose}
         adminId={IsUserLoggedIn?._id}
         isUserLoggedIn={IsUserLoggedIn}// Pass the actual admin ID
-      />
+      />}
     </Container>
   );
 }
