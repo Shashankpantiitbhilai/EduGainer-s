@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["user", "admin", "employee"], // Added "employee" role
+    enum: ["user", "admin", "employee","superAdmin"], // Added "employee" role
     default: "user",
     required: true,
   },
@@ -58,7 +58,8 @@ const userSchema = new mongoose.Schema({
   permissions: [{
     type: String,
     enum: ["library", "classes", "stationery"], // Allowed permission values
-  }]
+  }],
+
 });
 
 // Apply plugins
