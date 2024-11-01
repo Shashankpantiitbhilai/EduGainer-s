@@ -3,6 +3,9 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const findOrCreate = require("mongoose-findorcreate");
 
 // Define the user schema
+
+
+// Define the user schema
 const userSchema = new mongoose.Schema({
   strategy: {
     type: String,
@@ -11,39 +14,51 @@ const userSchema = new mongoose.Schema({
   },
   googleId: {
     type: String,
-  
   },
   firstName: {
     type: String,
-    required: false,
+   
   },
   lastName: {
     type: String,
-    required: false,
+   
   },
   address: {
     type: String,
-    required: false,
+   
   },
   bio: {
     type: String,
-    required: false,
+   
   },
   photoUpload: {
-    type: String, // Adjust type as per your requirement (String for URL or Buffer for storing binary data)
-    required: false,
+    type: String, // Adjust type as per your requirement
+   
   },
   role: {
     type: String,
-    enum: ["user", "admin"], // Define roles as needed
-    default: "user", // Default role if not specified
+    enum: ["user", "admin", "employee"], // Added "employee" role
+    default: "user",
     required: true,
   },
+
   status: {
     type: String,
-    default:"active",
+    default: "active",
+  },
+  // Change refAccount to an array to hold multiple sub-account IDs
+  refAccounts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Reference to other user documents
+  }],
+  isTeamAccount: {
+    type: Boolean,
+    default: false, // Default to false for sub-accounts
   }
 });
+
+// Apply plugins
+
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
@@ -160,7 +175,7 @@ const classesSchema = new mongoose.Schema({
     },
     razorpay_payment_id: {
       type: String,
-      required: false, // This will be updated after payment verification
+      // This will be updated after payment verification
     }
   }
 });

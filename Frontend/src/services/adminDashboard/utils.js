@@ -26,3 +26,24 @@ export async function editUserById(id,data) {
     }
 }
 
+export async function addUser(userData) {
+    try {
+        console.log("hi",userData)
+        const response = await axiosInstance.post(`/admin/addUser`, userData);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding new user:", error);
+        throw error;
+    }
+}
+
+// Delete a user by ID
+export async function deleteUserById(id) {
+    try {
+        const response = await axiosInstance.delete(`/admin/deleteUser/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting user by ID:", error);
+        throw error;
+    }
+}

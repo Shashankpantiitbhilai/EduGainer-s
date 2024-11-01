@@ -31,7 +31,7 @@ import ManageBooking from "./Components/Admin/Library/monthlyseat/table.jsx";
 import Policies from "./Components/policies/Policies.jsx";
 import StudentManagementTable from "./Components/Admin/Library/seat/ManageSeats.jsx";
 import Fee from "./Components/Library/fee.jsx"
-import AdminDashboard from "./Components/Admin/adminDashboard.jsx";
+import AdminDashboard from "./Components/Admin/Teams/adminDashboard.jsx";
 import StationaryHome from "./Components/Stationary/home.jsx";
 import FeedbackForm from "./Components/feedback/feedback.jsx";
 import Pamplette from "./Components/Admin/pamplette.jsx";

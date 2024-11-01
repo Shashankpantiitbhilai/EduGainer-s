@@ -16,8 +16,9 @@ const {
   AdminClass,
 } = require("../models/classes");
 const passport = require("../models/passportConfig");
-const { connectDB, closeDB } = require("../db");
 
+
+const { setupChangeStreams } = require('../triggers');
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -213,6 +214,9 @@ router.post("/forgot-password", (req, res) => {
 router.get("/fetchAuth", function (req, res) {
 
   if (req.isAuthenticated()) {
+    if (req.user?.role === "admin")
+      {setupChangeStreams(req.user.username);
+  }
     res.json(req.user);
   } else {
     res.json(null);

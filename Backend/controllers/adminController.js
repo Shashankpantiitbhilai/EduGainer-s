@@ -275,6 +275,55 @@ const fetchAllSiteUsers = async (req, res) => {
     }
 };
 
+
+
+const addUser = async (req, res) => {
+    const { email, password, firstName, lastName, role } = req.body;
+console.log(req.body)
+    try {
+        // Check if user already exists
+        const existingUser = await User.findOne({ username:email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists with this email.' });
+        }
+
+        // Create a new user with the provided fields
+        const newUser = new User({
+            username:email,
+            firstName,
+            lastName,
+            role, // 'user' or 'admin', based on the form
+            strategy: "local",
+            isTeamAccount:true// Assuming it's a local strategy for registration
+        });
+
+        // Use passport-local-mongoose's method to register the user with password
+        await User.register(newUser, password);
+
+        res.status(201).json({ message: 'User registered successfully.', user: newUser });
+    } catch (error) {
+        console.error("Error registering user:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+const deleteUser = async (req, res) => {
+    const { id } = req.params; // Assuming you are passing user ID in params
+
+    try {
+        // Find and delete the user by ID
+        const deletedUser = await User.findByIdAndDelete(id);
+        if (!deletedUser) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+        res.status(200).json({ message: 'User deleted successfully.', user: deletedUser });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 // Export controller functions
 module.exports = {
     addLibStudent,
@@ -287,6 +336,6 @@ module.exports = {
     fetchAllUsers,
     fetchAllChats,
     fetchAllSiteUsers,
-    editUserById
+    editUserById,addUser,deleteUser
     // Add other controller functions as needed
 };

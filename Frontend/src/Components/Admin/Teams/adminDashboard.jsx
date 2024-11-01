@@ -55,8 +55,9 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { fetchAllSiteUsers } from "../../services/Admin_services/adminUtils";
-import { editUserById } from "../../services/adminDashboard/utils";
+import { fetchAllSiteUsers } from "../../../services/Admin_services/adminUtils";
+import { editUserById } from "../../../services/adminDashboard/utils";
+import TeamManagement from "./TeamMember"
 // Enhanced sample data for charts
 const trafficData = [
   { name: "Jan", pageViews: 4000, uniqueVisitors: 2400, avgTimeOnSite: 120 },
@@ -317,6 +318,8 @@ const AdminDashboard = () => {
 
   const renderChart = () => {
     switch (selectedOption) {
+      case "teamManagement":
+  return <TeamManagement />;
       case "traffic":
         return renderTrafficStats();
       case "viewers":
@@ -401,6 +404,12 @@ const AdminDashboard = () => {
               Quick Actions
             </Typography>
             <List>
+              <ListItem button onClick={() => setSelectedOption("teamManagement")}>
+  <ListItemIcon>
+    <People />
+  </ListItemIcon>
+  <ListItemText primary="Manage Team" />
+</ListItem>
               <ListItem button onClick={() => setSelectedOption("traffic")}>
                 <ListItemIcon>
                   <Traffic />
