@@ -1,10 +1,5 @@
 const mongoose = require('mongoose');
-const {Log} = require('./models/EventLogs'); // Import the Log model
-let chalk;
-
-(async () => {
-    chalk = await import('chalk');
-})();
+const { Log } = require('./models/EventLogs'); // Import the Log model
 
 async function setupChangeStreams(currentUser) {
     logEvent('Initiating Change Stream Monitoring', currentUser);
@@ -22,17 +17,8 @@ async function setupChangeStreams(currentUser) {
         const changeStream = Model.watch([], { fullDocument: 'updateLookup' });
 
         changeStream.on('change', async (change) => {
-            const operationColors = {
-                'insert': chalk.default.green,
-                'update': chalk.default.yellow,
-                'delete': chalk.default.red,
-                'replace': chalk.default.magenta
-            };
-
-            const colorLog = operationColors[change.operationType] || chalk.default.white;
-
             const logMessage = `${currentUser} Database Change Detected - Model: ${modelName}, Operation: ${change.operationType.toUpperCase()}`;
-            console.log(colorLog('\n--- ' + logMessage + ' ---'));
+            console.log('\n--- ' + logMessage + ' ---');
 
             // Save log to database only for operation changes
             if (change.operationType !== 'system') {
@@ -45,7 +31,7 @@ async function setupChangeStreams(currentUser) {
         });
 
         changeStream.on('error', (error) => {
-            console.error(chalk.default.red(`🚨 Error in ${modelName} Change Stream:`), error);
+            console.error(`🚨 Error in ${modelName} Change Stream:`, error);
         });
     });
 }
@@ -68,9 +54,9 @@ async function logEvent(message, user, additionalData = null) {
             await logEntry.save();
 
             // Console logging
-            console.log(chalk.default.blue(`${new Date().toISOString()} - ${user}: ${message}`));
+            console.log(`${new Date().toISOString()} - ${user}: ${message}`);
             if (additionalData) {
-                console.log(chalk.default.gray('Additional Data:', additionalData));
+                console.log('Additional Data:', additionalData);
             }
         }
     } catch (error) {
