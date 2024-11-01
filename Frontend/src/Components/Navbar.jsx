@@ -121,9 +121,10 @@ function Navbar() {
       : [
           { name: "Library", link: "/library" },
           { name: "Classes", link: "/classes" },
-          { name: "Resources", link: "/resources" },
+       
           { name: "MeriStationary", link: "/stationary/home" },
-          { name: "Query", link: "/chat/home", showBadge: true },
+        { name: "Query", link: "/chat/home", showBadge: true },
+             { name: "Resources", link: "/resources" },
           { name: "Feedback", link: "/feedback" },
           { name: "Privacy", link: "/Policies" },
           { name: "Credits", link: "/credits" },
@@ -131,9 +132,10 @@ function Navbar() {
     : [
         { name: "Library", link: "/library" },
         { name: "Classes", link: "/classes" },
-        { name: "Resources", link: "/resources" },
+      
         { name: "MeriStationary", link: "/stationary/home" },
-        { name: "Query", link: "/chat/home", showBadge: true },
+      { name: "Query", link: "/chat/home", showBadge: true },
+          { name: "Resources", link: "/resources" },
         { name: "Privacy", link: "/Policies" },
         { name: "Credits", link: "/credits" },
       ];
