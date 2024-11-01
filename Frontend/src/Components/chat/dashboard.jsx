@@ -40,59 +40,47 @@ import {
 import { fetchAllChats } from "../../services/Admin_services/adminUtils";
 import ChatInput from "./chatInput"
 const Chat = () => {
-
   const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [error,setError]=useState("")
   const [announcementMessages, setAnnouncementMessages] = useState([]);
   const [adminRoomId, setAdminRoomId] = useState("");
   const socketRef = useRef(null);
   const [userRoomId, setUserRoomId] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("");
-  const [error, setError] = useState("");
   const messagesEndRef = useRef(null);
   const [unreadCounts, setUnreadCounts] = useState({
     announcements: 0,
     admin: 0,
   });
- 
   const [drawerOpen, setDrawerOpen] = useState(!isMobile);
- 
+  const [isRoomSelected, setIsRoomSelected] = useState(false);
 
- 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  const [isRoomSelected, setIsRoomSelected] = useState(false); // New state
-   const fetchAndUpdateUnseenMessages = async () => {
+  const fetchAndUpdateUnseenMessages = async () => {
     try {
       const unseenMessages = await fetchUnseenMessages(userRoomId);
       let adminCount = 0;
       let announcementCount = 0;
-console.log(unseenMessages,"unseen messages")
+
       unseenMessages.forEach(msg => {
-       console.log(msg.messages[0].sender,msg.messages[0].receiver,typeof(msg.messages),(msg.messages[0].sender===msg.messages[0].receiver))
-        if (msg.messages[0].receiver==="All") {
-    
-        
-            console.log("announcement")
-            announcementCount++;
-        }
-        else  if(msg.user===IsUserLoggedIn?._id){
-          console.log("admin")
+        if (msg.messages[0].receiver === "All") {
+          announcementCount++;
+        } else if (msg.user === IsUserLoggedIn?._id) {
           adminCount++;
-          }
-        
+        }
       });
 
       setUnreadCounts({
         announcements: announcementCount,
         admin: adminCount,
       });
-
-      // Show notification for new messages
-     
-     
     } catch (error) {
       console.error("Error fetching unseen messages:", error);
     }
@@ -103,6 +91,7 @@ console.log(unseenMessages,"unseen messages")
       fetchAndUpdateUnseenMessages();
     }
   }, [IsUserLoggedIn]);
+
   useEffect(() => {
     const fetchAdminAndMessages = async () => {
       try {
@@ -154,7 +143,7 @@ console.log(unseenMessages,"unseen messages")
               }
             }
 
-            scrollToBottom();
+            scrollToBottom();  // Ensure scrolling on new message
           });
 
           return () => {
@@ -173,20 +162,14 @@ console.log(unseenMessages,"unseen messages")
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, announcementMessages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, [messages, announcementMessages]); // Trigger scroll when messages update
 
   const sendMessage = async (message) => {
     if (!isRoomSelected) {
-      console.log("is roomselected is false"
-        )
-     // Show dialog if room not selected
+      console.log("isRoomSelected is false");
       return;
     }
-    console.log("input",message)
+
     if (selectedRoom === adminRoomId && adminRoomId !== userRoomId) {
       setError(
         "You are not authorized to send messages in the announcement room."
@@ -198,7 +181,6 @@ console.log(unseenMessages,"unseen messages")
             sender: IsUserLoggedIn._id,
             receiver: adminRoomId,
             content: message,
-            
           },
         ],
         user: IsUserLoggedIn._id,
@@ -224,38 +206,32 @@ console.log(unseenMessages,"unseen messages")
     }
   };
 
- const handleRoomClick = async (id) => {
+  const handleRoomClick = async (id) => {
     try {
-        setSelectedRoom(id);
+      setSelectedRoom(id);
       setIsRoomSelected(true);
       updateSeenMessage(id);
-        const response = await fetchAllChats(id);
-        const roomId = id;
+      const response = await fetchAllChats(id);
+      const roomId = id;
 
-        if (id === adminRoomId) {
-            setAnnouncementMessages(response);
-            setUnreadCounts((prev) => ({ ...prev, announcements: 0 }));
-        } else {
-            setMessages(response);
-            setUnreadCounts((prev) => ({ ...prev, admin: 0 }));
-        }
+      if (id === adminRoomId) {
+        setAnnouncementMessages(response);
+        setUnreadCounts((prev) => ({ ...prev, announcements: 0 }));
+      } else {
+        setMessages(response);
+        setUnreadCounts((prev) => ({ ...prev, admin: 0 }));
+      }
 
-        if (socketRef.current) {
-            socketRef.current.emit("joinRoom", roomId);
-            socketRef.current.emit("onSeen", id, userRoomId);
-        }
+      if (socketRef.current) {
+        socketRef.current.emit("joinRoom", roomId);
+        socketRef.current.emit("onSeen", id, userRoomId);
+      }
 
-        // Call makeAllMessagesSeenForUser here
-     
-        
-        scrollToBottom();
-        
+      scrollToBottom();
     } catch (error) {
-        console.error("Error fetching chat messages:", error);
+      console.error("Error fetching chat messages:", error);
     }
-};
-
-  
+  };
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
