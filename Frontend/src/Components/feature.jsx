@@ -35,18 +35,19 @@ const features = [
     description: "Unlimited access to study resources",
     link: "/library",
   },
-  {
-    icon: <School fontSize="large" />,
-    title: "Comprehensive Classes",
-    description: "Expert-led coaching for competitive exams",
-    link: "/classes",
-  },
+
  
   {
     icon: <Store fontSize="large" />,
     title: "MeriStationary",
     description: "All your academic supplies in one place",
     link: "/stationary/home",
+  },
+    {
+    icon: <School fontSize="large" />,
+    title: "Comprehensive Classes",
+    description: "Expert-led coaching for competitive exams",
+    link: "/classes",
   },
   {
     icon: <Chat fontSize="large" />,
@@ -64,7 +65,7 @@ const features = [
     icon: <SupportAgent fontSize="large" />,
     title: "Mentorship",
     description: "One-on-one expert mentoring",
-    link: "/mentorship",
+    link: "/chat/home",
   }
 ];
 
