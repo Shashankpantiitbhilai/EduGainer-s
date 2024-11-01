@@ -21,8 +21,9 @@ router.patch('/editLibResource/:id', adminController.editLibResource);
 router.delete('/deleteLibResource/:id', adminController.deleteLibResource);
 router.get('/fetchAllUsers', adminController.fetchAllUsers);
 router.get(`/fetchAllChats/:id`, adminController.fetchAllChats);
-router.post('/addUser', adminController.addUser);
+router.post('/addUser/:adminId', adminController.addUser);
 
 // Route to delete a user by ID
 router.delete('/deleteUser/:id', adminController.deleteUser);
+router.post('/verifyRoleForLibrary/:adminId', adminController.verifyRoleForLibrary);
 module.exports = router;

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Log = require('./models/EventLogs'); // Import the Log model
+const {Log} = require('./models/EventLogs'); // Import the Log model
 let chalk;
 
 (async () => {

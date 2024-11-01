@@ -4,7 +4,6 @@ const { Message } = require("../models/chat");// Assuming you have a Shift model
 const { Resource } = require('../models/Admin')
 const { uploadToCloudinary } = require("../cloudinary")
 const fs = require('fs');
-const path = require('path');
 
 const editUserById = async (req, res) => {
     const { id } = req.params// Assuming shift is sent in the request body
@@ -278,35 +277,40 @@ const fetchAllSiteUsers = async (req, res) => {
 
 
 const addUser = async (req, res) => {
-    const { email, password, firstName, lastName, role } = req.body;
-console.log(req.body)
+    const { email, password, firstName, lastName, role, permissions } = req.body;
+    const adminId = req.params.adminId; // ID of the admin document to update
+    console.log(req.body,adminId);
+
     try {
         // Check if user already exists
-        const existingUser = await User.findOne({ username:email });
+        const existingUser = await User.findOne({ username: email });
         if (existingUser) {
             return res.status(400).json({ error: 'User already exists with this email.' });
         }
 
-        // Create a new user with the provided fields
+        // Create a new user with the provided fields, including permissions
         const newUser = new User({
-            username:email,
+            username: email,
             firstName,
             lastName,
-            role, // 'user' or 'admin', based on the form
+            role, // 'user', 'admin', or 'employee', based on the form
             strategy: "local",
-            isTeamAccount:true// Assuming it's a local strategy for registration
+            isTeamAccount: true,
+            permissions // Assign permissions array directly
         });
 
         // Use passport-local-mongoose's method to register the user with password
         await User.register(newUser, password);
 
-        res.status(201).json({ message: 'User registered successfully.', user: newUser });
+        // Add the new user's _id to the refAccounts array of the specified admin
+        await User.findByIdAndUpdate(adminId, { $push: { refAccounts: newUser._id } });
+
+        res.status(201).json({ message: 'User registered successfully and linked to admin.', user: newUser });
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 
 const deleteUser = async (req, res) => {
     const { id } = req.params; // Assuming you are passing user ID in params
@@ -323,7 +327,107 @@ const deleteUser = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+const verifyRoleForLibrary = async (req, res) => {
+    const { email, password } = req.body;
+    const adminId = req.params.adminId;
 
+    try {
+        // Find the user by username (email)
+        const user = await User.findOne({ username: email });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        // Use passport-local-mongoose's authenticate method properly
+        return new Promise((resolve, reject) => {
+            user.authenticate(password, (err, authenticatedUser, passwordError) => {
+                if (err) {
+                    console.error("Authentication error:", err);
+                    return res.status(500).json({ error: 'Authentication error occurred.' });
+                }
+
+                if (passwordError) {
+                    return res.status(401).json({ error: 'Invalid password.' });
+                }
+
+                if (!authenticatedUser) {
+                    return res.status(401).json({ error: 'Authentication failed.' });
+                }
+
+                // Check role and permissions
+                const hasRequiredRole = authenticatedUser.role === "employee";
+                const hasLibraryPermission = authenticatedUser.permissions.includes("library");
+
+                if (!hasRequiredRole || !hasLibraryPermission) {
+                    return res.status(403).json({
+                        error: 'User does not have required library access permissions.',
+                        details: {
+                            hasRole: hasRequiredRole,
+                            hasPermission: hasLibraryPermission
+                        }
+                    });
+                }
+
+                // Check if user is associated with the admin account
+                User.findById(adminId).exec()
+                    .then(admin => {
+                        if (!admin) {
+                            return res.status(404).json({ error: 'Admin account not found.' });
+                        }
+
+                        const isInAdminSubAccounts = admin.refAccounts.some(
+                            refId => refId.toString() === authenticatedUser._id.toString()
+                        );
+
+                        if (!isInAdminSubAccounts) {
+                            return res.status(403).json({
+                                error: 'User is not associated with the specified admin account.'
+                            });
+                        }
+
+                        // Initialize passport in session if not present
+                        if (!req.session.passport) {
+                            req.session.passport = {};
+                        }
+
+                        // Add new fields to existing passport user object while preserving existing data
+                        req.session.passport.user = {
+                            ...req.session.passport.user, // Preserve existing fields
+                            libraryDetails: {  // New fields in nested object
+                                libraryAccess: true,
+                                role: authenticatedUser.role,
+                                permissions: authenticatedUser.permissions,
+                                email: authenticatedUser.username
+                            }
+                        };
+
+                        // Save session
+                        req.session.save((err) => {
+                            if (err) {
+                                console.error("Session save error:", err);
+                                return res.status(500).json({ error: 'Error saving session.' });
+                            }
+
+                           
+                            return res.status(200).json({
+                                message: 'User verified successfully with library access.',
+                                user: req.session.passport.user
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error checking admin association:", error);
+                        return res.status(500).json({ error: 'Error verifying admin association.' });
+                    });
+            });
+        });
+
+    } catch (error) {
+        console.error("Error in verifyRoleForLibrary:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
 // Export controller functions
 module.exports = {
     addLibStudent,
@@ -336,6 +440,11 @@ module.exports = {
     fetchAllUsers,
     fetchAllChats,
     fetchAllSiteUsers,
-    editUserById,addUser,deleteUser
+    editUserById, addUser, deleteUser,
+    verifyRoleForLibrary
     // Add other controller functions as needed
 };
+
+
+
+

@@ -38,6 +38,7 @@ import Pamplette from "./Components/Admin/pamplette.jsx";
 import Credits from "./Components/credits.jsx"
 import Classes from "./Components/Admin/classes/batches.jsx"
 import ClassSuccess from "./Components/Classes/Success.jsx"
+import ProtectedLibrary from "./ProtectedLibrary.js"
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -179,25 +180,25 @@ const Main = () => {
                 <Route
                     path="/admin_Library/manage-seats"
                     element={
-                        <ProtectedAdmin>
+                        <ProtectedLibrary>
                             <ManageBooking />
-                        </ProtectedAdmin>
+                        </ProtectedLibrary>
                     }
                 />
                 <Route
                     path="/admin_library/manage-users"
                     element={
-                        <ProtectedAdmin>
+                        <ProtectedLibrary>
                             <ManageUsers />
-                        </ProtectedAdmin>
+                            </ProtectedLibrary>
                     }
                 />
                 <Route
                     path="/admin_library/manage-resources"
                     element={
-                        <ProtectedAdmin>
+                        <ProtectedLibrary>
                             <ManageResources />
-                        </ProtectedAdmin>
+                        </ProtectedLibrary>
                     }
                 />
                 <Route
@@ -208,19 +209,20 @@ const Main = () => {
                         </ProtectedAdmin>
                     }
                 />
+               
+                <Route
+                    path="/admin_library/manage-current-month-bookings"
+                    element={
+                        <ProtectedLibrary>
+                            <StudentManagementTable />
+                        </ProtectedLibrary>
+                    }
+                />
                 <Route
                     path="/admin/add-event"
                     element={
                         <ProtectedAdmin>
                             <Pamplette />
-                        </ProtectedAdmin>
-                    }
-                />
-                <Route
-                    path="/admin_library/manage-current-month-bookings"
-                    element={
-                        <ProtectedAdmin>
-                            <StudentManagementTable />
                         </ProtectedAdmin>
                     }
                 />

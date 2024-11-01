@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState,useContext } from "react";
 import { Link } from "react-router-dom";
 import {
   Container,
@@ -21,7 +21,8 @@ import {
   ArrowForward as ArrowForwardIcon,
   Info as InfoIcon,
 } from "@mui/icons-material";
-
+import { LibraryAccessDialog } from "./access"; // Adjust the path as necessary
+import { AdminContext } from "../../../App";
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
   display: "flex",
@@ -43,13 +44,14 @@ const CardIcon = styled(Box)(({ theme }) => ({
   },
 }));
 
-const AdminCard = ({ title, description, link, icon: Icon }) => (
+const AdminCard = ({ title, description, link, icon: Icon, onClick }) => (
   <StyledCard>
     <CardContent sx={{ flexGrow: 1, position: "relative" }}>
       <Tooltip title={`Information about ${title}`} placement="top">
         <IconButton
           sx={{ position: "absolute", top: 8, right: 8 }}
           aria-label={`Info about ${title}`}
+          onClick={onClick} // Trigger dialog on info click
         >
           <InfoIcon />
         </IconButton>
@@ -86,6 +88,9 @@ const AdminCard = ({ title, description, link, icon: Icon }) => (
 );
 
 function Admin_Library() {
+  const [dialogOpen, setDialogOpen] = useState(true);
+  const { IsUserLoggedIn } = useContext(AdminContext)
+  console.log(IsUserLoggedIn,"user")
   const adminCards = [
     {
       title: "Manage Library Seats",
@@ -115,6 +120,16 @@ function Admin_Library() {
     },
   ];
 
+  const handleDialogSuccess = () => {
+    
+    setDialogOpen(false);
+    // Handle success logic (e.g., refresh data)
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ textAlign: "center", mb: 6 }}>
@@ -137,10 +152,22 @@ function Admin_Library() {
       <Grid container spacing={4}>
         {adminCards.map((card, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <AdminCard {...card} />
+            <AdminCard 
+              {...card} 
+              onClick={() => setDialogOpen(true)} // Open dialog on info click
+            />
           </Grid>
         ))}
       </Grid>
+
+      {/* Library Access Dialog */}
+      <LibraryAccessDialog
+        open={dialogOpen}
+        onSuccess={handleDialogSuccess}
+        onClose={handleDialogClose}
+        adminId={IsUserLoggedIn?._id}
+        isUserLoggedIn={IsUserLoggedIn}// Pass the actual admin ID
+      />
     </Container>
   );
 }

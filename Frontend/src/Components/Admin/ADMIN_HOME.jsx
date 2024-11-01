@@ -14,11 +14,6 @@ import {
   Avatar,
   Tooltip,
   Badge,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -31,7 +26,6 @@ import {
   LibraryBooks as LibraryIcon,
   Class as ClassIcon,
   Chat as ChatIcon,
-  Home as HomeIcon,
   Event as EventIcon,
   People as UsersIcon,
   Notifications as NotificationsIcon,
@@ -43,46 +37,38 @@ import {
 import { AdminContext } from "../../App";
 import { logoutUser } from "../../services/auth";
 import { fetchUnseenMessages } from "../../services/chat/utils";
+import DBLOGS from "./db-events";
 
 // Transition component for smooth popup animation
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
 function ADMIN_HOME() {
   const navigate = useNavigate();
-  const {IsUserLoggedIn,setIsUserLoggedIn } = useContext(AdminContext);
+  const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [unseenMessageCount, setUnseenMessageCount] = useState(0);
   const [showNotification, setShowNotification] = useState(false);
 
- 
-
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-     const adminId=IsUserLoggedIn?._id
-
-      const unseenMessages = await fetchUnseenMessages();
-      
-      // Filter messages where the sender is not the admin
-      const nonAdminMessages = unseenMessages.filter(
-        (message) => message.user !== adminId
-      );
-      console.log(nonAdminMessages,adminId)
-      setUnseenMessageCount(nonAdminMessages.length);
-      
-      // Show notification popup if there are unseen messages not from the admin
-      if (nonAdminMessages.length > 0) {
-        setShowNotification(true);
+    const fetchData = async () => {
+      try {
+        const adminId = IsUserLoggedIn?._id;
+        const unseenMessages = await fetchUnseenMessages();
+        const nonAdminMessages = unseenMessages.filter(
+          (message) => message.user !== adminId
+        );
+        setUnseenMessageCount(nonAdminMessages.length);
+        if (nonAdminMessages.length > 0) {
+          setShowNotification(true);
+        }
+      } catch (error) {
+        console.error("Error fetching unseen messages:", error);
       }
-    } catch (error) {
-      console.error("Error fetching unseen messages:", error);
-    }
-  };
-  fetchData();
-}, []);
+    };
+    fetchData();
+  }, [IsUserLoggedIn]);
 
   const handleCloseNotification = () => {
     setShowNotification(false);
@@ -92,12 +78,12 @@ function ADMIN_HOME() {
     setShowNotification(false);
     navigate("/admin/chat");
   };
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
- 
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -110,15 +96,11 @@ function ADMIN_HOME() {
 
   const adminTools = [
     { title: "Manage Library", icon: <LibraryIcon />, link: "/admin_library" },
-    {
-      title: "Manage Classes",
-      icon: <ClassIcon />,
-      link: "/admin/classes",
-    },
+    { title: "Manage Classes", icon: <ClassIcon />, link: "/admin/classes" },
     {
       title: "Admin Chat",
       icon: (
-        <Badge badgeContent={unseenMessageCount} color="error"> {/* Display unseen messages count as badge */}
+        <Badge badgeContent={unseenMessageCount} color="error">
           <ChatIcon />
         </Badge>
       ),
@@ -134,16 +116,9 @@ function ADMIN_HOME() {
     { title: "Upcoming Events", value: "7", icon: <EventIcon /> },
   ];
 
-  const recentNotifications = [
-  
-   
-    "2 new books added to the library",
-    "System maintenance scheduled for tonight",
-  ];
-
   return (
-    <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "#f5f5f5" }}>
-        <Dialog
+    <Box sx={{ width: "100%", minHeight: "100vh", bgcolor: "#f5f5f5" }}>
+      <Dialog
         open={showNotification}
         TransitionComponent={Transition}
         keepMounted
@@ -160,23 +135,18 @@ function ADMIN_HOME() {
           <IconButton
             aria-label="close"
             onClick={handleCloseNotification}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: 'white'
-            }}
+            sx={{ position: "absolute", right: 8, top: 8, color: "white" }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
-          <Box sx={{ py: 2, textAlign: 'center' }}>
+          <Box sx={{ py: 2, textAlign: "center" }}>
             <Badge badgeContent={unseenMessageCount} color="error" sx={{ mb: 2 }}>
-              <ChatIcon sx={{ fontSize: 40, color: '#1976d2' }} />
+              <ChatIcon sx={{ fontSize: 40, color: "#1976d2" }} />
             </Badge>
             <Typography variant="h6" gutterBottom>
-              You have {unseenMessageCount} new message{unseenMessageCount !== 1 ? 's' : ''}!
+              You have {unseenMessageCount} new message{unseenMessageCount !== 1 ? "s" : ""}!
             </Typography>
             <Typography color="text.secondary">
               Click below to view your messages in the chat section.
@@ -187,17 +157,13 @@ function ADMIN_HOME() {
           <Button onClick={handleCloseNotification} color="inherit">
             Dismiss
           </Button>
-          <Button 
-            onClick={handleViewMessages} 
-            variant="contained" 
-            startIcon={<ChatIcon />}
-          >
+          <Button onClick={handleViewMessages} variant="contained" startIcon={<ChatIcon />}>
             View Messages
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
         <Paper elevation={3} sx={{ borderRadius: "15px", overflow: "hidden" }}>
           <Box sx={{ p: 3, borderBottom: "1px solid #e0e0e0" }}>
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -287,24 +253,7 @@ function ADMIN_HOME() {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <Paper elevation={2} sx={{ p: 2, height: "100%" }}>
-                  <Typography variant="h6" gutterBottom>
-                    Recent Notifications
-                  </Typography>
-                  <List>
-                    {recentNotifications.map((notification, index) => (
-                      <React.Fragment key={index}>
-                        <ListItem>
-                          <ListItemIcon>
-                            <NotificationsIcon color="primary" />
-                          </ListItemIcon>
-                          <ListItemText primary={notification} />
-                        </ListItem>
-                        {index < recentNotifications.length - 1 && <Divider />}
-                      </React.Fragment>
-                    ))}
-                  </List>
-                </Paper>
+                <DBLOGS />
               </Grid>
             </Grid>
           </Box>

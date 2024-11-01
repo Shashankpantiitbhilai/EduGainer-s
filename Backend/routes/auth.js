@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 
 const jwt = require("jsonwebtoken")
 const nodemailer = require("nodemailer");
-const bcrypt = require("bcrypt");
+
 const otpGenerator = require('otp-generator')
 const {
   LibStudent,
@@ -214,10 +213,10 @@ router.post("/forgot-password", (req, res) => {
 router.get("/fetchAuth", function (req, res) {
 
   if (req.isAuthenticated()) {
-    if (req.user?.role === "admin")
-      {setupChangeStreams(req.user.username);
-  }
-    res.json(req.user);
+    if (req.user?.role === "admin") {
+      setupChangeStreams(req.user.username);
+    }
+    res.json(req.session.passport.user);
   } else {
     res.json(null);
   }

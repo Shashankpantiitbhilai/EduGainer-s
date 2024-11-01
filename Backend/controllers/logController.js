@@ -1,5 +1,5 @@
 // controllers/logController.js
-const Log = require('../models/EventLogs');
+const {Log} = require('../models/EventLogs');
 
 /**
  * Fetch logs for the admin dashboard
@@ -8,6 +8,7 @@ const Log = require('../models/EventLogs');
  */
 const fetchLogs = async (req, res) => {
     try {
+        
         // Check if user is authenticated and is an admin
         if (!req.isAuthenticated() || req.user.role !== 'admin') {
             return res.status(403).json({ message: 'Unauthorized' });
@@ -17,7 +18,7 @@ const fetchLogs = async (req, res) => {
         const logs = await Log.find()
             .sort({ timestamp: -1 })
             .limit(100); // Limit to most recent 100 logs
-
+      
         res.json(logs);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching logs', error: error.message });

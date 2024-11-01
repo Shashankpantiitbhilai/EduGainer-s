@@ -14,10 +14,10 @@ const axiosInstance = axios.create({
     },
 });
 
-export async function editUserById(id,data) {
+export async function editUserById(id, data) {
 
     try {
-        const response = await axiosInstance.patch(`/admin/editUser/${id}`,{data});
+        const response = await axiosInstance.patch(`/admin/editUser/${id}`, { data });
         // console.log(response.data);
         return response.data;
     } catch (error) {
@@ -26,10 +26,10 @@ export async function editUserById(id,data) {
     }
 }
 
-export async function addUser(userData) {
+export async function addUser(userData, adminId) {
     try {
-        console.log("hi",userData)
-        const response = await axiosInstance.post(`/admin/addUser`, userData);
+        console.log("hi", userData, adminId)
+        const response = await axiosInstance.post(`/admin/addUser/${adminId}`, userData);
         return response.data;
     } catch (error) {
         console.error("Error adding new user:", error);

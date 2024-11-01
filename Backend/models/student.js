@@ -54,7 +54,11 @@ const userSchema = new mongoose.Schema({
   isTeamAccount: {
     type: Boolean,
     default: false, // Default to false for sub-accounts
-  }
+  },
+  permissions: [{
+    type: String,
+    enum: ["library", "classes", "stationery"], // Allowed permission values
+  }]
 });
 
 // Apply plugins
