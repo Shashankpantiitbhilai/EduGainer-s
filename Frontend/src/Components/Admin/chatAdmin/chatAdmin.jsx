@@ -161,6 +161,118 @@ const AdminChat = () => {
   const socketRef = useRef();
   const messageEndRef = useRef(null);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [lastMessages, setLastMessages] = useState({});
+    useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        const [adminData, usersData, unseenMessages] = await Promise.all([
+          fetchAdminCredentials(),
+          fetchAllSiteUsers(),
+          fetchUnseenMessages()
+        ]);
+
+        if (usersData) {
+          // Create a map of last message timestamps
+          const lastMessageMap = {};
+          unseenMessages.forEach(message => {
+            const userId = message.user;
+            const timestamp = new Date(message.timestamp || 0).getTime();
+            
+            // Update only if the message is more recent
+            if (!lastMessageMap[userId] || timestamp > lastMessageMap[userId]) {
+              lastMessageMap[userId] = timestamp;
+            }
+          });
+          setLastMessages(lastMessageMap);
+
+          // Process unseen counts as before
+          const unseenCounts = {};
+          unseenMessages.forEach(message => {
+            if (message.messages && 
+                message.messages[0]?.sender !== IsUserLoggedIn._id && 
+                !message.messages[0]?.seen) {
+              const userId = message.user;
+              unseenCounts[userId] = (unseenCounts[userId] || 0) + 1;
+            }
+          });
+          setUnreadCounts(unseenCounts);
+          setUsers(usersData);
+        }
+
+        if (adminData) {
+          setAdminRoomId(adminData._id);
+          setupSocket(adminData._id);
+        }
+      } catch (error) {
+        console.error('Error fetching resources:', error);
+        setSnackbar({
+          open: true,
+          message: 'Error loading chat data',
+          severity: 'error'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  // Update handleNewMessage to track last message timestamps
+  const handleNewMessage = (message, roomId, sender, adminId) => {
+    if (sender === selectedRoom) {
+      if (roomId === adminId) {
+        setAnnouncementMessages(prev => [...prev, message]);
+      } else {
+        setMessages(prev => [...prev, message]);
+      }
+    }
+
+    if (roomId !== selectedRoom && sender !== adminId) {
+      setUnreadCounts(prev => ({
+        ...prev,
+        [roomId]: (prev[roomId] || 0) + 1,
+      }));
+    }
+
+    // Update last message timestamp
+    setLastMessages(prev => ({
+      ...prev,
+      [roomId]: new Date().getTime()
+    }));
+
+    playNotificationSound();
+  };
+
+  // Modified filteredUsers with sorting logic
+  const filteredUsers = users
+    .filter(user => 
+      user._id !== IsUserLoggedIn._id &&
+      user.username.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      // First priority: unseen messages
+      const unreadA = unreadCounts[a._id] || 0;
+      const unreadB = unreadCounts[b._id] || 0;
+      
+      if (unreadA !== unreadB) {
+        return unreadB - unreadA; // Users with more unread messages come first
+      }
+      
+      // Second priority: last message timestamp
+      const lastMessageA = lastMessages[a._id] || 0;
+      const lastMessageB = lastMessages[b._id] || 0;
+      
+      if (lastMessageA !== lastMessageB) {
+        return lastMessageB - lastMessageA; // More recent messages come first
+      }
+      
+      // Final priority: email alphabetical order
+      return (a.email || '').localeCompare(b.email || '');
+    });
+
  const handleEmojiClick = (emoji) => {
     setInput(prevInput => prevInput + emoji);
     setEmojiAnchorEl(null);
@@ -249,27 +361,7 @@ const AdminChat = () => {
     });
   };
 
-  const handleNewMessage = (message, roomId, sender,adminId) => {
-   
-    if (sender === selectedRoom) {
-      if (roomId === adminId) {
-        setAnnouncementMessages(prev => [...prev, message]);
-      } else {
-      
-        setMessages(prev => [...prev, message]);
-      }
-    }
-
-    if (roomId !== selectedRoom && sender !== adminId) {
-
-      setUnreadCounts(prev => ({
-        ...prev,
-        [roomId]: (prev[roomId] || 0) + 1,
-      }));
-    }
-    playNotificationSound();
-  };
-
+ 
   const playNotificationSound = () => {
     const context = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = context.createOscillator();
@@ -370,11 +462,7 @@ const messageData = {
     setMenuAnchorEl(null);
   };
 
-  const filteredUsers = users.filter(user => 
-    user._id !== IsUserLoggedIn._id &&
-    user.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+ 
   const getSelectedUserName = () => {
     if (selectedRoom === adminRoomId) return 'Announcement Room';
     const selectedUser = users.find(user => user._id === selectedRoom);

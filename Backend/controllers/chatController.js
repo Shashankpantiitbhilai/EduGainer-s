@@ -24,7 +24,7 @@ module.exports = (io) => {
 
         try {
             const newMessage = await Message.create({ messages, user });
-            console.log(newMessage, newMessage.messages[0].seen, "seen")
+         
             await newMessage.save();
 
 
