@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { ThemeProvider } from "@mui/material/styles";
+
 import { Link } from "react-router-dom";
 import {
   Box,
-  Grid,
-  TextField,
+  
+ 
   Typography,
   List,
   ListItem,
@@ -14,53 +13,36 @@ import {
   IconButton,
   Paper,
   Badge,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   useMediaQuery,
-  useTheme,Stack,Slide
+  useTheme,
+  Drawer,
+  AppBar,
+  Toolbar,
+  Divider,
+  InputAdornment,
 } from "@mui/material";
 import {
   Send as SendIcon,
   Announcement,
   Person,
-  Close,
+  Menu as MenuIcon,
+  ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 import io from "socket.io-client";
-import { lightTheme } from "../../theme";
 import { AdminContext } from "../../App";
 import {
   fetchChatMessages,
   postChatMessages,
-  fetchAdminCredentials,fetchUnseenMessages,updateSeenMessage
+  fetchAdminCredentials,
+  fetchUnseenMessages,
+  updateSeenMessage,
 } from "../../services/chat/utils";
 import { fetchAllChats } from "../../services/Admin_services/adminUtils";
-import RoomSelectDialog from "./roomSelectDialog";
-import {
-  ExitToApp as LogoutIcon,
-  LibraryBooks as LibraryIcon,
-  Class as ClassIcon,
-  Chat as ChatIcon,
-  Home as HomeIcon,
-  Event as EventIcon,
-  People as UsersIcon,
-  Notifications as NotificationsIcon,
-  Settings as SettingsIcon,
-  Dashboard as DashboardIcon,
-  Close as CloseIcon,
-  Mail as MailIcon,
-} from "@mui/icons-material";
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-
-
-  
+import ChatInput from "./chatInput"
 const Chat = () => {
-  const navigate = useNavigate();
+
+  const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { IsUserLoggedIn } = useContext(AdminContext);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -75,11 +57,12 @@ const Chat = () => {
     announcements: 0,
     admin: 0,
   });
-const [showRoomSelectDialog, setShowRoomSelectDialog] = useState(false); // New dialog state
- const [showNotification, setShowNotification] = useState(false);
-  const [showChatDialog, setShowChatDialog] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+ 
+  const [drawerOpen, setDrawerOpen] = useState(!isMobile);
+ 
+
+ 
+
   const [isRoomSelected, setIsRoomSelected] = useState(false); // New state
    const fetchAndUpdateUnseenMessages = async () => {
     try {
@@ -108,10 +91,8 @@ console.log(unseenMessages,"unseen messages")
       });
 
       // Show notification for new messages
-      if (adminCount + announcementCount > 0) {
-     setShowNotification(true)
-      }
-      console.log(unreadCounts,"unreadCounts")
+     
+     
     } catch (error) {
       console.error("Error fetching unseen messages:", error);
     }
@@ -198,13 +179,14 @@ console.log(unseenMessages,"unseen messages")
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (message) => {
     if (!isRoomSelected) {
       console.log("is roomselected is false"
         )
-      setShowRoomSelectDialog(true); // Show dialog if room not selected
+     // Show dialog if room not selected
       return;
     }
+    console.log("input",message)
     if (selectedRoom === adminRoomId && adminRoomId !== userRoomId) {
       setError(
         "You are not authorized to send messages in the announcement room."
@@ -215,7 +197,7 @@ console.log(unseenMessages,"unseen messages")
           {
             sender: IsUserLoggedIn._id,
             receiver: adminRoomId,
-            content: input,
+            content: message,
             
           },
         ],
@@ -267,477 +249,252 @@ console.log(unseenMessages,"unseen messages")
      
         
         scrollToBottom();
-        setShowChatDialog(true);
+        
     } catch (error) {
         console.error("Error fetching chat messages:", error);
     }
 };
-const handleCloseNotification = () => {
-    setShowNotification(false);
+
+  
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
-  const handleViewMessages = () => {
-    setShowNotification(false);
-    navigate("/admin/chat");
-  };
-  const handleCloseChat = () => {
-    setShowChatDialog(false);
-  };
+  const ChatSidebar = () => (
+    <Box
+      sx={{
+        width: isMobile ? 240 : "100%",
+        height: "100%",
+        bgcolor: "background.paper",
+        borderRight: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <Box sx={{ p: 2, textAlign: "center" }}>
+        <Avatar
+          alt="Edugainer"
+          src="../../images/logo.jpg"
+          sx={{ 
+            width: 64, 
+            height: 64, 
+            mx: "auto", 
+            mb: 1,
+            border: 2,
+            borderColor: "primary.main" 
+          }}
+        />
+        <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
+          Query Portal
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Connect with our experts
+        </Typography>
+      </Box>
+      
+      <Divider />
+      
+      <List sx={{ p: 2 }}>
+        <ListItem
+          button
+          onClick={() => handleRoomClick(adminRoomId)}
+          sx={{
+            mb: 1,
+            borderRadius: 2,
+            bgcolor: selectedRoom === adminRoomId ? "primary.light" : "transparent",
+            "&:hover": { bgcolor: "primary.lighter" },
+          }}
+        >
+          <Badge badgeContent={unreadCounts.announcements} color="error">
+            <Announcement sx={{ mr: 2, color: "primary.main" }} />
+          </Badge>
+          <ListItemText 
+            primary="Announcements"
+            secondary={`${announcementMessages.length} messages`}
+          />
+        </ListItem>
+        
+        <ListItem
+          button
+          onClick={() => handleRoomClick(userRoomId)}
+          sx={{
+            borderRadius: 2,
+            bgcolor: selectedRoom === userRoomId ? "primary.light" : "transparent",
+            "&:hover": { bgcolor: "primary.lighter" },
+          }}
+        >
+          <Badge badgeContent={unreadCounts.admin} color="error">
+            <Person sx={{ mr: 2, color: "primary.main" }} />
+          </Badge>
+          <ListItemText 
+            primary="Admin Chat"
+            secondary={`${messages.length} messages`}
+          />
+        </ListItem>
+      </List>
+      
+      <Box sx={{ p: 2, mt: "auto" }}>
+        <Typography variant="caption" color="text.secondary" align="center" display="block">
+          End-to-end encrypted
+        </Typography>
+      </Box>
+    </Box>
+  );
 
-  return (
-    <ThemeProvider theme={lightTheme}>
-     
-      <Box
-        sx={{
-          flexGrow: 1,
-          height: "100vh",
+  const ChatContent = () => (
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+      }}
+    >
+      <AppBar 
+        position="static" 
+        color="inherit" 
+        elevation={0}
+        sx={{ 
+          borderBottom: 1, 
+          borderColor: "divider",
+          bgcolor: "background.paper" 
         }}
       >
-        <Grid container spacing={2} sx={{ height: "100%" }}>
-          {!isMobile && (
-            <Grid item xs={12} sm={3}>
-              <Paper
-                elevation={3}
-                sx={{
-                  height: "calc(100vh - 32px)",
-                  p: 2,
-                  backgroundColor: "primary.main",
-                  position: "sticky",
-                  top: 16,
-                  overflowY: "auto",
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ color: "white", mb: 2, textAlign: "center" }}
-                >
-                  Edugainer Query Portal
-                </Typography>
-                <Avatar
-                  alt="Admin"
-                  src="../../images/logo.jpg"
-                  sx={{ width: 100, height: 100, mx: "auto", mb: 2 }}
-                />
-                <List>
-                  <ListItem
-                    button
-                    onClick={() => handleRoomClick(adminRoomId)}
-                    sx={{
-                      mb: 1,
-                      backgroundColor:
-                        selectedRoom === adminRoomId
-                          ? "warning.main"
-                          : "transparent",
-                      borderRadius: 1,
-                      "&:hover": {
-                        backgroundColor: "warning.light",
-                      },
-                    }}
-                    disabled={!IsUserLoggedIn}
-                  >
-                    <Badge
-                      badgeContent={unreadCounts.announcements}
-                      color="error"
-                    >
-                      <Announcement sx={{ mr: 1, color: "white" }} />
-                    </Badge>
-                    <ListItemText
-                      primary="Announcements"
-                      sx={{ color: "white" }}
-                    />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={() => handleRoomClick(userRoomId)}
-                    sx={{
-                      backgroundColor:
-                        selectedRoom === userRoomId
-                          ? "warning.main"
-                          : "transparent",
-                      borderRadius: 1,
-                      "&:hover": {
-                        backgroundColor: "warning.light",
-                      },
-                    }}
-                    disabled={!IsUserLoggedIn}
-                  >
-                    <Badge badgeContent={unreadCounts.admin} color="error">
-                      <Person sx={{ mr: 1, color: "white" }} />
-                    </Badge>
-                    <ListItemText primary="Admin" sx={{ color: "white" }} />
-                  </ListItem>
-                </List>{" "}
-                <Typography
-                  variant="body2"
-                  sx={{ color: "white", mb: 2,mt:7, textAlign: "center" }}
-                >
-                  End-to-end encrypted.
-                  <br /> Query your queries with our experts and get solutions
-                  fast.
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "white", mb: 2, textAlign: "center" }}
-                >
-                  Secure. Fast. Reliable. Your queries are our priority.
-                </Typography>
-              </Paper>
-            </Grid>
+        <Toolbar>
+          {isMobile && (
+            <IconButton edge="start" onClick={handleDrawerToggle} sx={{ mr: 2 }}>
+              {drawerOpen ? <ArrowBackIcon /> : <MenuIcon />}
+            </IconButton>
           )}
-          {isMobile ? (
-            <Grid item xs={12}>
-              <Paper
-                elevation={3}
-                sx={{
-                  height: "calc(100vh - 32px)",
-                  p: 2,
-                  backgroundColor: "primary.main",
-                  overflowY: "auto",
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ color: "white", mb: 2, textAlign: "center" }}
-                >
-                  Edugainer Query Portal
-                  {!IsUserLoggedIn && (
-                    <Box
-                      sx={{
-                        height: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        p: 4,
-                        backgroundColor: "background.default",
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "error.main", textAlign: "center" }}
-                      >
-                        Please{" "}
-                        <Link to="/login" style={{ color: "error.main" }}>
-                          log in
-                        </Link>{" "}
-                        to access the Query portal.
-                      </Typography>
-                    </Box>
-                  )}
-                </Typography>
-                <Avatar
-                  alt="Admin"
-                  src="../../images/logo.jpg"
-                  sx={{ width: 100, height: 100, mx: "auto", mb: 2 }}
-                />
-                <List>
-                  <ListItem
-                    button
-                    onClick={() => handleRoomClick(adminRoomId)}
-                    sx={{
-                      mb: 1,
-                      backgroundColor:
-                        selectedRoom === adminRoomId
-                          ? "warning.main"
-                          : "transparent",
-                      borderRadius: 1,
-                      "&:hover": {
-                        backgroundColor: "warning.light",
-                      },
-                    }}
-                    disabled={!IsUserLoggedIn}
-                  >
-                    <Badge
-                      badgeContent={unreadCounts.announcements}
-                      color="error"
-                    >
-                      <Announcement sx={{ mr: 1, color: "white" }} />
-                    </Badge>
-                    <ListItemText
-                      primary="Announcements"
-                      sx={{ color: "white" }}
-                    />
-                  </ListItem>
-                  <ListItem
-                    button
-                    onClick={() => handleRoomClick(userRoomId)}
-                    sx={{
-                      backgroundColor:
-                       selectedRoom === userRoomId
-                          ? "warning.main"
-                          : "transparent",
-                      borderRadius: 1,
-                      "&:hover": {
-                        backgroundColor: "warning.light",
-                      },
-                    }}
-                    disabled={!IsUserLoggedIn}
-                  >
-                    <Badge badgeContent={unreadCounts.admin} color="error">
-                      <Person sx={{ mr: 1, color: "white" }} />
-                    </Badge>
-                    <ListItemText primary="Admin" sx={{ color: "white" }} />
-                  </ListItem>
-                </List>{" "}
-                <Typography
-                  variant="body2"
-                  sx={{ color: "white", mb: 2, mt: 7, textAlign: "center" }}
-                >
-                  End-to-end encrypted.
-                  <br /> Query your queries with our experts and get solutions
-                  fast.
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: "white", mb: 2, textAlign: "center" }}
-                >
-                  Secure. Fast. Reliable. Your queries are our priority.
-                </Typography>
-              </Paper>
-              <Dialog
-                open={showChatDialog}
-                onClose={handleCloseChat}
-                fullWidth
-                maxWidth="md"
-              >
-                <DialogTitle>
-                  <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Typography variant="h6">Chat</Typography>
-                    <IconButton onClick={handleCloseChat}>
-                      <Close />
-                    </IconButton>
-                  </Grid>
-                </DialogTitle>
-                <DialogContent>
-                  <Box
-                    sx={{
-                      height: "60vh",
-                      overflowY: "auto",
-                      p: 2,
-                    }}
-                  >
-                    {(selectedRoom === adminRoomId
-                      ? announcementMessages
-                      : messages
-                    ).map((msg, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: "flex",
-                          justifyContent:
-                            msg.messages[0].sender === IsUserLoggedIn._id
-                              ? "flex-end"
-                              : "flex-start",
-                          mb: 2,
-                        }}
-                      >
-                        <Paper
-                          elevation={1}
-                          sx={{
-                            p: 1,
-                            backgroundColor:
-                              msg.messages[0].sender === IsUserLoggedIn._id
-                                ? "secondary.light"
-                                : "primary.light",
-                            borderRadius: 2,
-                            maxWidth: "70%",
-                          }}
-                        >
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              wordBreak: "break-word",
-                              overflowWrap: "break-word",
-                            }}
-                          >
-                            {msg.messages[0].content}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              mt: 0.5,
-                              color: "text.secondary",
-                            }}
-                          >
-                            {new Date(msg.timestamp).toLocaleTimeString()}
-                          </Typography>
-                        </Paper>
-                      </Box>
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </Box>
-                </DialogContent>
-                <DialogActions>
-                  {selectedRoom === adminRoomId &&
-                  adminRoomId !== userRoomId ? (
-                    <Typography color="error">
-                      You are not authorized to send messages in the
-                      announcement room.
-                    </Typography>
-                  ) : (
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs>
-                        <TextField
-                          id="outlined-basic-email"
-                          label="Type Something"
-                          fullWidth
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === "Enter" ) {
-                              sendMessage();
-                            }
-                          }}
-                        />
-                      </Grid>
-                      <Grid item>
-                        <IconButton
-                          color="primary"
-                          onClick={sendMessage}
-                          disabled={!input.trim() && !isRoomSelected}
-                        >
-                          <SendIcon />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
-                  )}
-                </DialogActions>
-              </Dialog>
-            </Grid>
-          ) : (
-            <Grid item xs={12} sm={9}>
-              {IsUserLoggedIn ? (
-                <Paper
-                  elevation={3}
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
-                    {(selectedRoom === adminRoomId
-                      ? announcementMessages
-                      : messages
-                    ).map((msg, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: "flex",
-                          justifyContent:
-                            msg.messages[0].sender === IsUserLoggedIn._id
-                              ? "flex-end"
-                              : "flex-start",
-                          mb: 2,
-                        }}
-                      >
-                        <Paper
-                          elevation={1}
-                          sx={{
-                            p: 1,
-                            backgroundColor:
-                              msg.messages[0].sender === IsUserLoggedIn._id
-                                ? "secondary.light"
-                                : "primary.light",
-                            borderRadius: 2,
-                            maxWidth: "70%",
-                          }}
-                        >
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              wordBreak: "break-word",
-                              overflowWrap: "break-word",
-                            }}
-                          >
-                            {msg.messages[0].content}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              mt: 0.5,
-                              color: "text.secondary",
-                            }}
-                          >
-                            {new Date(msg.timestamp).toLocaleTimeString()}
-                          </Typography>
-                        </Paper>
-                      </Box>
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </Box>
+          <Typography variant="h6" color="primary">
+            {selectedRoom === adminRoomId ? "Announcements" : "Admin Chat"}
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-                  <Box sx={{ p: 2, backgroundColor: "background.paper" }}>
-                    {selectedRoom === adminRoomId &&
-                    adminRoomId !== userRoomId ? (
-                      <Typography color="error">
-                        You are not authorized to send messages in the
-                        announcement room.
-                      </Typography>
-                    ) : (
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs>
-                          <TextField
-                            id="outlined-basic-email"
-                            label="Type Something"
-                            fullWidth
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyPress={(e) => {
-                              if (e.key === "Enter") {
-                                sendMessage();
-                              }
-                            }}
-                          />
-                        </Grid>
-                        <Grid item>
-                          <IconButton
-                            color="primary"
-                            onClick={sendMessage }
-                            disabled={!input.trim() && !isRoomSelected}
-                          >
-                            <SendIcon />
-                          </IconButton>
-                        </Grid>
-                      </Grid>
-                    )}
-                  </Box>
-                </Paper>
-              ) : (
-                <Paper
-                  elevation={3}
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    p: 4,
-                  }}
-                >
-                  <Typography variant="h6" sx={{ mb: 2, color: "red" }}>
-                    Please{" "}
-                    <Link to="/login" style={{ color: "red" }}>
-                      Login
-                    </Link>{" "}
-                    to access the Query portal.
-                  </Typography>
-                </Paper>
-              )}
-            </Grid>
-          )}
-        </Grid>
-           <RoomSelectDialog
-          open={showRoomSelectDialog}
-          onClose={() => setShowRoomSelectDialog(false)}
-        />
+      <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
+        {(selectedRoom === adminRoomId ? announcementMessages : messages).map((msg, index) => (
+          <Box
+            key={index}
+            sx={{
+              display: "flex",
+              justifyContent: msg.messages[0].sender === IsUserLoggedIn._id ? "flex-end" : "flex-start",
+              mb: 2,
+            }}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                maxWidth: "70%",
+                bgcolor: msg.messages[0].sender === IsUserLoggedIn._id 
+                  ? "primary.light" 
+                  : "background.paper",
+                borderRadius: 2,
+                boxShadow: 1,
+              }}
+            >
+              <Typography variant="body1">
+                {msg.messages[0].content}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ display: "block", mt: 0.5 }}
+              >
+                {new Date(msg.timestamp).toLocaleTimeString()}
+              </Typography>
+            </Paper>
+          </Box>
+        ))}
+        <div ref={messagesEndRef} />
       </Box>
-    </ThemeProvider>
+
+      {selectedRoom !== adminRoomId || adminRoomId === userRoomId ? (
+        <Box sx={{ p: 2, bgcolor: "background.paper", borderTop: 1, borderColor: "divider" }}>
+      
+<ChatInput 
+  onSendMessage={(message) => {
+    setInput(message);
+    sendMessage(message);
+  }}
+  isRoomSelected={isRoomSelected}
+/>
+        </Box>
+      ) : (
+        <Box sx={{ p: 2, bgcolor: "background.paper", borderTop: 1, borderColor: "divider" }}>
+          <Typography color="error" align="center">
+            You cannot send messages in the announcement room
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
+
+  if (!IsUserLoggedIn) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "background.default"
+        }}
+      >
+        <Paper 
+          elevation={3}
+          sx={{
+            p: 4,
+            textAlign: "center",
+            maxWidth: 400,
+            mx: 2
+          }}
+        >
+          <Typography variant="h5" color="primary" gutterBottom>
+            Welcome to Query Portal
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph>
+            Please log in to access the chat features
+          </Typography>
+          <Link 
+            to="/login"
+            style={{
+              textDecoration: "none",
+              color: theme.palette.primary.main,
+              fontWeight: "bold"
+            }}
+          >
+            Login Now
+          </Link>
+        </Paper>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ height: "100vh", display: "flex" }}>
+      {isMobile ? (
+        <Drawer
+          variant="temporary"
+          open={drawerOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            "& .MuiDrawer-paper": { width: 240 },
+          }}
+        >
+          <ChatSidebar />
+        </Drawer>
+      ) : (
+        <Box sx={{ width: 300, flexShrink: 0 }}>
+          <ChatSidebar />
+        </Box>
+      )}
+      <Box sx={{ flexGrow: 1 }}>
+        <ChatContent />
+      </Box>
+    </Box>
   );
 };
 

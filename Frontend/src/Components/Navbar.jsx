@@ -93,7 +93,9 @@ function Navbar() {
     setUnseenMessageCount(0);
     setDrawerOpen(!drawerOpen);
   };
-
+  const handleUnseenMessage = () => {
+   setUnseenMessageCount(0);
+}
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -197,6 +199,7 @@ function Navbar() {
                 invisible={!page.showBadge || unseenMessageCount === 0}
               >
                 <Button
+                  onClick={handleUnseenMessage}
                   component={Link}
                   to={page.link}
                   sx={{
