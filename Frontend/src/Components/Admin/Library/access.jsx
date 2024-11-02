@@ -19,7 +19,7 @@ import {
 } from '@mui/icons-material';
 import { verifyLibraryAccess } from '../../../services/Admin_services/employeeAccess';
 
-// Styled components
+// Styled components remain the same
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
     borderRadius: 16,
@@ -43,18 +43,13 @@ const LoadingButton = styled(Button)(({ theme }) => ({
   minWidth: 120,
 }));
 
-export const LibraryAccessDialog = ({ open, onSuccess, onClose, adminId, isUserLoggedIn }) => {
+export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // If user already has library access, don't show the dialog
-  if (isUserLoggedIn?.libraryDetails?.libraryAccess) {
-    return null;
-  }
 
   const handleChange = (e) => {
     setFormData({
@@ -71,7 +66,6 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose, adminId, isUserL
 
     try {
       const response = await verifyLibraryAccess(
-        adminId, 
         formData.email, 
         formData.password,
       );
@@ -79,6 +73,8 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose, adminId, isUserL
       console.log(response, "response");
       setLoading(false);
       onSuccess();
+      // Add window reload after successful verification
+      window.location.reload();
     } catch (error) {
       setLoading(false);
       if (error.response) {

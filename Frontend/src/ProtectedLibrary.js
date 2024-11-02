@@ -1,25 +1,55 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { AdminContext } from "./App";
+import { LibraryAccessDialog } from "./Components/Admin/Library/access";
 
 const ProtectedLibrary = ({ children }) => {
     const { IsUserLoggedIn } = useContext(AdminContext);
-    if (IsUserLoggedIn?.role === "superAdmin") return children
-    // Check if user is logged in
+    const [isDialogOpen, setDialogOpen] = useState(false);
+
+    const hasLibraryPermission = IsUserLoggedIn?.currentUser?.permissions.includes("library");
+    const isEmployee = IsUserLoggedIn?.role === "employee";
+    const isSuperAdmin = IsUserLoggedIn?.role === "superAdmin";
+console.log(IsUserLoggedIn,"user",hasLibraryPermission)
+    useEffect(() => {
+        if (!hasLibraryPermission ) {
+            setDialogOpen(true);
+        } else {
+            setDialogOpen(false);
+        }
+    }, [hasLibraryPermission, isEmployee]);
+
+    // Handle dialog success
+    const handleDialogSuccess = () => {
+        setDialogOpen(false);
+        // Additional permission update logic if needed
+    };
+
+    // Early returns after hooks
+    if (isSuperAdmin) return children;
+
     if (!IsUserLoggedIn || IsUserLoggedIn?.role === "user") {
         return <Navigate to="/login" replace />;
     }
 
-console.log(IsUserLoggedIn,"isuserloggedin")
-    // Check if user has library permission
-    const hasLibraryPermission = IsUserLoggedIn?.libraryDetails?.libraryAccess === true;
-
-
-    // Check if user is employee/admin and has library permission
-    if (!hasLibraryPermission) {
-        return <Navigate to="/admin_home" replace />;
+    // If has permission, return children directly without dialog
+    if (hasLibraryPermission && isEmployee) {
+        return children;
     }
 
-    return children;
+    return (
+        <>
+            {isDialogOpen && (
+                <LibraryAccessDialog
+                    open={isDialogOpen}
+                    onSuccess={handleDialogSuccess}
+                    onClose={() => setDialogOpen(false)}
+                    isUserLoggedIn={IsUserLoggedIn}
+                />
+            )}
+            {!isDialogOpen && hasLibraryPermission && children}
+        </>
+    );
 };
-export default ProtectedLibrary
+
+export default ProtectedLibrary;

@@ -13,13 +13,13 @@ const axiosInstance = axios.create({
         "Content-Type": "application/json",
     },
 });
-export async function verifyLibraryAccess(adminId, email, password) {
+export async function verifyLibraryAccess( email, password) {
     try {
-        const response = await axiosInstance.post(`/admin/verifyRoleForLibrary/${adminId}`, {
+        const response = await axiosInstance.post(`/admin/verifyRoleForLibrary`, {
             email,
             password
         });
-
+console.log(response.data,"data")
         // Return response data if the request is successful
         return response.data;
     } catch (error) {

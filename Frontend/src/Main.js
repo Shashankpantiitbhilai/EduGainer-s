@@ -165,9 +165,9 @@ const Main = () => {
                 <Route
                     path="/admin_Library"
                     element={
-                        <ProtectedAdmin>
+                        <ProtectedLibrary>
                             <AdminLibrary />
-                        </ProtectedAdmin>
+                        </ProtectedLibrary>
                     }
                 />
                 <Route
