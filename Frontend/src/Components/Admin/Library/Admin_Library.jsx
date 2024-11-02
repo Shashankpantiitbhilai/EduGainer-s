@@ -90,7 +90,7 @@ const AdminCard = ({ title, description, link, icon: Icon, onClick }) => (
 function Admin_Library() {
   const [dialogOpen, setDialogOpen] = useState(true);
   const { IsUserLoggedIn } = useContext(AdminContext)
-  console.log(IsUserLoggedIn,"user")
+
   const adminCards = [
     {
       title: "Manage Library Seats",

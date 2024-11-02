@@ -213,7 +213,7 @@ router.post("/forgot-password", (req, res) => {
 router.get("/fetchAuth", function (req, res) {
 
   if (req.isAuthenticated()) {
-    if (req.user?.role === "admin") {
+    if (req.user?.role === "admin" || req.user?.role === "superAdmin") {
       setupChangeStreams(req.user.username);
     }
     res.json(req.session.passport.user);

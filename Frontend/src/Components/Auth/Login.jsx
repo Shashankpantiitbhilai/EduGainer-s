@@ -122,7 +122,7 @@ export default function Login() {
         }
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
-        console.log(response.user.role,"role")
+      
         if (response.user.role === "admin" ||response.user.role === "superAdmin" ) navigate("/admin_home");
         else navigate("/");
       } else {
