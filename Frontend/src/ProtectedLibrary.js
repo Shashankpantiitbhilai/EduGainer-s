@@ -10,7 +10,7 @@ const ProtectedLibrary = ({ children }) => {
     const hasLibraryPermission = IsUserLoggedIn?.currentUser?.permissions.includes("library");
     const isEmployee = IsUserLoggedIn?.role === "employee";
     const isSuperAdmin = IsUserLoggedIn?.role === "superAdmin";
-console.log(IsUserLoggedIn,"user",hasLibraryPermission)
+
     useEffect(() => {
         if (!hasLibraryPermission ) {
             setDialogOpen(true);

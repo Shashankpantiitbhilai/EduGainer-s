@@ -11,6 +11,8 @@ import {
   Box,
   Typography,
   IconButton,
+  Paper,
+  Divider,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
@@ -18,16 +20,29 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { verifyLibraryAccess } from '../../../services/Admin_services/employeeAccess';
+import logo from "../../../images/logo.jpg";
 
-// Styled components remain the same
+// Styled components with enhanced styling
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
-    borderRadius: 16,
+    borderRadius: 20,
     padding: theme.spacing(2),
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
   },
 }));
 
-const IconContainer = styled(Box)(({ theme }) => ({
+const LogoContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  marginBottom: theme.spacing(2),
+  '& img': {
+    height: 60,
+    objectFit: 'contain',
+  },
+}));
+
+const IconContainer = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.primary.light,
   borderRadius: '50%',
   padding: theme.spacing(2),
@@ -35,15 +50,36 @@ const IconContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   margin: '0 auto',
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  width: 64,
+  height: 64,
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
 }));
 
 const LoadingButton = styled(Button)(({ theme }) => ({
   position: 'relative',
-  minWidth: 120,
+  minWidth: 140,
+  height: 48,
+  borderRadius: 24,
+  textTransform: 'none',
+  fontSize: '1rem',
+  fontWeight: 600,
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  '&:hover': {
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
+  },
 }));
 
-export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 12,
+    '&:hover fieldset': {
+      borderColor: theme.palette.primary.main,
+    },
+  },
+}));
+
+export const LibraryAccessDialog = ({ open, onSuccess, onClose }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -69,30 +105,28 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
         formData.email, 
         formData.password,
       );
-       
-      console.log(response, "response");
+      
       setLoading(false);
       onSuccess();
-      // Add window reload after successful verification
       window.location.reload();
     } catch (error) {
       setLoading(false);
       if (error.response) {
         switch (error.response.status) {
           case 404:
-            setError('User not found');
+            setError('User not found. Please check your credentials.');
             break;
           case 401:
-            setError('Invalid email or password');
+            setError('Invalid email or password. Please try again.');
             break;
           case 403:
-            setError('You do not have permission to access the library');
+            setError('You do not have permission to access the EduGainer library.');
             break;
           default:
-            setError('An error occurred. Please try again');
+            setError('An error occurred. Please try again later.');
         }
       } else {
-        setError('Network error. Please check your connection');
+        setError('Network error. Please check your internet connection.');
       }
     }
   };
@@ -103,6 +137,9 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
       onClose={loading ? undefined : onClose}
       maxWidth="sm"
       fullWidth
+      PaperProps={{
+        elevation: 0,
+      }}
     >
       <Box sx={{ position: 'relative' }}>
         <IconButton
@@ -110,6 +147,10 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
             position: 'absolute',
             right: 8,
             top: 8,
+            bgcolor: 'grey.100',
+            '&:hover': {
+              bgcolor: 'grey.200',
+            },
           }}
           onClick={onClose}
           disabled={loading}
@@ -117,38 +158,58 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
           <CloseIcon />
         </IconButton>
 
-        <DialogTitle sx={{ textAlign: 'center', mt: 2 }}>
-          <IconContainer>
+        <DialogTitle sx={{ textAlign: 'center', mt: 1 }}>
+          <LogoContainer>
+            <img src={logo} alt="EduGainer Logo" />
+          </LogoContainer>
+          <IconContainer elevation={2}>
             <LockIcon color="primary" sx={{ fontSize: 32 }} />
           </IconContainer>
-          <Typography variant="h5" component="div" fontWeight="bold">
-            Library Access Verification
+          <Typography variant="h5" component="div" fontWeight="bold" color="primary">
+            EduGainer Library Access
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Please verify your credentials to access the library
           </Typography>
         </DialogTitle>
+
+        <Divider sx={{ my: 2 }} />
 
         <form onSubmit={handleSubmit}>
           <DialogContent sx={{ pt: 2 }}>
             {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  mb: 3,
+                  borderRadius: 2,
+                  '& .MuiAlert-icon': {
+                    fontSize: 24
+                  }
+                }}
+              >
                 {error}
               </Alert>
             )}
 
-            <TextField
+            <StyledTextField
               autoFocus
               required
               fullWidth
-              label="Email"
+              label="Email Address"
               name="email"
               type="email"
               value={formData.email}
               onChange={handleChange}
               disabled={loading}
-              sx={{ mb: 2 }}
-              variant="outlined"
+              sx={{ mb: 3 }}
+              placeholder="Enter your email"
+              InputProps={{
+                sx: { height: 56 }
+              }}
             />
 
-            <TextField
+            <StyledTextField
               required
               fullWidth
               label="Password"
@@ -157,16 +218,25 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
               value={formData.password}
               onChange={handleChange}
               disabled={loading}
-              variant="outlined"
+              placeholder="Enter your password"
+              InputProps={{
+                sx: { height: 56 }
+              }}
             />
           </DialogContent>
 
-          <DialogActions sx={{ p: 3, justifyContent: 'center' }}>
+          <DialogActions sx={{ p: 3, justifyContent: 'center', gap: 2 }}>
             <Button
               variant="outlined"
               onClick={onClose}
               disabled={loading}
-              sx={{ minWidth: 100 }}
+              sx={{ 
+                minWidth: 140,
+                height: 48,
+                borderRadius: 24,
+                textTransform: 'none',
+                fontSize: '1rem',
+              }}
             >
               Cancel
             </Button>
@@ -177,7 +247,7 @@ export const LibraryAccessDialog = ({ open, onSuccess, onClose}) => {
             >
               {loading ? (
                 <>
-                  <CircularProgress size={20} sx={{ mr: 1 }} />
+                  <CircularProgress size={24} sx={{ mr: 1 }} />
                   Verifying...
                 </>
               ) : (
