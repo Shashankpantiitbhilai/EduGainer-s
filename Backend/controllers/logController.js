@@ -10,7 +10,7 @@ const fetchLogs = async (req, res) => {
     try {
         
         // Check if user is authenticated and is an admin
-        if (!req.isAuthenticated() || req.user.role !== 'admin') {
+        if (!req.isAuthenticated() ) {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
