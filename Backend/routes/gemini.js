@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const geminiController = require("../controllers/ai/chatbot");
-
+const audioController = require("../controllers/ai/audioController");
 // Configure multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -32,9 +32,10 @@ const upload = multer({
     }
 });
 
+const upload1 = multer({ storage: multer.memoryStorage() });
 // Route for text-based chat
 router.post("/chatbot", geminiController.getGeminiResponse);
-
+router.post("/chatbot/processAudio", upload1.single('audio'), audioController.handler);
 // Route for file upload and processing
 router.post("/chatbot/file",
     upload.single('file'), // 'file' is the field name in form-data

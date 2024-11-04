@@ -13,6 +13,7 @@ const routes_admin_classes = require("./routes/admin_classes");
 const gemini = require("./routes/gemini");
 const routes_db_event = require("./routes/eventLogs");
 const routes_vision = require("./routes/vision");
+const routes_translate = require("./routes/translation");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const { connectDB } = require("./db");
@@ -106,7 +107,7 @@ app.use("/db-events", routes_db_event)
 // Import vision route
 app.use("/vision", routes_vision); // Register vision route
  // Import vision route
-app.use("/vision", routes_vision); // Register vision route
+app.use("/translate",routes_translate) // Register vision route
 
 // Pass Socket.IO instance to chat routes
 app.use("/chat", routes_chat(io));
