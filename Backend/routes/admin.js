@@ -25,5 +25,5 @@ router.post('/addUser/:adminId', adminController.addUser);
 
 // Route to delete a user by ID
 router.delete('/deleteUser/:id', adminController.deleteUser);
-router.post('/verifyRoleForLibrary/:adminId', adminController.verifyRoleForLibrary);
+router.post('/verifyRoleForLibrary', adminController.verifyRoleForLibrary);
 module.exports = router;

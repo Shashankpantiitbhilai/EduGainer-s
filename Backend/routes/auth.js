@@ -211,16 +211,34 @@ router.post("/forgot-password", (req, res) => {
     });
 });
 router.get("/fetchAuth", function (req, res) {
+ 
+
+  console.log("Session:", req.session?.passport?.user);
 
   if (req.isAuthenticated()) {
-    if (req.user?.role === "admin" || req.user?.role === "superAdmin") {
-      setupChangeStreams(req.user.username);
+    // Get current user from session, fallback to req.user if needed
+    const user = req.session?.passport?.user;
+
+    // Initialize currentUser object if it doesn't exist
+    if (!user.currentUser) {
+      user.currentUser = {
+        username: user.username, // Default to main user's username
+        role: user.role || 'admin', // Default role
+        permissions: user.permissions || [] // Default permissions
+      };
     }
-    res.json(req.session.passport.user);
+
+
+    if (user.currentUser?.role === "admin" || user.currentUser?.role === "superAdmin" || user.currentUser?.role==="employee") {
+      setupChangeStreams(user.currentUser.username);
+    }
+
+    res.json(req.session?.passport?.user);
   } else {
     res.json(null);
   }
 });
+
 
 // Local Authentication
 router.post("/login", passport.authenticate("local"), async (req, res) => {

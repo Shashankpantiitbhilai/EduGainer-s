@@ -21,7 +21,7 @@ import {
   ArrowForward as ArrowForwardIcon,
   Info as InfoIcon,
 } from "@mui/icons-material";
-import { LibraryAccessDialog } from "./access"; // Adjust the path as necessary
+ // Adjust the path as necessary
 import { AdminContext } from "../../../App";
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
@@ -89,7 +89,7 @@ const AdminCard = ({ title, description, link, icon: Icon, onClick }) => (
 
 function Admin_Library() {
   const [dialogOpen, setDialogOpen] = useState(true);
-  const { IsUserLoggedIn } = useContext(AdminContext)
+  
 
   const adminCards = [
     {
@@ -120,15 +120,9 @@ function Admin_Library() {
     },
   ];
 
-  const handleDialogSuccess = () => {
-    
-    setDialogOpen(false);
-    // Handle success logic (e.g., refresh data)
-  };
+ 
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
+  
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -161,13 +155,7 @@ function Admin_Library() {
       </Grid>
 
       {/* Library Access Dialog */}
-      {IsUserLoggedIn.role !== "superAdmin" && <LibraryAccessDialog
-        open={dialogOpen}
-        onSuccess={handleDialogSuccess}
-        onClose={handleDialogClose}
-        adminId={IsUserLoggedIn?._id}
-        isUserLoggedIn={IsUserLoggedIn}// Pass the actual admin ID
-      />}
+    
     </Container>
   );
 }

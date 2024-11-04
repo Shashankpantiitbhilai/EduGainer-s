@@ -40,6 +40,7 @@ import Classes from "./Components/Admin/classes/batches.jsx"
 import ClassSuccess from "./Components/Classes/Success.jsx"
 import ProtectedLibrary from "./ProtectedLibrary.js"
 import ProtectedSuperAdmin from "./ProtectedSuperAdmin.js";
+import VisionUploader from "./Components/vision/camera.jsx";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -165,9 +166,9 @@ const Main = () => {
                 <Route
                     path="/admin_Library"
                     element={
-                        <ProtectedAdmin>
+                        <ProtectedLibrary>
                             <AdminLibrary />
-                        </ProtectedAdmin>
+                        </ProtectedLibrary>
                     }
                 />
                 <Route
@@ -234,6 +235,15 @@ const Main = () => {
 
                     }
                 />
+                <Route
+                    path="/admin/vision/uploader"
+                    element={
+                        <ProtectedAdmin>
+                            <VisionUploader/>
+                        </ProtectedAdmin>
+                    }
+                />
+
 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

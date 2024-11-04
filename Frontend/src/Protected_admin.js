@@ -6,9 +6,9 @@ import { AdminContext } from "./App";
 
 const Protected_Admin = ({ children }) => {
     const { IsUserLoggedIn } = useContext(AdminContext);
-   
-    if (IsUserLoggedIn?.role === "superAdmin")return children
-   if (!IsUserLoggedIn || IsUserLoggedIn?.role === "user") {
+ console.log(IsUserLoggedIn,"userloggedin")
+    if (IsUserLoggedIn?.role === "superAdmin") return children
+    if (!IsUserLoggedIn || IsUserLoggedIn?.role === "user") {
         return <Navigate to="/login" replace />;
     }
 

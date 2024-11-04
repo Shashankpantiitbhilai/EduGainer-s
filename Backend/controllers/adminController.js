@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const editUserById = async (req, res) => {
     const { id } = req.params// Assuming shift is sent in the request body
-    console.log(id,req.body.data)
+
     try {
         // Query database to find admins based on the shift
 
@@ -279,12 +279,13 @@ const fetchAllSiteUsers = async (req, res) => {
 const addUser = async (req, res) => {
     const { email, password, firstName, lastName, role, permissions } = req.body;
     const adminId = req.params.adminId; // ID of the admin document to update
-    console.log(req.body,adminId);
+  
 
     try {
         // Check if user already exists
         const existingUser = await User.findOne({ username: email });
         if (existingUser) {
+            console.log("User already exists with this email:", email);
             return res.status(400).json({ error: 'User already exists with this email.' });
         }
 
@@ -299,21 +300,38 @@ const addUser = async (req, res) => {
             permissions // Assign permissions array directly
         });
 
-        // Use passport-local-mongoose's method to register the user with password
+        // Register the new user with the provided password
         await User.register(newUser, password);
+      
+
+        // Check if the admin exists
+        const adminUser = await User.findById(adminId);
+        if (!adminUser) {
+            console.log("Admin not found with ID:", adminId);
+            return res.status(404).json({ error: 'Admin account not found.' });
+        }
 
         // Add the new user's _id to the refAccounts array of the specified admin
-        await User.findByIdAndUpdate(adminId, { $push: { refAccounts: newUser._id } });
+        const updatedAdmin = await User.findByIdAndUpdate(
+            adminId,
+            { $push: { refAccounts: newUser._id } },
+            { new: true } // Return the updated document
+        );
+        console.log("Updated Admin's refAccounts:", updatedAdmin.refAccounts);
 
-        res.status(201).json({ message: 'User registered successfully and linked to admin.', user: newUser });
+        res.status(201).json({
+            message: 'User registered successfully and linked to admin.',
+            user: newUser
+        });
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
 
+
 const deleteUser = async (req, res) => {
-    const { id } = req.params; // Assuming you are passing user ID in params
+    const { id } = req.params; // User ID to be deleted
 
     try {
         // Find and delete the user by ID
@@ -321,16 +339,35 @@ const deleteUser = async (req, res) => {
         if (!deletedUser) {
             return res.status(404).json({ error: 'User not found.' });
         }
-        res.status(200).json({ message: 'User deleted successfully.', user: deletedUser });
+
+        // Remove the deleted user from the admin's refAccounts array
+        const adminId = process.env.adminId;
+        const updatedAdmin = await User.findByIdAndUpdate(
+            adminId,
+            { $pull: { refAccounts: id } },
+            { new: true } // Return the updated document
+        );
+
+        // Check if the admin update was successful
+        if (!updatedAdmin) {
+            console.warn("Admin not found with ID:", adminId);
+            return res.status(404).json({ error: 'Admin account not found.' });
+        }
+
+        res.status(200).json({
+            message: 'User deleted successfully and removed from admin’s refAccounts.',
+            user: deletedUser
+        });
     } catch (error) {
         console.error("Error deleting user:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
 const verifyRoleForLibrary = async (req, res) => {
     const { email, password } = req.body;
-    const adminId = req.params.adminId;
-
+    const adminId =process.env.adminId;
+console.log(req.body)
     try {
         // Find the user by username (email)
         const user = await User.findOne({ username: email });
@@ -342,6 +379,7 @@ const verifyRoleForLibrary = async (req, res) => {
         // Use passport-local-mongoose's authenticate method properly
         return new Promise((resolve, reject) => {
             user.authenticate(password, (err, authenticatedUser, passwordError) => {
+                console.log(authenticatedUser,"auth")
                 if (err) {
                     console.error("Authentication error:", err);
                     return res.status(500).json({ error: 'Authentication error occurred.' });
@@ -357,9 +395,11 @@ const verifyRoleForLibrary = async (req, res) => {
 
                 // Check role and permissions
                 const hasRequiredRole = authenticatedUser.role === "employee";
+            
                 const hasLibraryPermission = authenticatedUser.permissions.includes("library");
 
                 if (!hasRequiredRole || !hasLibraryPermission) {
+                    console.log("error")
                     return res.status(403).json({
                         error: 'User does not have required library access permissions.',
                         details: {
@@ -381,6 +421,7 @@ const verifyRoleForLibrary = async (req, res) => {
                         );
 
                         if (!isInAdminSubAccounts) {
+                           
                             return res.status(403).json({
                                 error: 'User is not associated with the specified admin account.'
                             });
@@ -391,14 +432,13 @@ const verifyRoleForLibrary = async (req, res) => {
                             req.session.passport = {};
                         }
 
-                        // Add new fields to existing passport user object while preserving existing data
+                        // Store only currentUser with email and permissions
                         req.session.passport.user = {
                             ...req.session.passport.user, // Preserve existing fields
-                            libraryDetails: {  // New fields in nested object
-                                libraryAccess: true,
-                                role: authenticatedUser.role,
+                            currentUser: {  // Only store email and permissions
+                               username: authenticatedUser.username,
                                 permissions: authenticatedUser.permissions,
-                                email: authenticatedUser.username
+                                role:"employee"
                             }
                         };
 
@@ -408,8 +448,7 @@ const verifyRoleForLibrary = async (req, res) => {
                                 console.error("Session save error:", err);
                                 return res.status(500).json({ error: 'Error saving session.' });
                             }
-
-                           
+console.log(req.session.passport.user.currentUser,"curr")
                             return res.status(200).json({
                                 message: 'User verified successfully with library access.',
                                 user: req.session.passport.user
@@ -428,6 +467,7 @@ const verifyRoleForLibrary = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
 // Export controller functions
 module.exports = {
     addLibStudent,

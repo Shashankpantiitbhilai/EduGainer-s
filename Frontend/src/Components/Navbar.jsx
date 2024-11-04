@@ -116,7 +116,9 @@ function Navbar() {
           { name: "MeriStationary", link: "/stationary/home" },
           { name: "Events", link: "/admin/add-event" },
           { name: "Privacy", link: "/Policies" },
-          { name: "Credits", link: "/credits" },
+        { name: "Credits", link: "/credits" },
+        { name: "Vision-Beta", link: "/admin/vision/uploader" },
+         
         ]
       : [
           { name: "Library", link: "/library" },
