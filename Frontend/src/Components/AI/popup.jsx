@@ -42,6 +42,10 @@ import {
   ContentCopy as CopyIcon,
 } from "@mui/icons-material";
 // ... (keep existing imports)
+import AudioInput from './mic';
+
+// In the ChatPopup component, add the handleAudioInput function
+
 const MessageActions = styled(Box)(({ theme, sender }) => ({
   display: "flex",
   gap: "2px",
@@ -409,6 +413,7 @@ const ChatPopup = () => {
 
   const handleSend = async () => {
     if (input.trim()) {
+      console.log("YO")
       const userMessage = input.trim();
       setInput("");
       setSuggestedQuestions([]);
@@ -534,7 +539,13 @@ const ChatPopup = () => {
       setSelectedFile(file);
     }
   };
-
+const handleAudioInput = (text) => {
+  if (text.trim()) {
+    setInput(text);
+    console.log("send")
+    handleSend();
+  }
+};
   const handleFileClear = () => {
     setSelectedFile(null);
     setUploadProgress(0);
@@ -955,6 +966,7 @@ const ChatPopup = () => {
             zIndex: 2,
           }}
         >
+      
           {selectedFile && (
             <FileUploadPreview>
               <Typography noWrap sx={{ flex: 1 }}>
@@ -1013,7 +1025,7 @@ const ChatPopup = () => {
                 },
               }}
             />
-
+     <AudioInput onInputReceived={handleAudioInput} />
             <Box sx={{ display: "flex", gap: 0.5 }}>
               <IconButton
                 color="primary"

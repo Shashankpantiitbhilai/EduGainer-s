@@ -2,7 +2,7 @@
 
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AdminContext } from "./App";
+import { AdminContext } from "../App";
 
 const Protected_Admin = ({ children }) => {
     const { IsUserLoggedIn } = useContext(AdminContext);

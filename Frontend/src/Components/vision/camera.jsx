@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { 
   Button, 
   Typography, 
@@ -12,8 +11,6 @@ import {
   Chip,
   Card,
   CardContent,
-  Switch,
-  FormControlLabel,
   Tooltip,
   Fade,
   Backdrop
@@ -21,17 +18,13 @@ import {
 import { 
   Camera, 
   FlipCameraIos, 
-  Lightbulb, 
-  LightbulbOutlined,
   CheckCircle,
   Warning 
 } from '@mui/icons-material';
 import { analyzeImage } from '../../services/vision/auth';
 
-const CameraVisionUploader = () => {
+const EduGainerFaceRecognition = () => {
   const theme = useTheme();
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [isDarkMode, setIsDarkMode] = useState(prefersDarkMode);
   const [loading, setLoading] = useState(false);
   const [labels, setLabels] = useState([]);
   const [error, setError] = useState("");
@@ -45,11 +38,11 @@ const CameraVisionUploader = () => {
 
   // Theme configuration
   const themeColors = {
-    primary: isDarkMode ? '#4caf50' : '#2e7d32', // Green shades
-    secondary: isDarkMode ? '#ff9800' : '#f57c00', // Orange shades
-    background: isDarkMode ? '#1a1a1a' : '#ffffff',
-    paper: isDarkMode ? '#2d2d2d' : '#f5f5f5',
-    text: isDarkMode ? '#ffffff' : '#000000'
+    primary: theme.palette.primary.main, // Use app theme primary color
+    secondary: theme.palette.secondary.main, // Use app theme secondary color
+    background: theme.palette.background.default,
+    paper: theme.palette.background.paper,
+    text: theme.palette.text.primary
   };
 
   useEffect(() => {
@@ -130,8 +123,7 @@ const CameraVisionUploader = () => {
         gap: 2, 
         mt: 4,
         backgroundColor: themeColors.background,
-        minHeight: '100vh',
-        transition: 'background-color 0.3s ease'
+        minHeight: '100vh'
       }}
     >
       <Paper 
@@ -140,29 +132,15 @@ const CameraVisionUploader = () => {
           padding: 4, 
           borderRadius: 3, 
           textAlign: 'center', 
-          maxWidth: '600px', 
+          maxWidth: '800px', 
           width: '100%',
           backgroundColor: themeColors.paper,
-          color: themeColors.text,
-          transition: 'all 0.3s ease'
+          color: themeColors.text
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, color: themeColors.primary }}>
-            Face Recognition System
-          </Typography>
-          <FormControlLabel
-            control={
-              <Switch 
-                checked={isDarkMode}
-                onChange={() => setIsDarkMode(!isDarkMode)}
-                icon={<LightbulbOutlined />}
-                checkedIcon={<Lightbulb />}
-              />
-            }
-            label={isDarkMode ? "Dark Mode" : "Light Mode"}
-          />
-        </Box>
+        <Typography variant="h4" sx={{ fontWeight: 600, color: themeColors.primary, mb: 2 }}>
+          Edugainer Face Recognition System
+        </Typography>
 
         <Card 
           elevation={3} 
@@ -277,7 +255,7 @@ const CameraVisionUploader = () => {
 
         {!loading && labels.length > 0 && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" sx={{ color: themeColors.primary, mb: 2 }}>
+            <Typography variant="h5" sx={{ color: themeColors.primary, mb: 2 }}>
               Recognition Results
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
@@ -303,4 +281,4 @@ const CameraVisionUploader = () => {
   );
 };
 
-export default CameraVisionUploader;
+export default EduGainerFaceRecognition;

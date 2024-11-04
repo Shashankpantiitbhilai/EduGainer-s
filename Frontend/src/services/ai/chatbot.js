@@ -105,3 +105,24 @@ function formatError(error) {
         return error;
     }
 }
+
+export async function processAudioInput(audioBlob) {
+    try {
+        // Create FormData and append the audio blob with proper filename
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.webm');
+
+        // Set proper headers for multipart/form-data
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        };
+
+        const response = await axiosFileInstance.post('/gemini/chatbot/processAudio', formData, config);
+        return response.data;
+    } catch (error) {
+        console.error("Error processing audio:", error);
+        throw formatError(error);
+    }
+}

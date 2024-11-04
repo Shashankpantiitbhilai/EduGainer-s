@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { AdminContext } from "./App";
-import { LibraryAccessDialog } from "./Components/Admin/Library/access";
+import { AdminContext } from "../App";
+import { LibraryAccessDialog } from "../Components/Admin/Library/access";
 
 const ProtectedLibrary = ({ children }) => {
     const { IsUserLoggedIn } = useContext(AdminContext);

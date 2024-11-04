@@ -1,7 +1,7 @@
 // ProtectedRoute.js
 import React,{useContext} from 'react';
 import { Navigate } from 'react-router-dom';
-import { AdminContext } from './App';
+import { AdminContext } from '../App';
 // hypothetical Auth Context for role management
 
 const ProtectedRoute = ({ role, children }) => {

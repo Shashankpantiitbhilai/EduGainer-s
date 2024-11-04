@@ -10,9 +10,9 @@ import ResetPassword from "./Components/Auth/Reset-Password.jsx";
 import Library from "./Components/Library/Library.jsx";
 import NewReg from "./Components/Library/New-Reg.jsx";
 import Success from "./Components/Library/Success.jsx";
-import ProtectedUser from "./Protected_user.js";
+import ProtectedUser from "./Protection/Protected_user.js";
 
-import ProtectedAdmin from "./Protected_admin.js";
+import ProtectedAdmin from "./Protection/Protected_admin.js";
 import Navbar from "./Components/Navbar.jsx";
 import Dashboard from "./Components/User/dashboard.jsx";
 import Profile from "./Components/User/Profile.jsx";
@@ -38,8 +38,8 @@ import Pamplette from "./Components/Admin/pamplette.jsx";
 import Credits from "./Components/credits.jsx"
 import Classes from "./Components/Admin/classes/batches.jsx"
 import ClassSuccess from "./Components/Classes/Success.jsx"
-import ProtectedLibrary from "./ProtectedLibrary.js"
-import ProtectedSuperAdmin from "./ProtectedSuperAdmin.js";
+import ProtectedLibrary from "./Protection/ProtectedLibrary.js"
+import ProtectedSuperAdmin from "./Protection/ProtectedSuperAdmin.js";
 import VisionUploader from "./Components/vision/camera.jsx";
 const Main = () => {
     const location = useLocation();
