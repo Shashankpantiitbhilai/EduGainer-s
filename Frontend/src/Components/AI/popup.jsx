@@ -31,7 +31,7 @@ import {
   PersonAdd as SignUpIcon,
 } from "@mui/icons-material";
 import { lightTheme } from "../../theme";
-
+import robotIcon from "../../images/AI-chatbot.jpg";
 import { AdminContext } from "../../App";
 import SoundControl from './soundMode';
 import {defaultQuestions} from "./FAQ"// Existing styled components remain the same...
