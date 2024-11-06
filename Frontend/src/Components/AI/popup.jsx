@@ -75,6 +75,7 @@ const ChatPopup = () => {
 
   const handleLanguageChange = (languageCode) => {
     setCurrentLanguage(languageCode);
+    setShowDefaultQuestions(true)
     // Add language change logic here
     // You might want to update the UI text and potentially reload messages
   };
