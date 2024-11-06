@@ -79,7 +79,7 @@ export const fetchLibResources = async (data) => {
 };
 export async function addStudentData(data) {
     try {
-        console.log(data,"kkkkkk")
+        
         const response = await axiosInstance.post("/admin/addStudentData", data);
 
         return response.data;

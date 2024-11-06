@@ -10,6 +10,7 @@ const routes_chat = require("./routes/chat");
 const routes_library = require("./routes/Library");
 const routes_admin_library = require("./routes/admin_lib");
 const routes_admin_classes = require("./routes/admin_classes");
+const routes_admin_team = require("./routes/admin/Manage-Teams");
 const gemini = require("./routes/gemini");
 const routes_db_event = require("./routes/eventLogs");
 const routes_vision = require("./routes/vision");
@@ -104,6 +105,7 @@ app.use("/admin_event", routes_admin_events);
 app.use("/admin_classes", routes_admin_classes);
 app.use("/gemini", gemini);
 app.use("/db-events", routes_db_event)
+app.use("/admin/team", routes_admin_team)
 // Import vision route
 app.use("/vision", routes_vision); // Register vision route
  // Import vision route

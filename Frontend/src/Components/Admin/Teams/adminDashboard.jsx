@@ -57,7 +57,7 @@ import {
 } from "recharts";
 import { fetchAllSiteUsers } from "../../../services/Admin_services/adminUtils";
 import { editUserById } from "../../../services/adminDashboard/utils";
-import TeamManagement from "./TeamMember"
+import TeamManagement from "./TeamManagement"
 // Enhanced sample data for charts
 const trafficData = [
   { name: "Jan", pageViews: 4000, uniqueVisitors: 2400, avgTimeOnSite: 120 },

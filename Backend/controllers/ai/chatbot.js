@@ -2,12 +2,15 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { GoogleAIFileManager } = require('@google/generative-ai/server');
 const path = require('path');
 const fs = require('fs').promises;
+const { TranslationServiceClient } = require('@google-cloud/translate');
+const translationClient = new TranslationServiceClient();
 
 // Initialize the Google Generative AI with your API key
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 const fileManager = new GoogleAIFileManager(apiKey);
-
+  // Typically 'global' is used unless specified otherwise.
+const {translateText}=require("./googleApi/translate-api")
 // Common generation config
 const generationConfig = {
     temperature: 0.7,  // Lower temperature to reduce randomness
@@ -16,10 +19,15 @@ const generationConfig = {
     maxOutputTokens: 1024,
     responseMimeType: 'text/plain',
 };
+
+
 const getGeminiResponse = async (req, res) => {
     try {
         const { input } = req.body;
+        const { language, soundMode } = req.params;
 
+        // Adjust the language if necessary (only supporting English and Hindi for now)
+        const promptLanguage = language;
         // Session-based history to maintain conversation context
         const sessionHistory = req.session.history || [];
         sessionHistory.push({ user: input });
@@ -28,10 +36,13 @@ const getGeminiResponse = async (req, res) => {
 
         // Fetch response strictly related to EduGainer
         const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
-            sessionHistory,
+            sessionHistory, language: promptLanguage
         });
+        const translatedResponse = await translateText([responseText], language);
+        const translatedQuestions = await translateText(followUpQuestions, language);
 
-        res.json({ response: responseText, followUpQuestions, link });
+        res.json({ response: translatedResponse[0], followUpQuestions: translatedQuestions, link });
+     
     } catch (error) {
         console.error('Error in text processing:', error);
 
@@ -54,7 +65,8 @@ const extractLink = (text) => {
 
 
 // Adjusted function to generate responses strictly related to EduGainer
-const fetchGeminiTextResponse = async (input, { sessionHistory }) => {
+const fetchGeminiTextResponse = async (input, { sessionHistory,language }) => {
+    console.log(language,)
     // Step 1: Format session history for Gemini
     const formattedHistory = sessionHistory.map(entry => {
         if (entry.user) {
@@ -144,14 +156,15 @@ Please classify the following question as 1 (Related) or 0 (Not Related):
             13. "How can I view and edit my profile?": "https://edugainers.com/profile/:id" (replace :id with your user ID)
             14. "Where can I find stationery items on EduGainer?": "https://edugainers.com/stationary/home"
             15. "What resources are available on the EduGainer platform?": "https://edugainers.com/resources"
-            Only provide a link if the user's question \`${input}\` matches one of the specified queries about EduGainer's services.`
+            Only provide a link if the user's question \`${input}\` matches one of the specified queries about EduGainer's services.
+            `
         );
 
         const responseText = await result.response.text();
         const link = extractLink(responseText);
 
         // Generate follow-up questions
-        const followUpQuestions = await generateFollowUpQuestions(chatSession, input);
+        const followUpQuestions = await generateFollowUpQuestions(chatSession, input,language);
 
         return {
             responseText,
@@ -172,13 +185,21 @@ Please classify the following question as 1 (Related) or 0 (Not Related):
 };
 
 // Separate function to handle follow-up questions generation with error handling
-const generateFollowUpQuestions = async (chatSession, input) => {
+const generateFollowUpQuestions = async (chatSession, input,language) => {
     try {
         const response = await chatSession.sendMessage(`
-            Assume you are an AI chatbot named Aiden, designed to assist users specifically with EduGainer's services, which provide the best library, classes, and stationery offerings in Uttarkashi.
-            Act as a human. Based on the user's message: "${input}" and the conversation history, generate exactly 3 follow-up questions phrased from the user's perspective. For example, questions should start with "Can I..." or "How can I...". 
-            Format the output as an array: ["Question 1?", "Question 2?", "Question 3?"]
-        `);
+      
+        
+        You are an AI chatbot named Aiden, designed to assist users with EduGainer's services, which include the best library, classes, and stationery offerings in Uttarkashi.
+        Your responses should sound human-like. 
+
+        Based on the user's message: "${input}" and the conversation history, generate **exactly 3 follow-up questions** phrased from the user's perspective, in **language code \`${language}\` only**. 
+
+        The questions should start with phrases like "Can I..." or "How can I...", and be formatted as an array:
+        ["Question 1?", "Question 2?", "Question 3?"]
+    `);
+    
+
 
         const text = response.response.text().trim();
         console.log('Response:', text); // Log the raw response text
@@ -202,6 +223,8 @@ const generateFollowUpQuestions = async (chatSession, input) => {
         return ["What would you like to know about EduGainer?", "How can I help with your EduGainer queries?", "Would you like details on EduGainer’s offerings?"];
     }
 };
+
+
 
 
 // Controller function to handle text-based Gemini API requests

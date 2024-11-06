@@ -25,9 +25,10 @@ const axiosFileInstance = axios.create({
 });
 
 // Function to send user text to the chatbot
-export async function sendMessageToChatbot(userInput) {
+export async function sendMessageToChatbot(userInput,language) {
     try {
-        const response = await axiosInstance.post("/gemini/chatbot", {
+        console.log(language,"lang")
+        const response = await axiosInstance.post(`/gemini/chatbot/${language}/true`, {
             input: userInput
         });
         console.log("Text response:", response.data);

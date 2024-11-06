@@ -3,7 +3,11 @@ const { LibStudent, User } = require('../models/student');
 const { Message } = require("../models/chat");// Assuming you have a Shift model
 const { Resource } = require('../models/Admin')
 const { uploadToCloudinary } = require("../cloudinary")
-const fs = require('fs');
+const fs = require('fs/promises');
+
+
+
+
 
 const editUserById = async (req, res) => {
     const { id } = req.params// Assuming shift is sent in the request body
@@ -11,7 +15,7 @@ const editUserById = async (req, res) => {
     try {
         // Query database to find admins based on the shift
 
-        const user = await User.findByIdAndUpdate({ _id:id },{...req.body.data},{new:true});
+        const user = await User.findByIdAndUpdate({ _id: id }, { ...req.body.data }, { new: true });
         // console.log(chats)
         // Example response structure
         console.log(user)
@@ -77,9 +81,9 @@ const addLibStudent = async (req, res) => {
         // Query database to find admins based on the shift
         const data = {
             ...req.body,
-            
+
         }
-       
+
         const addedStudent = await LibStudent.create(data);
         const imagedata = {}
         if (image) {
@@ -276,197 +280,7 @@ const fetchAllSiteUsers = async (req, res) => {
 
 
 
-const addUser = async (req, res) => {
-    const { email, password, firstName, lastName, role, permissions } = req.body;
-    const adminId = req.params.adminId; // ID of the admin document to update
-  
 
-    try {
-        // Check if user already exists
-        const existingUser = await User.findOne({ username: email });
-        if (existingUser) {
-            console.log("User already exists with this email:", email);
-            return res.status(400).json({ error: 'User already exists with this email.' });
-        }
-
-        // Create a new user with the provided fields, including permissions
-        const newUser = new User({
-            username: email,
-            firstName,
-            lastName,
-            role, // 'user', 'admin', or 'employee', based on the form
-            strategy: "local",
-            isTeamAccount: true,
-            permissions // Assign permissions array directly
-        });
-
-        // Register the new user with the provided password
-        await User.register(newUser, password);
-      
-
-        // Check if the admin exists
-        const adminUser = await User.findById(adminId);
-        if (!adminUser) {
-            console.log("Admin not found with ID:", adminId);
-            return res.status(404).json({ error: 'Admin account not found.' });
-        }
-
-        // Add the new user's _id to the refAccounts array of the specified admin
-        const updatedAdmin = await User.findByIdAndUpdate(
-            adminId,
-            { $push: { refAccounts: newUser._id } },
-            { new: true } // Return the updated document
-        );
-        console.log("Updated Admin's refAccounts:", updatedAdmin.refAccounts);
-
-        res.status(201).json({
-            message: 'User registered successfully and linked to admin.',
-            user: newUser
-        });
-    } catch (error) {
-        console.error("Error registering user:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-};
-
-
-const deleteUser = async (req, res) => {
-    const { id } = req.params; // User ID to be deleted
-
-    try {
-        // Find and delete the user by ID
-        const deletedUser = await User.findByIdAndDelete(id);
-        if (!deletedUser) {
-            return res.status(404).json({ error: 'User not found.' });
-        }
-
-        // Remove the deleted user from the admin's refAccounts array
-        const adminId = process.env.adminId;
-        const updatedAdmin = await User.findByIdAndUpdate(
-            adminId,
-            { $pull: { refAccounts: id } },
-            { new: true } // Return the updated document
-        );
-
-        // Check if the admin update was successful
-        if (!updatedAdmin) {
-            console.warn("Admin not found with ID:", adminId);
-            return res.status(404).json({ error: 'Admin account not found.' });
-        }
-
-        res.status(200).json({
-            message: 'User deleted successfully and removed from admin’s refAccounts.',
-            user: deletedUser
-        });
-    } catch (error) {
-        console.error("Error deleting user:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-};
-
-const verifyRoleForLibrary = async (req, res) => {
-    const { email, password } = req.body;
-    const adminId =process.env.adminId;
-console.log(req.body)
-    try {
-        // Find the user by username (email)
-        const user = await User.findOne({ username: email });
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found.' });
-        }
-
-        // Use passport-local-mongoose's authenticate method properly
-        return new Promise((resolve, reject) => {
-            user.authenticate(password, (err, authenticatedUser, passwordError) => {
-                console.log(authenticatedUser,"auth")
-                if (err) {
-                    console.error("Authentication error:", err);
-                    return res.status(500).json({ error: 'Authentication error occurred.' });
-                }
-
-                if (passwordError) {
-                    return res.status(401).json({ error: 'Invalid password.' });
-                }
-
-                if (!authenticatedUser) {
-                    return res.status(401).json({ error: 'Authentication failed.' });
-                }
-
-                // Check role and permissions
-                const hasRequiredRole = authenticatedUser.role === "employee";
-            
-                const hasLibraryPermission = authenticatedUser.permissions.includes("library");
-
-                if (!hasRequiredRole || !hasLibraryPermission) {
-                    console.log("error")
-                    return res.status(403).json({
-                        error: 'User does not have required library access permissions.',
-                        details: {
-                            hasRole: hasRequiredRole,
-                            hasPermission: hasLibraryPermission
-                        }
-                    });
-                }
-
-                // Check if user is associated with the admin account
-                User.findById(adminId).exec()
-                    .then(admin => {
-                        if (!admin) {
-                            return res.status(404).json({ error: 'Admin account not found.' });
-                        }
-
-                        const isInAdminSubAccounts = admin.refAccounts.some(
-                            refId => refId.toString() === authenticatedUser._id.toString()
-                        );
-
-                        if (!isInAdminSubAccounts) {
-                           
-                            return res.status(403).json({
-                                error: 'User is not associated with the specified admin account.'
-                            });
-                        }
-
-                        // Initialize passport in session if not present
-                        if (!req.session.passport) {
-                            req.session.passport = {};
-                        }
-
-                        // Store only currentUser with email and permissions
-                        req.session.passport.user = {
-                            ...req.session.passport.user, // Preserve existing fields
-                            currentUser: {  // Only store email and permissions
-                               username: authenticatedUser.username,
-                                permissions: authenticatedUser.permissions,
-                                role:"employee"
-                            }
-                        };
-
-                        // Save session
-                        req.session.save((err) => {
-                            if (err) {
-                                console.error("Session save error:", err);
-                                return res.status(500).json({ error: 'Error saving session.' });
-                            }
-console.log(req.session.passport.user.currentUser,"curr")
-                            return res.status(200).json({
-                                message: 'User verified successfully with library access.',
-                                user: req.session.passport.user
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        console.error("Error checking admin association:", error);
-                        return res.status(500).json({ error: 'Error verifying admin association.' });
-                    });
-            });
-        });
-
-    } catch (error) {
-        console.error("Error in verifyRoleForLibrary:", error);
-        return res.status(500).json({ error: "Internal server error" });
-    }
-};
 
 // Export controller functions
 module.exports = {
@@ -480,8 +294,7 @@ module.exports = {
     fetchAllUsers,
     fetchAllChats,
     fetchAllSiteUsers,
-    editUserById, addUser, deleteUser,
-    verifyRoleForLibrary
+    editUserById,
     // Add other controller functions as needed
 };
 

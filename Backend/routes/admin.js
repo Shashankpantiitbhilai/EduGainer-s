@@ -1,9 +1,8 @@
 const express = require("express");
-const { Student, User } = require("../models/student");
+
 const upload = require("../multer");
 const router = express.Router();
 
-const { sendEmailWithAttachment } = require("../emailSender");
 const adminController = require("../controllers/adminController");
 
 router.get('/fetchLibData', adminController.fetchAllUsers);
@@ -21,9 +20,6 @@ router.patch('/editLibResource/:id', adminController.editLibResource);
 router.delete('/deleteLibResource/:id', adminController.deleteLibResource);
 router.get('/fetchAllUsers', adminController.fetchAllUsers);
 router.get(`/fetchAllChats/:id`, adminController.fetchAllChats);
-router.post('/addUser/:adminId', adminController.addUser);
 
-// Route to delete a user by ID
-router.delete('/deleteUser/:id', adminController.deleteUser);
-router.post('/verifyRoleForLibrary', adminController.verifyRoleForLibrary);
+
 module.exports = router;

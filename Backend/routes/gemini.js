@@ -34,7 +34,8 @@ const upload = multer({
 
 const upload1 = multer({ storage: multer.memoryStorage() });
 // Route for text-based chat
-router.post("/chatbot", geminiController.getGeminiResponse);
+router.post("/chatbot/:language/true", geminiController.getGeminiResponse);
+
 router.post("/chatbot/processAudio", upload1.single('audio'), audioController.handler);
 // Route for file upload and processing
 router.post("/chatbot/file",

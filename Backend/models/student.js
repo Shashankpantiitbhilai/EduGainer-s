@@ -59,8 +59,38 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["library", "classes", "stationery"], // Allowed permission values
   }],
+  faceData: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Face'
+  },
 
-});
+  // Face authentication settings
+  faceAuthEnabled: {
+    type: Boolean,
+    default: false
+  },
+
+  lastFaceAuth: {
+    timestamp: Date,
+    success: Boolean
+  },
+  phoneNumber: {
+    type: String,
+  },
+  department: {
+    type: String,
+  },
+  startDate: {
+    type: Date,
+  },
+  endDate: {
+    type: Date,
+  },
+}, {
+  timestamps: true
+}
+
+);
 
 // Apply plugins
 
