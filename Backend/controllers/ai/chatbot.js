@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { TranslationServiceClient } = require('@google-cloud/translate');
 const translationClient = new TranslationServiceClient();
-
+const {synthesizeSpeech}=require("./googleApi/textToSpeech")
 // Initialize the Google Generative AI with your API key
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -40,9 +40,18 @@ const getGeminiResponse = async (req, res) => {
         });
         const translatedResponse = await translateText([responseText], language);
         const translatedQuestions = await translateText(followUpQuestions, language);
+        let audioContent = null;
+        if (soundMode === 'true') {
+            audioContent = await synthesizeSpeech(translatedResponse[0], language);
+        }
 
-        res.json({ response: translatedResponse[0], followUpQuestions: translatedQuestions, link });
-     
+        res.json({
+            response: translatedResponse[0],
+            followUpQuestions: translatedQuestions,
+            link,
+            audioContent
+        });
+        
     } catch (error) {
         console.error('Error in text processing:', error);
 

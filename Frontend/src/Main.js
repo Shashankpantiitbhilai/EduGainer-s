@@ -192,7 +192,7 @@ const Main = () => {
                     element={
                         <ProtectedLibrary>
                             <ManageUsers />
-                            </ProtectedLibrary>
+                        </ProtectedLibrary>
                     }
                 />
                 <Route
@@ -222,7 +222,7 @@ const Main = () => {
                 <Route
                     path="/admin_library/manage-current-month-bookings"
                     element={
-                    <ProtectedLibrary>
+                        <ProtectedLibrary>
                             <StudentManagementTable />
                         </ProtectedLibrary>
                     }
@@ -239,7 +239,7 @@ const Main = () => {
                     path="/admin/vision/uploader"
                     element={
                         <ProtectedAdmin>
-                            <VisionUploader/>
+                            <VisionUploader />
                         </ProtectedAdmin>
                     }
                 />

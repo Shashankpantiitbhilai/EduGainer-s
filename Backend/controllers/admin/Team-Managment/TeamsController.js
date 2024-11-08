@@ -23,18 +23,18 @@ const addEmployee = async (req, res) => {
 
         const imageContent = await fs.readFile(imagePath);
 
-        // Analyze face using Cloud Vision API
-        const [result] = await visionClient.faceDetection({
-            image: { content: imageContent.toString("base64") }
-        });
+        // // Analyze face using Cloud Vision API
+        // const [result] = await visionClient.faceDetection({
+        //     image: { content: imageContent.toString("base64") }
+        // });
 
-        const faces = result.faceAnnotations;
-        if (!faces || faces.length === 0) {
-            return res.status(400).json({ error: 'No face detected in the image' });
-        }
-        if (faces.length > 1) {
-            return res.status(400).json({ error: 'Multiple faces detected. Please upload a photo with a single face' });
-        }
+        // const faces = result.faceAnnotations;
+        // if (!faces || faces.length === 0) {
+        //     return res.status(400).json({ error: 'No face detected in the image' });
+        // }
+        // if (faces.length > 1) {
+        //     return res.status(400).json({ error: 'Multiple faces detected. Please upload a photo with a single face' });
+        // }
 
         // Upload the image to Cloudinary
         const cloudinaryResult = await uploadToCloudinary(req.file.path, "EduGainer's Team");
@@ -54,32 +54,32 @@ const addEmployee = async (req, res) => {
           
             ...req.body
         });
-
+        await User.register(newUser, req.body.password);
         const savedUser = await newUser.save();
 
         // Create face data entry
         const faceData = new Face({
             userId: savedUser._id,
-            landmarks: faces[0].landmarks.map(landmark => ({
-                type: landmark.type,
-                position: {
-                    x: landmark.position.x,
-                    y: landmark.position.y,
-                    z: landmark.position.z
-                }
-            })),
-            faceAngles: {
-                rollAngle: faces[0].rollAngle,
-                panAngle: faces[0].panAngle,
-                tiltAngle: faces[0].tiltAngle
-            },
-            boundingBox: {
-                left: faces[0].boundingPoly.vertices[0].x,
-                top: faces[0].boundingPoly.vertices[0].y,
-                width: faces[0].boundingPoly.vertices[2].x - faces[0].boundingPoly.vertices[0].x,
-                height: faces[0].boundingPoly.vertices[2].y - faces[0].boundingPoly.vertices[0].y
-            },
-            confidence: faces[0].detectionConfidence,
+            // landmarks: faces[0].landmarks.map(landmark => ({
+            //     type: landmark.type,
+            //     position: {
+            //         x: landmark.position.x,
+            //         y: landmark.position.y,
+            //         z: landmark.position.z
+            //     }
+            // })),
+            // faceAngles: {
+            //     rollAngle: faces[0].rollAngle,
+            //     panAngle: faces[0].panAngle,
+            //     tiltAngle: faces[0].tiltAngle
+            // },
+            // boundingBox: {
+            //     left: faces[0].boundingPoly.vertices[0].x,
+            //     top: faces[0].boundingPoly.vertices[0].y,
+            //     width: faces[0].boundingPoly.vertices[2].x - faces[0].boundingPoly.vertices[0].x,
+            //     height: faces[0].boundingPoly.vertices[2].y - faces[0].boundingPoly.vertices[0].y
+            // },
+            // confidence: faces[0].detectionConfidence,
             referenceImage: {
                 url: imageUrl,
                 publicId:public_id,
@@ -224,14 +224,14 @@ const addUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     const { id } = req.params; // User ID to be deleted
-
+console.log("deleting")
     try {
         // Find and delete the user by ID
         const deletedUser = await User.findByIdAndDelete(id);
         if (!deletedUser) {
             return res.status(404).json({ error: 'User not found.' });
         }
-
+console.log("deleting")
         // Remove the deleted user from the admin's refAccounts array
         const adminId = process.env.adminId;
         const updatedAdmin = await User.findByIdAndUpdate(
@@ -363,5 +363,5 @@ const verifyRoleForLibrary = async (req, res) => {
 
 
 module.exports = {
-    addEmployee,fetchTeamAccounts
+    addEmployee,fetchTeamAccounts,verifyRoleForLibrary,deleteUser
 }

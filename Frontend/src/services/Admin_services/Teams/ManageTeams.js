@@ -27,8 +27,9 @@ export async function addUser(userData, adminId) {
 
 // Delete a user by ID
 export async function deleteUserById(id) {
+
     try {
-        const response = await axiosInstance.delete(`/admin/team/deleteUser/${id}`);
+        const response = await axiosInstance.delete(`/admin/team/deleteTeam-account/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting user by ID:", error);

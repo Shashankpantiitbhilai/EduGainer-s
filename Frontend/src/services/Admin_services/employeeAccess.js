@@ -15,7 +15,8 @@ const axiosInstance = axios.create({
 });
 export async function verifyLibraryAccess( email, password) {
     try {
-        const response = await axiosInstance.post(`/admin/verifyRoleForLibrary`, {
+        console.log("verify")
+        const response = await axiosInstance.post(`/admin/team/verifyRoleForLibrary`, {
             email,
             password
         });

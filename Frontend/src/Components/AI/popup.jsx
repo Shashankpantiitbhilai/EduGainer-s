@@ -59,6 +59,7 @@ const ChatPopup = () => {
   const [feedback, setFeedback] = useState({});
  const [soundEnabled, setSoundEnabled] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('en');
+   const audioRef = useRef(new Audio());
   const handleFeedback = (messageId, type) => {
     setFeedback((prev) => ({
       ...prev,
@@ -123,8 +124,30 @@ const ChatPopup = () => {
     setIsTyping(true);
 
     try {
-      const botResponse = await sendMessageToChatbot(question,currentLanguage);
-      console.log(botResponse.link);
+      const botResponse = await sendMessageToChatbot(question, currentLanguage,soundEnabled);
+        if (soundEnabled && botResponse.audioContent) {
+          try {
+            // Convert base64 to blob
+            const audioBlob = await fetch(`data:audio/mp3;base64,${botResponse.audioContent}`).then(res => res.blob());
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            // Clean up previous audio
+            if (audioRef.current) {
+              audioRef.current.pause();
+              URL.revokeObjectURL(audioRef.current.src);
+            }
+            
+            // Play new audio
+            audioRef.current.src = audioUrl;
+            audioRef.current.play().catch(error => {
+              console.error("Error playing audio:", error);
+            });
+          } catch (error) {
+            console.error("Error processing audio:", error);
+          }
+        }
+
+     
       setMessages((prev) => [
         ...prev,
         {

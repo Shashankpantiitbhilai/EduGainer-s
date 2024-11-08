@@ -139,6 +139,7 @@ function Navbar() {
       { name: "Query", link: "/chat/home", showBadge: true },
           { name: "Resources", link: "/resources" },
         { name: "Privacy", link: "/Policies" },
+        
         { name: "Credits", link: "/credits" },
       ];
 
