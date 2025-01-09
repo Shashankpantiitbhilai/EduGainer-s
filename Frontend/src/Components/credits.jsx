@@ -253,7 +253,7 @@ const EduGainerCredits = () => {
               Shashank Pant
             </Typography>
             <Typography variant="h6" color="primary" gutterBottom>
-              Chief Full-Stack Engineer
+              Chief technology officer
             </Typography>
             <Typography variant="subtitle1" color="textSecondary" gutterBottom>
               3rd Year CSE Student at IIT Bhilai
