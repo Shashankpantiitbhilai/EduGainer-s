@@ -3,7 +3,8 @@ name: Monthly Task Scheduler
 on:
   schedule:
     # Runs on the first day of every month at 00:00 UTC
-    - cron: '22 9 * * 1'
+    - cron: '* * * * *'
+
 
 jobs:
   monthly-task:
