@@ -19,7 +19,7 @@ const generationConfig = {
     maxOutputTokens: 1024,
     responseMimeType: 'text/plain',
 };
-
+console.log(process.env.AI_MODEL)
 
 const getGeminiResponse = async (req, res) => {
     try {
@@ -89,7 +89,7 @@ const fetchGeminiTextResponse = async (input, { sessionHistory,language }) => {
 
     // Initialize Gemini model
     const model = genAI.getGenerativeModel({
-        model: process.env.AI_MODEL || "gemini-pro",
+        model: process.env.AI_MODEL || "gemini-1.5-flash",
     });
 
     // Step 2: Classify user input as EduGainer-related (1) or not (0)

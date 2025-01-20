@@ -5,9 +5,18 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    const ConnectDB = `${process.env.MONGODB_URI}`;
-    await mongoose.connect(ConnectDB);
-    console.log("MongoDB Connected")
+    const connectDB = async () => {
+      const connectURI = process.env.MONGODB_URI;
+
+      await mongoose.connect(connectURI, {
+        useNewUrlParser: true, // Parses connection strings correctly
+        useUnifiedTopology: true, // Handles server discovery and monitoring
+        serverSelectionTimeoutMS: 30000, // Timeout after 30 seconds if no server is available
+      });
+
+      console.log("MongoDB Connected successfully.");
+    };
+    await connectDB();
  
     // Note: CSV imports are handled separately and can be called as needed
   } catch (error) {

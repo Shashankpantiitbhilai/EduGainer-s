@@ -1,9 +1,7 @@
-const cron = require('node-cron');
 const mongoose = require('mongoose');
 const { getModelForMonth } = require('./models/student'); // Adjust the path to your models file
 
-// Schedule the cron job to run daily at 12:33 AM
-cron.schedule('0 1 1 * *', async () => {
+async function executeMonthlyTask() {
     try {
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth() + 1; // Get the current month (1-12)
@@ -19,43 +17,24 @@ cron.schedule('0 1 1 * *', async () => {
             booking => booking?.nextMonthStatus?.toLowerCase() !== 'discontinue'
         );
 
-        if (validBookings.length > 0) {
-            // Clear the current month's collection
-            await currentMonthModel.deleteMany({});
+        // Log people who paid their fee (i.e., where regFee, cash, online, or TotalMoney > 0)
+        const paidBookings = validBookings.filter(
+            booking => booking.regFee > 0 || booking.cash > 0 || booking.online > 0 || booking.TotalMoney > 0
+        );
 
-            // Prepare records for insertion into the current month's collection
-            const updatedBookings = validBookings.map(booking => {
-                let status = booking.nextMonthStatus;
-                let color = 'white'; // Default color
-
-                if (!status) {
-                    status = 'Temporary'; // Default status if nextMonthStatus is empty
-                    color = '#989898'; // Default color if nextMonthStatus is empty
-                } else if (status === 'Confirmed') {
-                    color = '#FFEA00'; // Yellow color for 'Confirmed' status
-                }
-
-                return {
-                    ...booking.toObject(),
-                    status, // Set status
-                    nextMonthStatus: '', // Clear nextMonthStatus for the current month
-                    colors: { ...booking.colors.toObject(), status: color }, // Update the colors map with the new color for status
-                    regFee: 0, // Reset regFee to 0
-                    cash: 0, // Reset cash to 0
-                    online: 0, // Reset online to 0
-                    website: 0, // Reset website to 0
-                    TotalMoney: 0 // Reset TotalMoney to 0
-                };
+        if (paidBookings.length > 0) {
+            paidBookings.forEach(booking => {
+                console.log(`Paid booking: ${booking.name}, Reg Fee: ${booking.regFee}, Cash: ${booking.cash}, Online: ${booking.online}, Total Money: ${booking.TotalMoney}`);
             });
-
-            // Insert updated records into the current month's collection
-            await currentMonthModel.insertMany(updatedBookings);
-
-            console.log(`Successfully updated ${currentMonthModel.collection.name} with ${updatedBookings.length} bookings from ${previousMonthModel.collection.name}.`);
         } else {
-            console.log(`No valid bookings found to move for ${previousMonthModel.collection.name}.`);
+            console.log('No paid bookings found for the previous month.');
         }
+
     } catch (error) {
         console.error('Error during the monthly booking transition:', error);
     }
-});
+}
+
+module.exports = {
+    executeMonthlyTask
+};
