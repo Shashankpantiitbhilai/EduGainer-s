@@ -18,11 +18,6 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Set Debug Mode
-      run: |
-        echo "NODE_DEBUG=*" >> $GITHUB_ENV
-        echo "DEBUG=*" >> $GITHUB_ENV
-        
     - name: Install Dependencies
       run: |
         cd Backend
@@ -30,35 +25,13 @@ jobs:
         echo "Dependencies installed successfully"
         npm list
 
-    - name: Debug Environment
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Directory contents:"
-        ls -la
-        echo "Backend directory contents:"
-        ls -la Backend/
-        
     - name: Execute Monthly Task
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        NODE_ENV: development
       run: |
         cd Backend
-        node -e "
-        const { executeMonthlyTask } = require('./cronJobs.js');
-        async function run() {
-          try {
-            console.log('Starting monthly task execution...');
-            await executeMonthlyTask();
-            console.log('Monthly task completed successfully');
-          } catch (error) {
-            console.error('Error executing monthly task:', error);
-            process.exit(1);
-          }
-        }
-        run();
-        "
-      env:
-        NODE_ENV: development
-        DEBUG: '*'
+        node cronJobs.js
 
     - name: Upload logs
       if: always()
