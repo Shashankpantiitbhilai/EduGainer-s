@@ -1,37 +1,71 @@
 const mongoose = require('mongoose');
-const { getModelForMonth } = require('./models/student'); // Adjust the path to your models file
+const { getModelForMonth } = require('./models/student');
+const fs = require('fs').promises;
+const path = require('path');
+
+async function logToFile(message) {
+    const timestamp = new Date().toISOString();
+    const logMessage = `${timestamp}: ${message}\n`;
+
+    // Ensure both console and file logging
+    console.log(logMessage);
+
+    try {
+        const logDir = path.join(__dirname, 'logs');
+        await fs.mkdir(logDir, { recursive: true });
+        await fs.appendFile(path.join(logDir, 'monthly-task.log'), logMessage);
+    } catch (error) {
+        console.error('Error writing to log file:', error);
+    }
+}
 
 async function executeMonthlyTask() {
     try {
+        await logToFile('========== MONTHLY TASK EXECUTION START ==========');
+
         const currentDate = new Date();
-        const currentMonth = currentDate.getMonth() + 1; // Get the current month (1-12)
-        const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1; // Calculate the previous month
-        const currentMonthModel = getModelForMonth(currentMonth); // Get the model for the current month
-        const previousMonthModel = getModelForMonth(previousMonth); // Get the model for the previous month
+        const currentMonth = currentDate.getMonth() + 1;
+        const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
 
-        // Fetch all bookings from the previous month's collection
+        await logToFile(`Current Month: ${currentMonth}, Previous Month: ${previousMonth}`);
+
+        const currentMonthModel = getModelForMonth(currentMonth);
+        const previousMonthModel = getModelForMonth(previousMonth);
+
+        await logToFile('Fetching previous month bookings...');
         const previousMonthBookings = await previousMonthModel.find({});
+        await logToFile(`Total bookings found: ${previousMonthBookings.length}`);
 
-        // Filter out records with nextMonthStatus of 'Discontinue'
         const validBookings = previousMonthBookings.filter(
             booking => booking?.nextMonthStatus?.toLowerCase() !== 'discontinue'
         );
+        await logToFile(`Valid bookings (excluding discontinued): ${validBookings.length}`);
 
-        // Log people who paid their fee (i.e., where regFee, cash, online, or TotalMoney > 0)
         const paidBookings = validBookings.filter(
-            booking => booking.regFee > 0 || booking.cash > 0 || booking.online > 0 || booking.TotalMoney > 0
+            booking => booking.regFee > 0 || booking.cash > 0 ||
+                booking.online > 0 || booking.TotalMoney > 0
         );
 
+        await logToFile('\n----- PAID BOOKINGS DETAILS -----');
         if (paidBookings.length > 0) {
-            paidBookings.forEach(booking => {
-                console.log(`Paid booking: ${booking.name}, Reg Fee: ${booking.regFee}, Cash: ${booking.cash}, Online: ${booking.online}, Total Money: ${booking.TotalMoney}`);
-            });
+            for (const booking of paidBookings) {
+                await logToFile(JSON.stringify({
+                    name: booking.name,
+                    regFee: booking.regFee || 0,
+                    cash: booking.cash || 0,
+                    online: booking.online || 0,
+                    totalMoney: booking.TotalMoney || 0
+                }, null, 2));
+            }
         } else {
-            console.log('No paid bookings found for the previous month.');
+            await logToFile('No paid bookings found for the previous month.');
         }
 
+        await logToFile('========== MONTHLY TASK EXECUTION END ==========');
     } catch (error) {
-        console.error('Error during the monthly booking transition:', error);
+        await logToFile(`ERROR: ${error.message}`);
+        await logToFile(`Stack trace: ${error.stack}`);
+        throw error;
     }
 }
 

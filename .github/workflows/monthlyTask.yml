@@ -1,35 +1,68 @@
 name: Monthly Task Scheduler
-
 on:
   schedule:
-    # Runs on the first day of every month at 00:00 UTC
-    - cron: '22 9 * * 1'
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   monthly-task:
     name: Execute Monthly Tasks
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
-
+      
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16' # Specify the Node.js version as per your project
+        node-version: '16'
 
+    - name: Set Debug Mode
+      run: |
+        echo "NODE_DEBUG=*" >> $GITHUB_ENV
+        echo "DEBUG=*" >> $GITHUB_ENV
+        
     - name: Install Dependencies
-      run: npm install
-      working-directory: ./Backend
+      run: |
+        cd Backend
+        npm install
+        echo "Dependencies installed successfully"
+        npm list
 
+    - name: Debug Environment
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Directory contents:"
+        ls -la
+        echo "Backend directory contents:"
+        ls -la Backend/
+        
     - name: Execute Monthly Task
-      run: node cronJobs.js
-      working-directory: ./Backend
-
-    - name: Send Email Notification
+      run: |
+        cd Backend
+        node -e "
+        const { executeMonthlyTask } = require('./cronJobs.js');
+        async function run() {
+          try {
+            console.log('Starting monthly task execution...');
+            await executeMonthlyTask();
+            console.log('Monthly task completed successfully');
+          } catch (error) {
+            console.error('Error executing monthly task:', error);
+            process.exit(1);
+          }
+        }
+        run();
+        "
       env:
-        EMAIL: ${{ secrets.EMAIL }}
-        PASSWORD: ${{ secrets.PASSWORD }}
-      run: node emailSender.js
-      working-directory: ./Backend
+        NODE_ENV: development
+        DEBUG: '*'
+
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: execution-logs
+        path: Backend/logs
