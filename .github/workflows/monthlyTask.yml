@@ -2,9 +2,9 @@ name: Monthly Task Scheduler
 
 on:
   schedule:
-    # Runs on the first day of every month at 00:00 UTC
+    # Runs every minute
     - cron: '* * * * *'
-
+  workflow_dispatch:  # Allows manual trigger of the workflow
 
 jobs:
   monthly-task:
