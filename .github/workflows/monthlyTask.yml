@@ -28,9 +28,4 @@ jobs:
       run: node cronJobs.js
       working-directory: ./Backend
 
-    - name: Send Email Notification
-      env:
-        EMAIL: ${{ secrets.EMAIL }}
-        PASSWORD: ${{ secrets.PASSWORD }}
-      run: node emailSender.js
-      working-directory: ./Backend
+ 
