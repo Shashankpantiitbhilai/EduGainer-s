@@ -3,7 +3,7 @@ name: Monthly Task Scheduler
 on:
   schedule:
     # Runs every minute
-    - cron: '* * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:  # Allows manual trigger of the workflow
 
 jobs:
