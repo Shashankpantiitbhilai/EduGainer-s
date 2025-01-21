@@ -689,7 +689,7 @@ export default function LibraryRegistration() {
                   disabled={loading || !consentGiven}
                   fullWidth={isMobile}
                 >
-                  Submit and Pay ₹105
+                  Submit and Pay ₹100
                 </Button>
               ) : (
                 <Button
