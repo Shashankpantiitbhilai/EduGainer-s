@@ -567,7 +567,7 @@ export default function LibraryRegistration() {
               </Alert>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="body1">Registration Fee: ₹105</Typography>
+              <Typography variant="body1">Registration Fee: ₹100</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography variant="body2">
@@ -689,7 +689,7 @@ export default function LibraryRegistration() {
                   disabled={loading || !consentGiven}
                   fullWidth={isMobile}
                 >
-                  Submit and Pay ₹105
+                  Submit and Pay ₹100
                 </Button>
               ) : (
                 <Button
