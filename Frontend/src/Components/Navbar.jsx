@@ -113,11 +113,13 @@ function Navbar() {
           { name: "Library", link: "/admin_library" },
           { name: "Classes", link: "/admin/classes" },
           { name: "AdminChat", link: "/admin/chat" },
-          { name: "MeriStationary", link: "/stationary/home" },
+         
           { name: "Events", link: "/admin/add-event" },
-          { name: "Privacy", link: "/Policies" },
         
-        { name: "Format-Convertor", link: "https://edugainers-format-test.vercel.app/" },
+        
+        { name: "Doc-Convert", link: "https://edugainers-format-test.vercel.app/" },
+         { name: "MeriStationary", link: "/stationary/home" },
+          { name: "Privacy", link: "/Policies" },
          
         ]
       : [
