@@ -33,6 +33,7 @@ import {
   Dashboard as DashboardIcon,
   Close as CloseIcon,
   Mail as MailIcon,
+  Transform as TransformIcon,
 } from "@mui/icons-material";
 import { AdminContext } from "../../App";
 import { logoutUser } from "../../services/auth";
@@ -107,6 +108,12 @@ function ADMIN_HOME() {
       link: "/admin/chat",
     },
     { title: "Manage Events", icon: <EventIcon />, link: "/admin/add-event" },
+    { 
+      title: "Doc Convert", 
+      icon: <TransformIcon />, 
+      link: "https://edugainers-format-test.vercel.app/",
+      external: true
+    },
   ];
 
   const quickStats = [
@@ -241,9 +248,26 @@ function ADMIN_HOME() {
                             <Typography variant="subtitle1">{tool.title}</Typography>
                           </CardContent>
                           <CardActions>
-                            <Button fullWidth variant="outlined" component={Link} to={tool.link}>
-                              Access
-                            </Button>
+                            {tool.external ? (
+                              <Button 
+                                fullWidth 
+                                variant="outlined" 
+                                href={tool.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                              >
+                                Open
+                              </Button>
+                            ) : (
+                              <Button 
+                                fullWidth 
+                                variant="outlined" 
+                                component={Link} 
+                                to={tool.link}
+                              >
+                                Access
+                              </Button>
+                            )}
                           </CardActions>
                         </Card>
                       </Grid>
