@@ -1,5 +1,4 @@
 const speechServices = require('./audioHandler'); // Adjust path as needed
-const multer = require('multer');
 
 // Corrected handler function syntax
 const handler = async function (req, res) {

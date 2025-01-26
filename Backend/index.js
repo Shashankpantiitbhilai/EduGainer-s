@@ -93,7 +93,7 @@ else {
 }
 app.use(myPassport.initialize());
 app.use(myPassport.session());
-app.use("/traffic", trafficRoutes);
+
 app.use("/", routes_general);
 app.use("/auth", routes_auth);
 
@@ -113,7 +113,7 @@ app.use("/translate",routes_translate) // Register vision route
 
 // Pass Socket.IO instance to chat routes
 app.use("/chat", routes_chat(io));
-
+app.use("/traffic", trafficRoutes);
 app.get("/", (req, res) => {
   res.json("Hello");
 });
