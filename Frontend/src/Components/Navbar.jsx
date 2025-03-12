@@ -131,7 +131,7 @@ function Navbar() {
              { name: "Resources", link: "/resources" },
           { name: "Feedback", link: "/feedback" },
           { name: "Privacy", link: "/Policies" },
-          { name: "Credits", link: "/credits" },
+        
         ]
     : [
         { name: "Library", link: "/library" },
@@ -142,7 +142,7 @@ function Navbar() {
           { name: "Resources", link: "/resources" },
         { name: "Privacy", link: "/Policies" },
         
-        { name: "Credits", link: "/credits" },
+     
       ];
 
   const id = IsUserLoggedIn?._id;
