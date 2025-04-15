@@ -43,6 +43,7 @@ import TeamTable from './TeamTable';
     strategy: 'local',
     status: 'active',
     faceAuthEnabled: true,
+   
   });
 
   const availablePermissions = [
@@ -62,6 +63,7 @@ import TeamTable from './TeamTable';
     try {
       setLoading(true);
       const response = await fetchAllTeamAccounts();
+      console.log(response)
       const teamUsers = response.data || [];
       setUsers(teamUsers);
     } catch (error) {

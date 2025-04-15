@@ -64,6 +64,9 @@ import { Delete, AccountCircle } from '@mui/icons-material';
                       </Avatar>
                     </TableCell>
                     <TableCell>
+                    <Typography variant="subtitle2">
+                        {`${user.username}`}
+                      </Typography>
                       <Typography variant="subtitle2">
                         {`${user.firstName} ${user.lastName}`}
                       </Typography>

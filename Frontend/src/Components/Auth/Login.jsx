@@ -73,8 +73,8 @@ export default function Login() {
           });
           return;
         }
-
-        if (user.role === "admin" || user.role==="superadmin") {
+console.log(user.role);
+        if (user.role === "admin" || user.role==="superAdmin") {
           navigate("/admin_home");
         } else {
           navigate("/");
@@ -122,7 +122,7 @@ export default function Login() {
         }
         setIsUserLoggedIn(response.user);
         toast.success("Login successful", { autoClose: 2000 });
-      
+      console.log(response.user)
         if (response.user.role === "admin" ||response.user.role === "superAdmin" ) navigate("/admin_home");
         else navigate("/");
       } else {

@@ -9,6 +9,7 @@ const {User}=require("../../../models/student")
 
 // Initialize Cloud Vision client
 const visionClient = new vision.ImageAnnotatorClient();
+
 const addEmployee = async (req, res) => {
     try {
         const adminId = req.params.adminId;
@@ -18,103 +19,99 @@ const addEmployee = async (req, res) => {
             return res.status(400).json({ error: 'Face photo is required' });
         }
 
-        // Read the image from disk asynchronously
         const imagePath = path.resolve(req.file.path);
-
         const imageContent = await fs.readFile(imagePath);
 
-        // // Analyze face using Cloud Vision API
-        // const [result] = await visionClient.faceDetection({
-        //     image: { content: imageContent.toString("base64") }
-        // });
-
-        // const faces = result.faceAnnotations;
-        // if (!faces || faces.length === 0) {
-        //     return res.status(400).json({ error: 'No face detected in the image' });
-        // }
-        // if (faces.length > 1) {
-        //     return res.status(400).json({ error: 'Multiple faces detected. Please upload a photo with a single face' });
-        // }
-
-        // Upload the image to Cloudinary
+        // Upload to Cloudinary
         const cloudinaryResult = await uploadToCloudinary(req.file.path, "EduGainer's Team");
-        console.log(cloudinaryResult,"result")
         const imageUrl = cloudinaryResult.url;
         const public_id = cloudinaryResult.publicId;
-        // Create new user
-        const newUser = new User({
-            strategy: 'local',
-            username:req.body.email,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            address: req.body.address,
-            bio: req.body.bio,
-            role: req.body.role,
-            photoUpload: imageUrl,
-          
-            ...req.body
-        });
-        await User.register(newUser, req.body.password);
-        const savedUser = await newUser.save();
 
-        // Create face data entry
-        const faceData = new Face({
-            userId: savedUser._id,
-            // landmarks: faces[0].landmarks.map(landmark => ({
-            //     type: landmark.type,
-            //     position: {
-            //         x: landmark.position.x,
-            //         y: landmark.position.y,
-            //         z: landmark.position.z
-            //     }
-            // })),
-            // faceAngles: {
-            //     rollAngle: faces[0].rollAngle,
-            //     panAngle: faces[0].panAngle,
-            //     tiltAngle: faces[0].tiltAngle
-            // },
-            // boundingBox: {
-            //     left: faces[0].boundingPoly.vertices[0].x,
-            //     top: faces[0].boundingPoly.vertices[0].y,
-            //     width: faces[0].boundingPoly.vertices[2].x - faces[0].boundingPoly.vertices[0].x,
-            //     height: faces[0].boundingPoly.vertices[2].y - faces[0].boundingPoly.vertices[0].y
-            // },
-            // confidence: faces[0].detectionConfidence,
-            referenceImage: {
-                url: imageUrl,
-                publicId:public_id,
-                uploadedAt: new Date()
-            }
-        });
+        let existingUser = await User.findOne({ username: req.body.email });
 
-        const savedFaceData = await faceData.save();
+        if (existingUser) {
+            const updateData = {
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                address: req.body.address,
+                bio: req.body.bio,
+                role: req.body.role,
+                photoUpload: imageUrl,
+                phoneNumber: req.body.phoneNumber,
+                department: req.body.department,
+                isTeamAccount: req.body.isTeamAccount === 'true',
+                faceAuthEnabled: req.body.faceAuthEnabled === 'true',
+                permissions: req.body.permissions
+            };
 
-        // Update user with face data reference
-        savedUser.faceData = savedFaceData._id;
-        await savedUser.save();
+            existingUser = await User.findOneAndUpdate(
+                { username: req.body.email },
+                { $set: updateData, $addToSet: { refAccounts: adminId } },
+                { new: true }
+            );
 
-        // Update the admin's refAccounts array with the new employee's ID
-        const updatedAdmin = await User.findByIdAndUpdate(
-            adminId,
-            { $push: { refAccounts: savedUser._id } },
-            { new: true }
-        );
+            return res.status(200).json({
+                message: 'Employee details updated successfully.',
+                user: existingUser
+            });
 
-        res.status(201).json({
-            message: 'Employee added successfully and linked to admin.',
-            user: savedUser,
-            faceData: savedFaceData,
-            updatedAdmin
-        });
+        } else {
+            const newUser = new User({
+                strategy: 'local',
+                username: req.body.email,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                address: req.body.address,
+                bio: req.body.bio,
+                role: req.body.role,
+                photoUpload: imageUrl,
+                phoneNumber: req.body.phoneNumber,
+                department: req.body.department,
+                isTeamAccount: req.body.isTeamAccount === 'true',
+                faceAuthEnabled: req.body.faceAuthEnabled === 'true',
+                permissions: req.body.permissions
+            });
 
+            await User.register(newUser, req.body.password);
+            const savedUser = await newUser.save();
+
+            const faceData = new Face({
+                userId: savedUser._id,
+                referenceImage: {
+                    url: imageUrl,
+                    publicId: public_id,
+                    uploadedAt: new Date()
+                }
+            });
+
+            const savedFaceData = await faceData.save();
+
+            savedUser.faceData = savedFaceData._id;
+            await savedUser.save();
+
+            const updatedAdmin = await User.findByIdAndUpdate(
+                adminId,
+                { $push: { refAccounts: savedUser._id } },
+                { new: true }
+            );
+
+            return res.status(201).json({
+                message: 'Employee added successfully and linked to admin.',
+                user: savedUser,
+                faceData: savedFaceData,
+                updatedAdmin
+            });
+        }
     } catch (error) {
         console.error('Error adding employee:', error);
-        res.status(500).json({
+        return res.status(500).json({
             error: 'Error adding employee',
             details: error.message
         });
     }
 };
+
+
 // Assuming Face model is in this path
 
 const fetchTeamAccounts = async (req, res) => {
@@ -131,6 +128,7 @@ const fetchTeamAccounts = async (req, res) => {
             _id: user._id,
             strategy: user.strategy,
             googleId: user.googleId,
+            username:user.username,
             firstName: user.firstName,
             lastName: user.lastName,
             address: user.address,
@@ -154,7 +152,7 @@ const fetchTeamAccounts = async (req, res) => {
 
             } : null // If faceData is null, handle gracefully
         }));
-
+console.log(response);
         res.status(200).json({
             message: 'Team accounts fetched successfully',
             data: response
