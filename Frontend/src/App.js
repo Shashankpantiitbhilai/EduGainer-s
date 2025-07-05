@@ -51,10 +51,10 @@ function App() {
 
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>
-                               <LoadingAnimation />
+                                <Main />
                             </NotificationWrapper>
                         ) : (
-                           <LoadingAnimation />
+                            <Main />
                         )}
                     </BrowserRouter>
                 </LoadingContext.Provider>
