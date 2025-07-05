@@ -41,6 +41,7 @@ import ClassSuccess from "./Components/Classes/Success.jsx"
 import ProtectedLibrary from "./Protection/ProtectedLibrary.js"
 import ProtectedSuperAdmin from "./Protection/ProtectedSuperAdmin.js";
 import VisionUploader from "./Components/vision/camera.jsx";
+import { CareersPage } from "./Components/Careers";
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -61,6 +62,7 @@ const Main = () => {
                 <Route path="/otp-verify/:id" element={<OTPVerify />} />
                 <Route path="/chat/home" element={<Chat />} />
                 <Route path="/Policies" element={<Policies />} />
+                <Route path="/careers" element={<CareersPage />} />
                 <Route path="/feedback" element={<ProtectedUser><FeedbackForm /></ProtectedUser>} />
                 <Route path="/credits" element={<Credits />} />
                 <Route
