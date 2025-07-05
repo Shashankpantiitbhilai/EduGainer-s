@@ -24,7 +24,11 @@ import {
   Menu,
   MenuItem,
   Snackbar,
-  Alert
+  Alert,
+  Container,
+  alpha,
+  styled,
+  Fade,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -37,21 +41,26 @@ import {
   Archive as ArchiveIcon,
   Settings as SettingsIcon,
   Refresh as RefreshIcon,
-  EmojiEmotions as EmojiIcon
+  EmojiEmotions as EmojiIcon,
+  Chat as ChatIcon,
+  SupervisorAccount as AdminIcon,
 } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import io from 'socket.io-client';
 import { motion, AnimatePresence } from 'framer-motion';
+import io from 'socket.io-client';
 import { AdminContext } from '../../../App';
 import {
   postChatMessages,
-  fetchAdminCredentials,fetchUnseenMessages,updateSeenMessage
+  fetchAdminCredentials,
+  fetchUnseenMessages,
+  updateSeenMessage
 } from "../../../services/chat/utils";
 import { Popover } from '@mui/material';
 import {
   fetchAllChats,
   fetchAllSiteUsers,
 } from "../../../services/Admin_services/adminUtils";
+import { designTokens, glassMorphism } from '../../../theme/enterpriseTheme';
+import { showSuccessToast, showErrorToast } from '../../../utils/notificationUtils';
 
 const EMOJI_LIST = [
   '😊', '😂', '🤣', '❤️', '😍', 
@@ -63,22 +72,42 @@ const EMOJI_LIST = [
   '📝', '📚', '✍️', '🤔', '🎊'
 ];
 
+// Enterprise-level styled components for admin chat
+const AdminChatContainer = styled(Box)(({ theme }) => ({
+  height: '100vh',
+  background: theme.palette.mode === 'dark' 
+    ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.paper} 100%)`
+    : `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+}));
+
 const ChatContainer = styled(Paper)(({ theme }) => ({
   width: '100%',
-  height: '85vh',
+  height: '90vh',
   display: 'flex',
   flexDirection: 'column',
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: designTokens.borderRadius.xxl,
   overflow: 'hidden',
-  backgroundColor: theme.palette.background.paper
+  border: `1px solid ${theme.palette.divider}`,
+  ...glassMorphism(theme.palette.mode === 'dark' ? 0.05 : 0.02),
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[12],
 }));
 
 const ChatHeader = styled(AppBar)(({ theme }) => ({
   position: 'relative',
-  backgroundColor: theme.palette.mode === 'dark' ? '#1E1E1E' : '#f5f5f5',
-  color: theme.palette.text.primary,
+  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+  color: theme.palette.primary.contrastText,
   boxShadow: 'none',
-  borderBottom: `1px solid ${theme.palette.divider}`
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
+    pointerEvents: 'none',
+  },
 }));
 
 const SidebarContainer = styled(Box)(({ theme }) => ({
@@ -87,14 +116,48 @@ const SidebarContainer = styled(Box)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  backgroundColor: theme.palette.mode === 'dark' ? '#121212' : '#ffffff'
+  backgroundColor: theme.palette.background.paper,
+  ...glassMorphism(0.02),
+}));
+
+const UserListItem = styled(ListItem)(({ theme, selected }) => ({
+  margin: theme.spacing(1, 2),
+  borderRadius: designTokens.borderRadius.lg,
+  transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+  backgroundColor: selected 
+    ? alpha(theme.palette.primary.main, 0.1)
+    : 'transparent',
+  border: selected 
+    ? `2px solid ${alpha(theme.palette.primary.main, 0.3)}`
+    : `2px solid transparent`,
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+    transform: 'translateX(4px)',
+    boxShadow: theme.shadows[2],
+  },
 }));
 
 const MessageList = styled(List)(({ theme }) => ({
   flexGrow: 1,
   overflowY: 'auto',
-  padding: theme.spacing(2),
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A1A1A' : '#f8f9fa'
+  padding: theme.spacing(3),
+  background: theme.palette.mode === 'dark'
+    ? 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.02) 100%)'
+    : 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.01) 100%)',
+  '&::-webkit-scrollbar': {
+    width: 8,
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: alpha(theme.palette.grey[300], 0.2),
+    borderRadius: 4,
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.3),
+    borderRadius: 4,
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.5),
+    },
+  },
 }));
 
 const MessageBubble = styled(motion.div)(({ theme, isOwn }) => ({
@@ -126,20 +189,6 @@ const InputContainer = styled(Box)(({ theme }) => ({
 const SearchContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const UserListItem = styled(ListItem)(({ theme, selected }) => ({
-  borderRadius: theme.shape.borderRadius,
-  margin: theme.spacing(0.5, 1),
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover
-  },
-  ...(selected && {
-    backgroundColor: theme.palette.primary.light,
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light
-    }
-  })
 }));
 
 const AdminChat = () => {
@@ -471,32 +520,99 @@ const messageData = {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
+      <AdminChatContainer>
+        <Container>
+          <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+            <CircularProgress 
+              size={60} 
+              sx={{ color: theme.palette.primary.main }}
+            />
+          </Box>
+        </Container>
+      </AdminChatContainer>
     );
   }
 
   return (
-    <ChatContainer elevation={3}>
-      <ChatHeader>
-        <Toolbar>
-          {isMobile && !showSidebar && (
-            <IconButton edge="start" color="inherit" onClick={() => setShowSidebar(true)}>
-              <ArrowBackIcon />
-            </IconButton>
-          )}
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            {getSelectedUserName() || 'Admin Chat'}
-          </Typography>
-          <Tooltip title="Refresh">
-            <IconButton color="inherit" onClick={() => window.location.reload()}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
-          <IconButton color="inherit" onClick={handleMenuClick}>
-            <MoreVertIcon />
-          </IconButton>
+    <AdminChatContainer>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Fade in={true} timeout={1000}>
+          <ChatContainer elevation={0}>
+            <ChatHeader>
+              <Toolbar sx={{ minHeight: { xs: 64, sm: 80 } }}>
+                <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', width: '100%' }}>
+                  {isMobile && !showSidebar && (
+                    <IconButton 
+                      edge="start" 
+                      color="inherit" 
+                      onClick={() => setShowSidebar(true)}
+                      sx={{ mr: 2 }}
+                    >
+                      <ArrowBackIcon />
+                    </IconButton>
+                  )}
+                  <Avatar
+                    sx={{
+                      backgroundColor: alpha(theme.palette.primary.contrastText, 0.2),
+                      color: theme.palette.primary.contrastText,
+                      mr: 2,
+                      width: 40,
+                      height: 40,
+                    }}
+                  >
+                    <AdminIcon />
+                  </Avatar>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        fontWeight: designTokens.typography.fontWeight.bold,
+                        mb: 0.5,
+                      }}
+                    >
+                      {getSelectedUserName() || 'Admin Chat Center'}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        opacity: 0.8,
+                        fontWeight: designTokens.typography.fontWeight.medium,
+                      }}
+                    >
+                      Manage student communications
+                    </Typography>
+                  </Box>
+                  <Tooltip title="Refresh">
+                    <IconButton 
+                      color="inherit" 
+                      onClick={() => window.location.reload()}
+                      sx={{
+                        borderRadius: designTokens.borderRadius.sm,
+                        transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.contrastText, 0.1),
+                          transform: 'scale(1.05)',
+                        },
+                      }}
+                    >
+                      <RefreshIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <IconButton 
+                    color="inherit" 
+                    onClick={handleMenuClick}
+                    sx={{
+                      borderRadius: designTokens.borderRadius.sm,
+                      transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.contrastText, 0.1),
+                        transform: 'scale(1.05)',
+                      },
+                    }}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </Box>
         </Toolbar>
       </ChatHeader>
 
@@ -780,17 +896,25 @@ const messageData = {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        sx={{ zIndex: 9999 }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            borderRadius: designTokens.borderRadius.lg,
+            fontWeight: designTokens.typography.fontWeight.medium,
+          }}
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </ChatContainer>
+          </ChatContainer>
+        </Fade>
+      </Container>
+    </AdminChatContainer>
   );
 };
 

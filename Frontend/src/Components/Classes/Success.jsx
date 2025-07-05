@@ -11,36 +11,66 @@ import {
   Avatar,
   Chip,
   CircularProgress,
+  useTheme,
+  styled,
+  alpha,
+  Fade,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DownloadIcon from "@mui/icons-material/Download";
-import { getClassStudentInfo } from "../../services/Class/utils"; // Replace with your actual service
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import HomeIcon from "@mui/icons-material/Home";
+import { getClassStudentInfo } from "../../services/Class/utils";
+import { showSuccessToast, showErrorToast } from "../../utils/notificationUtils";
 import generatePDF from "react-to-pdf";
+import { designTokens, glassMorphism } from '../../theme/enterpriseTheme';
+
+// Styled components for enterprise-level UI
+const SuccessCard = styled(Card)(({ theme }) => ({
+  borderRadius: designTokens.borderRadius.xxl,
+  border: `1px solid ${theme.palette.divider}`,
+  ...glassMorphism(theme.palette.mode === 'dark' ? 0.05 : 0.02),
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[8],
+  overflow: 'hidden',
+  position: 'relative',
+}));
+
+const HeroSection = styled(Box)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
+  color: theme.palette.success.contrastText,
+  padding: theme.spacing(6),
+  textAlign: 'center',
+  position: 'relative',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
+    pointerEvents: 'none',
+  },
+}));
 
 const ClassSuccessPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [classData, setClassData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const pdfRef = useRef();
+  const theme = useTheme();
 
   useEffect(() => {
     const getClassData = async () => {
       try {
         const data = await getClassStudentInfo(id);
         setClassData(data);
-        toast.success("🎉 Class registration successful!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        setLoading(false);
+        showSuccessToast("🎉 Class registration successful!");
       } catch (error) {
-        toast.error("Error fetching class data. Please try again.");
+        showErrorToast("Error fetching class data. Please try again.");
+        setLoading(false);
       }
     };
     getClassData();
@@ -53,15 +83,27 @@ const ClassSuccessPage = () => {
     });
   };
 
-  if (!classData) {
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
+  if (loading) {
     return (
       <Box
         display="flex"
         justifyContent="center"
         alignItems="center"
         minHeight="100vh"
+        sx={{ 
+          background: theme.palette.mode === 'dark' 
+            ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.paper} 100%)`
+            : `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+        }}
       >
-        <CircularProgress />
+        <CircularProgress 
+          size={60} 
+          sx={{ color: theme.palette.primary.main }}
+        />
       </Box>
     );
   }
@@ -162,37 +204,114 @@ const ClassSuccessPage = () => {
   );
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Card elevation={3}>
-        <CardContent>
-          <Box ref={pdfRef}>
-            <PDFContent />
-          </Box>
+    <Box sx={{ 
+      minHeight: '100vh',
+      background: theme.palette.mode === 'dark' 
+        ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${theme.palette.background.paper} 100%)`
+        : `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+      py: 4,
+    }}>
+      <Container maxWidth="lg">
+        <Fade in={true} timeout={1000}>
+          <SuccessCard>
+            {/* Hero Section */}
+            <HeroSection>
+              <Box sx={{ position: 'relative', zIndex: 1 }}>
+                <CheckCircleOutlineIcon 
+                  sx={{ 
+                    fontSize: 80, 
+                    mb: 2,
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))',
+                  }} 
+                />
+                <Typography 
+                  variant="h3" 
+                  component="h1" 
+                  gutterBottom
+                  sx={{
+                    fontWeight: designTokens.typography.fontWeight.bold,
+                    mb: 2,
+                  }}
+                >
+                  Registration Successful!
+                </Typography>
+                <Typography 
+                  variant="h6" 
+                  sx={{
+                    opacity: 0.9,
+                    fontWeight: designTokens.typography.fontWeight.medium,
+                  }}
+                >
+                  Welcome to EduGainer's Classes & Library
+                </Typography>
+              </Box>
+            </HeroSection>
 
-          <Box mt={4} textAlign="center">
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              onClick={() => navigate(`/dashboard/${id}`)}
-              sx={{ mr: 2 }}
-            >
-              Go to Dashboard
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="large"
-              startIcon={<DownloadIcon />}
-              onClick={handleDownloadPDF}
-            >
-              Download PDF
-            </Button>
-          </Box>
-        </CardContent>
-      </Card>
-      <ToastContainer />
-    </Container>
+            {/* Content Section */}
+            <CardContent sx={{ p: 6 }}>
+              <Box ref={pdfRef} sx={{ mb: 4 }}>
+                <PDFContent />
+              </Box>
+
+              {/* Action Buttons */}
+              <Box 
+                display="flex" 
+                flexDirection={{ xs: 'column', sm: 'row' }}
+                gap={2}
+                justifyContent="center"
+                mt={4}
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<HomeIcon />}
+                  onClick={handleGoHome}
+                  sx={{
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                    color: theme.palette.primary.contrastText,
+                    fontWeight: designTokens.typography.fontWeight.bold,
+                    borderRadius: designTokens.borderRadius.lg,
+                    px: 4,
+                    py: 1.5,
+                    boxShadow: theme.shadows[4],
+                    transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.shadows[8],
+                      filter: 'brightness(1.1)',
+                    },
+                  }}
+                >
+                  Go to Home
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  startIcon={<DownloadIcon />}
+                  onClick={handleDownloadPDF}
+                  sx={{
+                    borderColor: theme.palette.secondary.main,
+                    color: theme.palette.secondary.main,
+                    fontWeight: designTokens.typography.fontWeight.bold,
+                    borderRadius: designTokens.borderRadius.lg,
+                    px: 4,
+                    py: 1.5,
+                    transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+                    '&:hover': {
+                      borderColor: theme.palette.secondary.dark,
+                      backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                >
+                  Download PDF
+                </Button>
+              </Box>
+            </CardContent>
+          </SuccessCard>
+        </Fade>
+      </Container>
+    </Box>
   );
 };
 

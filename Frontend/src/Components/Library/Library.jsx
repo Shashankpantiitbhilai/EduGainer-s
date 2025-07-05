@@ -17,12 +17,8 @@ import {
   CardContent,
   Typography,
   Slide,
-  Divider,
   Chip,
   Container,
-  IconButton,
-  Tooltip,
-  Stack,
 } from "@mui/material";
 import {
   WatchLater,
@@ -32,8 +28,6 @@ import {
   PowerSettingsNew,
   MenuBook,
   Info as InfoIcon,
-  ChevronRight,
-  ChevronLeft,
 } from "@mui/icons-material";
 import Footer from "../footer";
 import { Link } from "react-router-dom";
@@ -41,6 +35,8 @@ import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";
 import { io } from "socket.io-client";
 import { fetchAdminCredentials } from "../../services/chat/utils";
+import { designTokens } from '../../theme/enterpriseTheme';
+import { defaultSnackbarConfig } from '../../utils/notificationUtils';
 
 const libraryFacilities = [
   { icon: <WatchLater />, text: "24/7 Accessibility" },
@@ -53,21 +49,68 @@ const libraryFacilities = [
 
 const libraryRules = [
   "Maintain silence at all times",
-
   "Keep your mobile phones on silent mode",
   "Handle study materials with care",
   "Clean your space before leaving",
   "Report any issues to staff immediately",
 ];
 
-const FacilityCard = ({ icon, text }) => (
-  <Card sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
-    <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      <Box sx={{ color: 'primary.main' }}>{icon}</Box>
-      <Typography variant="body1">{text}</Typography>
-    </CardContent>
-  </Card>
-);
+const FacilityCard = ({ icon, text }) => {
+  const theme = useTheme();
+  
+  return (
+    <Card 
+      sx={{ 
+        height: '100%', 
+        display: 'flex', 
+        alignItems: 'center',
+        borderRadius: designTokens.borderRadius.lg,
+        border: `1px solid ${theme.palette.divider}`,
+        transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: theme.shadows[1],
+        p: 2,
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: theme.shadows[6],
+          borderColor: theme.palette.primary.main,
+          '& .facility-icon': {
+            transform: 'scale(1.1)',
+            color: theme.palette.primary.main,
+          }
+        },
+      }}
+    >
+      <Box 
+        className="facility-icon"
+        sx={{ 
+          color: theme.palette.primary.main,
+          mr: 2,
+          transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 40,
+          height: 40,
+          borderRadius: designTokens.borderRadius.md,
+          backgroundColor: theme.palette.action.hover,
+        }}
+      >
+        {icon}
+      </Box>
+      <Typography 
+        variant="body1" 
+        sx={{ 
+          fontWeight: designTokens.typography.fontWeight.medium,
+          color: theme.palette.text.primary,
+          flex: 1,
+        }}
+      >
+        {text}
+      </Typography>
+    </Card>
+  );
+};
 
 
 const shifts = [
@@ -158,57 +201,55 @@ const SeatRow = ({ seats, seatStatus, userSeat, selectedShift, userShift }) => {
 
   return (
     <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
-      {seats.map((seat) => (
-        <Button
-          key={seat}
-          variant="contained"
-          sx={{
-            width: isMobile ? 30 : 40,
-            height: isMobile ? 30 : 40,
-            minWidth: isMobile ? 30 : 40,
-            p: 0,
-            fontSize: isMobile ? "0.7rem" : "0.875rem",
-            backgroundColor: getBackgroundColor(
-              seatStatus,
-              seat,
-              selectedShift,
-              userSeat,
-              userShift
-            ),
-            "&:hover": {
-              backgroundColor: getBackgroundColor(
-                seatStatus,
-                seat,
-                selectedShift,
-                userSeat,
-                userShift
-              ),
-              opacity: 0.8,
-            },
-          }}
-        >
-          {seat}
-        </Button>
-      ))}
+      {seats.map((seat) => {
+        const backgroundColor = getBackgroundColor(
+          seatStatus,
+          seat,
+          selectedShift,
+          userSeat,
+          userShift
+        );
+        
+        return (
+          <Button
+            key={seat}
+            variant="contained"
+            sx={{
+              width: isMobile ? 32 : 44,
+              height: isMobile ? 32 : 44,
+              minWidth: isMobile ? 32 : 44,
+              p: 0,
+              fontSize: isMobile ? "0.7rem" : "0.875rem",
+              fontWeight: designTokens.typography.fontWeight.bold,
+              backgroundColor: backgroundColor,
+              borderRadius: designTokens.borderRadius.sm,
+              border: `2px solid ${
+                backgroundColor === 'purple' 
+                  ? theme.palette.secondary.main
+                  : backgroundColor === 'red'
+                  ? '#d32f2f'
+                  : backgroundColor === 'green'
+                  ? '#2e7d32'
+                  : '#ed6c02'
+              }`,
+              color: backgroundColor === 'yellow' ? '#000' : '#fff',
+              boxShadow: theme.shadows[1],
+              transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+              "&:hover": {
+                backgroundColor: backgroundColor,
+                opacity: 0.8,
+                transform: 'scale(1.05)',
+                boxShadow: theme.shadows[3],
+              },
+            }}
+          >
+            {seat}
+          </Button>
+        );
+      })}
     </Box>
   );
 };
-
-const SubscriptionCard = ({ months, discount }) => (
-  <Card sx={{ minWidth: 200, m: 1 }}>
-    <CardContent>
-      <Typography variant="h5" component="div">
-        {months} Months
-      </Typography>
-      <Typography sx={{ mb: 1.5 }} color="text.secondary">
-        {discount}% off
-      </Typography>
-      <Typography variant="body2">
-        Subscribe now and save!
-      </Typography>
-    </CardContent>
-  </Card>
-);
 
 const Library = () => {
   const { IsUserLoggedIn } = useContext(AdminContext);
@@ -220,18 +261,6 @@ const Library = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [showDiscount, setShowDiscount] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const maxSlides = Math.ceil(libraryRules.length / 2);
-
-  // Previous useEffect and handler functions remain the same...
-
-  const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % maxSlides);
-  };
-
-  const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + maxSlides) % maxSlides);
-  };
 
   const socketRef = useRef(null);
 
@@ -263,6 +292,7 @@ const Library = () => {
           socketRef.current.on(
             "seatStatusUpdate",
             ({ id, status, seat, shift }) => {
+            
               setSnackbarMessage(
                 `Seat ${seat} status updated to ${status} for shift ${shift}`
               );
@@ -332,44 +362,308 @@ const Library = () => {
 return (
     <>
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Hero Section */}
-        <Box sx={{ mb: 6, textAlign: 'center' }}>
-          <Typography variant="h3" component="h1" gutterBottom>
+        {/* Hero Section - Redesigned */}
+        <Box 
+          sx={{ 
+            mb: 6, 
+            textAlign: 'center',
+            p: { xs: 3, sm: 4, md: 6 },
+            borderRadius: designTokens.borderRadius.xl,
+            background: theme.palette.mode === 'dark' 
+              ? `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`
+              : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+            color: theme.palette.primary.contrastText,
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: theme.shadows[3],
+            border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.primary.dark : 'transparent'}`,
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: theme.palette.mode === 'dark' 
+                ? 'radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 70%)'
+                : 'radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            },
+          }}
+        >
+          <Typography 
+            variant="h2" 
+            component="h1" 
+            gutterBottom
+            sx={{
+              fontWeight: designTokens.typography.fontWeight.bold,
+              mb: 2,
+              position: 'relative',
+              zIndex: 1,
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            }}
+          >
             EduGainer's Library
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              mb: 4,
+              opacity: 0.95,
+              position: 'relative',
+              zIndex: 1,
+              maxWidth: 600,
+              mx: 'auto',
+              fontSize: { xs: '1rem', sm: '1.125rem' },
+            }}
+          >
             Your Gateway to Focused Learning and Academic Excellence
           </Typography>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={2}
-            justifyContent="center"
-          >
-            <Button
-              component={Link}
-              to="/new-reg"
-              variant="contained"
-              size="large"
-              sx={{ minWidth: 200 }}
-            >
-              Register Now
-            </Button>
-            <Button
-              component={Link}
-              to="/library/fee-pay"
-              variant="outlined"
-              size="large"
-              sx={{ minWidth: 200 }}
-            >
-              Pay Fee
-            </Button>
-          </Stack>
         </Box>
 
-        {/* Facilities Section */}
-        <Box sx={{ mb: 6 }}>
-          <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
-            Our Facilities
+        {/* Action Buttons Section - New Professional Design */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 4 },
+            mb: 6,
+            borderRadius: designTokens.borderRadius.xl,
+            backgroundColor: theme.palette.mode === 'dark' 
+              ? theme.palette.background.paper 
+              : theme.palette.background.default,
+            border: `2px solid ${theme.palette.divider}`,
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: theme.palette.mode === 'dark'
+                ? `linear-gradient(135deg, ${theme.palette.primary.dark}10 0%, ${theme.palette.secondary.dark}10 100%)`
+                : `linear-gradient(135deg, ${theme.palette.primary.light}05 0%, ${theme.palette.secondary.light}05 100%)`,
+              pointerEvents: 'none',
+            },
+          }}
+        >
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            <Typography 
+              variant="h5" 
+              align="center"
+              gutterBottom
+              sx={{
+                fontWeight: designTokens.typography.fontWeight.bold,
+                color: theme.palette.text.primary,
+                mb: 3,
+              }}
+            >
+              Quick Actions
+            </Typography>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} sm={6} md={4}>
+                <Button
+                  component={Link}
+                  to="/new-reg"
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  sx={{ 
+                    py: 2,
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                    borderRadius: designTokens.borderRadius.lg,
+                    fontWeight: designTokens.typography.fontWeight.bold,
+                    fontSize: '1.1rem',
+                    boxShadow: theme.shadows[2],
+                    border: `2px solid ${theme.palette.primary.main}`,
+                    transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.dark,
+                      transform: 'translateY(-3px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  📚 Register Now
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Button
+                  component={Link}
+                  to="/library/fee-pay"
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  sx={{ 
+                    py: 2,
+                    backgroundColor: theme.palette.secondary.main,
+                    color: theme.palette.mode === 'dark' ? theme.palette.text.primary : theme.palette.secondary.contrastText,
+                    borderRadius: designTokens.borderRadius.lg,
+                    fontWeight: designTokens.typography.fontWeight.bold,
+                    fontSize: '1.1rem',
+                    boxShadow: theme.shadows[2],
+                    border: `2px solid ${theme.palette.secondary.main}`,
+                    transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                    '&:hover': {
+                      backgroundColor: theme.palette.secondary.dark,
+                      transform: 'translateY(-3px)',
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                >
+                  💳 Pay Fee
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={6} md={4}>
+                <Button
+                  onClick={toggleDiscountCards}
+                  variant="outlined"
+                  size="large"
+                  fullWidth
+                  sx={{ 
+                    py: 2,
+                    borderColor: theme.palette.info.main,
+                    color: theme.palette.info.main,
+                    borderWidth: 2,
+                    borderRadius: designTokens.borderRadius.lg,
+                    fontWeight: designTokens.typography.fontWeight.bold,
+                    fontSize: '1.1rem',
+                    backgroundColor: 'transparent',
+                    transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                    '&:hover': {
+                      borderColor: theme.palette.info.main,
+                      backgroundColor: theme.palette.info.main,
+                      color: theme.palette.mode === 'dark' ? theme.palette.text.primary : theme.palette.info.contrastText,
+                      borderWidth: 2,
+                      transform: 'translateY(-3px)',
+                      boxShadow: theme.shadows[2],
+                    },
+                  }}
+                >
+                  🎯 View Plans
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </Paper>
+
+        {/* Subscription Plans - Sliding section */}
+        <Slide direction="up" in={showDiscount} mountOnEnter unmountOnExit>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              mb: 6,
+              borderRadius: designTokens.borderRadius.xl,
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+            }}
+          >
+            <Typography 
+              variant="h5" 
+              align="center" 
+              gutterBottom
+              sx={{
+                fontWeight: designTokens.typography.fontWeight.bold,
+                color: theme.palette.primary.main,
+                mb: 3,
+              }}
+            >
+              💰 Subscription Plans & Discounts
+            </Typography>
+            <Grid container spacing={3} justifyContent="center">
+              {[
+                { months: 3, discount: 3 },
+                { months: 6, discount: 6 },
+                { months: 9, discount: 9 },
+                { months: 12, discount: 12 }
+              ].map((plan) => (
+                <Grid item xs={12} sm={6} md={3} key={plan.months}>
+                  <Card 
+                    sx={{ 
+                      height: '100%',
+                      textAlign: 'center',
+                      borderRadius: designTokens.borderRadius.lg,
+                      border: `2px solid ${theme.palette.divider}`,
+                      transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: theme.shadows[4],
+                        borderColor: theme.palette.primary.main,
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Typography 
+                        variant="h4" 
+                        component="div"
+                        sx={{
+                          fontWeight: designTokens.typography.fontWeight.bold,
+                          color: theme.palette.primary.main,
+                          mb: 1,
+                        }}
+                      >
+                        {plan.months}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          color: theme.palette.text.secondary,
+                          mb: 2,
+                        }}
+                      >
+                        Months
+                      </Typography>
+                      <Chip
+                        label={`${plan.discount}% OFF`}
+                        sx={{
+                          backgroundColor: theme.palette.success.main,
+                          color: theme.palette.mode === 'dark' ? theme.palette.text.primary : '#fff',
+                          fontWeight: designTokens.typography.fontWeight.bold,
+                          fontSize: '0.875rem',
+                        }}
+                      />
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          mt: 2,
+                          color: theme.palette.text.primary,
+                        }}
+                      >
+                        Subscribe now and save!
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Paper>
+        </Slide>
+
+        {/* Facilities Section - Redesigned */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 4 },
+            mb: 6,
+            borderRadius: designTokens.borderRadius.xl,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            align="center"
+            gutterBottom 
+            sx={{ 
+              fontWeight: designTokens.typography.fontWeight.bold,
+              color: theme.palette.primary.main,
+              mb: 4,
+            }}
+          >
+            🏢 World-Class Facilities
           </Typography>
           <Grid container spacing={3}>
             {libraryFacilities.map((facility, index) => (
@@ -378,102 +672,240 @@ return (
               </Grid>
             ))}
           </Grid>
-        </Box>
-
-        {/* Rules Section */}
-        <Paper elevation={3} sx={{ p: 3, mb: 6 }}>
-          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <InfoIcon color="primary" />
-            Library Rules
-          </Typography>
-          <Box sx={{ position: 'relative', my: 2 }}>
-            <IconButton
-              onClick={handlePrevSlide}
-              sx={{ position: 'absolute', left: -20, top: '50%', transform: 'translateY(-50%)' }}
-            >
-              <ChevronLeft />
-            </IconButton>
-            <IconButton
-              onClick={handleNextSlide}
-              sx={{ position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)' }}
-            >
-              <ChevronRight />
-            </IconButton>
-            <Box sx={{ overflow: 'hidden' }}>
-              <Grid container spacing={2} sx={{ transform: `translateX(-${currentSlide * 100}%)`, transition: 'transform 0.3s' }}>
-                {libraryRules.map((rule, index) => (
-                  <Grid item xs={12} sm={6} key={index}>
-                    <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Chip size="small" label={index + 1} color="primary" />
-                      {rule}
-                    </Typography>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Box>
         </Paper>
 
-        {/* Shift Selection */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            Select Your Shift
+        {/* Rules Section - Redesigned */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: { xs: 3, sm: 4 }, 
+            mb: 6,
+            borderRadius: designTokens.borderRadius.xl,
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.background.paper,
+          }}
+        >
+          <Typography 
+            variant="h5" 
+            gutterBottom 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+              fontWeight: designTokens.typography.fontWeight.bold,
+              color: theme.palette.primary.main,
+              mb: 3,
+              justifyContent: 'center',
+            }}
+          >
+            <InfoIcon sx={{ color: theme.palette.primary.main, fontSize: '1.5rem' }} />
+            📋 Library Guidelines & Rules
           </Typography>
-          <FormControl fullWidth>
-            <InputLabel id="shift-select-label">Time Slot</InputLabel>
+          
+          <Grid container spacing={2}>
+            {libraryRules.map((rule, index) => (
+              <Grid item xs={12} sm={6} key={index}>
+                <Box
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start', 
+                    gap: 2,
+                    p: 2,
+                    borderRadius: designTokens.borderRadius.lg,
+                    backgroundColor: theme.palette.mode === 'dark' 
+                      ? theme.palette.background.default 
+                      : theme.palette.action.hover,
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.shadows[2],
+                      borderColor: theme.palette.primary.main,
+                    },
+                  }}
+                >
+                  <Chip 
+                    size="small" 
+                    label={index + 1} 
+                    sx={{
+                      backgroundColor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
+                      fontWeight: designTokens.typography.fontWeight.bold,
+                      minWidth: 32,
+                      height: 24,
+                    }}
+                  />
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      color: theme.palette.text.primary,
+                      fontWeight: designTokens.typography.fontWeight.medium,
+                      flex: 1,
+                    }}
+                  >
+                    {rule}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+
+        {/* Shift Selection - Redesigned */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 4 },
+            mb: 4,
+            borderRadius: designTokens.borderRadius.xl,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography 
+            variant="h5" 
+            gutterBottom
+            sx={{
+              fontWeight: designTokens.typography.fontWeight.bold,
+              color: theme.palette.primary.main,
+              mb: 3,
+              textAlign: 'center',
+            }}
+          >
+            ⏰ Select Your Preferred Time Slot
+          </Typography>
+          <FormControl 
+            fullWidth
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: designTokens.borderRadius.lg,
+                backgroundColor: theme.palette.mode === 'dark' 
+                  ? theme.palette.background.default 
+                  : theme.palette.background.paper,
+                border: `2px solid ${theme.palette.divider}`,
+                transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                },
+                '&.Mui-focused': {
+                  borderColor: theme.palette.primary.main,
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: theme.palette.text.secondary,
+                fontWeight: designTokens.typography.fontWeight.medium,
+                '&.Mui-focused': {
+                  color: theme.palette.primary.main,
+                },
+              },
+            }}
+          >
+            <InputLabel id="shift-select-label">Choose Time Slot</InputLabel>
             <Select
               labelId="shift-select-label"
               value={selectedShift}
               onChange={handleShiftChange}
-              label="Time Slot"
+              label="Choose Time Slot"
+              sx={{
+                '& .MuiSelect-select': {
+                  fontWeight: designTokens.typography.fontWeight.medium,
+                  color: theme.palette.text.primary,
+                },
+              }}
             >
               {shifts.map((shift) => (
-                <MenuItem key={shift} value={shift}>{shift}</MenuItem>
+                <MenuItem 
+                  key={shift} 
+                  value={shift}
+                  sx={{
+                    borderRadius: designTokens.borderRadius.sm,
+                    mx: 1,
+                    my: 0.5,
+                    fontWeight: designTokens.typography.fontWeight.medium,
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                    },
+                    '&.Mui-selected': {
+                      backgroundColor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    },
+                  }}
+                >
+                  {shift}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
-        </Box>
+        </Paper>
 
-
-      <Slide direction="up" in={showDiscount} mountOnEnter unmountOnExit>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
+        {/* Important Alert */}
+        <Alert 
+          severity="warning" 
+          sx={{ 
             mb: 4,
+            borderRadius: designTokens.borderRadius.lg,
+            border: `1px solid ${theme.palette.warning.main}`,
+            backgroundColor: theme.palette.mode === 'dark' 
+              ? `${theme.palette.warning.main}10` 
+              : `${theme.palette.warning.main}05`,
           }}
         >
-          <SubscriptionCard months={3} discount={3} />
-          <SubscriptionCard months={6} discount={6} />
-          <SubscriptionCard months={9} discount={9} />
-          <SubscriptionCard months={12} discount={12} />
-        </Box>
-      </Slide>
-
-    
-
-      <Alert severity="warning" sx={{ mt: 2, mb: 4 }}>
-        <AlertTitle>Note</AlertTitle>
-        In case the seat you need is not empty, kindly contact our office.
-        Register early to secure your preferred seat!
-      </Alert>
- <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            Seat Layout
+          <AlertTitle sx={{ fontWeight: designTokens.typography.fontWeight.bold }}>
+            📢 Important Note
+          </AlertTitle>
+          <Typography variant="body1">
+            In case the seat you need is not available, kindly contact our office.
+            <strong> Register early to secure your preferred seat!</strong>
           </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Paper
-            elevation={3}
+        </Alert>
+        {/* Seat Layout Section - Redesigned */}
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: { xs: 3, sm: 4 }, 
+            mb: 4,
+            borderRadius: designTokens.borderRadius.xl,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography 
+            variant="h5" 
+            gutterBottom
             sx={{
-              p: 2,
-              borderRadius: 2,
-              position: "relative",
-              overflow: "auto",
+              fontWeight: designTokens.typography.fontWeight.bold,
+              color: theme.palette.primary.main,
+              mb: 3,
+              textAlign: 'center',
             }}
           >
-            <Box sx={{ border: "2px solid #ccc", borderRadius: "8px", p: 2 }}>
+            🪑 Interactive Seat Layout
+          </Typography>
+          
+          <Paper
+            elevation={2}
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: designTokens.borderRadius.lg,
+              position: "relative",
+              overflow: "auto",
+              backgroundColor: theme.palette.mode === 'dark' 
+                ? theme.palette.background.default 
+                : '#fafafa',
+              border: `2px solid ${theme.palette.divider}`,
+            }}
+          >
+            <Box 
+              sx={{ 
+                border: `2px solid ${theme.palette.primary.main}`, 
+                borderRadius: designTokens.borderRadius.lg, 
+                p: { xs: 2, sm: 3 },
+                backgroundColor: theme.palette.background.paper,
+              }}
+            >
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Box
                   sx={{
@@ -641,55 +1073,134 @@ return (
                   mt: 4,
                 }}
               >
-                <Box sx={{ mr: 4 }}>door →</Box>
-                <Box sx={{ width: 64, height: 4, bgcolor: "black" }}></Box>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    mr: 2, 
+                    color: theme.palette.text.secondary,
+                    fontWeight: designTokens.typography.fontWeight.medium,
+                  }}
+                >
+                  🚪 Exit →
+                </Typography>
+                <Box 
+                  sx={{ 
+                    width: 64, 
+                    height: 6, 
+                    bgcolor: theme.palette.primary.main,
+                    borderRadius: designTokens.borderRadius.sm,
+                  }}
+                />
               </Box>
             </Box>
           </Paper>
-        </Grid>
-      </Grid>
-      </Paper>
-        <Alert severity="info" sx={{ mt: 4 }}>
-        <AlertTitle>Legend</AlertTitle>
-        <Box
+        </Paper>
+
+        {/* Legend Section - Redesigned */}
+        <Paper
+          elevation={0}
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: "flex-start",
-            gap: 2,
+            p: { xs: 3, sm: 4 },
+            mb: 4,
+            borderRadius: designTokens.borderRadius.xl,
+            backgroundColor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "purple", mr: 2 }}></Box>
-            <Box>Your Seat</Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "red", mr: 2 }}></Box>
-            <Box>Booked</Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "green", mr: 2 }}></Box>
-            <Box>Empty</Box>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box sx={{ width: 16, height: 16, bgcolor: "yellow", mr: 2 }}></Box>
-            <Box>Pending</Box>
-          </Box>
-        </Box>
-      </Alert>
-      <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          <Typography 
+            variant="h6" 
+            gutterBottom
+            sx={{
+              fontWeight: designTokens.typography.fontWeight.bold,
+              color: theme.palette.primary.main,
+              mb: 3,
+              textAlign: 'center',
+            }}
+          >
+            🔍 Seat Status Legend
+          </Typography>
+          <Grid container spacing={2} justifyContent="center">
+            {[
+              { color: "purple", label: "Your Seat", icon: "👤" },
+              { color: "red", label: "Booked", icon: "❌" },
+              { color: "green", label: "Available", icon: "✅" },
+              { color: "yellow", label: "Pending", icon: "⏳" },
+            ].map((item, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Box 
+                  sx={{ 
+                    display: "flex", 
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 2,
+                    p: 2,
+                    borderRadius: designTokens.borderRadius.lg,
+                    backgroundColor: theme.palette.mode === 'dark' 
+                      ? theme.palette.background.default 
+                      : theme.palette.action.hover,
+                    border: `1px solid ${theme.palette.divider}`,
+                    transition: `all ${designTokens.animation.duration.normal} cubic-bezier(0.4, 0, 0.2, 1)`,
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.shadows[2],
+                    },
+                  }}
+                >
+                  <Typography variant="body1" sx={{ fontSize: '1.2rem' }}>
+                    {item.icon}
+                  </Typography>
+                  <Box 
+                    sx={{ 
+                      width: 20, 
+                      height: 20, 
+                      bgcolor: item.color, 
+                      borderRadius: designTokens.borderRadius.sm,
+                      border: `1px solid ${theme.palette.divider}`,
+                    }} 
+                  />
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      fontWeight: designTokens.typography.fontWeight.medium,
+                      color: theme.palette.text.primary,
+                    }}
+                  >
+                    {item.label}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+        <Snackbar
+          {...defaultSnackbarConfig}
           open={snackbarOpen}
-          autoHideDuration={4000}
           onClose={handleCloseSnackbar}
-          message={snackbarMessage}
-        />
+          sx={{
+            ...defaultSnackbarConfig.sx,
+            '& .MuiSnackbarContent-root': {
+              ...defaultSnackbarConfig.sx['& .MuiSnackbarContent-root'],
+              backgroundColor: theme.palette.mode === 'dark' 
+                ? theme.palette.primary.dark 
+                : theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+            },
+          }}
+        >
+          <Alert 
+            onClose={handleCloseSnackbar} 
+            severity="info" 
+            sx={{ 
+              width: '100%',
+              borderRadius: designTokens.borderRadius.lg,
+            }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Container>
       <Footer />
     </>
-
-    
-   
   );
 };
 

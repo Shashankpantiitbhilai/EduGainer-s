@@ -46,7 +46,6 @@ import { logoutUser } from "../../services/auth";
 import { fetchUnseenMessages } from "../../services/chat/utils";
 import DBLOGS from "./db-events";
 import TrafficInsights from "./traffic/traffic";
-import NotificationDialog from "../notificationDialog";
 
 // Transition component for smooth popup animation
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -59,7 +58,7 @@ function ADMIN_HOME() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [unseenMessageCount, setUnseenMessageCount] = useState(0);
   const [showNotification, setShowNotification] = useState(false);
-
+  
   // Layout State
   const [layoutMode, setLayoutMode] = useState('split'); // 'split', 'logs-side', 'insights-side'
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -69,12 +68,10 @@ function ADMIN_HOME() {
       try {
         const adminId = IsUserLoggedIn?._id;
         const unseenMessages = await fetchUnseenMessages();
-        console.log(unseenMessages);
         const nonAdminMessages = unseenMessages.filter(
           (message) => message.user !== adminId
         );
         setUnseenMessageCount(nonAdminMessages.length);
-        console.log("unseen", unseenMessageCount);
         if (nonAdminMessages.length > 0) {
           setShowNotification(true);
         }
@@ -82,7 +79,6 @@ function ADMIN_HOME() {
         console.error("Error fetching unseen messages:", error);
       }
     };
-
     fetchData();
   }, [IsUserLoggedIn]);
 
@@ -364,14 +360,6 @@ function ADMIN_HOME() {
           </Box>
         </Paper>
       </Container>
-
-      {/* Notification Dialog */}
-      <NotificationDialog
-        open={showNotification}
-        onClose={handleCloseNotification}
-        unseenMessageCount={unseenMessageCount}
-        onViewMessages={handleViewMessages}
-      />
     </Box>
   );
 }

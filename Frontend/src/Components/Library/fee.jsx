@@ -252,7 +252,18 @@ const { initializePayment } = Payment({
 
   return (
     <Container maxWidth="sm">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 9999, top: '80px' }}
+      />
       <StyledPaper elevation={3}>
         <Typography
           variant="h4"

@@ -17,7 +17,32 @@ code {
 }
 
 .table {
-
   border-radius: 10px;
+}
 
+/* Fix for react-toastify z-index issues - ensure toasts appear above navbar */
+.Toastify__toast-container {
+  z-index: 9999 !important;
+  top: 80px !important; /* Add top offset to avoid navbar overlap */
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05) !important;
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%) !important;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%) !important;
+}
+
+.Toastify__toast--warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
 }

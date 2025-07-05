@@ -31,6 +31,8 @@ import {
   ListItemText,
   useMediaQuery,
   useTheme,
+  styled,
+  alpha,
 } from "@mui/material";
 
 import { HowToReg, CheckCircleOutline, Info } from "@mui/icons-material";
@@ -41,6 +43,7 @@ import {
 } from "../../services/Class/utils";
 import Payment from "../payment/razorpay";
 import { CircularProgress } from "@mui/material";
+import { designTokens, glassMorphism } from '../../theme/enterpriseTheme';
 
 const steps = [
   "Benefits",

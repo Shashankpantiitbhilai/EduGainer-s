@@ -13,38 +13,176 @@ import {
   useTheme,
   Link,
   useMediaQuery,
+  Paper,
+  Fade,
+  Zoom,
+  styled,
+  alpha,
+  keyframes,s
 } from "@mui/material";
+import {colors} from "../../theme/enterpriseTheme";
 import {
   Visibility,
   VisibilityOff,
   Google as GoogleIcon,
   Email as EmailIcon,
   Lock as LockIcon,
+  School as SchoolIcon,
+  AutoStories as AutoStoriesIcon,
 } from "@mui/icons-material";
+import { motion } from 'framer-motion';
 import { useForm } from "react-hook-form";
 import { AdminContext } from "../../App";
 import { loginUser } from "../../services/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { designTokens, glassMorphism, hoverScale } from '../../theme/enterpriseTheme';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import ClassIcon from '@mui/icons-material/Class';
+import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
+import StarIcon from '@mui/icons-material/Star';
 
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
-import ClassIcon from "@mui/icons-material/Class";
-import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
+// Enhanced animations for smooth UI
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
-import {
-  LocalMall as LocalMallIcon,
-  Star as StarIcon,
-} from "@mui/icons-material";
-// Theme colors
-const colors = {
-  primary: "#2E7D32",
-  secondary: "#FFB100",
-  background: "#f0f7ff",
-  textDark: "#333333",
-  textMuted: "#666666",
-  link: "#1976d2",
-};
+const shimmer = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+`;
+
+// Enterprise styled components
+const LoginContainer = styled(Container)(({ theme }) => ({
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%)',
+    pointerEvents: 'none',
+  },
+}));
+
+const LoginCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  borderRadius: designTokens.borderRadius.xxl,
+  background: theme.palette.background.paper,
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  ...glassMorphism(0.05),
+  boxShadow: `0 24px 48px ${alpha(theme.palette.common.black, 0.1)}`,
+  position: 'relative',
+  overflow: 'hidden',
+  animation: `${fadeInUp} 0.8s ease-out`,
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.primary.main, 0.1)}, transparent)`,
+    animation: `${shimmer} 3s infinite`,
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(3),
+    margin: theme.spacing(2),
+  },
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-root': {
+    borderRadius: designTokens.borderRadius.lg,
+    backgroundColor: alpha(theme.palette.background.default, 0.5),
+    border: `2px solid transparent`,
+    transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+    '& fieldset': {
+      border: 'none',
+    },
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.background.default, 0.7),
+      border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+      transform: 'translateY(-2px)',
+      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.1)}`,
+    },
+    '&.Mui-focused': {
+      backgroundColor: alpha(theme.palette.background.default, 0.9),
+      border: `2px solid ${theme.palette.primary.main}`,
+      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.1)}`,
+      transform: 'translateY(-2px)',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    fontWeight: designTokens.typography.fontWeight.medium,
+    '&.Mui-focused': {
+      color: theme.palette.primary.main,
+      fontWeight: designTokens.typography.fontWeight.bold,
+    },
+  },
+}));
+
+const EnterpriseButton = styled(Button)(({ theme, variant }) => ({
+  borderRadius: designTokens.borderRadius.lg,
+  textTransform: 'none',
+  fontWeight: designTokens.typography.fontWeight.bold,
+  fontSize: designTokens.typography.fontSize.base,
+  padding: theme.spacing(1.5, 3),
+  position: 'relative',
+  overflow: 'hidden',
+  transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+  ...(variant === 'primary' && {
+    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+    color: theme.palette.primary.contrastText,
+    boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+    '&:hover': {
+      background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.main})`,
+      transform: 'translateY(-2px)',
+      boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.4)}`,
+    },
+  }),
+  ...(variant === 'google' && {
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.text.primary,
+    border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+      borderColor: theme.palette.primary.main,
+      transform: 'translateY(-2px)',
+      boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.2)}`,
+    },
+  }),
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '100%',
+    height: '100%',
+    background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.2)}, transparent)`,
+    transition: 'left 0.5s ease',
+  },
+  '&:hover::before': {
+    left: '100%',
+  },
+}));
 
 export default function Login() {
   const theme = useTheme();

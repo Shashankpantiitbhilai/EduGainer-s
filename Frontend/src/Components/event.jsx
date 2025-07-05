@@ -17,6 +17,7 @@ import {
   Chip,
   styled,
   useTheme,
+  alpha,
 } from "@mui/material";
 import { 
   Close as CloseIcon, 
@@ -28,21 +29,22 @@ import {
 import { toast } from "react-toastify";
 import { AdminContext } from "../App";
 import { getAllEvents } from "../services/Admin_services/admin_event";
+import { colors, designTokens, glassMorphism, hoverScale } from '../theme/enterpriseTheme';
 
 // Styled components for the event cards
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  borderRadius: theme.shape.borderRadius * 3,
-  boxShadow: theme.shadows[3],
+  borderRadius: designTokens.borderRadius.xl,
+  border: `1px solid ${colors.border.light}`,
   overflow: "hidden",
-  transition: theme.transitions.create(['transform', 'box-shadow'], {
-    duration: theme.transitions.duration.standard,
-  }),
+  ...glassMorphism(0.05),
+  transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
   '&:hover': {
-    transform: 'scale(1.02)',
-    boxShadow: theme.shadows[6],
+    transform: 'translateY(-8px)',
+    boxShadow: colors.shadow.xl,
+    borderColor: colors.primary.light,
   },
 }));
 
@@ -51,26 +53,23 @@ const ImageOverlay = styled(Box)(({ theme }) => ({
   bottom: 0,
   left: 0,
   width: "100%",
-  background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)",
-  color: theme.palette.common.white,
-  padding: theme.spacing(2),
+  background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)",
+  color: colors.text.inverse,
+  padding: designTokens.spacing.lg,
 }));
 
 const EventTitle = styled(Typography)(({ theme }) => ({
-  color: theme.palette.common.white,
-  fontWeight: "bold",
-  textShadow: "1px 1px 2px black",
+  color: colors.text.inverse,
+  fontWeight: designTokens.typography.fontWeight.bold,
+  textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
 }));
 
 const PageTitle = styled(Typography)(({ theme }) => ({
-  color: theme.palette.primary.main,
-  fontWeight: "bold",
-  marginBottom: theme.spacing(6),
+  color: colors.primary.main,
+  fontWeight: designTokens.typography.fontWeight.bold,
+  marginBottom: designTokens.spacing.xxxl,
   textAlign: "center",
-  fontSize: {
-    xs: "2.5rem",
-    md: "3.5rem",
-  },
+  fontSize: { xs: "2.5rem", md: "3.5rem" },
 }));
 
 const EventCard = ({ event, onDetailsClick }) => {

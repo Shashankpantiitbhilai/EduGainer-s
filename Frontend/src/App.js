@@ -2,7 +2,7 @@ import "./App.css";
 import React, { useEffect, useState, createContext } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { lightTheme, darkTheme } from "./theme";
+import { lightTheme, darkTheme } from "./theme/enterpriseTheme";
 
 import Main from "./Main";
 import { fetchCredentials } from "./services/auth";
@@ -51,10 +51,10 @@ function App() {
 
                         {IsUserLoggedIn ? (
                             <NotificationWrapper>
-                                <Main />
+                               <LoadingAnimation />
                             </NotificationWrapper>
                         ) : (
-                            <Main />
+                           <LoadingAnimation />
                         )}
                     </BrowserRouter>
                 </LoadingContext.Provider>

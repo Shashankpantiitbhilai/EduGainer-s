@@ -21,63 +21,97 @@ import {
   ArrowForward as ArrowForwardIcon,
   Info as InfoIcon,
 } from "@mui/icons-material";
- // Adjust the path as necessary
 import { AdminContext } from "../../../App";
+import { colors, designTokens, glassMorphism, hoverScale } from '../../../theme/enterpriseTheme';
+
 const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  transition: "all 0.3s ease-in-out",
+  borderRadius: designTokens.borderRadius.xl,
+  border: `1px solid ${colors.border.light}`,
+  background: colors.background.paper,
+  transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+  ...glassMorphism(0.05),
   "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: theme.shadows[10],
+    transform: "translateY(-8px)",
+    boxShadow: colors.shadow.xl,
+    borderColor: colors.primary.light,
   },
 }));
 
 const CardIcon = styled(Box)(({ theme }) => ({
-  fontSize: 48,
-  marginBottom: theme.spacing(2),
-  color: theme.palette.primary.main,
-  transition: "transform 0.3s ease-in-out",
+  fontSize: '3rem',
+  marginBottom: designTokens.spacing.md,
+  color: colors.primary.main,
+  transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
   "&:hover": {
-    transform: "scale(1.1)",
+    transform: "scale(1.1) rotate(5deg)",
+    color: colors.secondary.main,
   },
 }));
 
 const AdminCard = ({ title, description, link, icon: Icon, onClick }) => (
   <StyledCard>
-    <CardContent sx={{ flexGrow: 1, position: "relative" }}>
+    <CardContent sx={{ flexGrow: 1, position: "relative", p: 3 }}>
       <Tooltip title={`Information about ${title}`} placement="top">
         <IconButton
-          sx={{ position: "absolute", top: 8, right: 8 }}
+          sx={{ 
+            position: "absolute", 
+            top: 8, 
+            right: 8,
+            backgroundColor: colors.background.subtle,
+            border: `1px solid ${colors.border.light}`,
+            ...hoverScale(1.1),
+          }}
           aria-label={`Info about ${title}`}
-          onClick={onClick} // Trigger dialog on info click
+          onClick={onClick}
         >
-          <InfoIcon />
+          <InfoIcon sx={{ color: colors.primary.main }} />
         </IconButton>
       </Tooltip>
       <CardIcon>
         <Icon fontSize="inherit" />
       </CardIcon>
-      <Typography variant="h5" component="h3" gutterBottom>
+      <Typography 
+        variant="h5" 
+        component="h3" 
+        gutterBottom
+        sx={{
+          fontWeight: designTokens.typography.fontWeight.bold,
+          color: colors.text.primary,
+        }}
+      >
         {title}
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography 
+        variant="body2" 
+        sx={{ 
+          color: colors.text.secondary,
+          lineHeight: designTokens.typography.lineHeight.relaxed,
+        }}
+      >
         {description}
       </Typography>
     </CardContent>
-    <CardActions>
+    <CardActions sx={{ p: 3, pt: 0 }}>
       <Button
         variant="contained"
-        color="primary"
         component={Link}
         to={link}
         fullWidth
         endIcon={<ArrowForwardIcon />}
         sx={{
-          transition: "background-color 0.3s",
+          background: colors.primary.gradient,
+          color: colors.text.inverse,
+          borderRadius: designTokens.borderRadius.lg,
+          fontWeight: designTokens.typography.fontWeight.bold,
+          py: 1.5,
+          transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
           "&:hover": {
-            backgroundColor: "primary.dark",
+            filter: 'brightness(1.1)',
+            transform: 'translateY(-2px)',
+            boxShadow: colors.shadow.lg,
           },
         }}
       >
@@ -126,21 +160,64 @@ function Admin_Library() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ textAlign: "center", mb: 6 }}>
-        <Typography variant="h3" component="h1" gutterBottom>
+      <Box 
+        sx={{ 
+          textAlign: "center", 
+          mb: 6,
+          p: 4,
+          borderRadius: designTokens.borderRadius.xxl,
+          background: colors.primary.gradient,
+          color: colors.text.inverse,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          },
+        }}
+      >
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          gutterBottom
+          sx={{
+            fontWeight: designTokens.typography.fontWeight.bold,
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           Welcome to EduGainer's Library
         </Typography>
         <Typography
           variant="h5"
           component="h2"
-          color="text.secondary"
           gutterBottom
+          sx={{
+            opacity: 0.9,
+            position: 'relative',
+            zIndex: 1,
+          }}
         >
           Admin Dashboard
         </Typography>
       </Box>
 
-      <Typography variant="h4" component="h2" gutterBottom>
+      <Typography 
+        variant="h4" 
+        component="h2" 
+        gutterBottom
+        sx={{
+          fontWeight: designTokens.typography.fontWeight.bold,
+          color: colors.primary.main,
+          mb: 3,
+        }}
+      >
         Manage Sections
       </Typography>
       <Grid container spacing={4}>

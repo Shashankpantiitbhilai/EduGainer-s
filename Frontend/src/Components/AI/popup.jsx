@@ -9,6 +9,7 @@ import {
   IconButton,
   Typography,
   TextField,
+  Drawer,
   
   Fab,
 
@@ -30,7 +31,7 @@ import {
   Login as LoginIcon,
   PersonAdd as SignUpIcon,
 } from "@mui/icons-material";
-import { lightTheme } from "../../theme";
+import { lightTheme } from "../";
 import robotIcon from "../../images/AI-chatbot.jpg";
 import { AdminContext } from "../../App";
 import SoundControl from './soundMode';
@@ -48,6 +49,7 @@ import {
   MessagesList, MessageContainer, MessageBubble, BetaTag, BetaNote,
   FileUploadPreview, UploadProgress, getTimeBasedGreeting, QuestionButton
 } from "./ui";
+
 import LanguageControl from "./langChange"
 // In the ChatPopup component, add the handleAudioInput function
 
@@ -837,6 +839,6 @@ const handleAudioInput = (text) => {
         </Box>
       </Drawer>
     </ThemeProvider>
-  );
+  ) 
 };
 export default ChatPopup;

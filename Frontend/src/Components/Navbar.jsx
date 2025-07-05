@@ -14,6 +14,7 @@ import {
   MenuItem,
   Fade,
   Badge,
+  useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { AdminContext } from "../App";
@@ -23,15 +24,8 @@ import DarkModeToggle from '../darkmode';
 import { LoadingContext } from "../App";
 import { fetchUnseenMessages } from "../services/chat/utils";
 import CustomDrawer from './Drawer';
-
-const colors = {
-  primary: "#006400",
-  secondary: "#FFA500",
-  text: "#FFFFFF",
-  background: "#F0F8FF",
-  white: "#FFFFFF",
-  accent: "#4CAF50",
-};
+import { colors } from "../theme/enterpriseTheme";
+import { designTokens } from '../theme/enterpriseTheme';
 
 function Navbar() {
   const { IsUserLoggedIn, setIsUserLoggedIn } = useContext(AdminContext);
@@ -41,6 +35,7 @@ function Navbar() {
   const [unseenMessageCount, setUnseenMessageCount] = useState(0);
   const navigate = useNavigate();
   const { isDarkMode, setIsDarkMode } = useContext(LoadingContext);
+  const theme = useTheme();
 
   useEffect(() => {
     if (IsUserLoggedIn?.username) {
@@ -162,33 +157,62 @@ function Navbar() {
   ];
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: colors.primary }}>
-      <Container maxWidth="lg">
-        <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
+    <AppBar 
+      position="sticky" 
+      elevation={0}
+      sx={{ 
+        backgroundColor: theme.palette.primary.main,
+        boxShadow: theme.shadows[2],
+        borderBottom: `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2 } }}>
+        <Toolbar 
+          sx={{ 
+            justifyContent: "space-between",
+            minHeight: { xs: 56, sm: 64 },
+            px: 0,
+          }}
+        >
           {/* Logo Section */}
-          <Box component={Link} to={homeURL} sx={{ display: "flex", alignItems: "center" }}>
+          <Box 
+            component={Link} 
+            to={homeURL} 
+            sx={{ 
+              display: "flex", 
+              alignItems: "center",
+              textDecoration: 'none',
+              transition: `transform ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+              '&:hover': {
+                transform: 'scale(1.02)',
+              },
+            }}
+          >
             <Box
               component="img"
               src={logoImage}
               alt="EduGainer's Logo"
               sx={{
-                height: { xs: 40, sm: 40 },
+                height: { xs: 40, sm: 48 },
+                width: 'auto',
                 display: "block",
+                borderRadius: designTokens.borderRadius.sm,
               }}
             />
             <Typography
               variant="h6"
               noWrap
               sx={{
-                fontFamily: "monospace",
-                fontWeight: 700,
+                fontFamily: designTokens.typography.fontFamily,
+                fontWeight: designTokens.typography.fontWeight.bold,
                 letterSpacing: ".1rem",
-                color: colors.white,
+                color: theme.palette.primary.contrastText,
                 textDecoration: "none",
                 display: { xs: "none", md: "block" },
+                ml: 2,
+                transition: `color ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
                 "&:hover": {
-                  color: colors.secondary,
-                  transition: "color 0.3s ease-in-out",
+                  color: theme.palette.secondary.main,
                 },
               }}
             >
@@ -197,7 +221,7 @@ function Navbar() {
           </Box>
 
           {/* Desktop Navigation */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
             {pages.map((page) => (
               <Badge
                 key={page.name}
@@ -210,12 +234,19 @@ function Navbar() {
                   component={Link}
                   to={page.link}
                   sx={{
-                    color: colors.white,
-                    display: "block",
-                    mx: 1,
+                    color: theme.palette.primary.contrastText,
+                    fontWeight: designTokens.typography.fontWeight.medium,
+                    fontSize: designTokens.typography.fontSize.sm,
+                    px: 2,
+                    py: 1,
+                    borderRadius: designTokens.borderRadius.lg,
+                    textTransform: 'none',
+                    transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
                     "&:hover": {
-                      backgroundColor: colors.secondary,
-                      transition: "background-color 0.3s ease-in-out",
+                      backgroundColor: theme.palette.secondary.main,
+                      color: theme.palette.secondary.contrastText,
+                      transform: 'translateY(-1px)',
+                      boxShadow: theme.shadows[2],
                     },
                   }}
                 >
@@ -241,7 +272,15 @@ function Navbar() {
               >
                 <IconButton
                   onClick={handleDrawerToggle}
-                  sx={{ color: colors.white }}
+                  sx={{ 
+                    color: theme.palette.primary.contrastText,
+                    borderRadius: designTokens.borderRadius.sm,
+                    transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                      transform: 'scale(1.05)',
+                    },
+                  }}
                 >
                   <MenuIcon />
                 </IconButton>
@@ -256,10 +295,16 @@ function Navbar() {
                     <Avatar
                       alt={IsUserLoggedIn.username}
                       sx={{
-                        bgcolor: colors.secondary,
+                        bgcolor: theme.palette.secondary.main,
+                        color: theme.palette.secondary.contrastText,
+                        fontWeight: designTokens.typography.fontWeight.bold,
+                        width: 40,
+                        height: 40,
+                        transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
                         "&:hover": {
-                          bgcolor: colors.accent,
-                          transition: "background-color 0.3s ease-in-out",
+                          bgcolor: theme.palette.secondary.dark,
+                          transform: 'scale(1.1)',
+                          boxShadow: theme.shadows[3],
                         },
                       }}
                     >
@@ -270,11 +315,18 @@ function Navbar() {
                       variant="contained"
                       onClick={() => navigate("/login")}
                       sx={{
-                        backgroundColor: colors.secondary,
-                        color: colors.white,
+                        backgroundColor: theme.palette.secondary.main,
+                        color: theme.palette.secondary.contrastText,
+                        fontWeight: designTokens.typography.fontWeight.medium,
+                        borderRadius: designTokens.borderRadius.lg,
+                        px: 3,
+                        py: 1,
+                        textTransform: 'none',
+                        transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
                         "&:hover": {
-                          backgroundColor: colors.accent,
-                          transition: "background-color 0.3s ease-in-out",
+                          backgroundColor: theme.palette.secondary.dark,
+                          transform: 'translateY(-2px)',
+                          boxShadow: theme.shadows[3],
                         },
                       }}
                     >
@@ -284,7 +336,14 @@ function Navbar() {
                 </IconButton>
               </Tooltip>
               <Menu
-                sx={{ mt: "45px" }}
+                sx={{ 
+                  mt: "45px",
+                  '& .MuiPaper-root': {
+                    borderRadius: designTokens.borderRadius.lg,
+                    border: `1px solid ${theme.palette.divider}`,
+                    boxShadow: theme.shadows[3],
+                  },
+                }}
                 id="menu-appbar"
                 anchorEl={anchorElUser}
                 anchorOrigin={{
@@ -307,13 +366,26 @@ function Navbar() {
                     component={setting.action ? "div" : Link}
                     to={setting.link}
                     sx={{
+                      borderRadius: designTokens.borderRadius.sm,
+                      mx: 1,
+                      my: 0.5,
+                      fontWeight: designTokens.typography.fontWeight.medium,
+                      transition: `all ${designTokens.animation.duration.normal} ${designTokens.animation.easing.default}`,
                       "&:hover": {
-                        backgroundColor: colors.background,
-                        transition: "background-color 0.3s ease-in-out",
+                        backgroundColor: theme.palette.action.hover,
+                        transform: 'translateX(4px)',
                       },
                     }}
                   >
-                    <Typography textAlign="center">{setting.name}</Typography>
+                    <Typography 
+                      textAlign="center"
+                      sx={{
+                        fontWeight: designTokens.typography.fontWeight.medium,
+                        color: theme.palette.text.primary,
+                      }}
+                    >
+                      {setting.name}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
