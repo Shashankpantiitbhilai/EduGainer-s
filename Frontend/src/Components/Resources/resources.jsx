@@ -8,7 +8,7 @@ import { AutoStories, Search, Lock } from '@mui/icons-material';
 import FreeSolo from "./freesolo";
 import { fetchLibResources } from "../../services/Admin_services/adminUtils";
 import { ToastContainer, toast } from "react-toastify";
-import Footer from "../footer";
+import Footer from "../Footer/footer";
 import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "../../App";
 import { designTokens } from '../../theme/enterpriseTheme';

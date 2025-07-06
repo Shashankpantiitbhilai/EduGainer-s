@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import Home from "./Components/Home.jsx";
+import Home from "./Components/Home/Home.jsx";
 import Login from "./Components/Auth/Login";
 import Register from "./Components/Auth/Register";
 import OTPVerify from "./Components/Auth/otp-verify.jsx";
@@ -13,7 +13,7 @@ import Success from "./Components/Library/Success.jsx";
 import ProtectedUser from "./Protection/Protected_user.js";
 
 import ProtectedAdmin from "./Protection/Protected_admin.js";
-import Navbar from "./Components/Navbar.jsx";
+import Navbar from "./Components/Navigation/Navbar.jsx";
 import Dashboard from "./Components/User/dashboard.jsx";
 import Profile from "./Components/User/Profile.jsx";
 import AdminHome from "./Components/Admin/ADMIN_HOME.jsx";
@@ -35,13 +35,17 @@ import AdminDashboard from "./Components/Admin/Teams/adminDashboard.jsx";
 import StationaryHome from "./Components/Stationary/home.jsx";
 import FeedbackForm from "./Components/feedback/feedback.jsx";
 import Pamplette from "./Components/Admin/pamplette.jsx";
-import Credits from "./Components/credits.jsx"
+import Credits from "./Components/Credits/credits.jsx"
 import Classes from "./Components/Admin/classes/batches.jsx"
 import ClassSuccess from "./Components/Classes/Success.jsx"
 import ProtectedLibrary from "./Protection/ProtectedLibrary.js"
 import ProtectedSuperAdmin from "./Protection/ProtectedSuperAdmin.js";
 import VisionUploader from "./Components/vision/camera.jsx";
 import { CareersPage } from "./Components/Careers";
+
+// E-Commerce Components
+import { ECommerceRoutes } from "./Components/ECommerce";
+
 const Main = () => {
     const location = useLocation();
     const hideNavbarPaths = ["/login", "/register", "/forgot-password", "/reset-password", "/otp-verify"];
@@ -246,6 +250,9 @@ const Main = () => {
                     }
                 />
 
+                {/* E-Commerce Routes */}
+                <Route path="/shop/*" element={<ECommerceRoutes />} />
+                <Route path="/admin/ecommerce/*" element={<ECommerceRoutes />} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

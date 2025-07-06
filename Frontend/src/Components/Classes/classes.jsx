@@ -34,7 +34,7 @@ import {
   Groups as GroupsIcon,
 } from "@mui/icons-material";
 import { designTokens, glassMorphism, hoverScale } from '../../theme/enterpriseTheme';
-import Footer from "../footer";
+import Footer from "../Footer/footer";
 
 // Styled components for enterprise-level UI
 const HeroSection = styled(Paper)(({ theme }) => ({

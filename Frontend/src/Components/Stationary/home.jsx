@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import Footer from "../footer";
+import Footer from "../Footer/footer";
 // Create a motion-enabled Card component
 const StyledCard = motion(Card);
 

@@ -22,5 +22,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-/.env
+.env
 /config
+
+# Test files
+test-*.js
+*-test.js
+test-data.json

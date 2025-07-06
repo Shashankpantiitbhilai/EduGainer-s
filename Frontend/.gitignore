@@ -4,14 +4,17 @@
 /node_modules
 /.pnp
 .pnp.js
-
+./Fr
 # testing
 /coverage
-
+/ECOMMERCE_BACKEND_INTEGRATION_SUMMARY.md
 # production
 /build
-
+frontend-api-test.js
 # misc
+full-api-test.js
+create-test-data.js
+authenticated-api-test.js
 .DS_Store
 .env.local
 .env.development.local

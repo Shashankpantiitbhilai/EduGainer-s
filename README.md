@@ -817,7 +817,10 @@ If you find EduGainer's helpful, please consider:
 - [ ] **AR/VR**: Immersive learning experiences
 
 ---
-
+20+x/32+x=3/4
+80-4x=96-3x
+x=16
+52+2x
 <div align="center">
 
 **Built with ❤️ by the EduGainer's Team**

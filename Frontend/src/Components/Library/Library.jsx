@@ -29,7 +29,7 @@ import {
   MenuBook,
   Info as InfoIcon,
 } from "@mui/icons-material";
-import Footer from "../footer";
+import Footer from "../Footer/footer";
 import { Link } from "react-router-dom";
 import { getSeatsData, getStudentLibSeat } from "../../services/library/utils";
 import { AdminContext } from "../../App";

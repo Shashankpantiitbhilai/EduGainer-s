@@ -31,7 +31,7 @@ import {
   Login as LoginIcon,
   PersonAdd as SignUpIcon,
 } from "@mui/icons-material";
-import { lightTheme } from "../../theme";
+import { lightTheme } from "../../theme/enterpriseTheme";
 import robotIcon from "../../images/AI-chatbot.jpg";
 import { AdminContext } from "../../App";
 import SoundControl from './soundMode';

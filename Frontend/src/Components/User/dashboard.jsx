@@ -30,7 +30,7 @@ import {
 } from "@mui/icons-material";
 
 import { fetchUserDataById } from "../../services/utils";
-import Footer from "../footer";
+import Footer from "../Footer/footer";
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [tabValue, setTabValue] = useState(0);

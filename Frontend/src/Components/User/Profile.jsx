@@ -21,7 +21,7 @@ import { useParams } from "react-router-dom";
 
 import { updateUserDetails } from "../../services/utils";
 import { AdminContext } from "../../App";
-import Footer from "../footer";
+import Footer from "../Footer/footer";
 const StyledCard = styled(Card)(({ theme }) => ({
   maxWidth: 800,
   margin: "auto",
