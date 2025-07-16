@@ -12,7 +12,7 @@ const connectDB = async () => {
     console.log(`Connecting to MongoDB in ${process.env.NODE_ENV} mode...`);
     console.log(`Connection URI: ${connectURI.replace(/\/\/[^:]+:[^@]+@/, '//***:***@')}`);
     console.log(`Database name: ${connectURI.split('/').pop().split('?')[0]}`);
-
+console.log(connectURI)
     await mongoose.connect(connectURI, {
       useNewUrlParser: true, // Parses connection strings correctly
       useUnifiedTopology: true, // Handles server discovery and monitoring

@@ -14,7 +14,7 @@ frontend-api-test.js
 # misc
 full-api-test.js
 create-test-data.js
-authenticated-api-test.js
+Frontend\authenticated-api-test.js
 .DS_Store
 .env.local
 .env.development.local

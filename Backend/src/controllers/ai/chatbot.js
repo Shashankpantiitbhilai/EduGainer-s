@@ -38,18 +38,18 @@ const getGeminiResponse = async (req, res) => {
         const { responseText, followUpQuestions, link } = await fetchGeminiTextResponse(input, {
             sessionHistory, language: promptLanguage
         });
-        const translatedResponse = await translateText([responseText], language);
-        const translatedQuestions = await translateText(followUpQuestions, language);
-        let audioContent = null;
-        if (soundMode === 'true') {
-            audioContent = await synthesizeSpeech(translatedResponse[0], language);
-        }
+        // const translatedResponse = await translateText([responseText], language);
+        // const translatedQuestions = await translateText(followUpQuestions, language);
+        // let audioContent = null;
+        // if (soundMode === 'true') {
+        //     audioContent = await synthesizeSpeech(translatedResponse[0], language);
+        // }
 
         res.json({
-            response: translatedResponse[0],
-            followUpQuestions: translatedQuestions,
+            response: responseText,
+            followUpQuestions: followUpQuestions,
             link,
-            audioContent
+            // audioContent
         });
         
     } catch (error) {
@@ -174,7 +174,7 @@ Please classify the following question as 1 (Related) or 0 (Not Related):
 
         // Generate follow-up questions
         const followUpQuestions = await generateFollowUpQuestions(chatSession, input,language);
-
+console.log(followUpQuestions, "follow-up questions")
         return {
             responseText,
             followUpQuestions,

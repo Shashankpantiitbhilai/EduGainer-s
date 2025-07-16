@@ -43,6 +43,7 @@ import {
 } from "@mui/icons-material";
 // ... (keep existing imports)
 import AudioInput from './mic';
+import ResearchingAnimation from './ResearchingAnimation';
 import {
   AuthButtons, TypingIndicator, AssistantAvatar, WelcomePopup,
   SuggestedQuestion, MessageLink, SuggestedQuestionsContainer, MessageActions, ActionButton,
@@ -87,6 +88,7 @@ const ChatPopup = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isProcessingComplete, setIsProcessingComplete] = useState(false);
   const [showDefaultQuestions, setShowDefaultQuestions] = useState(true);
   const [suggestedQuestions, setSuggestedQuestions] = useState([]);
   const messagesContainerRef = useRef(null);
@@ -123,10 +125,13 @@ const ChatPopup = () => {
     setSuggestedQuestions([]);
 
     setMessages((prev) => [...prev, { sender: "user", content: question }]);
-    setIsTyping(true);
-
-    try {
-      const botResponse = await sendMessageToChatbot(question, currentLanguage,soundEnabled);
+    setIsTyping(true);      try {
+        const botResponse = await sendMessageToChatbot(question, currentLanguage,soundEnabled);
+        
+        // Show "Ready" state briefly before completing
+        setIsProcessingComplete(true);
+        await new Promise(resolve => setTimeout(resolve, 800)); // Show "Ready" for 800ms
+        
         if (soundEnabled && botResponse.audioContent) {
           try {
             // Convert base64 to blob
@@ -179,6 +184,7 @@ const ChatPopup = () => {
       ]);
     } finally {
       setIsTyping(false);
+      setIsProcessingComplete(false);
     }
   };
 
@@ -198,8 +204,11 @@ const ChatPopup = () => {
 
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-
         const botResponse = await sendMessageToChatbot(userMessage);
+
+        // Show "Ready" state briefly before completing
+        setIsProcessingComplete(true);
+        await new Promise(resolve => setTimeout(resolve, 800)); // Show "Ready" for 800ms
 
         setMessages((prev) => [
           ...prev,
@@ -230,6 +239,7 @@ const ChatPopup = () => {
         ]);
       } finally {
         setIsTyping(false);
+        setIsProcessingComplete(false);
       }
     }
   };
@@ -528,8 +538,8 @@ const handleAudioInput = (text) => {
           )}
         </Box>
    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SoundControl onToggle={handleSoundToggle} />
-              <LanguageControl onLanguageChange={handleLanguageChange} />
+              {/* <SoundControl onToggle={handleSoundToggle} />
+              <LanguageControl onLanguageChange={handleLanguageChange} /> */}
               <IconButton
                 color="inherit"
                 onClick={() => setIsOpen(false)}
@@ -696,7 +706,7 @@ const handleAudioInput = (text) => {
               <MessageContainer sender="bot">
                 <AssistantAvatar size={32} />
                 <MessageBubble sender="bot" elevation={1}>
-                  <TypingIndicator />
+                  <ResearchingAnimation isComplete={isProcessingComplete} />
                 </MessageBubble>
               </MessageContainer>
             )}
@@ -802,9 +812,9 @@ const handleAudioInput = (text) => {
                 },
               }}
             />
-     <AudioInput onInputReceived={handleAudioInput} />
+     {/* <AudioInput onInputReceived={handleAudioInput} /> */}
             <Box sx={{ display: "flex", gap: 0.5 }}>
-              <IconButton
+              {/* <IconButton
                 color="primary"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading || isTyping}
@@ -816,7 +826,7 @@ const handleAudioInput = (text) => {
                 }}
               >
                 <AttachFileIcon />
-              </IconButton>
+              </IconButton> */}
 
               <IconButton
                 onClick={selectedFile ? handleFileUpload : handleSend}
