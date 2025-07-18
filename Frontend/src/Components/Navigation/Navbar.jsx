@@ -119,7 +119,7 @@ function Navbar() {
       : [
           { name: "Library", link: "/library" },
           { name: "Classes", link: "/classes" },
-          { name: "Shop", link: "/shop" },
+          // { name: "Shop", link: "/shop" },
           { name: "MeriStationary", link: "/stationary/home" },
           { name: "Query", link: "/chat/home", showBadge: true },
           { name: "Resources", link: "/resources" },
@@ -130,7 +130,7 @@ function Navbar() {
     : [
         { name: "Library", link: "/library" },
         { name: "Classes", link: "/classes" },
-        { name: "Shop", link: "/shop" },
+        // { name: "Shop", link: "/shop" },
         { name: "MeriStationary", link: "/stationary/home" },
         { name: "Query", link: "/chat/home", showBadge: true },
         { name: "Resources", link: "/resources" },
