@@ -500,7 +500,7 @@ const EduGainerClassesDisplay = () => {
                       >
                         Learn More
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="contained"
                         fullWidth
                         onClick={() => handleRegister(classItem)}
@@ -520,7 +520,7 @@ const EduGainerClassesDisplay = () => {
                         }}
                       >
                         Register Now
-                      </Button>
+                      </Button> */}
                     </Box>
                   </CardContent>
                 </ClassCard>
@@ -719,7 +719,7 @@ const EduGainerClassesDisplay = () => {
                 >
                   Close
                 </Button>
-                <Button
+                {/* <Button
                   variant="contained"
                   onClick={() => handleRegister(selectedClass)}
                   sx={{
@@ -740,7 +740,7 @@ const EduGainerClassesDisplay = () => {
                   }}
                 >
                   Register Now
-                </Button>
+                </Button> */}
               </DialogActions>
             </>
           )}
