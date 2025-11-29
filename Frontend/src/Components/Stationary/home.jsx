@@ -16,8 +16,6 @@ import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import StoreIcon from "@mui/icons-material/Store";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TelegramIcon from "@mui/icons-material/Telegram";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import Footer from "../Footer/footer";
@@ -468,104 +466,7 @@ function Home() {
       >
         <Container maxWidth="lg">
           <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-              >
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: "bold",
-                    mb: 3,
-                    color: theme.palette.primary.main,
-                    textAlign: { xs: "center", md: "left" },
-                  }}
-                >
-                  Connect With Us
-                </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Button
-                    component="a"
-                    href="https://www.facebook.com/profile.php?id=61580563475151"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<FacebookIcon />}
-                    variant="outlined"
-                    sx={{
-                      justifyContent: { xs: "center", md: "flex-start" },
-                      borderColor: "#1877F2",
-                      color: "#1877F2",
-                      "&:hover": {
-                        borderColor: "#1877F2",
-                        backgroundColor: "rgba(24, 119, 242, 0.1)",
-                      },
-                    }}
-                  >
-                    Facebook - Stationary
-                  </Button>
-                  <Button
-                    component="a"
-                    href="https://www.facebook.com/EduGainers"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<FacebookIcon />}
-                    variant="outlined"
-                    sx={{
-                      justifyContent: { xs: "center", md: "flex-start" },
-                      borderColor: "#1877F2",
-                      color: "#1877F2",
-                      "&:hover": {
-                        borderColor: "#1877F2",
-                        backgroundColor: "rgba(24, 119, 242, 0.1)",
-                      },
-                    }}
-                  >
-                    Facebook - EduGainers
-                  </Button>
-                  <Button
-                    component="a"
-                    href="https://t.me/edugainer"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<TelegramIcon />}
-                    variant="outlined"
-                    sx={{
-                      justifyContent: { xs: "center", md: "flex-start" },
-                      borderColor: "#0088cc",
-                      color: "#0088cc",
-                      "&:hover": {
-                        borderColor: "#0088cc",
-                        backgroundColor: "rgba(0, 136, 204, 0.1)",
-                      },
-                    }}
-                  >
-                    Telegram
-                  </Button>
-                  <Button
-                    component="a"
-                    href="https://chat.whatsapp.com/DBadpw0ZCZsFw6ApoaRj4n"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<WhatsAppIcon />}
-                    variant="outlined"
-                    sx={{
-                      justifyContent: { xs: "center", md: "flex-start" },
-                      borderColor: "#25D366",
-                      color: "#25D366",
-                      "&:hover": {
-                        borderColor: "#25D366",
-                        backgroundColor: "rgba(37, 211, 102, 0.1)",
-                      },
-                    }}
-                  >
-                    WhatsApp Community
-                  </Button>
-                </Box>
-              </motion.div>
-            </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={12}>
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}

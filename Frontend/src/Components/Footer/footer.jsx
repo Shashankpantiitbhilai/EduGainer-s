@@ -18,6 +18,7 @@ import {
   Instagram,
   Facebook,
   LinkedIn,
+  Telegram,
 } from "@mui/icons-material";
 import XLogo from "@mui/icons-material/X";
 import { designTokens } from '../../theme/enterpriseTheme';
@@ -49,6 +50,12 @@ function Footer() {
       url: "https://www.linkedin.com/in/edu-gainers-bb128328b/?originalSubdomain=in",
       icon: LinkedIn,
       color: "#0A66C2"
+    },
+    {
+      name: "Telegram",
+      url: "https://t.me/edugainer",
+      icon: Telegram,
+      color: "#0088cc"
     }
   ];
 
