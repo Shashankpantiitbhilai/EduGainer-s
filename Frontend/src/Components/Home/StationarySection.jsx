@@ -25,11 +25,11 @@ const StationarySection = () => {
   const navigate = useNavigate();
 
   const handleVisitStore = () => {
-    navigate('/shop');
+    window.open("https://vyaparapp.in/store/meristationeryedugainers", "_blank");
   };
 
   const handleShopNow = () => {
-    navigate('/shop/products');
+    window.open("https://vyaparapp.in/store/meristationeryedugainers", "_blank");
   };
 
   return (
@@ -52,7 +52,7 @@ const StationarySection = () => {
           variant="body1"
           sx={{
             fontSize: "1.2rem",
-            mb: 6,
+            mb: 4,
             textAlign: "center",
             maxWidth: "800px",
             margin: "0 auto",
@@ -62,6 +62,20 @@ const StationarySection = () => {
           provide high-quality stationery, textbooks, and study materials to
           support your learning journey. Experience seamless online shopping
           with our comprehensive e-commerce platform.
+        </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            fontSize: "1.1rem",
+            mb: 6,
+            textAlign: "center",
+            maxWidth: "800px",
+            margin: "0 auto",
+            fontWeight: "bold",
+            color: colors.secondary,
+          }}
+        >
+          🛒 Order directly from our online store - Click below to shop now!
         </Typography>
         
         {/* Action Buttons */}
@@ -88,7 +102,7 @@ const StationarySection = () => {
             }}
             endIcon={<Store />}
           >
-            Visit Our Store
+            Order Online Now
           </MotionButton>
           
           <MotionButton
@@ -114,7 +128,7 @@ const StationarySection = () => {
             }}
             endIcon={<ShoppingCart />}
           >
-            Shop Now
+            Shop Online Now
           </MotionButton>
         </Box>
 
@@ -134,7 +148,7 @@ const StationarySection = () => {
                 alignItems: "center",
                 cursor: "pointer"
               }}
-              onClick={handleShopNow}
+              onClick={handleVisitStore}
             >
               <Store sx={{ fontSize: 64, color: colors.secondary, mb: 2 }} />
               <Typography

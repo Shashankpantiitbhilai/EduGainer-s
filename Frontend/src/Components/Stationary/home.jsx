@@ -14,6 +14,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import StoreIcon from "@mui/icons-material/Store";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
 import Footer from "../Footer/footer";
 // Create a motion-enabled Card component
 const StyledCard = motion(Card);
@@ -136,8 +142,8 @@ const VideoAnimation = () => {
 function Home() {
   const theme = useTheme();
 
-  const handleWhatsAppClick = () => {
-    window.open("https://wa.me/qr/2C3KLXY6PXWRF1", "_blank");
+  const handleOrderNow = () => {
+    window.open("https://vyaparapp.in/store/meristationeryedugainers", "_blank");
   };
 
   return (
@@ -191,26 +197,94 @@ function Home() {
           <Box display="flex" justifyContent="center">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
-                onClick={handleWhatsAppClick}
+                onClick={handleOrderNow}
                 variant="contained"
                 size="large"
-                startIcon={<WhatsAppIcon />}
+                startIcon={<ShoppingCartIcon />}
                 sx={{
                   backgroundColor: theme.palette.secondary.main,
                   color: theme.palette.secondary.contrastText,
                   "&:hover": { backgroundColor: theme.palette.secondary.dark },
-                  fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
-                  py: 1.5,
-                  px: 4,
+                  fontSize: { xs: "1rem", sm: "1.1rem", md: "1.3rem" },
+                  py: 2,
+                  px: 5,
                   borderRadius: "50px",
+                  fontWeight: "bold",
+                  boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
                 }}
               >
-               Order on WhatsApp 
+               Order Now
               </Button>
             </motion.div>
           </Box>
         </Container>
       </Box>
+
+      {/* Prominent Inline Ordering Section */}
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Card
+            sx={{
+              background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+              color: theme.palette.secondary.contrastText,
+              p: { xs: 3, sm: 4, md: 5 },
+              borderRadius: "20px",
+              boxShadow: "0 12px 40px rgba(0,0,0,0.2)",
+              textAlign: "center",
+              mb: 4,
+            }}
+          >
+            <StoreIcon sx={{ fontSize: 60, mb: 2, color: theme.palette.secondary.contrastText }} />
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: "bold",
+                mb: 2,
+                fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+              }}
+            >
+              Order directly from our online store!
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                mb: 3,
+                opacity: 0.95,
+                fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" },
+              }}
+            >
+              Click here to shop now and get the best deals on quality stationery
+            </Typography>
+            <Button
+              onClick={handleOrderNow}
+              variant="contained"
+              size="large"
+              startIcon={<ShoppingCartIcon />}
+              sx={{
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.secondary.main,
+                "&:hover": { 
+                  backgroundColor: theme.palette.background.default,
+                  transform: "scale(1.05)",
+                },
+                fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
+                py: 1.5,
+                px: 5,
+                borderRadius: "50px",
+                fontWeight: "bold",
+                boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+                transition: "all 0.3s ease",
+              }}
+            >
+              Shop Online Now
+            </Button>
+          </Card>
+        </motion.div>
+      </Container>
 
       <Container maxWidth="md" sx={{ py: 4 }}>
         <motion.div
@@ -225,11 +299,10 @@ function Home() {
               fontWeight: "bold",
               textAlign: "center",
               fontSize: { xs: "1.2rem", sm: "1.5rem", md: "2rem" },
-              mb: 4,
+              mb: 2,
             }}
           >
-            Wanna buy study-related stuff? Don't worry, we have everything at
-            affordable prices!
+            उत्तराखण्ड की समस्त परीक्षाओं की तैयारी हेतु सर्वश्रेष्ठ संस्थान
           </Typography>
           <Typography
             variant="h6"
@@ -238,10 +311,22 @@ function Home() {
               fontWeight: "bold",
               textAlign: "center",
               fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" },
+              mb: 4,
             }}
           >
-            Shop with us and experience the best deals on high-quality
-            stationery!
+            Library facilities with all subjects tuition classes for school students.
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              color: theme.palette.text.primary,
+              fontWeight: "bold",
+              textAlign: "center",
+              fontSize: { xs: "1rem", sm: "1.2rem", md: "1.5rem" },
+            }}
+          >
+            Wanna buy study-related stuff? Don't worry, we have everything at
+            affordable prices!
           </Typography>
         </motion.div>
       </Container>
@@ -372,6 +457,213 @@ function Home() {
           </motion.div>
         </Container>
       </Box>
+
+      {/* Social Media and Contact Section */}
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.paper,
+          py: 6,
+          borderTop: `4px solid ${theme.palette.secondary.main}`,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    mb: 3,
+                    color: theme.palette.primary.main,
+                    textAlign: { xs: "center", md: "left" },
+                  }}
+                >
+                  Connect With Us
+                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Button
+                    component="a"
+                    href="https://www.facebook.com/profile.php?id=61580563475151"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    startIcon={<FacebookIcon />}
+                    variant="outlined"
+                    sx={{
+                      justifyContent: { xs: "center", md: "flex-start" },
+                      borderColor: "#1877F2",
+                      color: "#1877F2",
+                      "&:hover": {
+                        borderColor: "#1877F2",
+                        backgroundColor: "rgba(24, 119, 242, 0.1)",
+                      },
+                    }}
+                  >
+                    Facebook - Stationary
+                  </Button>
+                  <Button
+                    component="a"
+                    href="https://www.facebook.com/EduGainers"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    startIcon={<FacebookIcon />}
+                    variant="outlined"
+                    sx={{
+                      justifyContent: { xs: "center", md: "flex-start" },
+                      borderColor: "#1877F2",
+                      color: "#1877F2",
+                      "&:hover": {
+                        borderColor: "#1877F2",
+                        backgroundColor: "rgba(24, 119, 242, 0.1)",
+                      },
+                    }}
+                  >
+                    Facebook - EduGainers
+                  </Button>
+                  <Button
+                    component="a"
+                    href="https://t.me/edugainer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    startIcon={<TelegramIcon />}
+                    variant="outlined"
+                    sx={{
+                      justifyContent: { xs: "center", md: "flex-start" },
+                      borderColor: "#0088cc",
+                      color: "#0088cc",
+                      "&:hover": {
+                        borderColor: "#0088cc",
+                        backgroundColor: "rgba(0, 136, 204, 0.1)",
+                      },
+                    }}
+                  >
+                    Telegram
+                  </Button>
+                  <Button
+                    component="a"
+                    href="https://chat.whatsapp.com/DBadpw0ZCZsFw6ApoaRj4n"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    startIcon={<WhatsAppIcon />}
+                    variant="outlined"
+                    sx={{
+                      justifyContent: { xs: "center", md: "flex-start" },
+                      borderColor: "#25D366",
+                      color: "#25D366",
+                      "&:hover": {
+                        borderColor: "#25D366",
+                        backgroundColor: "rgba(37, 211, 102, 0.1)",
+                      },
+                    }}
+                  >
+                    WhatsApp Community
+                  </Button>
+                </Box>
+              </motion.div>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: "bold",
+                    mb: 3,
+                    color: theme.palette.primary.main,
+                    textAlign: { xs: "center", md: "left" },
+                  }}
+                >
+                  Contact Information
+                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      justifyContent: { xs: "center", md: "flex-start" },
+                    }}
+                  >
+                    <EmailIcon sx={{ color: theme.palette.primary.main }} />
+                    <Typography
+                      component="a"
+                      href="mailto:Meristationeryedugainers@gmail.com"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        textDecoration: "none",
+                        "&:hover": {
+                          color: theme.palette.primary.main,
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      Meristationeryedugainers@gmail.com
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      justifyContent: { xs: "center", md: "flex-start" },
+                    }}
+                  >
+                    <PhoneIcon sx={{ color: theme.palette.primary.main }} />
+                    <Typography
+                      component="a"
+                      href="tel:+916397166682"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        textDecoration: "none",
+                        "&:hover": {
+                          color: theme.palette.primary.main,
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      +91 6397166682
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      justifyContent: { xs: "center", md: "flex-start" },
+                    }}
+                  >
+                    <WhatsAppIcon sx={{ color: "#25D366" }} />
+                    <Typography
+                      component="a"
+                      href="https://wa.me/916397166682"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        textDecoration: "none",
+                        "&:hover": {
+                          color: "#25D366",
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      WhatsApp: +91 6397166682
+                    </Typography>
+                  </Box>
+                </Box>
+              </motion.div>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
       <Footer/>
     </Box>
   );

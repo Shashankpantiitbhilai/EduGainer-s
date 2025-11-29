@@ -127,7 +127,7 @@ const ClassSuccessPage = () => {
       }}
     >
       <Typography variant="h6" gutterBottom align="center">
-        EduGainer's Classes & Library
+        EduGainer's Career Point
       </Typography>
 
       <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
@@ -242,7 +242,7 @@ const ClassSuccessPage = () => {
                     fontWeight: designTokens.typography.fontWeight.medium,
                   }}
                 >
-                  Welcome to EduGainer's Classes & Library
+                  Welcome to EduGainer's Career Point
                 </Typography>
               </Box>
             </HeroSection>

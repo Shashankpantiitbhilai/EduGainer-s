@@ -187,7 +187,7 @@ const Payment = ({ formData, imageBase64, userId, setLoading, amount, status }) 
         key,
         amount: order.amount,
         currency: "INR",
-        name: "EduGainer's Classes & Library",
+        name: "EduGainer's Career Point",
         description: "Registration Fee",
         image: "https://res.cloudinary.com/dlxbl2ero/image/upload/v1721800478/Library_Resources/sjnicynl3rfkomnfc884.jpg",
         order_id: order.id,

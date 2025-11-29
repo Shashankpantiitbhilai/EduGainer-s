@@ -87,7 +87,7 @@ const SuccessPage = () => {
       }}
     >
       <Typography variant="h6" gutterBottom align="center">
-        EduGainer's Classes & Library
+        EduGainer's Career Point
       </Typography>
 
       <Box display="flex" flexDirection="column" alignItems="center" mb={4}>

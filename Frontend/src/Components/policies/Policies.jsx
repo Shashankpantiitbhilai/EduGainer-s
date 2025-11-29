@@ -47,7 +47,7 @@ const Policies = () => {
 
       <PolicySection
         title="No Shipping and No Refund Policy"
-        content="Edugainer's provides digital services and does not offer physical products, therefore we do not provide shipping services. All purchases made on our platform are final and non-refundable. We encourage users to carefully review the service details before making a purchase."
+        content="EduGainer's provides both digital services and physical goods (stationery products). For digital services, we do not provide shipping. For physical goods, shipping policies apply as per the order details. All purchases made on our platform are final and non-refundable unless otherwise specified in the product description. We encourage users to carefully review the service and product details before making a purchase."
       />
 
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
@@ -91,7 +91,7 @@ const Policies = () => {
             </ListItemIcon>
             <ListItemText
               primary="Address"
-              secondary="Near Court Road,EduGainer's Classes & Library, Uttarkashi,PIN-249193, Uttarakhand, India"
+              secondary="Near Court Road,EduGainer's Career Point, Uttarkashi,PIN-249193, Uttarakhand, India"
             />
           </ListItem>
         </List>

@@ -28,7 +28,7 @@ function Footer() {
   const socialLinks = [
     {
       name: "Instagram",
-      url: "https://www.instagram.com/edugainersclasses/?hl=en",
+      url: "https://www.instagram.com/edugainers_classes?igsh=cHlxem1idDg1cnhz",
       icon: Instagram,
       color: "#E1306C"
     },
@@ -122,7 +122,7 @@ function Footer() {
                     mb: 1,
                   }}
                 >
-                  Classes & Library
+                  Career Point
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                   <LocationOn 
@@ -141,7 +141,7 @@ function Footer() {
                     }}
                   >
                     Near Court road, MeriStationary,<br />
-                    EduGainer's Classes & Library,<br />
+                    EduGainer's Career Point,<br />
                     Uttarkashi - 249193
                   </Typography>
                 </Box>
@@ -293,7 +293,7 @@ function Footer() {
                 },
               }}
             >
-              EduGainer's Classes and Library
+              EduGainer's Career Point
             </Link>{" "}
             {new Date().getFullYear()}. All rights reserved.
           </Typography>

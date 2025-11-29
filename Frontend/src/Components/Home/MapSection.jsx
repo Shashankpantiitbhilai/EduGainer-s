@@ -27,7 +27,7 @@ const MapSection = () => {
     {
       icon: <LocationOn />,
       label: "Address",
-      value: "EduGainer's Classes & Library,Uttarkashi,Uttarakhand - 249193",
+      value: "EduGainer's Career Point,Uttarkashi,Uttarakhand - 249193",
     },
     {
       icon: <Phone />,
@@ -259,7 +259,7 @@ const MapSection = () => {
               </Box>
 
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6859.271406693189!2d78.42992424145729!3d30.72864022085043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3908ed08d3bdd33f%3A0xc82a9e75e23749e4!2sEduGainer&#39;s%20Classes%20%26%20Library!5e0!3m2!1sen!2sin!4v1724170083231!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6859.271406693189!2d78.42992424145729!3d30.72864022085043!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3908ed08d3bdd33f%3A0xc82a9e75e23749e4!2sEduGainer&#39;s%20Career%20Point!5e0!3m2!1sen!2sin!4v1724170083231!5m2!1sen!2sin"
                 style={{
                   position: "absolute",
                   top: 0,
